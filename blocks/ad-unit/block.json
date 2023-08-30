@@ -1,0 +1,15 @@
+{
+	"name": "acf/mai-ad-unit",
+	"title": "Mai Ad Unit",
+	"description": "Displays an add unit.",
+	"category": "widgets",
+	"keywords": [ "ad", "unit", "gam" ],
+	"icon": "info",
+	"textdomain": "mai-gam",
+	"style": "file:../../assets/css/mai-notices.min.css",
+	"acf": {
+		"mode": "preview",
+		"renderCallback": "mai_gam_do_ad_unit_block"
+	},
+	"supports": {}
+}
