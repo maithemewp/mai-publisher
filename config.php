@@ -6,9 +6,12 @@ defined( 'ABSPATH' ) || die;
 return [
 	'ad_units' => [
 		'footer' => [
-			'ad_sizes'     => [ '320x50', '468x60', '728x90', '970x90' ],
-			'post_title'   => 'Footer',
-			'post_content' => '',
+			'sizes'         => [ '320x50', '468x60', '728x90', '970x90' ],
+			'sizes_desktop' => [ '970x90', '728x90' ],
+			'sizes_tablet'  => [ '468x60', '320x50' ],
+			'sizes_mobile'  => [ '320x50' ],
+			'post_title'    => 'Footer',
+			'post_content'  => '',
 		],
 		'fullscreen' => [
 			'ad_sizes'     => [ 'Fluid', '320x480', '468x60', '480x320', '768x1024', '1024x768' ],

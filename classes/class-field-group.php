@@ -40,10 +40,6 @@ class Mai_GAM_Ad_Field_Group {
 		$version   = MAI_GAM_VERSION . '.' . date( 'njYHi', filemtime( $file_path ) );
 
 		wp_enqueue_script( 'mai-gam-admin', $file_url, [], $version, true );
-		wp_localize_script( 'mai-gam-admin', 'maiGAMVars',
-			[
-			]
-		);
 	}
 
 	function register_field_group() {

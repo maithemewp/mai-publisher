@@ -3,7 +3,7 @@
 /**
  * Plugin Name:     Mai GAM
  * Plugin URI:      https://bizbudding.com
- * Description:     Manage Google Ad Manager ads in Mai Theme.
+ * Description:     Manage Google Ad Manager ads in Mai Theme and beyond.
  * Version:         0.1.0
  *
  * Author:          BizBudding
@@ -101,25 +101,10 @@ final class Mai_GAM_Plugin {
 			define( 'MAI_GAM_DIR', plugin_dir_path( __FILE__ ) );
 		}
 
-		// Plugin Includes Path.
-		// if ( ! defined( 'MAI_GAM_INCLUDES_DIR' ) ) {
-		// 	define( 'MAI_GAM_INCLUDES_DIR', MAI_GAM_DIR . 'includes/' );
-		// }
-
 		// Plugin Folder URL.
 		if ( ! defined( 'MAI_GAM_URL' ) ) {
 			define( 'MAI_GAM_URL', plugin_dir_url( __FILE__ ) );
 		}
-
-		// Plugin Root File.
-		// if ( ! defined( 'MAI_GAM_FILE' ) ) {
-		// 	define( 'MAI_GAM_FILE', __FILE__ );
-		// }
-
-		// // Plugin Base Name
-		// if ( ! defined( 'MAI_GAM_BASENAME' ) ) {
-		// 	define( 'MAI_GAM_BASENAME', dirname( plugin_basename( __FILE__ ) ) );
-		// }
 	}
 
 	/**
@@ -138,12 +123,16 @@ final class Mai_GAM_Plugin {
 		foreach ( glob( MAI_GAM_DIR . 'classes/' . '*.php' ) as $file ) { include $file; }
 		// Blocks.
 		// include MAI_GAM_DIR . 'blocks/ad/block.php';
+		include MAI_GAM_DIR . 'blocks/ad-unit/block.php';
 		// Instantiate classes.
-		$settings = new Mai_GAM_Settings;
-		$admin    = new Mai_GAM_Admin;
-		$metabox  = new Mai_GAM_Ad_Field_Group;
-		$fields   = new Mai_GAM_Ad_Fields;
-		$generate = new Mai_GAM_Generate_Ads;
+		$settings      = new Mai_GAM_Settings;
+		$admin         = new Mai_GAM_Admin;
+		$metabox       = new Mai_GAM_Ad_Field_Group;
+		$fields        = new Mai_GAM_Ad_Fields;
+		$generate      = new Mai_GAM_Generate_Ads;
+		$scripts       = new Mai_GAM_Scripts;
+		// $ad_block      = new Mai_GAM_Ad_Block;
+		$ad_unit_block = new Mai_GAM_Ad_Unit_Block;
 	}
 
 	/**
@@ -156,7 +145,6 @@ final class Mai_GAM_Plugin {
 	public function hooks() {
 		add_action( 'plugins_loaded', [ $this, 'updater' ] );
 		add_action( 'init',           [ $this, 'register_content_types' ] );
-		// add_action( 'init',           [ $this, 'run' ] );
 
 		register_activation_hook( __FILE__, [ $this, 'activate' ] );
 		register_deactivation_hook( __FILE__, 'flush_rewrite_rules' );
@@ -179,23 +167,26 @@ final class Mai_GAM_Plugin {
 			return;
 		}
 
-		// // Setup the updater.
-		// $updater = PucFactory::buildUpdateChecker( 'https://github.com/maithemewp/mai-gam/', __FILE__, 'mai-gam' );
+		// Setup the updater.
+		$updater = PucFactory::buildUpdateChecker( 'https://github.com/maithemewp/mai-gam/', __FILE__, 'mai-gam' );
 
-		// // Maybe set github api token.
-		// if ( defined( 'MAI_GITHUB_API_TOKEN' ) ) {
-		// 	$updater->setAuthentication( MAI_GITHUB_API_TOKEN );
-		// }
+		// Set the branch that contains the stable release.
+		$updater->setBranch( 'main' );
 
-		// // Add icons for Dashboard > Updates screen.
-		// if ( function_exists( 'mai_get_updater_icons' ) && $icons = mai_get_updater_icons() ) {
-		// 	$updater->addResultFilter(
-		// 		function ( $info ) use ( $icons ) {
-		// 			$info->icons = $icons;
-		// 			return $info;
-		// 		}
-		// 	);
-		// }
+		// Maybe set github api token.
+		if ( defined( 'MAI_GITHUB_API_TOKEN' ) ) {
+			$updater->setAuthentication( MAI_GITHUB_API_TOKEN );
+		}
+
+		// Add icons for Dashboard > Updates screen.
+		if ( function_exists( 'mai_get_updater_icons' ) && $icons = mai_get_updater_icons() ) {
+			$updater->addResultFilter(
+				function ( $info ) use ( $icons ) {
+					$info->icons = $icons;
+					return $info;
+				}
+			);
+		}
 	}
 
 	/**
@@ -245,19 +236,6 @@ final class Mai_GAM_Plugin {
 			]
 		);
 	}
-
-	/**
-	 * Runs the plugin.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @return void
-	 */
-	// public function run() {
-	// 	$ads      = new Mai_GAM_Admin;
-	// 	$metabox  = new Mai_GAM_Ad_Metabox;
-	// 	$generate = new Mai_GAM_Generate_Ads;
-	// }
 
 	/**
 	 * Plugin activation.

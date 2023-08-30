@@ -9,7 +9,7 @@
 	"style": "file:../../assets/css/mai-notices.min.css",
 	"acf": {
 		"mode": "preview",
-		"renderCallback": "mai_gam_do_ad_unit_block"
+		"renderCallback": "maigam_do_ad_unit_block"
 	},
 	"supports": {}
 }

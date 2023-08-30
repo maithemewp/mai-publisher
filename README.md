@@ -1,2 +1,2 @@
-# Starter Plugin
-Starter plugin for BizBudding, Inc
+# Mai GAM
+Manage Google Ad Manager ads in Mai Theme and beyond.
