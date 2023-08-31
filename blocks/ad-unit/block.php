@@ -53,12 +53,12 @@ class Mai_GAM_Ad_Unit_Block {
 	 * @return void
 	 */
 	function render_block( $block, $content = '', $is_preview = false, $post_id = 0 ) {
-		$styles = 'display:grid;place-items:center;aspect-ratio:728/90;background:rgba(0,0,0,0.1);font-variant:all-small-caps;letter-spacing:1px;';
 		$id     = get_field( 'id' );
 
 		if ( $is_preview ) {
-			$text = $id ? __( 'Ad Placeholder', 'mai-gam' ) : __( 'No Ad Unit Selected', 'mai-gam' );
-			printf( '<div style="%s">%s</div>', $styles, $text );
+			$styles = 'display:grid;place-items:center;aspect-ratio:728/90;background:rgba(0,0,0,0.1);font-variant:all-small-caps;letter-spacing:1px;';
+			$text   = $id ? __( 'Ad Placeholder', 'mai-gam' ) : __( 'No Ad Unit Selected', 'mai-gam' );
+			printf( '<div class="mai-ad-unit" style="%s">%s</div>', $styles, $text );
 			return;
 		}
 
@@ -72,7 +72,7 @@ class Mai_GAM_Ad_Unit_Block {
 
 		// TODO. Get aspect ratio from config sizes at each breakpoint and add as inline custom properties.
 
-		printf( '<div style="%s"><div id="mai-ad-%s"><script>googletag.cmd.push(function(){googletag.display("mai-ad-%s")});</script></div></div>', $styles, $slot, $slot );
+		printf( '<div class="mai-ad-unit" data-label="%s"><div id="mai-ad-%s"><script>googletag.cmd.push(function(){googletag.display("mai-ad-%s")});</script></div></div>', maigam_get_option( 'label' ), $slot, $slot );
 	}
 
 	/**

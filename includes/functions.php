@@ -473,7 +473,7 @@ function maigam_get_config( $sub_config = '' ) {
 function maigam_get_option( $option, $fallback = true ) {
 	$options = maigam_get_options();
 
-	return isset( $options[ $option ] ) && $options[ $option ] ? $options[ $option ] : $fallback;
+	return isset( $options[ $option ] ) && $options[ $option ] ? $options[ $option ] : maigam_get_default_option( $option );
 }
 
 /**
