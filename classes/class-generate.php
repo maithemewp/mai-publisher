@@ -43,6 +43,12 @@ class Mai_GAM_Generate_Ads {
 		// Get missing ad count.
 		$missing = count( $this->get_missing_ads() );
 
+		// Bail if none missing.
+		if ( ! $missing ) {
+			return;
+		}
+
+		// Add admin notice.
 		add_action( 'admin_notices', function() use ( $missing ) {
 
 			if ( 1 === $missing ) {
@@ -194,8 +200,6 @@ class Mai_GAM_Generate_Ads {
 		$matches = array_filter( $slugs, function( $slug ) use ( $diff ) {
 			return in_array( $slug, $diff );
 		});
-
-		ray( $matches, $config );
 
 		// Get ads from config.
 		foreach ( $matches as $slug ) {
