@@ -6,10 +6,8 @@
 	"keywords": [ "ad", "unit", "gam" ],
 	"icon": "info",
 	"textdomain": "mai-gam",
-	"style": "file:../../assets/css/mai-notices.min.css",
 	"acf": {
-		"mode": "preview",
-		"renderCallback": "maigam_do_ad_unit_block"
+		"mode": "preview"
 	},
 	"supports": {}
 }

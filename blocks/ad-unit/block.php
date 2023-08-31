@@ -13,6 +13,34 @@ class Mai_GAM_Ad_Unit_Block {
 	}
 
 	/**
+	 * Add hooks.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return void
+	 */
+	function hooks() {
+		add_action( 'acf/init',                             [ $this, 'register_block' ] );
+		add_action( 'acf/init',                             [ $this, 'register_field_group' ] );
+		add_filter( 'acf/load_field/key=maigam_ad_unit_id', [ $this, 'load_ad_unit_choices' ] );
+	}
+
+	/**
+	 * Registers block.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return void
+	 */
+	function register_block() {
+		register_block_type( __DIR__ . '/block.json',
+			[
+				'render_callback' => [ $this, 'render_block' ],
+			]
+		);
+	}
+
+	/**
 	 * Callback function to render the block.
 	 *
 	 * @since 0.1.0
@@ -24,32 +52,15 @@ class Mai_GAM_Ad_Unit_Block {
 	 *
 	 * @return void
 	 */
-	public static function do_block( $block, $content = '', $is_preview = false, $post_id = 0 ) {
-		echo '<h2>TBD</h2>';
-	}
+	function render_block( $block, $content = '', $is_preview = false, $post_id = 0 ) {
+		$styles = 'display:grid;place-items:center;aspect-ratio:728/90;background:rgba(0,0,0,0.1);font-variant:all-small-caps;letter-spacing: 1px;';
 
-	/**
-	 * Add hooks.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @return void
-	 */
-	function hooks() {
-		add_action( 'acf/init',                             [ $this, 'register_block' ] );
-		add_action( 'acf/init',                             [ $this, 'register_field_group' ] );
-		add_filter( 'acf/load_field/key=maigam_ad_unit_id', [ $this, 'load_ids' ] );
-	}
+		if ( $is_preview ) {
+			printf( '<div style="%s">%s</div>', $styles, __( 'Ad Placeholder', 'mai-gam' ) );
+			return;
+		}
 
-	/**
-	 * Registers block.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @return void
-	 */
-	function register_block() {
-		register_block_type( __DIR__ . '/block.json' );
+		printf( '<div style="%s">%s</div>', $styles, __( 'Ad Placeholder', 'mai-gam' ) );
 	}
 
 	/**
@@ -99,7 +110,7 @@ class Mai_GAM_Ad_Unit_Block {
 	 *
 	 * @return array
 	 */
-	function load_ids( $field ) {
+	function load_ad_unit_choices( $field ) {
 		$choices = [ '' => __( 'None', 'mai-gam' ) ];
 		$units   = maigam_get_config( 'ad_units' );
 
@@ -111,21 +122,4 @@ class Mai_GAM_Ad_Unit_Block {
 
 		return $field;
 	}
-}
-
-/**
- * Procedural function to render the block.
- * Called via block.json.
- *
- * @since 0.1.0
- *
- * @param array  $block      The block settings and attributes.
- * @param string $content    The block inner HTML (empty).
- * @param bool   $is_preview True during AJAX preview.
- * @param int    $post_id    The post ID this block is saved to.
- *
- * @return void
- */
-function maigam_do_ad_unit_block( $block, $content = '', $is_preview = false, $post_id = 0 ) {
-	Mai_GAM_Ad_Unit_Block::do_block( $block, $content, $is_preview, $post_id );
 }

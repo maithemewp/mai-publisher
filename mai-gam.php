@@ -130,9 +130,9 @@ final class Mai_GAM_Plugin {
 		$metabox       = new Mai_GAM_Ad_Field_Group;
 		$fields        = new Mai_GAM_Ad_Fields;
 		$generate      = new Mai_GAM_Generate_Ads;
-		$scripts       = new Mai_GAM_Scripts;
 		// $ad_block      = new Mai_GAM_Ad_Block;
 		$ad_unit_block = new Mai_GAM_Ad_Unit_Block;
+		$display       = new Mai_GAM_Display;
 	}
 
 	/**

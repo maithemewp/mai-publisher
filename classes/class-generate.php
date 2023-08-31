@@ -20,8 +20,8 @@ class Mai_GAM_Generate_Ads {
 	 * @return void
 	 */
 	function hooks() {
-		add_action( 'load-edit.php',                          [ $this, 'admin_notice' ] );
-		add_action( 'load-edit.php',                          [ $this, 'admin_notice_success' ] );
+		add_action( 'load-edit.php',                         [ $this, 'admin_notice' ] );
+		add_action( 'load-edit.php',                         [ $this, 'admin_notice_success' ] );
 		add_action( 'admin_post_maigam_generate_ads_action', [ $this, 'action' ] );
 	}
 
@@ -35,52 +35,32 @@ class Mai_GAM_Generate_Ads {
 	function admin_notice() {
 		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : false;
 
+		// Bail if not the admin CPT archive.
 		if ( ! ( $screen && 'mai_ad' === $screen->post_type ) ) {
 			return;
 		}
 
-		$ads = maigam_get_config( 'ad_units' );
+		// Get missing ad count.
+		$missing = count( $this->get_missing_ads() );
 
-		if ( ! $ads ) {
-			return;
-		}
+		add_action( 'admin_notices', function() use ( $missing ) {
 
-		$slugs     = array_keys( $ads );
-		$count     = count( $slugs );
-		$existing  = maigam_get_ads_data();
-		// $existing  = wp_list_pluck( $existing, 'post_name' );
-		// $intersect = count( array_intersect( $slugs, $existing ) );
+			if ( 1 === $missing ) {
+				$notice = sprintf( '%s %s', $missing, __( 'default Mai Ad needs to be created.', 'mai-gam' ) );
+			} else {
+				$notice = sprintf( '%s %s', $missing, __( 'default Mai Ads need to be created.', 'mai-gam' ) );
+			}
 
-		// // Bail if we have the right amount.
-		// if ( $count === $intersect ) {
-		// 	return;
-		// }
+			$generate_url = add_query_arg( [ 'action' => 'maigam_generate_ads_action' ], admin_url( 'admin-post.php' ) );
+			$generate_url = wp_nonce_url( $generate_url, 'maigam_generate_ads_action', 'maigam_generate_ads_nonce' );
+			$button       = sprintf( '<a class="button button-primary" href="%s">%s</a>', $generate_url, __( 'Generate Now', 'mai-gam' ) );
 
-		// $available = ( $count - $intersect );
-
-		// // Bail if none available.
-		// if ( ! $available ) {
-		// 	return;
-		// }
-
-		// add_action( 'admin_notices', function() use ( $available ) {
-
-		// 	if ( 1 === $available ) {
-		// 		$notice = sprintf( '%s %s', $available, __( 'default Mai Ad needs to be created.', 'mai-gam' ) );
-		// 	} else {
-		// 		$notice = sprintf( '%s %s', $available, __( 'default Mai Ads need to be created.', 'mai-gam' ) );
-		// 	}
-
-		// 	$generate_url = add_query_arg( [ 'action' => 'maigam_generate_ads_action' ], admin_url( 'admin-post.php' ) );
-		// 	$generate_url = wp_nonce_url( $generate_url, 'maigam_generate_ads_action', 'maigam_generate_ads_nonce' );
-		// 	$button       = sprintf( '<a class="button button-primary" href="%s">%s</a>', $generate_url, __( 'Generate Now', 'mai-gam' ) );
-
-		// 	printf(
-		// 		'<div class="notice notice-warning"><p>%s</p><p>%s</p></div>',
-		// 		$notice,
-		// 		$button
-		// 	);
-		// });
+			printf(
+				'<div class="notice notice-warning"><p>%s</p><p>%s</p></div>',
+				$notice,
+				$button
+			);
+		});
 	}
 
 	/**
@@ -93,6 +73,7 @@ class Mai_GAM_Generate_Ads {
 	function admin_notice_success() {
 		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : false;
 
+		// Bail if not the admin CPT archive.
 		if ( ! ( $screen && 'mai_ad' === $screen->post_type ) ) {
 			return;
 		}
@@ -132,8 +113,8 @@ class Mai_GAM_Generate_Ads {
 		}
 
 		$redirect = admin_url( 'edit.php?post_type=mai_ad' );
-		$gam_ads  = $this->create_ads();
-		$count    = count( $gam_ads );
+		$ads      = $this->create_ads();
+		$count    = count( $ads );
 
 		switch ( $count ) {
 			case 0:
@@ -163,13 +144,10 @@ class Mai_GAM_Generate_Ads {
 	 * @return array
 	 */
 	function create_ads() {
-		$created = [];
+		$created  = [];
+		$generate = $this->get_missing_ads();
 
-		foreach ( maigam_get_config( 'ad_units' ) as $slug => $ad ) {
-			if ( $this->ad_exists( $slug ) ) {
-				continue;
-			}
-
+		foreach ( $generate as $slug => $ad ) {
 			$post_id = wp_insert_post(
 				[
 					'post_type'    => 'mai_ad',
@@ -192,22 +170,75 @@ class Mai_GAM_Generate_Ads {
 	}
 
 	/**
-	 * Checks whether the ad exists.
+	 * Get missing ads.
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param string $slug Template part slug.
-	 *
-	 * @return bool
+	 * @return array
 	 */
-	function ad_exists( $slug ) {
-		return false;
+	function get_missing_ads() {
+		$ads      = [];
+		$config   = maigam_get_config( 'ad_units' );
+		$existing = $this->get_existing_ads();
 
-		// TODO: Fix this.
+		if ( ! ( $config && $existing ) ) {
+			return $ads;
+		}
 
-		// $existing  = maigam_get_ads_data();
-		// $existing  = wp_list_pluck( $existing, 'post_name' );
+		// Get missing ads.
+		$slugs    = array_keys( $config );
+		$existing = array_keys( $existing );
+		$diff     = array_diff( $slugs, $existing );
 
-		// return isset( $existing[ $slug ] );
+		// Get ads from config that match diff.
+		$matches = array_filter( $slugs, function( $slug ) use ( $diff ) {
+			return in_array( $slug, $diff );
+		});
+
+		ray( $matches, $config );
+
+		// Get ads from config.
+		foreach ( $matches as $slug ) {
+			if ( ! isset( $config[ $slug ] ) ) {
+				continue;
+			}
+
+			$ads[ $slug ] = $config[ $slug ];
+		}
+
+		return $ads;
+	}
+
+	/**
+	 * Get existing ads from DB.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return array
+	 */
+	function get_existing_ads() {
+		$existing = [];
+
+		$query = new WP_Query(
+			[
+				'post_type'              => 'mai_ad',
+				'posts_per_page'         => 500,
+				'no_found_rows'          => true,
+				'update_post_meta_cache' => false,
+				'update_post_term_cache' => false,
+				'suppress_filters'       => false, // https://github.com/10up/Engineering-Best-Practices/issues/116
+				'orderby'                => 'menu_order',
+				'order'                  => 'ASC',
+			]
+		);
+
+		if ( $query->have_posts() ) {
+			while ( $query->have_posts() ) : $query->the_post();
+				$existing[ get_post_field( 'post_name', get_the_ID() ) ] = get_post();
+			endwhile;
+		}
+		wp_reset_postdata();
+
+		return $existing;
 	}
 }

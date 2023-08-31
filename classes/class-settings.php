@@ -115,7 +115,7 @@ class Mai_GAM_Settings {
 	 */
 	public function maigam_sanitize( $input ) {
 		// Sanitize.
-		$input['domain'] = maigam_sanitize_domain( $input['domain'] );
+		$input['domain'] = maigam_get_domain_sanitized( $input['domain'] );
 		$input['label']  = esc_html( $input['label'] );
 
 		return $input;
@@ -138,7 +138,7 @@ class Mai_GAM_Settings {
 	 * @return void
 	 */
 	public function domain_callback() {
-		printf( '<input class="regular-text" type="text" name="mai_gam[domain]" id="domain" value="%s">', maigam_get_domain() );
+		printf( '<input class="regular-text" type="text" name="mai_gam[domain]" id="domain" placeholder="%s" value="%s">', maigam_get_default_option( 'domain' ), maigam_get_domain( false ) );
 	}
 
 	/**
@@ -149,7 +149,7 @@ class Mai_GAM_Settings {
 	 * @return void
 	 */
 	public function label_callback() {
-		printf( '<input class="regular-text" type="text" name="mai_gam[label]" id="label" value="%s">', maigam_get_option( 'label', __( 'Advertisement', 'gam' ) ) );
+		printf( '<input class="regular-text" type="text" name="mai_gam[label]" id="label" placeholder="%s" value="%s">', __( 'Sponsored', 'gam' ), maigam_get_option( 'label', false ) );
 	}
 
 	/**
