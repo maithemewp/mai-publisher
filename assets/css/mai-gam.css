@@ -12,7 +12,7 @@
 	bottom: 100%;
 	left: 50%;
 	transform: translateX(-50%);
-	color: var(--mai-ad-unit-label-color, rgba(0, 0, 0, 0.5));
+	color: var(--mai-ad-unit-label-color, rgba(0, 0, 0, 0.6));
 	font-size: var(--mai-ad-unit-label-font-size, 0.9rem);
 	font-variant: all-small-caps;
 	letter-spacing: 1px;
