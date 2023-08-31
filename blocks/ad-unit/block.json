@@ -1,10 +1,10 @@
 {
 	"name": "acf/mai-ad-unit",
 	"title": "Mai Ad Unit",
-	"description": "Displays an add unit.",
+	"description": "Displays an ad unit.",
 	"category": "widgets",
 	"keywords": [ "ad", "unit", "gam" ],
-	"icon": "info",
+	"icon": "media-code",
 	"textdomain": "mai-gam",
 	"acf": {
 		"mode": "preview"

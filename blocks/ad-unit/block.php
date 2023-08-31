@@ -53,14 +53,44 @@ class Mai_GAM_Ad_Unit_Block {
 	 * @return void
 	 */
 	function render_block( $block, $content = '', $is_preview = false, $post_id = 0 ) {
-		$styles = 'display:grid;place-items:center;aspect-ratio:728/90;background:rgba(0,0,0,0.1);font-variant:all-small-caps;letter-spacing: 1px;';
+		$styles = 'display:grid;place-items:center;aspect-ratio:728/90;background:rgba(0,0,0,0.1);font-variant:all-small-caps;letter-spacing:1px;';
+		$id     = get_field( 'id' );
 
 		if ( $is_preview ) {
-			printf( '<div style="%s">%s</div>', $styles, __( 'Ad Placeholder', 'mai-gam' ) );
+			$text = $id ? __( 'Ad Placeholder', 'mai-gam' ) : __( 'No Ad Unit Selected', 'mai-gam' );
+			printf( '<div style="%s">%s</div>', $styles, $text );
 			return;
 		}
 
-		printf( '<div style="%s">%s</div>', $styles, __( 'Ad Placeholder', 'mai-gam' ) );
+		// Bail if no ID.
+		if ( ! $id ) {
+			return;
+		}
+
+		// Get formatted slot.
+		$slot = $id ? $this->maybe_increment_slot( $id ) : '';
+
+		printf( '<div style="%s"><div id="mai-ad-%s"><script>googletag.cmd.push(function(){googletag.display("mai-ad-%s")});</script></div></div>', $styles, $slot, $slot );
+	}
+
+	/**
+	 * Increments the slot ID, if needed.
+	 *
+	 * @param string $slot
+	 *
+	 * @return string
+	 */
+	function maybe_increment_slot( $slot ) {
+		static $counts = [];
+
+		if ( isset( $counts[ $slot ] ) ) {
+			$counts[ $slot ]++;
+			$slot = $slot . '-' . $counts[ $slot ];
+		} else {
+			$counts[ $slot ] = 1;
+		}
+
+		return $slot;
 	}
 
 	/**
