@@ -6,6 +6,7 @@
 	"keywords": [ "ad", "unit", "gam" ],
 	"icon": "media-code",
 	"textdomain": "mai-gam",
+	"style": "file:../../assets/css/mai-gam.css",
 	"acf": {
 		"mode": "preview"
 	},
