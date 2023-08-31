@@ -70,11 +70,15 @@ class Mai_GAM_Ad_Unit_Block {
 		// Get formatted slot.
 		$slot = $id ? $this->maybe_increment_slot( $id ) : '';
 
+		// TODO. Get aspect ratio from config sizes at each breakpoint and add as inline custom properties.
+
 		printf( '<div style="%s"><div id="mai-ad-%s"><script>googletag.cmd.push(function(){googletag.display("mai-ad-%s")});</script></div></div>', $styles, $slot, $slot );
 	}
 
 	/**
 	 * Increments the slot ID, if needed.
+	 *
+	 * @since 0.1.0
 	 *
 	 * @param string $slot
 	 *
