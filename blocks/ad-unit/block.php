@@ -53,7 +53,7 @@ class Mai_Publisher_Ad_Unit_Block {
 	 * @return void
 	 */
 	function render_block( $block, $content = '', $is_preview = false, $post_id = 0 ) {
-		$id     = get_field( 'id' );
+		$id = get_field( 'id' );
 
 		if ( $is_preview ) {
 			$styles = 'display:grid;place-items:center;aspect-ratio:728/90;background:rgba(0,0,0,0.1);font-variant:all-small-caps;letter-spacing:1px;';

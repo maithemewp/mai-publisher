@@ -49,7 +49,7 @@ class Mai_Publisher_Ad_Field_Group {
 
 		acf_add_local_field_group(
 			[
-				'key'      => 'maipub_field_group',
+				'key'      => 'maipub_ad_field_group',
 				'title'    => __( 'Locations Settings', 'mai-publisher' ),
 				'fields'   => $this->get_fields(),
 				'location' => [

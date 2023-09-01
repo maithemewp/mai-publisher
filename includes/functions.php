@@ -101,18 +101,6 @@ function maipub_get_content( $content, $args, $counts = false ) {
 		return $counts ? [] : $content;
 	}
 
-	// If modifying content.
-	if ( ! $counts ) {
-		/**
-		 * Build the temporary dom.
-		 * Special characters were causing issues with `appendXML()`.
-		 *
-		 * @link https://stackoverflow.com/questions/4645738/domdocument-appendxml-with-special-characters
-		 * @link https://www.py4u.net/discuss/974358
-		 */
-		$tmp = maipub_get_dom_document( maipub_get_processed_content( $args['content'] ) );
-	}
-
 	$item       = 0;
 	$tmp_counts = array_flip( $args['content_count'] );
 
@@ -131,6 +119,16 @@ function maipub_get_content( $content, $args, $counts = false ) {
 
 		// If modifying content.
 		if ( ! $counts ) {
+			/**
+			 * Build the temporary dom.
+			 * Special characters were causing issues with `appendXML()`.
+			 *
+			 * This needs to happen inside the loop, otherwise the slot IDs are not correctly incremented.
+			 *
+			 * @link https://stackoverflow.com/questions/4645738/domdocument-appendxml-with-special-characters
+			 * @link https://www.py4u.net/discuss/974358
+			 */
+			$tmp  = maipub_get_dom_document( maipub_get_processed_content( $args['content'] ) );
 			$node = $dom->importNode( $tmp->documentElement, true );
 
 			// Skip if no node.
@@ -245,11 +243,20 @@ function maipub_get_ads_data() {
 		return $ads;
 	}
 
+	// Set default ad array.
 	$ads = [
 		'global'  => [],
 		'single'  => [],
 		'archive' => [],
 	];
+
+	// Check visibility.
+	$visibility = maipub_is_singular() ? get_post_meta( get_the_ID(), 'maipub_visibility', true ) : false;
+
+	// Bail if hidding all ads.
+	if ( $visibility && in_array( 'all', $visibility ) ) {
+		return $ads;
+	}
 
 	$query = new WP_Query(
 		[
@@ -324,6 +331,17 @@ function maipub_get_ads_data() {
 		endwhile;
 	}
 	wp_reset_postdata();
+
+	// Now that we have data, maybe check visibility for incontent ads.
+	if ( $visibility && in_array( 'incontent', $visibility ) ) {
+		foreach ( $ads['single'] as $index => $values ) {
+			if ( 'content' !== $values['location'] ) {
+				continue;
+			}
+
+			unset( $ads['single'][ $index ] );
+		}
+	}
 
 	return $ads;
 }

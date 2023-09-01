@@ -8,7 +8,7 @@ googletag.cmd.push( function() {
 
 	// Loop through maiPubVars getting key and values.
 	for ( var id in ads ) {
-		console.log( id, ads[id].sizes );
+		// console.log( id, ads[id].sizes );
 
 		// Define ad slot.
 		var slot = googletag.defineSlot( '/22487526518/' + maiPubVars['gam_domain'] + '/' + id, ads[id].sizes, 'mai-ad-' + id )
