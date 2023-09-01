@@ -3,10 +3,6 @@
 // Prevent direct file access.
 defined( 'ABSPATH' ) || die;
 
-[ [125, 125], [120, 90], [120, 60] ]
-
-[ [125, 125], [120, 90], [120, 60] ]
-
 return [
 	'ad_units' => [
 		'billboard' => [
