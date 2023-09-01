@@ -5,7 +5,7 @@ defined( 'ABSPATH' ) || die;
 
 return [
 	'ad_units' => [
-		'billboard' =? [
+		'billboard' => [
 			'sizes'         => [ '970x250' ],
 			'sizes_desktop' => [ '970x250' ],
 			'sizes_tablet'  => [ '1x1' ],
@@ -13,7 +13,7 @@ return [
 			'post_title'    => __( 'Billboard', 'mai-gam' ),
 			'post_content'  => '',
 		],
-		'button' =? [
+		'button' => [
 			'sizes'         => [ '125x125', '120x90', '120x60' ],
 			'sizes_desktop' => [ '125x125', '120x90', '120x60' ],
 			'sizes_tablet'  => [ '125x125', '120x90', '120x60' ],
@@ -25,7 +25,7 @@ return [
 			'sizes'         => [ '320x50', '468x60', '728x90', '970x90' ],
 			'sizes_desktop' => [ '728x90', '970x90' ],
 			'sizes_tablet'  => [ '320x50', '468x60' ],
-			'sizes_mobile'  => [ '320x50' ],upd
+			'sizes_mobile'  => [ '320x50' ],
 			'post_title'    => __( 'Footer', 'mai-gam' ),
 			'post_content'  => '',
 		],
@@ -37,7 +37,7 @@ return [
 			'post_title'    => __( 'Fullscreen', 'mai-gam' ),
 			'post_content'  => '',
 		],
-		'halfpage' =? [
+		'halfpage' => [
 			'sizes'         => [ '300x600' ],
 			'sizes_desktop' => [ '300x600' ],
 			'sizes_tablet'  => [ '300x600' ],
@@ -77,15 +77,15 @@ return [
 			'post_title'    => __( 'In-recipe', 'mai-gam' ),
 			'post_content'  => '',
 		],
-		'leaderboard' =? [
+		'leaderboard' => [
 			'sizes'         => [ '970x90', '728x90', '320x50', '300x50' ],
 			'sizes_desktop' => [ '970x90', '728x90' ],
 			'sizes_tablet'  => [ '728x90' ],
 			'sizes_mobile'  => [ '320x50', '300x50' ],
 			'post_title'    => __( 'Leaderboard', 'mai-gam' ),
 			'post_content'  => '',
-		]
-		'medium-rectangle' =? [
+		],
+		'medium-rectangle' => [
 			'sizes'         => [ '300x250' ],
 			'sizes_desktop' => [ '300x250' ],
 			'sizes_tablet'  => [ '300x250' ],
@@ -93,7 +93,7 @@ return [
 			'post_title'    => __( 'Medium Rectangle', 'mai-gam' ),
 			'post_content'  => '',
 		],
-		'micro-bar' =? [
+		'micro-bar' => [
 			'sizes'         => [ '88x31' ],
 			'sizes_desktop' => [ '88x31' ],
 			'sizes_tablet'  => [ '88x31' ],
@@ -117,7 +117,7 @@ return [
 			'post_title'    => __( 'Podcast Header', 'mai-gam' ),
 			'post_content'  => '',
 		],
-		'skyscraper' =? [
+		'skyscraper' => [
 			'sizes'         => [ '160x600', '120x600' ],
 			'sizes_desktop' => [ '160x600', '120x600' ],
 			'sizes_tablet'  => [ '160x600', '120x600' ],
@@ -125,7 +125,7 @@ return [
 			'post_title'    => __( 'Skyscraper', 'mai-gam' ),
 			'post_content'  => '',
 		],
-		'sponsored-sidebar' =? [
+		'sponsored-sidebar' => [
 			'sizes'         => [ '320x50', '300x600', '300x250', '160x600' ],
 			'sizes_desktop' => [ '320x50', '300x600', '300x250', '160x600' ],
 			'sizes_tablet'  => [ '320x50', '300x600', '300x250', '160x600' ],
