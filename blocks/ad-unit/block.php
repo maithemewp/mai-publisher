@@ -286,7 +286,7 @@ class Mai_Publisher_Ad_Unit_Block {
 		$units   = maipub_get_config( 'ad_units' );
 
 		foreach ( $units as $slug => $unit ) {
-			$choices[ $slug ] = $unit['post_title'];
+			$choices[ $slug ] = $slug;
 		}
 
 		$field['choices'] = $choices;

@@ -284,7 +284,7 @@ function maipub_validate_args_single( $args ) {
 	$include = $args['include'] && in_array( $post_id, $args['include'] );
 
 	// If not already including, check post types.
-	if ( ! $include && ! ( in_array( '*', $args['types'] ) || ! in_array( $post_type, $args['types'] ) ) ) {
+	if ( ! $include && ! ( in_array( '*', $args['types'] ) || in_array( $post_type, $args['types'] ) ) ) {
 		return [];
 	}
 
