@@ -142,6 +142,8 @@ function maipub_get_content( $content, $args, $counts = false ) {
 
 			// TODO: This is not working correctly on sugarmakers.
 
+			// TODO: 2 Mai Ad blocks manually in content aren't generating the right mai-ad-unit slug.
+
 			/**
 			 * Bail if this is the last element.
 			 * This avoids duplicates since this location would technically be "after entry content" at this point.
