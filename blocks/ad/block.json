@@ -1,0 +1,14 @@
+{
+	"name": "acf/mai-ad",
+	"title": "Mai Ad",
+	"description": "Displays a Mai Ad.",
+	"category": "widgets",
+	"keywords": [ "ad", "publisher", "gam" ],
+	"icon": "media-code",
+	"textdomain": "mai-publisher",
+	"style": "file:../../assets/css/mai-publisher.css",
+	"acf": {
+		"mode": "preview"
+	},
+	"supports": {}
+}

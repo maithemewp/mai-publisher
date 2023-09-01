@@ -40,7 +40,7 @@ class Mai_Publisher_Settings {
 	function add_menu_item() {
 		add_submenu_page(
 			'edit.php?post_type=mai_ad',
-			__( 'Mai GAM', 'mai-publisher' ), // page_title
+			__( 'Mai Publisher', 'mai-publisher' ), // page_title
 			__( 'Settings', 'mai-publisher' ), // menu_title
 			'manage_options', // capability
 			'settings', // menu_slug
@@ -103,6 +103,22 @@ class Mai_Publisher_Settings {
 			'mai-publisher-section', // page
 			'maipub_settings' // section
 		);
+
+		add_settings_field(
+			'header_scripts', // id
+			__( 'Header Scripts', 'mai-publisher' ), // title
+			[ $this, 'header_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings' // section
+		);
+
+		add_settings_field(
+			'footer', // id
+			__( 'Footer Scripts', 'mai-publisher' ), // title
+			[ $this, 'footer_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings' // section
+		);
 	}
 
 	/**
@@ -116,6 +132,8 @@ class Mai_Publisher_Settings {
 		// Sanitize.
 		$input['gam_domain'] = isset( $input['gam_domain'] ) ? maipub_get_gam_domain_sanitized( $input['gam_domain'] ) : '';
 		$input['label']      = isset( $input['label'] ) ? esc_html( $input['label'] ) : '';
+		$input['header']     = current_user_can( 'unfiltered_html' ) ? trim( $input['header'] ) : wp_kses_post( trim( $input['header'] ) );
+		$input['footer']     = current_user_can( 'unfiltered_html' ) ? trim( $input['footer'] ) : wp_kses_post( trim( $input['footer'] ) );
 
 		return $input;
 	}
@@ -151,6 +169,27 @@ class Mai_Publisher_Settings {
 		printf( '<input class="regular-text" type="text" name="mai_publisher[domain]" id="domain" value="%s">', maipub_get_default_option( 'gam_domain' ), maipub_get_gam_domain( false ) );
 	}
 
+	/**
+	 * Setting callback.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return void
+	 */
+	function header_callback() {
+		printf( '<textarea name="mai_publisher[header]" id="header" rows="8" style="width:100%%;max-width:600px">%s</textarea>', maipub_get_option( 'header' ) );
+	}
+
+	/**
+	 * Setting callback.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return void
+	 */
+	function footer_callback() {
+		printf( '<textarea name="mai_publisher[footer]" id="footer" rows="8" style="width:100%%;max-width:600px">%s</textarea>', maipub_get_option( 'footer' ) );
+	}
 
 	/**
 	 * Return the plugin action links.  This will only be called if the plugin is active.

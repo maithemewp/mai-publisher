@@ -122,7 +122,7 @@ final class Mai_Publisher_Plugin {
 		// Classes.
 		foreach ( glob( MAI_PUBLISHER_DIR . 'classes/' . '*.php' ) as $file ) { include $file; }
 		// Blocks.
-		// include MAI_PUBLISHER_DIR . 'blocks/ad/block.php';
+		include MAI_PUBLISHER_DIR . 'blocks/ad/block.php';
 		include MAI_PUBLISHER_DIR . 'blocks/ad-unit/block.php';
 		// Instantiate classes.
 		$settings      = new Mai_Publisher_Settings;
@@ -131,7 +131,7 @@ final class Mai_Publisher_Plugin {
 		$fields        = new Mai_Publisher_Ad_Fields;
 		$visibility    = new Mai_Publisher_Ad_Visibility;
 		$generate      = new Mai_Publisher_Generate_Ads;
-		// $ad_block      = new Mai_Publisher_Ad_Block;
+		$ad_block      = new Mai_Publisher_Ad_Block;
 		$ad_unit_block = new Mai_Publisher_Ad_Unit_Block;
 		$display       = new Mai_Publisher_Display;
 	}
@@ -209,15 +209,15 @@ final class Mai_Publisher_Plugin {
 				'has_archive'         => true,
 				'hierarchical'        => false,
 				'labels'              => [
-					'name'               => _x( 'Ads', 'Ad general name', 'mai-publisher' ),
-					'singular_name'      => _x( 'Ad',  'Ad singular name', 'mai-publisher' ),
-					'menu_name'          => _x( 'Ads', 'Ad admin menu', 'mai-publisher' ),
-					'name_admin_bar'     => _x( 'Ad',  'Ad add new on admin bar', 'mai-publisher' ),
+					'name'               => _x( 'Mai Ads', 'Mai Ad general name', 'mai-publisher' ),
+					'singular_name'      => _x( 'Mai Ad',  'Mai Ad singular name', 'mai-publisher' ),
+					'menu_name'          => _x( 'Mai Ads', 'Mai Ad admin menu', 'mai-publisher' ),
+					'name_admin_bar'     => _x( 'Mai Ad',  'Mai Ad add new on admin bar', 'mai-publisher' ),
 					'add_new'            => _x( 'Add New', 'Ad', 'mai-publisher' ),
 					'add_new_item'       => __( 'Add New Mai Ad', 'mai-publisher' ),
-					'new_item'           => __( 'New Ad', 'mai-publisher' ),
-					'edit_item'          => __( 'Edit Ad', 'mai-publisher' ),
-					'view_item'          => __( 'View Ad', 'mai-publisher' ),
+					'new_item'           => __( 'New Mai Ad', 'mai-publisher' ),
+					'edit_item'          => __( 'Edit Mai Ad', 'mai-publisher' ),
+					'view_item'          => __( 'View Mai Ad', 'mai-publisher' ),
 					'all_items'          => __( 'All Mai Ads', 'mai-publisher' ),
 					'search_items'       => __( 'Search Mai Ads', 'mai-publisher' ),
 					'parent_item_colon'  => __( 'Parent Mai Ads:', 'mai-publisher' ),

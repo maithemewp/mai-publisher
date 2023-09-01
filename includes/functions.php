@@ -547,6 +547,8 @@ function maipub_get_default_options() {
 	$options = [
 		'gam_domain' => (string) wp_parse_url( esc_url( home_url() ), PHP_URL_HOST ),
 		'label'      => __( 'Sponsored', 'mai-publisher' ),
+		'header'     => '',
+		'footer'     => '',
 	];
 
 	return $options;

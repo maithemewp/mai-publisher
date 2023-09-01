@@ -23,6 +23,8 @@ class Mai_Publisher_Display {
 	 */
 	function hooks() {
 		add_action( 'wp_enqueue_scripts', [ $this, 'run' ], 0 );
+		add_action( 'wp_head',            [ $this, 'header' ] );
+		add_action( 'wp_footer',          [ $this, 'footer' ], 20 );
 	}
 
 	/**
@@ -62,6 +64,40 @@ class Mai_Publisher_Display {
 
 		// Display the ads.
 		$this->render();
+	}
+
+	/**
+	 * Outputs header.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return void
+	 */
+	function header() {
+		$header = maipub_get_option( 'header' );
+
+		if ( ! $header ) {
+			return;
+		}
+
+		echo $header;
+	}
+
+	/**
+	 * Outputs footer.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return void
+	 */
+	function footer() {
+		$footer = maipub_get_option( 'footer' );
+
+		if ( ! $footer ) {
+			return;
+		}
+
+		echo $footer;
 	}
 
 	/**

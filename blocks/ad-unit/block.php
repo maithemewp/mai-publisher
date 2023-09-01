@@ -227,7 +227,7 @@ class Mai_Publisher_Ad_Unit_Block {
 
 		acf_add_local_field_group(
 			[
-				'key'      => 'mai_field_group',
+				'key'      => 'maipub_ad_unit_block_field_group',
 				'title'    => __( 'Locations Settings', 'mai-publisher' ),
 				'fields'   =>[
 					[
@@ -268,7 +268,6 @@ class Mai_Publisher_Ad_Unit_Block {
 						],
 					],
 				],
-				'instruction_placement' => 'label',
 			]
 		);
 	}
