@@ -57,13 +57,21 @@ class Mai_Publisher_Ad_Unit_Block {
 		$unit     = $id ? $ad_units[ $id ] : [];
 		$sizes    = $id ? $this->get_sizes( $unit ) : [];
 		$styles   = $id ? $this->get_styles( $sizes, $is_preview ) : '';
-		$slot     = $id ? $this->maybe_increment_slot( $id ) : '';
-		$label    = maipub_get_option( 'label' );
+		$slot     = $id ? $this->get_slot( $id ) : '';
 
+		$attr = [
+			'class'      => 'mai-ad-unit',
+			'data-label' => maipub_get_option( 'label' ),
+		];
+
+		if ( $styles ) {
+			$attr['style'] = $styles;
+		}
+
+		// If previewing in editor, show placeholder.
 		if ( $is_preview ) {
-			$label = $id ? maipub_get_option( 'label' ) : __( 'No Ad Unit Selected', 'mai-publisher' );
 			$text  = $id ? __( 'Ad Placeholder', 'mai-publisher' ) : __( 'No Ad Unit Selected', 'mai-publisher' );
-			printf( '<div class="mai-ad-unit" data-label="%s"%s><span style="font-size:1.1rem;font-variant:all-small-caps;letter-spacing:1px;">%s</span></div>', $label, $styles, $text );
+			printf( '<div%s><span style="font-size:1.1rem;font-variant:all-small-caps;letter-spacing:1px;">%s</span></div>', maipub_build_attributes( $attr ), $text );
 			return;
 		}
 
@@ -72,7 +80,17 @@ class Mai_Publisher_Ad_Unit_Block {
 			return;
 		}
 
-		printf( '<div class="mai-ad-unit" data-label="%s"%s><div id="mai-ad-%s"><script>googletag.cmd.push(function(){googletag.display("mai-ad-%s")});</script></div></div>', maipub_get_option( 'label' ), $styles, $slot, $slot );
+		// Maybe add anaytlics tracking.
+		if ( class_exists( 'Mai_Analytics_Plugin' ) ) {
+			$attr['data-content-name']  = $slot;
+			$attr['data-track-content'] = null;
+		}
+
+		// Build HTML, then allow filtering.
+		$html = sprintf( '<div%s><div id="mai-ad-%s"><script>googletag.cmd.push(function(){googletag.display("mai-ad-%s")});</script></div></div>', maipub_build_attributes( $attr ), $slot, $slot );
+		$html = apply_filters( 'maipub_ad_unit', $html );
+
+		echo $html;
 	}
 
 	/**
@@ -87,9 +105,9 @@ class Mai_Publisher_Ad_Unit_Block {
 	function get_sizes( $unit ) {
 		$sizes = [];
 		$array = [
-			'lg' => $unit['sizes_desktop'],
-			'md' => $unit['sizes_tablet'],
 			'sm' => $unit['sizes_mobile'],
+			'md' => $unit['sizes_tablet'],
+			'lg' => $unit['sizes_desktop'],
 		];
 
 		foreach ( $array as $key => $item ) {
@@ -145,21 +163,25 @@ class Mai_Publisher_Ad_Unit_Block {
 			$styles .= 'background:rgba(0,0,0,0.05);border:2px dashed rgba(0,0,0,0.25);';
 		}
 
+		// Build max-width.
 		foreach ( $sizes as $break => $values ) {
 			if ( ! $values ) {
 				continue;
 			}
 
-			// Max width.
 			$styles .= sprintf( '--mai-ad-unit-max-width-%s:%spx;', $break, $values[0] );
-
-			// Aspect ratio.
-			if ( 2 === count( $values ) ) {
-				$styles .= sprintf( '--mai-ad-unit-aspect-ratio-%s:%s/%s;', $break, $values[0], $values[1] );
-			}
 		}
 
-		return $styles ? sprintf( ' style="%s"', $styles ) : '';
+		// Build aspect-ratio.
+		foreach ( $sizes as $break => $values ) {
+			if ( ! $values || 2 !== count( $values ) ) {
+				continue;
+			}
+
+			$styles .= sprintf( '--mai-ad-unit-aspect-ratio-%s:%s/%s;', $break, $values[0], $values[1] );
+		}
+
+		return $styles;
 	}
 
 	/**
@@ -171,7 +193,7 @@ class Mai_Publisher_Ad_Unit_Block {
 	 *
 	 * @return string
 	 */
-	function maybe_increment_slot( $slot ) {
+	function get_slot( $slot ) {
 		static $counts = [];
 
 		if ( isset( $counts[ $slot ] ) ) {

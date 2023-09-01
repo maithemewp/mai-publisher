@@ -86,6 +86,36 @@ function maipub_sanitize_taxonomies( $taxonomies ) {
 }
 
 /**
+ * Generate a string of HTML attributes.
+ *
+ * @since 0.1.0
+ *
+ * @link https://github.com/mcaskill/php-html-build-attributes
+ *
+ * @param array  $attr   Associative array representing attribute names and values.
+ * @param string $escape Callback function to escape the values for HTML attributes.
+ *
+ * @return string Returns a string of HTML attributes
+ */
+function maipub_build_attributes( $attr, $escape = 'esc_attr' ) {
+	$html = '';
+
+	if ( ! $attr ) {
+		return $html;
+	}
+
+	foreach ( $attr as $name => $value ) {
+		if ( is_null( $value ) ) {
+			$html .= sprintf( ' %s', $name );
+		} else {
+			$html .= sprintf( ' %s="%s"', $name, $value );
+		}
+	}
+
+	return $html;
+}
+
+/**
  * Removes any array elements where the value is an empty string.
  *
  * @since 0.1.0
