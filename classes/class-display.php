@@ -3,7 +3,7 @@
 // Prevent direct file access.
 defined( 'ABSPATH' ) || die;
 
-class Mai_GAM_Display {
+class Mai_Publisher_Display {
 	protected $ads;
 	protected $domain;
 
@@ -33,8 +33,8 @@ class Mai_GAM_Display {
 	 * @return void
 	 */
 	function run() {
-		$ads    = maigam_get_ads();
-		$domain = maigam_get_domain();
+		$ads    = maipub_get_ads();
+		$domain = maipub_get_gam_domain();
 
 		// Bail if no ads.
 		if ( ! $ads ) {
@@ -51,10 +51,10 @@ class Mai_GAM_Display {
 		// If we have GAM ad IDs, enqueue the JS.
 		if ( $gam_ads ) {
 			wp_enqueue_script( 'google-gpt', 'https://securepubads.g.doubleclick.net/tag/js/gpt.js', [],  $this->get_file_data( 'version' ), false );
-			wp_enqueue_script( 'mai-gam', $this->get_file_data( 'url' ), [ 'google-gpt' ],  $this->get_file_data( 'version' ), false );
-			wp_localize_script( 'mai-gam', 'maiGAMVars',
+			wp_enqueue_script( 'mai-publisher', $this->get_file_data( 'url' ), [ 'google-gpt' ],  $this->get_file_data( 'version' ), false );
+			wp_localize_script( 'mai-publisher', 'maiPubVars',
 				[
-					'domain' => $this->domain,
+					'gam_domain' => $this->domain,
 					'ads'    => $gam_ads,
 				]
 			);
@@ -75,7 +75,7 @@ class Mai_GAM_Display {
 		$ads    = [];
 		$counts = [];
 		$ad_ids = $this->domain ? $this->get_ad_ids() : [];
-		$config = maigam_get_config( 'ad_units' );
+		$config = maipub_get_config( 'ad_units' );
 
 		foreach ( $ad_ids as $slug ) {
 			if ( ! isset( $config[ $slug ] ) ) {
@@ -163,7 +163,7 @@ class Mai_GAM_Display {
 	 * @return void
 	 */
 	function render() {
-		$locations = maigam_get_locations();
+		$locations = maipub_get_locations();
 
 		foreach ( $this->ads as $args ) {
 			// Bail if no registered location.
@@ -190,7 +190,7 @@ class Mai_GAM_Display {
 						return $content;
 					}
 
-					$content = maigam_get_content( $content, $args );
+					$content = maipub_get_content( $content, $args );
 
 					return $content;
 				});
@@ -222,7 +222,7 @@ class Mai_GAM_Display {
 						return $close;
 					}
 
-					$ad = sprintf( '<div class="maigam-ad" style="order:calc(var(--maicca-columns) * %s);">%s</div>', $args['content_count'], maigam_get_processed_content( $args['content'] ) );
+					$ad = sprintf( '<div class="maipub-ad" style="order:calc(var(--maicca-columns) * %s);">%s</div>', $args['content_count'], maipub_get_processed_content( $args['content'] ) );
 
 					return $ad . $close;
 
@@ -239,7 +239,7 @@ class Mai_GAM_Display {
 				 * @return string
 				 */
 				add_action( $locations[ $args['location'] ]['hook'], function() use ( $args, $priority ) {
-					echo maigam_get_processed_content( $args['content'] );
+					echo maipub_get_processed_content( $args['content'] );
 				}, $priority );
 			 }
 		}
@@ -302,10 +302,10 @@ class Mai_GAM_Display {
 		}
 
 		$suffix    = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-		$file      = "/assets/js/mai-gam{$suffix}.js";
-		$file_path = MAI_GAM_DIR . $file;
-		$file_url  = MAI_GAM_URL . $file;
-		$version   = MAI_GAM_VERSION . '.' . date( 'njYHi', filemtime( $file_path ) );
+		$file      = "/assets/js/mai-publisher{$suffix}.js";
+		$file_path = MAI_PUBLISHER_DIR . $file;
+		$file_url  = MAI_PUBLISHER_URL . $file;
+		$version   = MAI_PUBLISHER_VERSION . '.' . date( 'njYHi', filemtime( $file_path ) );
 		$cache     = [
 			'path'    => $file_path,
 			'url'     => $file_url,
@@ -335,27 +335,27 @@ class Mai_GAM_Display {
 
 		?>
 		<style>
-			.maigam-ad {
+			.maipub-ad {
 				flex:1 1 100%;
 			}
 			@media only screen and (max-width: 599px) {
 				.entries-wrap {
-					--maigam-columns: var(--maigam-columns-xs);
+					--maipub-columns: var(--maipub-columns-xs);
 				}
 			}
 			@media only screen and (min-width: 600px) and (max-width: 799px) {
 				.entries-wrap {
-					--maigam-columns: var(--maigam-columns-sm);
+					--maipub-columns: var(--maipub-columns-sm);
 				}
 			}
 			@media only screen and (min-width: 800px) and (max-width: 999px) {
 				.entries-wrap {
-					--maigam-columns: var(--maigam-columns-md);
+					--maipub-columns: var(--maipub-columns-md);
 				}
 			}
 			@media only screen and (min-width: 1000px) {
 				.entries-wrap {
-					--maigam-columns: var(--maigam-columns-lg);
+					--maipub-columns: var(--maipub-columns-lg);
 				}
 			}
 		</style>
@@ -395,7 +395,7 @@ class Mai_GAM_Display {
 		$columns       = array_reverse( mai_get_breakpoint_columns( $markup_args['params']['args'] ) );
 
 		foreach ( $columns as $break => $column ) {
-			$atts['style'] .= sprintf( '--maigam-columns-%s:%s;', $break, $column );
+			$atts['style'] .= sprintf( '--maipub-columns-%s:%s;', $break, $column );
 		}
 
 		$has_atts = true;

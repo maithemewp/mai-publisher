@@ -7,7 +7,7 @@
  *
  * @return bool
  */
-function maigam_is_singular() {
+function maipub_is_singular() {
 	return is_singular();
 }
 
@@ -18,8 +18,8 @@ function maigam_is_singular() {
  *
  * @return bool
  */
-function maigam_is_archive() {
-	return is_home() || is_post_type_archive() || is_category() || is_tag() || is_tax() || is_search() || maigam_is_product_archive();
+function maipub_is_archive() {
+	return is_home() || is_post_type_archive() || is_category() || is_tag() || is_tax() || is_search() || maipub_is_product_archive();
 }
 
 /**
@@ -29,7 +29,7 @@ function maigam_is_archive() {
  *
  * @return bool
  */
-function maigam_is_shop_archive() {
+function maipub_is_shop_archive() {
 	return class_exists( 'WooCommerce' ) && is_shop();
 }
 
@@ -40,7 +40,7 @@ function maigam_is_shop_archive() {
  *
  * @return bool
  */
-function maigam_is_product_archive() {
+function maipub_is_product_archive() {
 	return class_exists( 'WooCommerce' ) && ( is_shop() || is_product_taxonomy() );
 }
 
@@ -51,7 +51,7 @@ function maigam_is_product_archive() {
  *
  * @return bool
  */
-function maigam_is_product_singular() {
+function maipub_is_product_singular() {
 	return class_exists( 'WooCommerce' ) && is_product();
 }
 
@@ -65,7 +65,7 @@ function maigam_is_product_singular() {
  *
  * @return string
  */
-function maigam_has_string( $needle, $haystack ) {
+function maipub_has_string( $needle, $haystack ) {
 	if ( ! $haystack ) {
 		return false;
 	}

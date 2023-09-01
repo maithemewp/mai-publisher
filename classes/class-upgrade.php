@@ -6,7 +6,7 @@ defined( 'ABSPATH' ) || die;
 /**
  * Handles upgrade routines.
  */
-class Mai_GAM_Upgrade {
+class Mai_Publisher_Upgrade {
 	/**
 	 * Construct the class.
 	 */
@@ -33,14 +33,14 @@ class Mai_GAM_Upgrade {
 	 * @return void
 	 */
 	function do_upgrade() {
-		$plugin_version = MAI_GAM_VERSION;
+		$plugin_version = MAI_PUBLISHER_VERSION;
 
 		// Set first version.
-		if ( false === maigam_get_option( 'first-version', false ) ) {
-			maigam_update_option( 'first-version', $plugin_version );
+		if ( false === maipub_get_option( 'first-version', false ) ) {
+			maipub_update_option( 'first-version', $plugin_version );
 		}
 
-		$db_version = maigam_get_option( 'db-version', false );
+		$db_version = maipub_get_option( 'db-version', false );
 
 		// Return early if at latest.
 		if ( $plugin_version === $db_version ) {
@@ -48,6 +48,6 @@ class Mai_GAM_Upgrade {
 		}
 
 		// Update database version after upgrade.
-		maigam_update_option( 'db-version', $plugin_version );
+		maipub_update_option( 'db-version', $plugin_version );
 	}
 }

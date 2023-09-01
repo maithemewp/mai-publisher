@@ -10,7 +10,7 @@ defined( 'ABSPATH' ) || die;
  *
  * @return void
  */
-function maigam_get_ads() {
+function maipub_get_ads() {
 	static $ads = null;
 
 	if ( ! is_null( $ads ) ) {
@@ -18,7 +18,7 @@ function maigam_get_ads() {
 	}
 
 	$ads  = [];
-	$data = maigam_get_ads_data();
+	$data = maipub_get_ads_data();
 
 	// Bail if no actual values.
 	if ( ! array_filter( array_values( $data ) ) ) {
@@ -30,7 +30,7 @@ function maigam_get_ads() {
 		// Loop through each item.
 		foreach ( $items as $args ) {
 			// Validate.
-			$args = maigam_validate_args( $args, $type );
+			$args = maipub_validate_args( $args, $type );
 
 			// Bail if not valid args.
 			if ( ! $args ) {
@@ -54,7 +54,7 @@ function maigam_get_ads() {
  *
  * @return string
  */
-function maigam_get_processed_content( $content ) {
+function maipub_get_processed_content( $content ) {
 	return do_blocks( $content );
 }
 
@@ -72,9 +72,9 @@ function maigam_get_processed_content( $content ) {
  *
  * @return string.
  */
-function maigam_get_content( $content, $args, $counts = false ) {
+function maipub_get_content( $content, $args, $counts = false ) {
 	$count = [];
-	$dom   = maigam_get_dom_document( $content );
+	$dom   = maipub_get_dom_document( $content );
 	$xpath = new DOMXPath( $dom );
 	$all   = $xpath->query( '/*[not(self::script or self::style or self::link)]' );
 
@@ -84,7 +84,7 @@ function maigam_get_content( $content, $args, $counts = false ) {
 
 	$last     = $all->item( $all->length - 1 );
 	$tags     = 'before' !== $args['location'] ? [ 'div', 'p', 'ol', 'ul', 'blockquote', 'figure', 'iframe' ] : [ 'h2', 'h3' ];
-	$tags     = apply_filters( 'maigam_content_elements', $tags, $args );
+	$tags     = apply_filters( 'maipub_content_elements', $tags, $args );
 	$tags     = array_filter( $tags );
 	$tags     = array_unique( $tags );
 	$elements = [];
@@ -110,7 +110,7 @@ function maigam_get_content( $content, $args, $counts = false ) {
 		 * @link https://stackoverflow.com/questions/4645738/domdocument-appendxml-with-special-characters
 		 * @link https://www.py4u.net/discuss/974358
 		 */
-		$tmp = maigam_get_dom_document( maigam_get_processed_content( $args['content'] ) );
+		$tmp = maipub_get_dom_document( maipub_get_processed_content( $args['content'] ) );
 	}
 
 	$item       = 0;
@@ -196,7 +196,7 @@ function maigam_get_content( $content, $args, $counts = false ) {
  *
  * @return DOMDocument
  */
-function maigam_get_dom_document( $html ) {
+function maipub_get_dom_document( $html ) {
 	// Create the new document.
 	$dom = new DOMDocument();
 
@@ -238,7 +238,7 @@ function maigam_get_dom_document( $html ) {
  *
  * @return array
  */
-function maigam_get_ads_data() {
+function maipub_get_ads_data() {
 	static $ads = null;
 
 	if ( ! is_null( $ads ) ) {
@@ -269,12 +269,12 @@ function maigam_get_ads_data() {
 			$post_id          = get_the_ID();
 			$slug             = get_post()->post_name;
 			$content          = get_post()->post_content;
-			$global_location  = get_field( 'maigam_global_location' );
-			$single_location  = get_field( 'maigam_single_location' );
-			$archive_location = get_field( 'maigam_archive_location' );
+			$global_location  = get_field( 'maipub_global_location' );
+			$single_location  = get_field( 'maipub_single_location' );
+			$archive_location = get_field( 'maipub_archive_location' );
 
 			if ( $global_location ) {
-				$ads['global'][] = maigam_filter_associative_array(
+				$ads['global'][] = maipub_filter_associative_array(
 					[
 						'id'       => $post_id,
 						'slug'     => $slug,
@@ -285,38 +285,38 @@ function maigam_get_ads_data() {
 			}
 
 			if ( $single_location ) {
-				$ads['single'][] = maigam_filter_associative_array(
+				$ads['single'][] = maipub_filter_associative_array(
 					[
 						'id'                  => $post_id,
 						'slug'                => $slug,
 						'location'            => $single_location,
 						'content'             => $content,
-						'content_location'    => get_field( 'maigam_single_content_location' ),
-						'content_count'       => get_field( 'maigam_single_content_count' ),
-						'types'               => get_field( 'maigam_single_types' ),
-						'keywords'            => get_field( 'maigam_single_keywords' ),
-						'taxonomies'          => get_field( 'maigam_single_taxonomies' ),
-						'taxonomies_relation' => get_field( 'maigam_single_taxonomies_relation' ),
-						'authors'             => get_field( 'maigam_single_authors' ),
-						'include'             => get_field( 'maigam_single_entries' ),
-						'exclude'             => get_field( 'maigam_single_exclude_entries' ),
+						'content_location'    => get_field( 'maipub_single_content_location' ),
+						'content_count'       => get_field( 'maipub_single_content_count' ),
+						'types'               => get_field( 'maipub_single_types' ),
+						'keywords'            => get_field( 'maipub_single_keywords' ),
+						'taxonomies'          => get_field( 'maipub_single_taxonomies' ),
+						'taxonomies_relation' => get_field( 'maipub_single_taxonomies_relation' ),
+						'authors'             => get_field( 'maipub_single_authors' ),
+						'include'             => get_field( 'maipub_single_entries' ),
+						'exclude'             => get_field( 'maipub_single_exclude_entries' ),
 					]
 				);
 			}
 
 			if ( $archive_location ) {
-				$ads['archive'][] = maigam_filter_associative_array(
+				$ads['archive'][] = maipub_filter_associative_array(
 					[
 						'id'            => $post_id,
 						'slug'          => $slug,
 						'location'      => $archive_location,
 						'content'       => $content,
-						'content_count' => get_field( 'maigam_archive_content_count' ),
-						'types'         => get_field( 'maigam_archive_types' ),
-						'taxonomies'    => get_field( 'maigam_archive_taxonomies' ),
-						'terms'         => get_field( 'maigam_archive_terms' ),
-						'exclude'       => get_field( 'maigam_archive_exclude_terms' ),
-						'includes'      => get_field( 'maigam_archive_includes' ),
+						'content_count' => get_field( 'maipub_archive_content_count' ),
+						'types'         => get_field( 'maipub_archive_types' ),
+						'taxonomies'    => get_field( 'maipub_archive_taxonomies' ),
+						'terms'         => get_field( 'maipub_archive_terms' ),
+						'exclude'       => get_field( 'maipub_archive_exclude_terms' ),
+						'includes'      => get_field( 'maipub_archive_includes' ),
 					]
 				);
 			}
@@ -335,7 +335,7 @@ function maigam_get_ads_data() {
  *
  * @return array
  */
-function maigam_get_locations() {
+function maipub_get_locations() {
 	static $locations = null;
 
 	if ( ! is_null( $locations ) ) {
@@ -389,7 +389,7 @@ function maigam_get_locations() {
 		],
 	];
 
-	if ( maigam_is_product_archive() || maigam_is_product_singular() ) {
+	if ( maipub_is_product_archive() || maipub_is_product_singular() ) {
 		$locations['before_loop'] = [
 			'hook'     => 'woocommerce_before_shop_loop',
 			'priority' => 12, // Notices are at 10.
@@ -421,7 +421,7 @@ function maigam_get_locations() {
 		];
 	}
 
-	$locations = apply_filters( 'maigam_locations', $locations );
+	$locations = apply_filters( 'maipub_locations', $locations );
 
 	if ( $locations ) {
 		foreach ( $locations as $name => $location ) {
@@ -446,11 +446,11 @@ function maigam_get_locations() {
  *
  * @return array
  */
-function maigam_get_config( $sub_config = '' ) {
+function maipub_get_config( $sub_config = '' ) {
 	static $config = null;
 
 	if ( ! is_array( $config ) ) {
-		$config = require MAI_GAM_DIR . '/config.php';
+		$config = require MAI_PUBLISHER_DIR . '/config.php';
 	}
 
 	if ( $sub_config ) {
@@ -470,10 +470,10 @@ function maigam_get_config( $sub_config = '' ) {
  *
  * @return string
  */
-function maigam_get_option( $option, $fallback = true ) {
-	$options = maigam_get_options();
+function maipub_get_option( $option, $fallback = true ) {
+	$options = maipub_get_options();
 
-	return isset( $options[ $option ] ) && $options[ $option ] ? $options[ $option ] : maigam_get_default_option( $option );
+	return isset( $options[ $option ] ) && $options[ $option ] ? $options[ $option ] : maipub_get_default_option( $option );
 }
 
 /**
@@ -483,14 +483,14 @@ function maigam_get_option( $option, $fallback = true ) {
  *
  * @return array
  */
-function maigam_get_options() {
+function maipub_get_options() {
 	static $options = null;
 
 	if ( ! is_null( $options ) ) {
 		return $options;
 	}
 
-	return (array) get_option( 'mai_gam', [] );
+	return (array) get_option( 'mai_publisher', [] );
 }
 
 /**
@@ -502,8 +502,8 @@ function maigam_get_options() {
  *
  * @return mixed|null
  */
-function maigam_get_default_option( $option ) {
-	$options = maigam_get_default_options();
+function maipub_get_default_option( $option ) {
+	$options = maipub_get_default_options();
 
 	return isset( $options[ $option ] ) ? $options[ $option ] : null;
 }
@@ -515,7 +515,7 @@ function maigam_get_default_option( $option ) {
  *
  * @return array
  */
-function maigam_get_default_options() {
+function maipub_get_default_options() {
 	static $options = null;
 
 	if ( ! is_null( $options ) ) {
@@ -523,8 +523,8 @@ function maigam_get_default_options() {
 	}
 
 	$options = [
-		'domain' => (string) wp_parse_url( esc_url( home_url() ), PHP_URL_HOST ),
-		'label'  => __( 'Sponsored', 'mai-gam' ),
+		'gam_domain' => (string) wp_parse_url( esc_url( home_url() ), PHP_URL_HOST ),
+		'label'      => __( 'Sponsored', 'mai-publisher' ),
 	];
 
 	return $options;
@@ -539,8 +539,8 @@ function maigam_get_default_options() {
  *
  * @return string
  */
-function maigam_get_domain( $fallback = true ) {
-	return maigam_get_domain_sanitized( (string) maigam_get_option( 'domain', $fallback ) );
+function maipub_get_gam_domain( $fallback = true ) {
+	return maipub_get_gam_domain_sanitized( (string) maipub_get_option( 'gam_domain', $fallback ) );
 }
 
 /**
@@ -552,7 +552,7 @@ function maigam_get_domain( $fallback = true ) {
  *
  * @return string
  */
-function maigam_get_domain_sanitized( string $domain ) {
+function maipub_get_gam_domain_sanitized( string $domain ) {
 	$domain = $domain ? (string) wp_parse_url( esc_url( (string) $domain ), PHP_URL_HOST ) : '';
 	$domain = str_replace( 'www.', '', $domain );
 
@@ -560,7 +560,7 @@ function maigam_get_domain_sanitized( string $domain ) {
 }
 
 /**
- * Update a single option from mai_gam array of options.
+ * Update a single option from mai_publisher array of options.
  *
  * @since 0.1.0
  *
@@ -569,8 +569,8 @@ function maigam_get_domain_sanitized( string $domain ) {
  *
  * @return void
  */
-function maigam_update_option( $option, $value ) {
-	$handle             = 'mai_gam';
+function maipub_update_option( $option, $value ) {
+	$handle             = 'mai_publisher';
 	$options            = get_option( $handle, [] );
 	$options[ $option ] = $value;
 

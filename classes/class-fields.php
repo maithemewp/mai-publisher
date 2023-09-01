@@ -3,7 +3,7 @@
 // Prevent direct file access.
 defined( 'ABSPATH' ) || die;
 
-class Mai_GAM_Ad_Fields {
+class Mai_Publisher_Ad_Fields {
 
 	/**
 	 * Construct the class.
@@ -20,15 +20,15 @@ class Mai_GAM_Ad_Fields {
 	 * @return void
 	 */
 	function hooks() {
-		add_action( 'acf/render_field/key=maigam_global_tab',          [ $this, 'admin_css' ] );
-		add_filter( 'acf/load_field/key=maigam_single_types',          [ $this, 'load_content_types' ] );
-		add_filter( 'acf/load_field/key=maigam_single_taxonomy',       [ $this, 'load_single_taxonomy' ] );
-		add_filter( 'acf/load_field/key=maigam_archive_types',         [ $this, 'load_archive_post_types' ] );
-		add_filter( 'acf/load_field/key=maigam_archive_taxonomies',    [ $this, 'load_all_taxonomies' ] );
-		add_filter( 'acf/load_field/key=maigam_archive_terms',         [ $this, 'load_all_terms' ] );
-		add_filter( 'acf/load_field/key=maigam_archive_exclude_terms', [ $this, 'load_all_terms' ] );
-		add_filter( 'acf/load_field/key=maigam_single_terms',          [ $this, 'load_single_terms' ] );
-		add_filter( 'acf/prepare_field/key=maigam_single_terms',       [ $this, 'prepare_single_terms' ] );
+		add_action( 'acf/render_field/key=maipub_global_tab',          [ $this, 'admin_css' ] );
+		add_filter( 'acf/load_field/key=maipub_single_types',          [ $this, 'load_content_types' ] );
+		add_filter( 'acf/load_field/key=maipub_single_taxonomy',       [ $this, 'load_single_taxonomy' ] );
+		add_filter( 'acf/load_field/key=maipub_archive_types',         [ $this, 'load_archive_post_types' ] );
+		add_filter( 'acf/load_field/key=maipub_archive_taxonomies',    [ $this, 'load_all_taxonomies' ] );
+		add_filter( 'acf/load_field/key=maipub_archive_terms',         [ $this, 'load_all_terms' ] );
+		add_filter( 'acf/load_field/key=maipub_archive_exclude_terms', [ $this, 'load_all_terms' ] );
+		add_filter( 'acf/load_field/key=maipub_single_terms',          [ $this, 'load_single_terms' ] );
+		add_filter( 'acf/prepare_field/key=maipub_single_terms',       [ $this, 'prepare_single_terms' ] );
 	}
 
 	/**
@@ -40,13 +40,13 @@ class Mai_GAM_Ad_Fields {
 	 */
 	function admin_css( $field ) {
 		echo '<style>
-		#acf-maigam_field_group > .acf-fields {
+		#acf-maipub_field_group > .acf-fields {
 			padding-bottom: 5vh !important;
 		}
-		.acf-field-maigam-single-taxonomies .acf-repeater .acf-actions {
+		.acf-field-maipub-single-taxonomies .acf-repeater .acf-actions {
 			text-align: start;
 		}
-		.acf-field-maigam-single-taxonomies .acf-repeater .acf-button {
+		.acf-field-maipub-single-taxonomies .acf-repeater .acf-button {
 			float: none;
 		}
 		</style>';
@@ -64,7 +64,7 @@ class Mai_GAM_Ad_Fields {
 	 */
 	function load_content_types( $field ) {
 		$field['choices'] = array_merge(
-			[ '*' => __( 'All Content Types', 'mai-gam' ) ],
+			[ '*' => __( 'All Content Types', 'mai-publisher' ) ],
 			$this->get_post_type_choices()
 		);
 
@@ -109,7 +109,7 @@ class Mai_GAM_Ad_Fields {
 		}
 
 		$field['choices'] = array_merge(
-			[ '*' => __( 'All Post Types', 'mai-gam' ) ],
+			[ '*' => __( 'All Post Types', 'mai-publisher' ) ],
 			$post_types
 		);
 
@@ -127,7 +127,7 @@ class Mai_GAM_Ad_Fields {
 	 */
 	function load_all_taxonomies( $field ) {
 		$field['choices'] = array_merge(
-			[ '*' => __( 'All Taxonomies', 'mai-gam' ) ],
+			[ '*' => __( 'All Taxonomies', 'mai-publisher' ) ],
 			$this->get_taxonomy_choices()
 		);
 
@@ -204,7 +204,7 @@ class Mai_GAM_Ad_Fields {
 		$post_types = get_post_types( [ 'public' => true ], 'names' );
 		unset( $post_types['attachment'] );
 
-		$post_types = apply_filters( 'maigam_post_types', array_values( $post_types ) );
+		$post_types = apply_filters( 'maipub_post_types', array_values( $post_types ) );
 
 		$post_types = array_unique( array_filter( (array) $post_types ) );
 
@@ -256,7 +256,7 @@ class Mai_GAM_Ad_Fields {
 
 		$taxonomies = get_taxonomies( [ 'public' => 'true' ], 'names' );
 
-		$taxonomies = apply_filters( 'maigam_taxonomies', array_values( $taxonomies ) );
+		$taxonomies = apply_filters( 'maipub_taxonomies', array_values( $taxonomies ) );
 
 		$taxonomies = array_unique( array_filter( (array) $taxonomies ) );
 

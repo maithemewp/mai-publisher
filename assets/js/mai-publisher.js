@@ -4,14 +4,14 @@ googletag.cmd.push( function() {
 	var refreshKey     = 'refresh';
 	var refreshvalue   = 'true';
 	var refreshSeconds = 30; // Seconds to wait after the slot becomes viewable before we refresh the ad
-	var ads            = maiGAMVars['ads'];
+	var ads            = maiPubVars['ads'];
 
-	// Loop through maiGAMVars getting key and values.
+	// Loop through maiPubVars getting key and values.
 	for ( var id in ads ) {
 		console.log( id, ads[id].sizes );
 
 		// Define ad slot.
-		var slot = googletag.defineSlot( '/22487526518/' + maiGAMVars['domain'] + '/' + id, ads[id].sizes, 'mai-ad-' + id )
+		var slot = googletag.defineSlot( '/22487526518/' + maiPubVars['gam_domain'] + '/' + id, ads[id].sizes, 'mai-ad-' + id )
 			.setTargeting( refreshKey, refreshvalue )
 			.addService( googletag.pubads() );
 

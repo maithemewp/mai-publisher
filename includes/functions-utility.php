@@ -12,7 +12,7 @@
  *
  * @return array
  */
-function maigam_array_insert_after( array $array, $key, array $new ) {
+function maipub_array_insert_after( array $array, $key, array $new ) {
 	$keys  = array_keys( $array );
 	$index = array_search( $key, $keys, true );
 	$pos   = false === $index ? count( $array ) : $index + 1;
@@ -29,7 +29,7 @@ function maigam_array_insert_after( array $array, $key, array $new ) {
  *
  * @return array
  */
-function maigam_sanitize_keywords( $keywords ) {
+function maipub_sanitize_keywords( $keywords ) {
 	$sanitized = [];
 	$keywords  = trim( (string) $keywords );
 
@@ -40,7 +40,7 @@ function maigam_sanitize_keywords( $keywords ) {
 	$sanitized = explode( ',', $keywords );
 	$sanitized = array_map( 'trim', $sanitized );
 	$sanitized = array_filter( $sanitized );
-	$sanitized = array_map( 'maigam_strtolower', $sanitized );
+	$sanitized = array_map( 'maipub_strtolower', $sanitized );
 
 	return $sanitized;
 }
@@ -54,7 +54,7 @@ function maigam_sanitize_keywords( $keywords ) {
  *
  * @return array
  */
-function maigam_sanitize_taxonomies( $taxonomies ) {
+function maipub_sanitize_taxonomies( $taxonomies ) {
 	if ( ! $taxonomies ) {
 		return $taxonomies;
 	}
@@ -94,12 +94,12 @@ function maigam_sanitize_taxonomies( $taxonomies ) {
  *
  * @return array
  */
-function maigam_filter_associative_array( $array ) {
+function maipub_filter_associative_array( $array ) {
 	foreach( $array as $key => $value ) {
 		if ( '' === $value ) {
 			unset( $array[ $key ] );
 		} elseif ( is_array( $value ) ) {
-			$value = maigam_filter_associative_array( $value );
+			$value = maipub_filter_associative_array( $value );
 		}
 	}
 
@@ -115,7 +115,7 @@ function maigam_filter_associative_array( $array ) {
  *
  * @return string
  */
-function maigam_strtolower( $string ) {
+function maipub_strtolower( $string ) {
 	return mb_strtolower( (string) $string, 'UTF-8' );
 }
 
@@ -129,7 +129,7 @@ function maigam_strtolower( $string ) {
  *
  * @return array
  */
-function maigam_validate_args( $args, $type ) {
+function maipub_validate_args( $args, $type ) {
 	$valid = [];
 
 	// Bail if no id, content, and location.
@@ -138,7 +138,7 @@ function maigam_validate_args( $args, $type ) {
 	}
 
 	// Set variables.
-	$locations = maigam_get_locations();
+	$locations = maipub_get_locations();
 
 	// Bail if no location hook. Only check isset for location since 'content' has no hook.
 	if ( ! isset( $locations[ $args['location'] ] ) ) {
@@ -148,15 +148,15 @@ function maigam_validate_args( $args, $type ) {
 	// Validate by type.
 	switch ( $type ) {
 		case 'global':
-			$valid = maigam_validate_args_global( $args );
+			$valid = maipub_validate_args_global( $args );
 			break;
 
 		case 'single':
-			$valid = maigam_validate_args_single( $args );
+			$valid = maipub_validate_args_single( $args );
 			break;
 
 		case 'archive':
-			$valid = maigam_validate_args_archive( $args );
+			$valid = maipub_validate_args_archive( $args );
 			break;
 	}
 
@@ -172,7 +172,7 @@ function maigam_validate_args( $args, $type ) {
  *
  * @return array
  */
-function maigam_validate_args_global( $args ) {
+function maipub_validate_args_global( $args ) {
 	// Parse.
 	$args = wp_parse_args( $args, [
 		'id'       => '',
@@ -201,8 +201,8 @@ function maigam_validate_args_global( $args ) {
  *
  * @return array
  */
-function maigam_validate_args_single( $args ) {
-	if ( ! maigam_is_singular() ) {
+function maipub_validate_args_single( $args ) {
+	if ( ! maipub_is_singular() ) {
 		return [];
 	}
 
@@ -232,8 +232,8 @@ function maigam_validate_args_single( $args ) {
 		'content_location'    => esc_html( $args['content_location'] ),
 		'content_count'       => $args['content_count'] ? array_map( 'absint', explode( ',', $args['content_count'] ) ) : [],
 		'types'               => $args['types'] ? array_map( 'esc_html', (array) $args['types'] ) : [],
-		'keywords'            => maigam_sanitize_keywords( $args['keywords'] ),
-		'taxonomies'          => maigam_sanitize_taxonomies( $args['taxonomies'] ),
+		'keywords'            => maipub_sanitize_keywords( $args['keywords'] ),
+		'taxonomies'          => maipub_sanitize_taxonomies( $args['taxonomies'] ),
 		'taxonomies_relation' => esc_html( $args['taxonomies_relation'] ),
 		'authors'             => $args['authors'] ? array_map( 'absint', (array) $args['authors'] ) : [],
 		'include'             => $args['include'] ? array_map( 'absint', (array) $args['include'] ) : [],
@@ -261,9 +261,9 @@ function maigam_validate_args_single( $args ) {
 	// If not already including, and have keywords, check for them.
 	if ( ! $include && $args['keywords'] ) {
 		$post         = get_post( $post_id );
-		$post_content = maigam_strtolower( strip_tags( do_shortcode( trim( $post->post_content ) ) ) );
+		$post_content = maipub_strtolower( strip_tags( do_shortcode( trim( $post->post_content ) ) ) );
 
-		if ( ! maigam_has_string( $args['keywords'], $post_content ) ) {
+		if ( ! maipub_has_string( $args['keywords'], $post_content ) ) {
 			return [];
 		}
 	}
@@ -333,7 +333,7 @@ function maigam_validate_args_single( $args ) {
 		}
 
 		// Get valid counts.
-		$count = maigam_get_content( $post_content, $args, true );
+		$count = maipub_get_content( $post_content, $args, true );
 
 		// Update counts or bail.
 		if ( $count ) {
@@ -355,8 +355,8 @@ function maigam_validate_args_single( $args ) {
  *
  * @return array
  */
-function maigam_validate_args_archive( $args ) {
-	if ( ! maigam_is_archive() ) {
+function maipub_validate_args_archive( $args ) {
+	if ( ! maipub_is_archive() ) {
 		return [];
 	}
 
@@ -396,9 +396,9 @@ function maigam_validate_args_archive( $args ) {
 		}
 	}
 	// CPT archive. WooCommerce shop returns false for `is_post_type_archive()`.
-	elseif ( is_post_type_archive() || maigam_is_shop_archive() ) {
+	elseif ( is_post_type_archive() || maipub_is_shop_archive() ) {
 		// Bail if shop page and not showing here.
-		if ( maigam_is_shop_archive() ) {
+		if ( maipub_is_shop_archive() ) {
 			if ( ! $args['types'] && ( ! in_array( '*', $args['types'] ) || ! in_array( 'product', $args['types'] ) ) ) {
 				return [];
 			}

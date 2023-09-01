@@ -4,8 +4,8 @@
 		return;
 	}
 
-	var postKeys = [ 'maigam_single_taxonomy' ];
-	var taxoKeys = [ 'maigam_single_terms' ];
+	var postKeys = [ 'maipub_single_taxonomy' ];
+	var taxoKeys = [ 'maipub_single_terms' ];
 
 	/**
 	 * Uses current post types or taxonomy for use in other field queries.
@@ -19,7 +19,7 @@
 
 			var postField = acf.getFields(
 				{
-					key: 'maigam_single_types',
+					key: 'maipub_single_types',
 					parent: field.$el.parents( '.acf-row' ).parents( '.acf-row' ),
 				}
 			);
@@ -35,7 +35,7 @@
 
 			var taxoField = acf.getFields(
 				{
-					key: 'maigam_single_taxonomy',
+					key: 'maipub_single_taxonomy',
 					sibling: field.$el,
 				}
 			);

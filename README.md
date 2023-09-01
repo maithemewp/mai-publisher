@@ -1,2 +1,2 @@
-# Mai GAM
-Manage Google Ad Manager ads in Mai Theme and beyond.
+# Mai Publisher
+Manage ads and more for websites in the Mai Publisher network

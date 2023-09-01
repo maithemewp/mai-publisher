@@ -3,7 +3,7 @@
 // Prevent direct file access.
 defined( 'ABSPATH' ) || die;
 
-class Mai_GAM_Generate_Ads {
+class Mai_Publisher_Generate_Ads {
 
 	/**
 	 * Construct the class.
@@ -22,7 +22,7 @@ class Mai_GAM_Generate_Ads {
 	function hooks() {
 		add_action( 'load-edit.php',                         [ $this, 'admin_notice' ] );
 		add_action( 'load-edit.php',                         [ $this, 'admin_notice_success' ] );
-		add_action( 'admin_post_maigam_generate_ads_action', [ $this, 'action' ] );
+		add_action( 'admin_post_maipub_generate_ads_action', [ $this, 'action' ] );
 	}
 
 	/**
@@ -52,14 +52,14 @@ class Mai_GAM_Generate_Ads {
 		add_action( 'admin_notices', function() use ( $missing ) {
 
 			if ( 1 === $missing ) {
-				$notice = sprintf( '%s %s', $missing, __( 'default Mai Ad needs to be created.', 'mai-gam' ) );
+				$notice = sprintf( '%s %s', $missing, __( 'default Mai Ad needs to be created.', 'mai-publisher' ) );
 			} else {
-				$notice = sprintf( '%s %s', $missing, __( 'default Mai Ads need to be created.', 'mai-gam' ) );
+				$notice = sprintf( '%s %s', $missing, __( 'default Mai Ads need to be created.', 'mai-publisher' ) );
 			}
 
-			$generate_url = add_query_arg( [ 'action' => 'maigam_generate_ads_action' ], admin_url( 'admin-post.php' ) );
-			$generate_url = wp_nonce_url( $generate_url, 'maigam_generate_ads_action', 'maigam_generate_ads_nonce' );
-			$button       = sprintf( '<a class="button button-primary" href="%s">%s</a>', $generate_url, __( 'Generate Now', 'mai-gam' ) );
+			$generate_url = add_query_arg( [ 'action' => 'maipub_generate_ads_action' ], admin_url( 'admin-post.php' ) );
+			$generate_url = wp_nonce_url( $generate_url, 'maipub_generate_ads_action', 'maipub_generate_ads_nonce' );
+			$button       = sprintf( '<a class="button button-primary" href="%s">%s</a>', $generate_url, __( 'Generate Now', 'mai-publisher' ) );
 
 			printf(
 				'<div class="notice notice-warning"><p>%s</p><p>%s</p></div>',
@@ -84,7 +84,7 @@ class Mai_GAM_Generate_Ads {
 			return;
 		}
 
-		$notice = isset( $_GET['maigam_notice'] ) ? esc_html( $_GET['maigam_notice'] ) : false;
+		$notice = isset( $_GET['maipub_notice'] ) ? esc_html( $_GET['maipub_notice'] ) : false;
 
 		if ( ! $notice ) {
 			return;
@@ -103,17 +103,17 @@ class Mai_GAM_Generate_Ads {
 	 * @return void
 	 */
 	function action() {
-		$referrer = check_admin_referer( 'maigam_generate_ads_action', 'maigam_generate_ads_nonce' );
-		$nonce    = isset( $_GET[ 'maigam_generate_ads_nonce' ] ) ? esc_html( $_GET[ 'maigam_generate_ads_nonce' ] ) : null;
+		$referrer = check_admin_referer( 'maipub_generate_ads_action', 'maipub_generate_ads_nonce' );
+		$nonce    = isset( $_GET[ 'maipub_generate_ads_nonce' ] ) ? esc_html( $_GET[ 'maipub_generate_ads_nonce' ] ) : null;
 		$action   = isset( $_GET[ 'action' ] ) ? esc_html( $_GET[ 'action' ] ) : null;
 
 		if ( ! ( current_user_can( 'edit_theme_options' ) && $referrer && $nonce && $action && wp_verify_nonce( $nonce, $action ) ) ) {
 			wp_die(
-				__( 'Mai Ads failed to generate.', 'mai-gam' ),
-				__( 'Error', 'mai-gam' ),
+				__( 'Mai Ads failed to generate.', 'mai-publisher' ),
+				__( 'Error', 'mai-publisher' ),
 				[
 					'link_url'  => admin_url( 'edit.php?post_type=mai_ad' ),
-					'link_text' => __( 'Go back.', 'mai-gam' ),
+					'link_text' => __( 'Go back.', 'mai-publisher' ),
 				]
 			);
 		}
@@ -124,17 +124,17 @@ class Mai_GAM_Generate_Ads {
 
 		switch ( $count ) {
 			case 0:
-				$message = __( 'Sorry, no ads are available.', 'mai-gam' );
+				$message = __( 'Sorry, no ads are available.', 'mai-publisher' );
 			break;
 			case 1:
-				$message = sprintf( '%s %s', $count, __( 'default ads successfully created.', 'mai-gam' ) );
+				$message = sprintf( '%s %s', $count, __( 'default ads successfully created.', 'mai-publisher' ) );
 			break;
 			default:
-				$message = sprintf( '%s %s', $count, __( 'default ads successfully created.', 'mai-gam' ) );
+				$message = sprintf( '%s %s', $count, __( 'default ads successfully created.', 'mai-publisher' ) );
 		}
 
 		if ( $message ) {
-			$redirect = add_query_arg( 'maigam_notice', urlencode( esc_html( $message ) ), $redirect );
+			$redirect = add_query_arg( 'maipub_notice', urlencode( esc_html( $message ) ), $redirect );
 		}
 
 		wp_safe_redirect( $redirect );
@@ -184,7 +184,7 @@ class Mai_GAM_Generate_Ads {
 	 */
 	function get_missing_ads() {
 		$ads      = [];
-		$config   = maigam_get_config( 'ad_units' );
+		$config   = maipub_get_config( 'ad_units' );
 		$existing = $this->get_existing_ads();
 
 		if ( ! ( $config && $existing ) ) {

@@ -3,7 +3,7 @@
 // Prevent direct file access.
 defined( 'ABSPATH' ) || die;
 
-class Mai_GAM_Ad_Unit_Block {
+class Mai_Publisher_Ad_Unit_Block {
 
 	/**
 	 * Construct the class.
@@ -22,7 +22,7 @@ class Mai_GAM_Ad_Unit_Block {
 	function hooks() {
 		add_action( 'acf/init',                             [ $this, 'register_block' ] );
 		add_action( 'acf/init',                             [ $this, 'register_field_group' ] );
-		add_filter( 'acf/load_field/key=maigam_ad_unit_id', [ $this, 'load_ad_unit_choices' ] );
+		add_filter( 'acf/load_field/key=maipub_ad_unit_id', [ $this, 'load_ad_unit_choices' ] );
 	}
 
 	/**
@@ -57,7 +57,7 @@ class Mai_GAM_Ad_Unit_Block {
 
 		if ( $is_preview ) {
 			$styles = 'display:grid;place-items:center;aspect-ratio:728/90;background:rgba(0,0,0,0.1);font-variant:all-small-caps;letter-spacing:1px;';
-			$text   = $id ? __( 'Ad Placeholder', 'mai-gam' ) : __( 'No Ad Unit Selected', 'mai-gam' );
+			$text   = $id ? __( 'Ad Placeholder', 'mai-publisher' ) : __( 'No Ad Unit Selected', 'mai-publisher' );
 			printf( '<div class="mai-ad-unit" style="%s">%s</div>', $styles, $text );
 			return;
 		}
@@ -72,7 +72,7 @@ class Mai_GAM_Ad_Unit_Block {
 
 		// TODO. Get aspect ratio from config sizes at each breakpoint and add as inline custom properties.
 
-		printf( '<div class="mai-ad-unit" data-label="%s"><div id="mai-ad-%s"><script>googletag.cmd.push(function(){googletag.display("mai-ad-%s")});</script></div></div>', maigam_get_option( 'label' ), $slot, $slot );
+		printf( '<div class="mai-ad-unit" data-label="%s"><div id="mai-ad-%s"><script>googletag.cmd.push(function(){googletag.display("mai-ad-%s")});</script></div></div>', maipub_get_option( 'label' ), $slot, $slot );
 	}
 
 	/**
@@ -112,11 +112,11 @@ class Mai_GAM_Ad_Unit_Block {
 		acf_add_local_field_group(
 			[
 				'key'      => 'mai_field_group',
-				'title'    => __( 'Locations Settings', 'mai-gam' ),
+				'title'    => __( 'Locations Settings', 'mai-publisher' ),
 				'fields'   =>[
 					[
-						'label'        => __( 'Ad Unit', 'mai-gam' ),
-						'key'          => 'maigam_ad_unit_id',
+						'label'        => __( 'Ad Unit', 'mai-publisher' ),
+						'key'          => 'maipub_ad_unit_id',
 						'name'         => 'id',
 						'type'         => 'select',
 						'choices'      => [],
@@ -145,8 +145,8 @@ class Mai_GAM_Ad_Unit_Block {
 	 * @return array
 	 */
 	function load_ad_unit_choices( $field ) {
-		$choices = [ '' => __( 'None', 'mai-gam' ) ];
-		$units   = maigam_get_config( 'ad_units' );
+		$choices = [ '' => __( 'None', 'mai-publisher' ) ];
+		$units   = maipub_get_config( 'ad_units' );
 
 		foreach ( $units as $slug => $unit ) {
 			$choices[ $slug ] = $unit['post_title'];

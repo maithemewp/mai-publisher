@@ -3,7 +3,7 @@
 // Prevent direct file access.
 defined( 'ABSPATH' ) || die;
 
-class Mai_GAM_Admin {
+class Mai_Publisher_Admin {
 
 	/**
 	 * Construct the class.
@@ -36,9 +36,9 @@ class Mai_GAM_Admin {
 	function add_slug_column( $columns ) {
 		unset( $columns['date'] );
 
-		$new = [ 'maigam_slug' => __( 'Slug', 'mai-gam' ) ];
+		$new = [ 'maipub_slug' => __( 'Slug', 'mai-publisher' ) ];
 
-		return maigam_array_insert_after( $columns, 'title', $new );
+		return maipub_array_insert_after( $columns, 'title', $new );
 	}
 
 	/**
@@ -52,7 +52,7 @@ class Mai_GAM_Admin {
 	 * @return void
 	 */
 	function display_slug_column( $column, $post_id ) {
-		if ( 'maigam_slug' !== $column ) {
+		if ( 'maipub_slug' !== $column ) {
 			return;
 		}
 

@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Plugin Name:     Mai GAM
+ * Plugin Name:     Mai Publisher
  * Plugin URI:      https://bizbudding.com
- * Description:     Manage Google Ad Manager ads in Mai Theme and beyond.
+ * Description:     Manage ads and more for websites in the Mai Publisher network.
  * Version:         0.1.0
  *
  * Author:          BizBudding
@@ -17,37 +17,37 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
 /**
- * Main Mai_GAM_Plugin Class.
+ * Main Mai_Publisher_Plugin Class.
  *
  * @since 0.1.0
  */
-final class Mai_GAM_Plugin {
+final class Mai_Publisher_Plugin {
 
 	/**
-	 * @var Mai_GAM_Plugin The one true Mai_GAM_Plugin
+	 * @var Mai_Publisher_Plugin The one true Mai_Publisher_Plugin
 	 *
 	 * @since 0.1.0
 	 */
 	private static $instance;
 
 	/**
-	 * Main Mai_GAM_Plugin Instance.
+	 * Main Mai_Publisher_Plugin Instance.
 	 *
-	 * Insures that only one instance of Mai_GAM_Plugin exists in memory at any one
+	 * Insures that only one instance of Mai_Publisher_Plugin exists in memory at any one
 	 * time. Also prevents needing to define globals all over the place.
 	 *
 	 * @since   0.1.0
 	 * @static  var array $instance
-	 * @uses    Mai_GAM_Plugin::setup_constants() Setup the constants needed.
-	 * @uses    Mai_GAM_Plugin::includes() Include the required files.
-	 * @uses    Mai_GAM_Plugin::hooks() Activate, deactivate, etc.
-	 * @see     Mai_GAM_Plugin()
-	 * @return  object | Mai_GAM_Plugin The one true Mai_GAM_Plugin
+	 * @uses    Mai_Publisher_Plugin::setup_constants() Setup the constants needed.
+	 * @uses    Mai_Publisher_Plugin::includes() Include the required files.
+	 * @uses    Mai_Publisher_Plugin::hooks() Activate, deactivate, etc.
+	 * @see     Mai_Publisher_Plugin()
+	 * @return  object | Mai_Publisher_Plugin The one true Mai_Publisher_Plugin
 	 */
 	public static function instance() {
 		if ( ! isset( self::$instance ) ) {
 			// Setup the setup.
-			self::$instance = new Mai_GAM_Plugin;
+			self::$instance = new Mai_Publisher_Plugin;
 			// Methods.
 			self::$instance->setup_constants();
 			self::$instance->includes();
@@ -68,7 +68,7 @@ final class Mai_GAM_Plugin {
 	 */
 	public function __clone() {
 		// Cloning instances of the class is forbidden.
-		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'mai-gam' ), '1.0' );
+		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'mai-publisher' ), '1.0' );
 	}
 
 	/**
@@ -80,7 +80,7 @@ final class Mai_GAM_Plugin {
 	 */
 	public function __wakeup() {
 		// Unserializing instances of the class is forbidden.
-		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'mai-gam' ), '1.0' );
+		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'mai-publisher' ), '1.0' );
 	}
 
 	/**
@@ -92,18 +92,18 @@ final class Mai_GAM_Plugin {
 	 */
 	private function setup_constants() {
 		// Plugin version.
-		if ( ! defined( 'MAI_GAM_VERSION' ) ) {
-			define( 'MAI_GAM_VERSION', '0.1.0' );
+		if ( ! defined( 'MAI_PUBLISHER_VERSION' ) ) {
+			define( 'MAI_PUBLISHER_VERSION', '0.1.0' );
 		}
 
 		// Plugin Folder Path.
-		if ( ! defined( 'MAI_GAM_DIR' ) ) {
-			define( 'MAI_GAM_DIR', plugin_dir_path( __FILE__ ) );
+		if ( ! defined( 'MAI_PUBLISHER_DIR' ) ) {
+			define( 'MAI_PUBLISHER_DIR', plugin_dir_path( __FILE__ ) );
 		}
 
 		// Plugin Folder URL.
-		if ( ! defined( 'MAI_GAM_URL' ) ) {
-			define( 'MAI_GAM_URL', plugin_dir_url( __FILE__ ) );
+		if ( ! defined( 'MAI_PUBLISHER_URL' ) ) {
+			define( 'MAI_PUBLISHER_URL', plugin_dir_url( __FILE__ ) );
 		}
 	}
 
@@ -118,21 +118,21 @@ final class Mai_GAM_Plugin {
 		// Include vendor libraries.
 		require_once __DIR__ . '/vendor/autoload.php';
 		// Includes.
-		foreach ( glob( MAI_GAM_DIR . 'includes/' . '*.php' ) as $file ) { include $file; }
+		foreach ( glob( MAI_PUBLISHER_DIR . 'includes/' . '*.php' ) as $file ) { include $file; }
 		// Classes.
-		foreach ( glob( MAI_GAM_DIR . 'classes/' . '*.php' ) as $file ) { include $file; }
+		foreach ( glob( MAI_PUBLISHER_DIR . 'classes/' . '*.php' ) as $file ) { include $file; }
 		// Blocks.
-		// include MAI_GAM_DIR . 'blocks/ad/block.php';
-		include MAI_GAM_DIR . 'blocks/ad-unit/block.php';
+		// include MAI_PUBLISHER_DIR . 'blocks/ad/block.php';
+		include MAI_PUBLISHER_DIR . 'blocks/ad-unit/block.php';
 		// Instantiate classes.
-		$settings      = new Mai_GAM_Settings;
-		$admin         = new Mai_GAM_Admin;
-		$metabox       = new Mai_GAM_Ad_Field_Group;
-		$fields        = new Mai_GAM_Ad_Fields;
-		$generate      = new Mai_GAM_Generate_Ads;
-		// $ad_block      = new Mai_GAM_Ad_Block;
-		$ad_unit_block = new Mai_GAM_Ad_Unit_Block;
-		$display       = new Mai_GAM_Display;
+		$settings      = new Mai_Publisher_Settings;
+		$admin         = new Mai_Publisher_Admin;
+		$metabox       = new Mai_Publisher_Ad_Field_Group;
+		$fields        = new Mai_Publisher_Ad_Fields;
+		$generate      = new Mai_Publisher_Generate_Ads;
+		// $ad_block      = new Mai_Publisher_Ad_Block;
+		$ad_unit_block = new Mai_Publisher_Ad_Unit_Block;
+		$display       = new Mai_Publisher_Display;
 	}
 
 	/**
@@ -168,7 +168,7 @@ final class Mai_GAM_Plugin {
 		}
 
 		// Setup the updater.
-		$updater = PucFactory::buildUpdateChecker( 'https://github.com/maithemewp/mai-gam/', __FILE__, 'mai-gam' );
+		$updater = PucFactory::buildUpdateChecker( 'https://github.com/maithemewp/mai-publisher/', __FILE__, 'mai-publisher' );
 
 		// Set the branch that contains the stable release.
 		$updater->setBranch( 'main' );
@@ -208,20 +208,20 @@ final class Mai_GAM_Plugin {
 				'has_archive'         => true,
 				'hierarchical'        => false,
 				'labels'              => [
-					'name'               => _x( 'Ads', 'Ad general name', 'mai-gam' ),
-					'singular_name'      => _x( 'Ad',  'Ad singular name', 'mai-gam' ),
-					'menu_name'          => _x( 'Ads', 'Ad admin menu', 'mai-gam' ),
-					'name_admin_bar'     => _x( 'Ad',  'Ad add new on admin bar', 'mai-gam' ),
-					'add_new'            => _x( 'Add New', 'Ad', 'mai-gam' ),
-					'add_new_item'       => __( 'Add New Mai Ad', 'mai-gam' ),
-					'new_item'           => __( 'New Ad', 'mai-gam' ),
-					'edit_item'          => __( 'Edit Ad', 'mai-gam' ),
-					'view_item'          => __( 'View Ad', 'mai-gam' ),
-					'all_items'          => __( 'All Mai Ads', 'mai-gam' ),
-					'search_items'       => __( 'Search Mai Ads', 'mai-gam' ),
-					'parent_item_colon'  => __( 'Parent Mai Ads:', 'mai-gam' ),
-					'not_found'          => __( 'No Mai Ads found.', 'mai-gam' ),
-					'not_found_in_trash' => __( 'No Mai Ads found in Trash.', 'mai-gam' )
+					'name'               => _x( 'Ads', 'Ad general name', 'mai-publisher' ),
+					'singular_name'      => _x( 'Ad',  'Ad singular name', 'mai-publisher' ),
+					'menu_name'          => _x( 'Ads', 'Ad admin menu', 'mai-publisher' ),
+					'name_admin_bar'     => _x( 'Ad',  'Ad add new on admin bar', 'mai-publisher' ),
+					'add_new'            => _x( 'Add New', 'Ad', 'mai-publisher' ),
+					'add_new_item'       => __( 'Add New Mai Ad', 'mai-publisher' ),
+					'new_item'           => __( 'New Ad', 'mai-publisher' ),
+					'edit_item'          => __( 'Edit Ad', 'mai-publisher' ),
+					'view_item'          => __( 'View Ad', 'mai-publisher' ),
+					'all_items'          => __( 'All Mai Ads', 'mai-publisher' ),
+					'search_items'       => __( 'Search Mai Ads', 'mai-publisher' ),
+					'parent_item_colon'  => __( 'Parent Mai Ads:', 'mai-publisher' ),
+					'not_found'          => __( 'No Mai Ads found.', 'mai-publisher' ),
+					'not_found_in_trash' => __( 'No Mai Ads found in Trash.', 'mai-publisher' )
 				],
 				'menu_icon'          => 'dashicons-media-code',
 				'menu_position'      => 50,
@@ -251,23 +251,23 @@ final class Mai_GAM_Plugin {
 }
 
 /**
- * The main function for that returns Mai_GAM_Plugin
+ * The main function for that returns Mai_Publisher_Plugin
  *
- * The main function responsible for returning the one true Mai_GAM_Plugin
+ * The main function responsible for returning the one true Mai_Publisher_Plugin
  * Instance to functions everywhere.
  *
  * Use this function like you would a global variable, except without needing
  * to declare the global.
  *
- * Example: <?php $plugin = Mai_GAM_Plugin(); ?>
+ * Example: <?php $plugin = Mai_Publisher_Plugin(); ?>
  *
  * @since 0.1.0
  *
- * @return object|Mai_GAM_Plugin The one true Mai_GAM_Plugin Instance.
+ * @return object|Mai_Publisher_Plugin The one true Mai_Publisher_Plugin Instance.
  */
-function maigam_plugin() {
-	return Mai_GAM_Plugin::instance();
+function maipub_plugin() {
+	return Mai_Publisher_Plugin::instance();
 }
 
-// Get Mai_GAM_Plugin Running.
-maigam_plugin();
+// Get Mai_Publisher_Plugin Running.
+maipub_plugin();
