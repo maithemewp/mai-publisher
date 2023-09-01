@@ -3,10 +3,10 @@
 	"title": "Mai Ad Unit",
 	"description": "Displays an ad unit.",
 	"category": "widgets",
-	"keywords": [ "ad", "unit", "gam" ],
+	"keywords": [ "ad", "publisher", "gam" ],
 	"icon": "media-code",
-	"textdomain": "mai-gam",
-	"style": "file:../../assets/css/mai-gam.css",
+	"textdomain": "mai-publisher",
+	"style": "file:../../assets/css/mai-publisher.css",
 	"acf": {
 		"mode": "preview"
 	},
