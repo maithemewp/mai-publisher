@@ -116,7 +116,7 @@ class Mai_Publisher_Ad_Block {
 	 * @return array
 	 */
 	function load_ad_choices( $field ) {
-		if ( is_admin() ) {
+		if ( ! is_admin() ) {
 			return $field;
 		}
 
@@ -129,7 +129,7 @@ class Mai_Publisher_Ad_Block {
 				'update_post_meta_cache' => false,
 				'update_post_term_cache' => false,
 				'suppress_filters'       => false, // https://github.com/10up/Engineering-Best-Practices/issues/116
-				'orderby'                => 'menu_order',
+				'orderby'                => 'title',
 				'order'                  => 'ASC',
 			]
 		);
