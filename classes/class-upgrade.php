@@ -39,7 +39,7 @@ class Mai_Publisher_Upgrade {
 		if ( false === maipub_get_option( 'first-version', false ) ) {
 			// Set first version and default label.
 			maipub_update_option( 'first-version', $plugin_version );
-			maipub_update_option( 'label', maipub_get_option_default( 'label' ) );
+			maipub_update_option( 'label', __( 'Sponsored', 'mai-publisher' ) );
 		}
 
 		$db_version = maipub_get_option( 'db-version', false );
