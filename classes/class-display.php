@@ -55,7 +55,7 @@ class Mai_Publisher_Display {
 			wp_localize_script( 'mai-publisher', 'maiPubVars',
 				[
 					'gam_domain' => $this->domain,
-					'ads'    => $gam_ads,
+					'ads'        => $gam_ads,
 				]
 			);
 		}
@@ -83,9 +83,8 @@ class Mai_Publisher_Display {
 			}
 
 			if ( isset( $counts[ $slug ] ) ) {
-				$slug_number                       = $counts[ $slug ] + 1;
-				$counts[ $slug ]                   = $slug_number;
-				$ads[ $slug . '-' . $slug_number ] = [
+				$counts[ $slug ]++;
+				$ads[ $slug . '-' . $counts[ $slug ] ] = [
 					'id'           => $slug,
 					'sizes'        => $config[ $slug ]['sizes'],
 					'sizesDesktop' => $config[ $slug ]['sizes_desktop'],
@@ -175,7 +174,6 @@ class Mai_Publisher_Display {
 
 			// In Content (Single).
 			if ( 'content' === $args['location'] ) {
-
 				/**
 				 * Adds content to the_content.
 				 *
@@ -302,7 +300,7 @@ class Mai_Publisher_Display {
 		}
 
 		$suffix    = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-		$file      = "/assets/js/mai-publisher{$suffix}.js";
+		$file      = "assets/js/mai-publisher{$suffix}.js";
 		$file_path = MAI_PUBLISHER_DIR . $file;
 		$file_url  = MAI_PUBLISHER_URL . $file;
 		$version   = MAI_PUBLISHER_VERSION . '.' . date( 'njYHi', filemtime( $file_path ) );
