@@ -409,7 +409,7 @@ function maipub_get_locations() {
 		],
 		'after_footer'        => [
 			'hook'     => 'wp_footer',
-			'priority' => 30,
+			'priority' => 20,
 		],
 	];
 
