@@ -87,6 +87,9 @@ class Mai_Publisher_Ad_Unit_Block {
 			return;
 		}
 
+		// Add id first.
+		$attr = array_merge( [ 'id' => sprintf( 'mai-ad-%s', $slot ) ], $attr );
+
 		// Maybe add anaytlics tracking.
 		if ( class_exists( 'Mai_Analytics_Plugin' ) ) {
 			$attr['data-content-name']  = $slot;
@@ -94,7 +97,7 @@ class Mai_Publisher_Ad_Unit_Block {
 		}
 
 		// Build HTML, then allow filtering.
-		$html = sprintf( '<div%s><div id="mai-ad-%s"><script>googletag.cmd.push(function(){googletag.display("mai-ad-%s")});</script></div></div>', maipub_build_attributes( $attr ), $slot, $slot );
+		$html = sprintf( '<div%s><script>googletag.cmd.push(function(){googletag.display("mai-ad-%s")});</script></div>', maipub_build_attributes( $attr ), $slot );
 		$html = apply_filters( 'maipub_ad_unit', $html );
 
 		echo $html;
