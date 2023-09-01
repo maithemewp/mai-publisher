@@ -146,6 +146,7 @@ final class Mai_Publisher_Plugin {
 	public function hooks() {
 		add_action( 'plugins_loaded', [ $this, 'updater' ] );
 		add_action( 'init',           [ $this, 'register_content_types' ] );
+		add_action( 'pre_get_posts',  [ $this, 'orderby_title' ] );
 
 		register_activation_hook( __FILE__, [ $this, 'activate' ] );
 		register_deactivation_hook( __FILE__, 'flush_rewrite_rules' );
@@ -236,6 +237,36 @@ final class Mai_Publisher_Plugin {
 				'supports'           => [ 'title', 'editor' ],
 			]
 		);
+	}
+
+	/**
+	 * Order dashboard ad list by title.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param object $query The query object.
+	 *
+	 * @return void
+	 */
+	public function orderby_title( $query ) {
+		// Bail if not in admin.
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		// Bail if not the main query.
+		if ( ! $query->is_main_query() ) {
+			return;
+		}
+
+		// Bail if not the mai_ad post type archive.
+		if ( ! $query->is_post_type_archive( 'mai_ad' ) ) {
+			return;
+		}
+
+		// Set order.
+		$query->set( 'orderby', 'title' );
+		$query->set( 'order','ASC' );
 	}
 
 	/**
