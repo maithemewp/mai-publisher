@@ -140,6 +140,8 @@ function maipub_get_content( $content, $args, $counts = false ) {
 		// After elements.
 		if ( 'before' !== $args['location'] ) {
 
+			// TODO: This is not working correctly on sugarmakers.
+
 			/**
 			 * Bail if this is the last element.
 			 * This avoids duplicates since this location would technically be "after entry content" at this point.
