@@ -113,7 +113,6 @@ class Mai_Publisher_Settings {
 	 * @return array
 	 */
 	function maipub_sanitize( $input ) {
-		ray( $input );
 		// Sanitize.
 		$input['gam_domain'] = isset( $input['gam_domain'] ) ? maipub_get_gam_domain_sanitized( $input['gam_domain'] ) : '';
 		$input['label']      = isset( $input['label'] ) ? esc_html( $input['label'] ) : '';

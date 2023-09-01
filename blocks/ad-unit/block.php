@@ -52,13 +52,16 @@ class Mai_Publisher_Ad_Unit_Block {
 	 * @return void
 	 */
 	function render_block( $block, $content = '', $is_preview = false, $post_id = 0 ) {
-		$id       = get_field( 'id' );
-		$ad_units = maipub_get_config( 'ad_units' );
-		$unit     = $id ? $ad_units[ $id ] : [];
-		$sizes    = $id ? $this->get_sizes( $unit ) : [];
-		$styles   = $id ? $this->get_styles( $sizes, $is_preview ) : '';
-		$slot     = $id ? $this->get_slot( $id ) : '';
-		$label    = maipub_get_option( 'label', false );
+		$id         = get_field( 'id' );
+		$label      = get_field( 'label' );
+		$label_hide = get_field( 'label_hide' );
+		$label      = $label ? $label : maipub_get_option( 'label', false );
+		$label      = $label_hide ? '' : $label;
+		$ad_units   = maipub_get_config( 'ad_units' );
+		$unit       = $id ? $ad_units[ $id ] : [];
+		$sizes      = $id ? $this->get_sizes( $unit ) : [];
+		$styles     = $id ? $this->get_styles( $sizes, $is_preview ) : '';
+		$slot       = $id ? $this->get_slot( $id ) : '';
 
 		$attr = [
 			'class' => 'mai-ad-unit',
@@ -69,7 +72,7 @@ class Mai_Publisher_Ad_Unit_Block {
 		}
 
 		if ( $label ) {
-			$attr['data-label'] = maipub_get_option( 'label', false );
+			$attr['data-label'] = $label;
 		}
 
 		// If previewing in editor, show placeholder.
@@ -228,11 +231,32 @@ class Mai_Publisher_Ad_Unit_Block {
 				'title'    => __( 'Locations Settings', 'mai-publisher' ),
 				'fields'   =>[
 					[
-						'label'        => __( 'Ad Unit', 'mai-publisher' ),
-						'key'          => 'maipub_ad_unit_id',
-						'name'         => 'id',
-						'type'         => 'select',
-						'choices'      => [],
+						'label'   => __( 'Ad unit', 'mai-publisher' ),
+						'key'     => 'maipub_ad_unit_id',
+						'name'    => 'id',
+						'type'    => 'select',
+						'choices' => [],
+					],
+					[
+						'label'             => __( 'Label override', 'mai-publisher' ),
+						'key'               => 'maipub_ad_unit_label',
+						'name'              => 'label',
+						'type'              => 'text',
+						'conditional_logic' => [
+							[
+								[
+									'field'    => 'maipub_ad_unit_label_hide',
+									'operator' => '!=',
+									'value'    => '1',
+								],
+							],
+						],
+					],
+					[
+						'message' => __( 'Hide label', 'mai-publisher' ),
+						'key'     => 'maipub_ad_unit_label_hide',
+						'name'    => 'label_hide',
+						'type'    => 'true_false',
 					],
 				],
 				'location' => [
@@ -244,6 +268,7 @@ class Mai_Publisher_Ad_Unit_Block {
 						],
 					],
 				],
+				'instruction_placement' => 'label',
 			]
 		);
 	}
