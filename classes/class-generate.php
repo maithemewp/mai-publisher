@@ -187,7 +187,7 @@ class Mai_Publisher_Generate_Ads {
 		$config   = maipub_get_config( 'ad_units' );
 		$existing = $this->get_existing_ads();
 
-		if ( ! ( $config && $existing ) ) {
+		if ( ! $config ) {
 			return $ads;
 		}
 
