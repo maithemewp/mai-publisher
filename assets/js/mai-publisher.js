@@ -1,7 +1,9 @@
 window.googletag = window.googletag || { cmd: [] };
 
 googletag.cmd.push( function() {
-	var ads = maiPubVars['ads'];
+	var ads          = maiPubVars['ads'];
+	var refreshKey   = 'refresh';
+	var refreshvalue = 'true';
 
 	// Loop through maiPubVars getting key and values.
 	for ( var id in ads ) {
@@ -9,7 +11,7 @@ googletag.cmd.push( function() {
 
 		// Define ad slot.
 		var slot = googletag.defineSlot( '/22487526518/' + maiPubVars['gam_domain'] + '/' + id, ads[id].sizes, 'mai-ad-' + id )
-			.setTargeting( 'refresh', 'true' )
+			.setTargeting( refreshKey, refreshvalue )
 			.addService( googletag.pubads() );
 
 		// Define size mapping.
