@@ -24,9 +24,9 @@ class Mai_Publisher_Settings {
 	 *
 	 * @return void
 	 */
-	public function hooks() {
-		add_action( 'admin_menu',                              [ $this, 'add_menu_item' ], 12 );
-		add_action( 'admin_init',                              [ $this, 'init' ] );
+	function hooks() {
+		add_action( 'admin_menu',                                          [ $this, 'add_menu_item' ], 12 );
+		add_action( 'admin_init',                                          [ $this, 'init' ] );
 		add_filter( 'plugin_action_links_mai-publisher/mai-publisher.php', [ $this, 'add_plugin_links' ], 10, 4 );
 	}
 
@@ -37,7 +37,7 @@ class Mai_Publisher_Settings {
 	 *
 	 * @return void
 	 */
-	public function add_menu_item() {
+	function add_menu_item() {
 		add_submenu_page(
 			'edit.php?post_type=mai_ad',
 			__( 'Mai GAM', 'mai-publisher' ), // page_title
@@ -55,10 +55,9 @@ class Mai_Publisher_Settings {
 	 *
 	 * @return void
 	 */
-	public function add_content() {
+	function add_content() {
 		echo '<div class="wrap">';
-			printf( '<h2>%s</h2>', __( 'Mai GAM', 'mai-publisher' ) );
-			// printf( '<p class="description">%s</p>', __( '', 'mai-publisher' ) );
+			printf( '<h2>%s</h2>', __( 'Mai Publisher', 'mai-publisher' ) );
 
 			echo '<form method="post" action="options.php">';
 				settings_fields( 'maipub_group' );
@@ -75,7 +74,7 @@ class Mai_Publisher_Settings {
 	 *
 	 * @return void
 	 */
-	public function init() {
+	function init() {
 		register_setting(
 			'maipub_group', // option_group
 			'mai_publisher', // option_name
@@ -90,17 +89,17 @@ class Mai_Publisher_Settings {
 		);
 
 		add_settings_field(
-			'gam_domain', // id
-			__( 'GAM Domain', 'mai-publisher' ), // title
-			[ $this, 'domain_callback' ], // callback
+			'label', // id
+			__( 'Ad Label', 'mai-publisher' ), // title
+			[ $this, 'label_callback' ], // callback
 			'mai-publisher-section', // page
 			'maipub_settings' // section
 		);
 
 		add_settings_field(
-			'label', // id
-			__( 'Ad Label', 'mai-publisher' ), // title
-			[ $this, 'label_callback' ], // callback
+			'gam_domain', // id
+			__( 'GAM Domain', 'mai-publisher' ), // title
+			[ $this, 'domain_callback' ], // callback
 			'mai-publisher-section', // page
 			'maipub_settings' // section
 		);
@@ -113,10 +112,11 @@ class Mai_Publisher_Settings {
 	 *
 	 * @return array
 	 */
-	public function maipub_sanitize( $input ) {
+	function maipub_sanitize( $input ) {
+		ray( $input );
 		// Sanitize.
-		$input['gam_domain'] = maipub_get_gam_domain_sanitized( $input['gam_domain'] );
-		$input['label']  = esc_html( $input['label'] );
+		$input['gam_domain'] = isset( $input['gam_domain'] ) ? maipub_get_gam_domain_sanitized( $input['gam_domain'] ) : '';
+		$input['label']      = isset( $input['label'] ) ? esc_html( $input['label'] ) : '';
 
 		return $input;
 	}
@@ -128,7 +128,7 @@ class Mai_Publisher_Settings {
 	 *
 	 * @return string
 	 */
-	public function maipub_section_info() {}
+	function maipub_section_info() {}
 
 	/**
 	 * Setting callback.
@@ -137,8 +137,8 @@ class Mai_Publisher_Settings {
 	 *
 	 * @return void
 	 */
-	public function domain_callback() {
-		printf( '<input class="regular-text" type="text" name="mai_publisher[domain]" id="domain" placeholder="%s" value="%s">', maipub_get_default_option( 'gam_domain' ), maipub_get_gam_domain( false ) );
+	function label_callback() {
+		printf( '<input class="regular-text" type="text" name="mai_publisher[label]" id="label" value="%s">', maipub_get_option( 'label', false ) );
 	}
 
 	/**
@@ -148,9 +148,10 @@ class Mai_Publisher_Settings {
 	 *
 	 * @return void
 	 */
-	public function label_callback() {
-		printf( '<input class="regular-text" type="text" name="mai_publisher[label]" id="label" placeholder="%s" value="%s">', __( 'Sponsored', 'gam' ), maipub_get_option( 'label', false ) );
+	function domain_callback() {
+		printf( '<input class="regular-text" type="text" name="mai_publisher[domain]" id="domain" value="%s">', maipub_get_default_option( 'gam_domain' ), maipub_get_gam_domain( false ) );
 	}
+
 
 	/**
 	 * Return the plugin action links.  This will only be called if the plugin is active.
@@ -164,7 +165,7 @@ class Mai_Publisher_Settings {
 	 *
 	 * @return array associative array of plugin action links
 	 */
-	public function add_plugin_links( $actions, $plugin_file, $plugin_data, $context ) {
+	function add_plugin_links( $actions, $plugin_file, $plugin_data, $context ) {
 		$actions['ads']      = sprintf( '<a href="%s">%s</a>', esc_url( admin_url( 'edit.php?post_type=mai_ad' ) ), __( 'Ads', 'mai-publisher' ) );
 		$actions['settings'] = sprintf( '<a href="%s">%s</a>', esc_url( admin_url( 'edit.php?post_type=mai_ad&page=settings' ) ), __( 'Settings', 'mai-publisher' ) );
 

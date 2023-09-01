@@ -58,14 +58,18 @@ class Mai_Publisher_Ad_Unit_Block {
 		$sizes    = $id ? $this->get_sizes( $unit ) : [];
 		$styles   = $id ? $this->get_styles( $sizes, $is_preview ) : '';
 		$slot     = $id ? $this->get_slot( $id ) : '';
+		$label    = maipub_get_option( 'label', false );
 
 		$attr = [
-			'class'      => 'mai-ad-unit',
-			'data-label' => maipub_get_option( 'label' ),
+			'class' => 'mai-ad-unit',
 		];
 
 		if ( $styles ) {
 			$attr['style'] = $styles;
+		}
+
+		if ( $label ) {
+			$attr['data-label'] = maipub_get_option( 'label', false );
 		}
 
 		// If previewing in editor, show placeholder.

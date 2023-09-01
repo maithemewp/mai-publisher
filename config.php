@@ -149,8 +149,8 @@ return [
 			'sizes_tablet'  => [ [160, 600], [120, 600] ],
 			'sizes_mobile'  => [ [160, 600], [120, 600] ],
 			'post_title'    => __( 'Skyscraper', 'mai-publisher' ),
-			'post_content'  => '<!-- wp:group {"align":"full","backgroundColor":"alt","layout":{"type":"constrained"},"contentWidth":"no","verticalSpacingTop":"xs","verticalSpacingBottom":"xs","verticalSpacingLeft":"xs","verticalSpacingRight":"xs","marginTop":"xl","marginBottom":"xl"} -->
-			<div class="wp-block-group alignfull has-alt-background-color has-background"><!-- wp:acf/mai-ad-unit {"name":"acf/mai-ad-unit","data":{"maipub_ad_unit_id":"podcast-header"},"mode":"preview"} /--></div>
+			'post_content'  => '<!-- wp:group {"backgroundColor":"alt","layout":{"type":"constrained"},"contentWidth":"no","verticalSpacingTop":"xs","verticalSpacingBottom":"xs","verticalSpacingLeft":"xs","verticalSpacingRight":"xs","marginTop":"xl","marginBottom":"xl"} -->
+			<div class="wp-block-group has-alt-background-color has-background"><!-- wp:acf/mai-ad-unit {"name":"acf/mai-ad-unit","data":{"maipub_ad_unit_id":"skyscraper"},"mode":"preview"} /--></div>
 			<!-- /wp:group -->',
 		],
 		'sponsored-sidebar' => [
