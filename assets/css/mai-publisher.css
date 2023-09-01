@@ -7,7 +7,7 @@
 	aspect-ratio: var(--mai-ad-unit-aspect-ratio);
 }
 
-.mai-ad-unit::before {
+.mai-ad-unit[data-label]::before {
 	display: block;
 	position: absolute;
 	bottom: 100%;
