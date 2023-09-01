@@ -4,7 +4,6 @@
 defined( 'ABSPATH' ) || die;
 
 class Mai_Publisher_Ad_Unit_Block {
-
 	/**
 	 * Construct the class.
 	 */
@@ -53,26 +52,114 @@ class Mai_Publisher_Ad_Unit_Block {
 	 * @return void
 	 */
 	function render_block( $block, $content = '', $is_preview = false, $post_id = 0 ) {
-		$id = get_field( 'id' );
+		$id       = get_field( 'id' );
+		$ad_units = maipub_get_config( 'ad_units' );
+		$unit     = $id ? $ad_units[ $id ] : [];
+		$sizes    = $id ? $this->get_sizes( $unit ) : [];
+		$styles   = $id ? $this->get_styles( $sizes, $is_preview ) : '';
+		$slot     = $id ? $this->maybe_increment_slot( $id ) : '';
+		$label    = maipub_get_option( 'label' );
 
 		if ( $is_preview ) {
-			$styles = 'display:grid;place-items:center;aspect-ratio:728/90;background:rgba(0,0,0,0.1);font-variant:all-small-caps;letter-spacing:1px;';
-			$text   = $id ? __( 'Ad Placeholder', 'mai-publisher' ) : __( 'No Ad Unit Selected', 'mai-publisher' );
-			printf( '<div class="mai-ad-unit" style="%s">%s</div>', $styles, $text );
+			$label = $id ? maipub_get_option( 'label' ) : __( 'No Ad Unit Selected', 'mai-publisher' );
+			$text  = $id ? __( 'Ad Placeholder', 'mai-publisher' ) : __( 'No Ad Unit Selected', 'mai-publisher' );
+			printf( '<div class="mai-ad-unit" data-label="%s"%s><span style="font-size:1.1rem;font-variant:all-small-caps;letter-spacing:1px;">%s</span></div>', $label, $styles, $text );
 			return;
 		}
 
 		// Bail if no ID.
-		if ( ! $id ) {
+		if ( ! ( $id && isset( $ad_units[ $id ] ) ) ) {
 			return;
 		}
 
-		// Get formatted slot.
-		$slot = $id ? $this->maybe_increment_slot( $id ) : '';
+		printf( '<div class="mai-ad-unit" data-label="%s"%s><div id="mai-ad-%s"><script>googletag.cmd.push(function(){googletag.display("mai-ad-%s")});</script></div></div>', maipub_get_option( 'label' ), $styles, $slot, $slot );
+	}
 
-		// TODO. Get aspect ratio from config sizes at each breakpoint and add as inline custom properties.
+	/**
+	 * Gets the sizes for the ad unit inline CSS.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param array $unit The ad unit data from config.
+	 *
+	 * @return array
+	 */
+	function get_sizes( $unit ) {
+		$sizes = [];
+		$array = [
+			'lg' => $unit['sizes_desktop'],
+			'md' => $unit['sizes_tablet'],
+			'sm' => $unit['sizes_mobile'],
+		];
 
-		printf( '<div class="mai-ad-unit" data-label="%s"><div id="mai-ad-%s"><script>googletag.cmd.push(function(){googletag.display("mai-ad-%s")});</script></div></div>', maipub_get_option( 'label' ), $slot, $slot );
+		foreach ( $array as $key => $item ) {
+			$sizes[ $key ] = [];
+
+			if ( ! is_array( $item ) ) {
+				continue;
+			}
+
+			$largest_width  = 0;
+			$largest_height = 0;
+
+			// Check for largest width and height.
+			foreach ( $item as $subitem ) {
+				$width  = $subitem[0];
+				$height = $subitem[1];
+
+				if ( $width > $largest_width ) {
+					$largest_width = $width;
+				}
+
+				if ( $height > $largest_height ) {
+					$largest_height = $height;
+				}
+			}
+
+			// Bail if we don't have at least a width.
+			if ( ! $largest_width ) {
+				continue;
+			}
+
+			// Set sizes.
+			$sizes[ $key ] = array( $largest_width, $largest_height );
+		}
+
+		return $sizes;
+	}
+
+	/**
+	 * Gets the inline styles.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param array $sizes      The ad unit responsive sizes.
+	 * @param bool  $is_preview Whether the block is being previewed in the editor.
+	 *
+	 * @return string
+	 */
+	function get_styles( $sizes, $is_preview ) {
+		$styles = '';
+
+		if ( $is_preview ) {
+			$styles .= 'background:rgba(0,0,0,0.05);border:2px dashed rgba(0,0,0,0.25);';
+		}
+
+		foreach ( $sizes as $break => $values ) {
+			if ( ! $values ) {
+				continue;
+			}
+
+			// Max width.
+			$styles .= sprintf( '--mai-ad-unit-max-width-%s:%spx;', $break, $values[0] );
+
+			// Aspect ratio.
+			if ( 2 === count( $values ) ) {
+				$styles .= sprintf( '--mai-ad-unit-aspect-ratio-%s:%s/%s;', $break, $values[0], $values[1] );
+			}
+		}
+
+		return $styles ? sprintf( ' style="%s"', $styles ) : '';
 	}
 
 	/**
