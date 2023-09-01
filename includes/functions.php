@@ -407,6 +407,10 @@ function maipub_get_locations() {
 			'hook'     => 'genesis_after_content_sidebar_wrap',
 			'priority' => 10,
 		],
+		'after_footer'        => [
+			'hook'     => 'wp_footer',
+			'priority' => 30,
+		],
 	];
 
 	if ( maipub_is_product_archive() || maipub_is_product_singular() ) {
