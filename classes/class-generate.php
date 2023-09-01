@@ -159,7 +159,7 @@ class Mai_Publisher_Generate_Ads {
 					'post_type'    => 'mai_ad',
 					'post_name'    => $slug,
 					'post_status'  => 'publish',
-					'post_title'   => $ad['post_title'],
+					'post_title'   => sprintf( 'mai-ad-%s', $slug ),
 					'post_content' => $ad['post_content'],
 					// 'menu_order'   => $ad['menu_order'],
 				]
