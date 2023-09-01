@@ -1,10 +1,7 @@
 window.googletag = window.googletag || { cmd: [] };
 
 googletag.cmd.push( function() {
-	var refreshKey     = 'refresh';
-	var refreshvalue   = 'true';
-	var refreshSeconds = 30; // Seconds to wait after the slot becomes viewable before we refresh the ad
-	var ads            = maiPubVars['ads'];
+	var ads = maiPubVars['ads'];
 
 	// Loop through maiPubVars getting key and values.
 	for ( var id in ads ) {
@@ -12,10 +9,11 @@ googletag.cmd.push( function() {
 
 		// Define ad slot.
 		var slot = googletag.defineSlot( '/22487526518/' + maiPubVars['gam_domain'] + '/' + id, ads[id].sizes, 'mai-ad-' + id )
-			.setTargeting( refreshKey, refreshvalue )
+			.setTargeting( 'refresh', 'true' )
 			.addService( googletag.pubads() );
 
 		// Define size mapping.
+		// If these breakpoints change, make sure to update the breakpoints in the mai-publisher.css file.
 		slot.defineSizeMapping(
 			googletag.sizeMapping()
 			.addSize( [ 1024, 768 ], ads[id].sizesDesktop )
@@ -39,7 +37,7 @@ googletag.cmd.push( function() {
 		if ( slot.getTargeting( refreshKey ).indexOf( refreshvalue ) >= 0 ) {
 			setTimeout( function() {
 				googletag.pubads().refresh([slot]);
-			}, refreshSeconds * 1000 );
+			}, 30 * 1000 ); // 30 seconds.
 		}
 	});
 
