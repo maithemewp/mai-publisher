@@ -125,6 +125,7 @@ final class Mai_Publisher_Plugin {
 		include MAI_PUBLISHER_DIR . 'blocks/ad/block.php';
 		include MAI_PUBLISHER_DIR . 'blocks/ad-unit/block.php';
 		// Instantiate classes.
+		$admin         = new Mai_Publisher_Admin;
 		$settings      = new Mai_Publisher_Settings;
 		$field_group   = new Mai_Publisher_Ad_Field_Group;
 		$fields        = new Mai_Publisher_Ad_Fields;
