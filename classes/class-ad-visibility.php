@@ -36,8 +36,7 @@ class Mai_Publisher_Ad_Visibility {
 				'title'  => __( 'Mai Ad Visibility', 'mai-publisher' ),
 				'fields' => [
 					[
-						// 'label'        => __( 'Mai Ad Visiblity', 'mai-publisher' ),
-						// 'instructions' => __( 'Hide ads on miscellaneous areas of the website.', 'mai-publisher' ),
+						'instructions' => __( 'Hide ads on this post/page. Does not hide manually added Mai Ad blocks.', 'mai-publisher' ),
 						'key'          => 'maipub_visibility',
 						'name'         => 'maipub_visibility',
 						'type'         => 'checkbox',
