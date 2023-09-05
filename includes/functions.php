@@ -83,7 +83,7 @@ function maipub_get_content( $content, $args, $counts = false ) {
 	}
 
 	$last     = $all->item( $all->length - 1 );
-	$tags     = 'before' !== $args['location'] ? [ 'div', 'p', 'ol', 'ul', 'blockquote', 'figure', 'iframe' ] : [ 'h2', 'h3' ];
+	$tags     = 'before' !== $args['content_location'] ? [ 'div', 'p', 'ol', 'ul', 'blockquote', 'figure', 'iframe' ] : [ 'h2', 'h3' ];
 	$tags     = apply_filters( 'maipub_content_elements', $tags, $args );
 	$tags     = array_filter( $tags );
 	$tags     = array_unique( $tags );
@@ -138,9 +138,7 @@ function maipub_get_content( $content, $args, $counts = false ) {
 		}
 
 		// After elements.
-		if ( 'before' !== $args['location'] ) {
-
-			// TODO: This is not working correctly on sugarmakers.
+		if ( 'before' !== $args['content_location'] ) {
 
 			// TODO: 2 Mai Ad blocks manually in content aren't generating the right mai-ad-unit slug.
 
