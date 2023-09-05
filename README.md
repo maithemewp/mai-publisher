@@ -12,7 +12,7 @@ Sidebars are not checked by default. You can manually and conditionally add side
  * @return array
  */
 add_filter( 'maipub_sidebars', function( $sidebars ) {
-	if ( is_singular() && mai_has_sidebar() ) {
+	if ( mai_has_sidebar() ) {
 		if ( ! is_singular( 'my_cpt' ) ) {
 			$sidebars[] = 'my_custom_sidebar';
 		} else {
