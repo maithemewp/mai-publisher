@@ -17,12 +17,26 @@ function maipub_get_ads() {
 		return $ads;
 	}
 
-	$ads  = [];
+	$ads = [];
+
+	// If singular, check for manuall added ad blocks.
+	if ( maipub_is_singular() ) {
+		$post = get_post();
+
+		if ( has_block( 'acf/mai-ad', $post ) || has_block( 'acf/mai-ad-unit', $post ) ) {
+			$ads[] = [
+				'id'      => $post->ID,
+				'content' => $post->post_content,
+			];
+		}
+	}
+
+	// Get ad data from location settings.
 	$data = maipub_get_ads_data();
 
 	// Bail if no actual values.
 	if ( ! array_filter( array_values( $data ) ) ) {
-		return [];
+		return $ads;
 	}
 
 	// Loop through each type.

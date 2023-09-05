@@ -175,13 +175,25 @@ class Mai_Publisher_Display {
 		$blocks = is_array( $input ) ? $input : parse_blocks( $input );
 
 		foreach ( $blocks as $block ) {
-			if ( 'acf/mai-ad-unit' === $block['blockName'] && isset( $block['attrs']['data']['id'] ) && ! empty( $block['attrs']['data']['id'] ) ) {
+			// If Mai Ad block with an ID.
+			if ( 'acf/mai-ad' === $block['blockName'] && isset( $block['attrs']['data']['id'] ) && ! empty( $block['attrs']['data']['id'] ) ) {
+				// Get the post object.
+				$post = get_post( $block['attrs']['data']['id'] );
+
+				// If we have a post, get the ad unit IDs from the post content.
+				if ( $post ) {
+					$ad_ids = array_merge( $ad_ids, $this->get_block_ad_ids( $post->post_content, 1 ) );
+				}
+			}
+			// If Mai Ad unit block with an ID.
+			elseif ( 'acf/mai-ad-unit' === $block['blockName'] && isset( $block['attrs']['data']['id'] ) && ! empty( $block['attrs']['data']['id'] ) ) {
 				// Loop through the $count and add the ad ID to the array.
 				for ( $i = 0; $i < $count; $i++ ) {
 					$ad_ids[] = $block['attrs']['data']['id'];
 				}
 			}
 
+			// If we have inner blocks, recurse.
 			if ( isset( $block['innerBlocks'] ) && $block['innerBlocks'] ) {
 				$ad_ids = array_merge( $ad_ids, $this->get_block_ad_ids( $block['innerBlocks'], $count ) );
 			}
@@ -201,7 +213,12 @@ class Mai_Publisher_Display {
 		$locations = maipub_get_locations();
 
 		foreach ( $this->ads as $args ) {
-			// Bail if no registered location.
+			// Bail if no location. This may happen for manually added ad blocks.
+			if ( ! isset( $args['location'] ) ) {
+				continue;
+			}
+
+			// Bail if not a registered location.
 			if ( ! isset( $locations[ $args['location'] ] ) ) {
 				continue;
 			}
@@ -277,42 +294,6 @@ class Mai_Publisher_Display {
 				}, $priority );
 			 }
 		}
-	}
-
-	/**
-	 * Gets slugs from ad data for defining slots.
-	 * Increments duplicate slugs with -2, -3, etc.
-	 *   if they are shown multiple times on the same page.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @param array $ads
-	 *
-	 * @return array
-	 */
-	function get_unique_slugs( $ads ) {
-		$slugs    = [];
-		$counters = [];
-
-		foreach ( $ads as $ad ) {
-			if ( 'content' === $ad['location'] ) {
-				foreach ( $ad['content_count'] as $index => $count ) {
-					$slugs[] = $ad['slug'];
-				}
-			} else {
-				$slugs[] = $ad['slug'];
-			}
-		}
-
-		foreach ( $slugs as &$slug ) {
-			if ( isset( $counters[ $slug ] ) ) {
-				$slug = $slug . '-' . $counters[ $slug ]++;
-			} else {
-				$counters[ $slug ] = 1;
-			}
-		}
-
-		return $slugs;
 	}
 
 	/**

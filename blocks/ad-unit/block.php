@@ -206,6 +206,14 @@ class Mai_Publisher_Ad_Unit_Block {
 	 */
 	function get_slot( $slot ) {
 		static $counts = [];
+		static $reset  = true;
+
+		// Mai_Publisher_Display->get_block_ad_ids() runs on wp_enqueue_scripts and increments the slot.
+		// We need to reset the counts after that so they match when actually displayed.
+		if ( ! doing_action( 'wp_enqueue_scripts' ) && $reset ) {
+			$counts = [];
+			$reset  = false;
+		}
 
 		if ( isset( $counts[ $slot ] ) ) {
 			$counts[ $slot ]++;
