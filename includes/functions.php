@@ -31,6 +31,49 @@ function maipub_get_ads() {
 		}
 	}
 
+	// Check for sidebars.
+	$sidebars = apply_filters( 'maipub_sidebars', [] );
+	$sidebars = $sidebars ? array_unique( array_map( 'esc_attr', $sidebars ) ) : [];
+
+	if ( $sidebars && class_exists( 'WP_HTML_Tag_Processor' ) ) {
+		$ad_ids = [];
+
+		foreach ( $sidebars as $id ) {
+			// Render sidebar to variable.
+			ob_start();
+			dynamic_sidebar( $id );
+			$sidebar = ob_get_clean();
+
+			if ( ! $sidebar ) {
+				continue;
+			}
+
+			// Check for ad-units.
+			$tags = new WP_HTML_Tag_Processor( $sidebar );
+
+			while ( $tags->next_tag( [ 'tag_name' => 'div', 'class_name' => 'mai-ad-unit' ] ) ) {
+				// Get slug from ID. Converts `mai-ad-infeed` and `mai-ad-infeed-2` to `infeed`.
+				$id   = $tags->get_attribute( 'id' );
+				$slug = maipub_get_string_between_strings( $id, 'mai-ad-', '-' );
+
+				if ( ! $slug ) {
+					continue;
+				}
+
+				$ad_ids[] = $slug;
+			}
+		}
+
+		// Add to ads.
+		if ( $ad_ids ) {
+			$ads[] = [
+				'id'      => 'sidebars',
+				'content' => '',
+				'ad_ids'  => $ad_ids,
+			];
+		}
+	}
+
 	// Get ad data from location settings.
 	$data = maipub_get_ads_data();
 

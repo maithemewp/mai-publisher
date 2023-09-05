@@ -471,3 +471,26 @@ function maipub_validate_args_archive( $args ) {
 
 	return $args;
 }
+
+/**
+ * Get a string between a starting and ending point.
+ *
+ * @since 0.1.0
+ *
+ * @param string $string          The full string to check.
+ * @param string $starting_string The starting point to check for.
+ * @param string $ending_string   The end point to check for.
+ *
+ * @return string
+ */
+function maipub_get_string_between_strings( $string, $starting_string, $ending_string ) {
+	$arr = explode( $starting_string, $string );
+
+	if ( isset( $arr[1] ) ) {
+		$arr = explode( $ending_string, $arr[1] );
+
+		return $arr[0];
+	}
+
+	return '';
+}
