@@ -60,19 +60,19 @@ function maipub_is_product_singular() {
  *
  * @since 0.1.0
  *
- * @param string|array $needle   String or array of strings to check for.
  * @param string       $haystack String to check in.
+ * @param string|array $needle   String or array of strings to check for.
  *
  * @return string
  */
-function maipub_has_string( $needle, $haystack ) {
+function maipub_str_contains( $haystack, $needle ) {
 	if ( ! $haystack ) {
 		return false;
 	}
 
 	if ( is_array( $needle ) ) {
 		foreach ( $needle as $string ) {
-			if ( false !== strpos( $haystack, $string ) ) {
+			if ( str_contains( $haystack, $string ) ) {
 				return true;
 			}
 		}
@@ -80,5 +80,5 @@ function maipub_has_string( $needle, $haystack ) {
 		return false;
 	}
 
-	return false !== strpos( $haystack, $needle );
+	return str_contains( $haystack, $needle );
 }

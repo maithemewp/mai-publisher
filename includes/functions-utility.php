@@ -293,7 +293,7 @@ function maipub_validate_args_single( $args ) {
 		$post         = get_post( $post_id );
 		$post_content = maipub_strtolower( strip_tags( do_shortcode( trim( $post->post_content ) ) ) );
 
-		if ( ! maipub_has_string( $args['keywords'], $post_content ) ) {
+		if ( ! maipub_str_contains( $post_content, $args['keywords'] ) ) {
 			return [];
 		}
 	}
