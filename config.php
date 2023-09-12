@@ -107,8 +107,8 @@ return [
 			'sizes_desktop' => [ [88, 31] ],
 			'sizes_tablet'  => [ [88, 31] ],
 			'sizes_mobile'  => [ [88, 31] ],
-			'post_content'  => '<!-- wp:group {"backgroundColor":"alt","layout":{"type":"constrained"},"contentWidth":"no","verticalSpacingTop":"xs","verticalSpacingBottom":"xs","verticalSpacingLeft":"xs","verticalSpacingRight":"xs","marginTop":"xl","marginBottom":"xl"} -->
-			<div class="wp-block-group has-alt-background-color has-background"><!-- wp:acf/mai-ad-unit {"name":"acf/mai-ad-unit","data":{"maipub_ad_unit_id":"micro-bar"},"mode":"preview"} /--></div>
+			'post_content'  => '<!-- wp:group {"layout":{"type":"constrained"},"contentWidth":"no","verticalSpacingTop":"xs","verticalSpacingBottom":"xs","verticalSpacingLeft":"xs","verticalSpacingRight":"xs","marginTop":"xl","marginBottom":"xl"} -->
+			<div class="wp-block-group"><!-- wp:acf/mai-ad-unit {"name":"acf/mai-ad-unit","data":{"maipub_ad_unit_id":"micro-bar","maipub_ad_unit_label_hide":"1"},"align":"right","mode":"preview"} /--></div>
 			<!-- /wp:group -->',
 		],
 		'podcast-footer' => [
