@@ -1,6 +1,8 @@
 .mai-ad-unit {
 	position: relative;
 	display: flex;
+	flex-direction: column;
+	justify-content: center;
 	align-items: center;
 	max-width: var(--mai-ad-unit-max-width);
 	margin: auto;
