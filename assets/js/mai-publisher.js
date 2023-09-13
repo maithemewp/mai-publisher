@@ -1,4 +1,5 @@
-window.googletag = window.googletag || { cmd: [] };
+window.googletag = window.googletag || {};
+googletag.cmd    = googletag.cmd || [];
 
 if ( window.googletag && googletag.apiReady ) {
 	googletag.cmd.push(() => {
@@ -15,8 +16,10 @@ if ( window.googletag && googletag.apiReady ) {
 				.addService( googletag.pubads()
 			);
 
-			// Define size mapping.
-			// If these breakpoints change, make sure to update the breakpoints in the mai-publisher.css file.
+			/**
+			 * Define size mapping.
+			 * If these breakpoints change, make sure to update the breakpoints in the mai-publisher.css file.
+			 */
 			slot.defineSizeMapping(
 				googletag.sizeMapping()
 				.addSize( [ 1024, 768 ], ads[id].sizesDesktop )
@@ -27,12 +30,22 @@ if ( window.googletag && googletag.apiReady ) {
 		}
 
 		/**
-		 * TODO: Add lazy loading:
+		 * Lazy loading.
 		 * @link https://developers.google.com/publisher-tag/reference?utm_source=lighthouse&utm_medium=lr#googletag.PubAdsService_enableLazyLoad
 		 */
+		googletag.pubads().enableLazyLoad({
+			// Fetch slots within 5 viewports.
+			fetchMarginPercent: 500,
+			// Render slots within 2 viewports.
+			renderMarginPercent: 200,
+			// Double the above values on mobile.
+			mobileScaling: 2.0,
+		});
 
-		// Set SafeFrame -- This setting will only take effect for subsequent ad requests made for the respective slots.
-		// To enable cross domain rendering for all creatives, execute setForceSafeFrame before loading any ad slots.
+		/**
+		 * Set SafeFrame -- This setting will only take effect for subsequent ad requests made for the respective slots.
+		 * To enable cross domain rendering for all creatives, execute setForceSafeFrame before loading any ad slots.
+		 */
 		googletag.pubads().setForceSafeFrame( true );
 
 		// Make ads centered.
