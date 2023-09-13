@@ -1,5 +1,8 @@
 <?php
 
+// Prevent direct file access.
+defined( 'ABSPATH' ) || die;
+
 /**
  * Checks if current page is an singular.
  *

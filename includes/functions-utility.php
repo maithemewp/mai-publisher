@@ -1,5 +1,8 @@
 <?php
 
+// Prevent direct file access.
+defined( 'ABSPATH' ) || die;
+
 /**
  * Insert a value or key/value pair after a specific key in an array.
  * If key doesn't exist, value is appended to the end of the array.
