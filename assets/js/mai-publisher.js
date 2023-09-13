@@ -26,6 +26,11 @@ if ( window.googletag && googletag.apiReady ) {
 			);
 		}
 
+		/**
+		 * TODO: Add lazy loading:
+		 * @link https://developers.google.com/publisher-tag/reference?utm_source=lighthouse&utm_medium=lr#googletag.PubAdsService_enableLazyLoad
+		 */
+
 		// Set SafeFrame -- This setting will only take effect for subsequent ad requests made for the respective slots.
 		// To enable cross domain rendering for all creatives, execute setForceSafeFrame before loading any ad slots.
 		googletag.pubads().setForceSafeFrame( true );
