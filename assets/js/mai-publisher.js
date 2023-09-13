@@ -65,7 +65,41 @@ if ( window.googletag && googletag.apiReady ) {
 		});
 
 		// Enable SRA and services.
+		googletag.pubads().disableInitialLoad(); // Disable initial load for header bidding.
 		googletag.pubads().enableSingleRequest();
 		googletag.enableServices();
+
+		/**
+		 * Amazon UAD.
+		 */
+		!function(a9,a,p,s,t,A,g){if(a[a9])return;function q(c,r){a[a9]._Q.push([c,r])}a[a9]={init:function(){q("i",arguments)},fetchBids:function(){q("f",arguments)},setDisplayBids:function(){},targetingKeys:function(){return[]},_Q:[]};A=p.createElement(s);A.async=!0;A.src=t;g=p.getElementsByTagName(s)[0];g.parentNode.insertBefore(A,g)}("apstag",window,document,"script","//c.amazon-adsystem.com/aax2/apstag.js");
+
+		// Initialize apstag and have apstag set bids on the googletag slots when they are returned to the page.
+		apstag.init({
+			pubID: '79166f25-5776-4c3e-9537-abad9a584b43', // BB.
+			adServer: 'googletag',
+			bidTimeout: 2e3
+		});
+
+		const uadSlots = [];
+
+		for ( const id in ads ) {
+			uadSlots.push({
+				slotID: id,
+				slotName: '/22487526518/' + maiPubVars['gam_domain'] + '/' + id,
+				sizes: ads[id].sizes,
+			});
+		}
+
+		// Request the bids for the four googletag slots.
+		apstag.fetchBids({
+			slots: uadSlots,
+		}, function( bids ) {
+			// Set apstag bids, then trigger the first request to GAM
+			googletag.cmd.push(function() {
+				apstag.setDisplayBids();
+				googletag.pubads().refresh();
+			});
+		});
 	});
 }
