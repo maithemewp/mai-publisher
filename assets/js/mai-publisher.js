@@ -78,7 +78,6 @@ if ( window.googletag && googletag.apiReady ) {
 		apstag.init({
 			pubID: '79166f25-5776-4c3e-9537-abad9a584b43', // BB.
 			adServer: 'googletag',
-			bidTimeout: 2e3
 		});
 
 		const uadSlots = [];
@@ -94,6 +93,7 @@ if ( window.googletag && googletag.apiReady ) {
 		// Request the bids for the four googletag slots.
 		apstag.fetchBids({
 			slots: uadSlots,
+			timeout: 2e3
 		}, function( bids ) {
 			// Set apstag bids, then trigger the first request to GAM
 			googletag.cmd.push(function() {
