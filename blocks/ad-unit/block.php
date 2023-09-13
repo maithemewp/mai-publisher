@@ -99,7 +99,7 @@ class Mai_Publisher_Ad_Unit_Block {
 
 		// Build HTML, then allow filtering.
 		// $html = sprintf( '<div%s><script>googletag.cmd.push(function(){googletag.display("%s")});</script></div>', maipub_build_attributes( $attr ), $slot );
-		$html = sprintf( '<div%s><script>window.googletag = window.googletag || {};googletag.cmd = googletag.cmd || [];if ( window.googletag && googletag.apiReady ) { googletag.cmd.push(function(){googletag.display("%s")}); }</script></div>', maipub_build_attributes( $attr ), $slot );
+		$html = sprintf( '<div%s><script>window.googletag = window.googletag || {};googletag.cmd = googletag.cmd || [];if ( window.googletag && googletag.apiReady ) { googletag.cmd.push(function(){ googletag.display("%s"); }); }</script></div>', maipub_build_attributes( $attr ), $slot );
 		$html = apply_filters( 'maipub_ad_unit', $html );
 
 		echo $html;
