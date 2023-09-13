@@ -29,7 +29,7 @@ if ( window.googletag && googletag.apiReady ) {
 		}
 
 		// TODO: Configure page-level targeting.
-		googletag.pubads().setTargeting( 'interests', 'basketball' );
+		// googletag.pubads().setTargeting( 'interests', 'basketball' );
 
 		/**
 		 * Lazy loading.
