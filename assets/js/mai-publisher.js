@@ -6,8 +6,6 @@ if ( window.googletag && googletag.apiReady ) {
 		const refreshKey   = 'refresh';
 		const refreshvalue = 'true';
 
-		console.log( googletag.pubads() );
-
 		// Loop through maiPubVars getting key and values.
 		for ( const id in ads ) {
 			// Define ad slot.
@@ -16,8 +14,6 @@ if ( window.googletag && googletag.apiReady ) {
 				.setTargeting( refreshKey, refreshvalue )
 				.addService( googletag.pubads()
 			);
-
-			console.log( 'Mai Publisher: Defining ad slot for ' + id );
 
 			// Define size mapping.
 			// If these breakpoints change, make sure to update the breakpoints in the mai-publisher.css file.
