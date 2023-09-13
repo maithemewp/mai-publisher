@@ -1,7 +1,7 @@
 .mai-ad-unit {
 	position: relative;
-	display: grid;
-	place-items: center;
+	display: flex;
+	align-items: center;
 	max-width: var(--mai-ad-unit-max-width);
 	margin: auto;
 	aspect-ratio: var(--mai-ad-unit-aspect-ratio);
