@@ -53,7 +53,7 @@ class Mai_Publisher_Display {
 		// If we have GAM ad IDs, enqueue the JS.
 		if ( $gam_ads ) {
 			wp_enqueue_script( 'google-gpt', 'https://securepubads.g.doubleclick.net/tag/js/gpt.js', [],  $this->get_file_data( 'version' ), [ 'strategy' => 'async' ] );
-			wp_enqueue_script( 'mai-publisher', $this->get_file_data( 'url' ), [ 'google-gpt' ],  $this->get_file_data( 'version' ), [ 'strategy' => 'async' ] );
+			wp_enqueue_script( 'mai-publisher', $this->get_file_data( 'url' ), [ 'google-gpt' ],  $this->get_file_data( 'version' ), false ); // Asyncing broke ads.
 			wp_localize_script( 'mai-publisher', 'maiPubVars',
 				[
 					'gam_domain' => $this->domain,
