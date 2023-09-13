@@ -11,9 +11,9 @@ if ( window.googletag && googletag.apiReady ) {
 		for ( const id in ads ) {
 			// Define ad slot.
 			const slot = googletag
-				.setTargeting( refreshKey, refreshvalue )
 				.defineSlot( '/22487526518/' + maiPubVars['gam_domain'] + '/' + id, ads[id].sizes, 'mai-ad-' + id )
-				.addService( googletag.pubads() );
+				.addService( googletag.pubads() )
+				.setTargeting( refreshKey, refreshvalue );
 
 			/**
 			 * Define size mapping.
@@ -27,6 +27,9 @@ if ( window.googletag && googletag.apiReady ) {
 				.build()
 			);
 		}
+
+		// TODO: Configure page-level targeting.
+		googletag.pubads().setTargeting( 'interests', 'basketball' );
 
 		/**
 		 * Lazy loading.
