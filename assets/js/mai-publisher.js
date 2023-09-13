@@ -37,11 +37,11 @@ if ( window.googletag && googletag.apiReady ) {
 		 */
 		googletag.pubads().enableLazyLoad({
 			// Fetch slots within 5 viewports.
-			fetchMarginPercent: 500,
+			fetchMarginPercent: 200,
 			// Render slots within 2 viewports.
-			renderMarginPercent: 200,
+			renderMarginPercent: 150,
 			// Double the above values on mobile.
-			mobileScaling: 2.0,
+			// mobileScaling: 2.0,
 		});
 
 		/**
