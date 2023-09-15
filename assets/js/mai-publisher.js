@@ -155,7 +155,7 @@ if ( window.googletag && googletag.apiReady ) {
 		apstag.fetchBids({
 				slots: uadSlots,
 			}, function(bids) {
-				console.log(bids);
+				// console.log(bids);
 				googletag.cmd.push(function() {
 					apstag.setDisplayBids();
 					requestManager.aps = true; // signals that APS request has completed
