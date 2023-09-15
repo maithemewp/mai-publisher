@@ -189,9 +189,9 @@ if ( window.googletag && googletag.apiReady ) {
 		sendAdserverRequest();
 	}, FAILSAFE_TIMEOUT );
 
-	/**
-	 * End prebid.
-	 */
+	/********************************************
+	 * End prebid.                              *
+	 ********************************************/
 
 	/**
 	 * Refresh ads only when they are in view and after expiration of refreshSeconds.
