@@ -105,6 +105,14 @@ class Mai_Publisher_Settings {
 		);
 
 		add_settings_field(
+			'matomo_token', // id
+			__( 'Matomo Token', 'mai-publisher' ), // title
+			[ $this, 'token_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings' // section
+		);
+
+		add_settings_field(
 			'header_scripts', // id
 			__( 'Header Scripts', 'mai-publisher' ), // title
 			[ $this, 'header_callback' ], // callback
@@ -167,6 +175,17 @@ class Mai_Publisher_Settings {
 	 */
 	function domain_callback() {
 		printf( '<input class="regular-text" type="text" name="mai_publisher[domain]" id="domain" value="%s">', maipub_get_default_option( 'gam_domain' ), maipub_get_gam_domain( false ) );
+	}
+
+	/**
+	 * Setting callback.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return void
+	 */
+	public function token_callback() {
+		printf( '<input class="regular-text" type="password" name="mai_publisher[matomo_token]" id="matomo_token" value="%s">', maipub_get_option( 'matomo_token', false ) );
 	}
 
 	/**
