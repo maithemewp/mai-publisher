@@ -558,7 +558,7 @@ function maipub_get_option( $option, $fallback = true ) {
 		return $options[ $option ];
 	}
 
-	return $fallback ? maipub_get_default_option( $option ) : null;
+	return $fallback ? maipub_get_option_default( $option ) : null;
 }
 
 /**
@@ -587,8 +587,8 @@ function maipub_get_options() {
  *
  * @return mixed|null
  */
-function maipub_get_default_option( $option ) {
-	$options = maipub_get_default_options();
+function maipub_get_option_default( $option ) {
+	$options = maipub_get_options_defaults();
 
 	return isset( $options[ $option ] ) ? $options[ $option ] : null;
 }
@@ -600,7 +600,7 @@ function maipub_get_default_option( $option ) {
  *
  * @return array
  */
-function maipub_get_default_options() {
+function maipub_get_options_defaults() {
 	static $options = null;
 
 	if ( ! is_null( $options ) ) {

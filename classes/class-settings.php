@@ -174,7 +174,7 @@ class Mai_Publisher_Settings {
 	 * @return void
 	 */
 	function domain_callback() {
-		printf( '<input class="regular-text" type="text" name="mai_publisher[domain]" id="domain" value="%s">', maipub_get_default_option( 'gam_domain' ), maipub_get_gam_domain( false ) );
+		printf( '<input class="regular-text" type="text" name="mai_publisher[domain]" id="domain" value="%s">', maipub_get_option_default( 'gam_domain' ), maipub_get_gam_domain( false ) );
 	}
 
 	/**
