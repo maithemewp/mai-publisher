@@ -71,34 +71,34 @@ if ( window.googletag && googletag.apiReady ) {
 	 ********************************************/
 
 	// Initialize apstag and have apstag set bids on the googletag slots when they are returned to the page.
-	// apstag.init({
-	// 	pubID: '79166f25-5776-4c3e-9537-abad9a584b43', // BB.
-	// 	adServer: 'googletag',
-	// 	bidTimeout: 2000,
-	// 	// us_privacy: '-1', // https://ams.amazon.com/webpublisher/uam/docs/web-integration-documentation/integration-guide/uam-ccpa.html?source=menu
-	// });
+	apstag.init({
+		pubID: '79166f25-5776-4c3e-9537-abad9a584b43', // BB.
+		adServer: 'googletag',
+		// bidTimeout: 2000,
+		// us_privacy: '-1', // https://ams.amazon.com/webpublisher/uam/docs/web-integration-documentation/integration-guide/uam-ccpa.html?source=menu
+	});
 
-	// const uadSlots = [];
+	const uadSlots = [];
 
-	// for ( const id in ads ) {
-	// 	uadSlots.push({
-	// 		slotID: id,
-	// 		slotName: '/22487526518/' + maiPubVars['gam_domain'] + '/' + id,
-	// 		sizes: ads[id].sizes,
-	// 	});
-	// }
+	for ( const id in ads ) {
+		uadSlots.push({
+			slotID: 'mai-ad-' + id,
+			slotName: '/22487526518/' + maiPubVars['gam_domain'] + '/' + id,
+			sizes: ads[id].sizes,
+		});
+	}
 
-	// // Request the bids for the four googletag slots.
-	// apstag.fetchBids({
-	// 	slots: uadSlots,
-	// 	// timeout: 2000,
-	// }, function( bids ) {
-	// 	// Set apstag bids, then trigger the first request to GAM.
-	// 	googletag.cmd.push(function() {
-	// 		apstag.setDisplayBids();
-	// 		googletag.pubads().refresh();
-	// 	});
-	// });
+	// Request the bids for the four googletag slots.
+	apstag.fetchBids({
+		slots: uadSlots,
+		timeout: 2000,
+	}, function( bids ) {
+		// Set apstag bids, then trigger the first request to GAM.
+		googletag.cmd.push(function() {
+			apstag.setDisplayBids();
+			googletag.pubads().refresh();
+		});
+	});
 
 	/********************************************
 	 * End standard auction.                    *
@@ -108,86 +108,88 @@ if ( window.googletag && googletag.apiReady ) {
 	 * Executes a parallel auction with prebid. *
 	 ********************************************/
 
-	apstag.init({
-		pubID: '79166f25-5776-4c3e-9537-abad9a584b43', // BB.
-		adServer: 'googletag',
-	});
+	// apstag.init({
+	// 	pubID: '79166f25-5776-4c3e-9537-abad9a584b43', // BB.
+	// 	adServer: 'googletag',
+	// });
 
-	const FAILSAFE_TIMEOUT = 1000;
-	const requestManager = {
-		adserverRequestSent: false,
-		aps: false,
-		prebid: false
-	};
+	// const FAILSAFE_TIMEOUT = 1000;
+	// const requestManager = {
+	// 	adserverRequestSent: false,
+	// 	aps: false,
+	// 	prebid: false
+	// };
 
-	// when both APS and Prebid have returned, initiate ad request
-	function biddersBack() {
-		if (requestManager.aps && requestManager.prebid) {
-			sendAdserverRequest();
-		}
-		return;
-	}
+	// // when both APS and Prebid have returned, initiate ad request
+	// function biddersBack() {
+	// 	if (requestManager.aps && requestManager.prebid) {
+	// 		sendAdserverRequest();
+	// 	}
+	// 	return;
+	// }
 
-	// sends adserver request
-	function sendAdserverRequest() {
-		if (requestManager.adserverRequestSent === true) {
-			return;
-		}
-		requestManager.adserverRequestSent = true;
-		googletag.cmd.push(function() {
-			googletag.pubads().refresh();
-		});
-	}
+	// // sends adserver request
+	// function sendAdserverRequest() {
+	// 	if (requestManager.adserverRequestSent === true) {
+	// 		return;
+	// 	}
+	// 	requestManager.adserverRequestSent = true;
+	// 	googletag.cmd.push(function() {
+	// 		googletag.pubads().refresh();
+	// 	});
+	// }
 
-	// sends bid request to APS and Prebid
-	function requestHeaderBids() {
-		const uadSlots = [];
+	// // sends bid request to APS and Prebid
+	// function requestHeaderBids() {
+	// 	const uadSlots = [];
 
-		for ( const id in ads ) {
-			uadSlots.push({
-				slotID: id,
-				slotName: '/22487526518/' + maiPubVars['gam_domain'] + '/' + id,
-				sizes: ads[id].sizes,
-			});
-		}
+	// 	for ( const id in ads ) {
+	// 		uadSlots.push({
+	// 			slotID: 'mai-ad-' + id,
+	// 			slotName: '/22487526518/' + maiPubVars['gam_domain'] + '/' + id,
+	// 			sizes: ads[id].sizes,
+	// 		});
+	// 	}
 
-		// APS request
-		apstag.fetchBids({
-				slots: uadSlots,
-			}, function(bids) {
-				// console.log(bids);
-				googletag.cmd.push(function() {
-					apstag.setDisplayBids();
-					requestManager.aps = true; // signals that APS request has completed
-					biddersBack(); // checks whether both APS and Prebid have returned
-				});
-			}
-		);
+	// 	console.log( uadSlots );
 
-		var pbjs = pbjs || {};
-		pbjs.que = pbjs.que || [];
+	// 	// APS request
+	// 	apstag.fetchBids({
+	// 			slots: uadSlots,
+	// 		}, function(bids) {
+	// 			// console.log(bids);
+	// 			googletag.cmd.push(function() {
+	// 				apstag.setDisplayBids();
+	// 				requestManager.aps = true; // signals that APS request has completed
+	// 				biddersBack(); // checks whether both APS and Prebid have returned
+	// 			});
+	// 		}
+	// 	);
 
-		// put prebid request here
-		pbjs.que.push(function() {
-			pbjs.requestBids({
-				bidsBackHandler: function() {
-					googletag.cmd.push(function() {
-						pbjs.setTargetingForGPTAsync();
-						requestManager.prebid = true; // signals that Prebid request has completed
-						biddersBack(); // checks whether both APS and Prebid have returned
-					})
-				}
-			});
-		});
-	}
+	// 	var pbjs = pbjs || {};
+	// 	pbjs.que = pbjs.que || [];
 
-	// initiate bid request
-	requestHeaderBids();
+	// 	// put prebid request here
+	// 	pbjs.que.push(function() {
+	// 		pbjs.requestBids({
+	// 			bidsBackHandler: function() {
+	// 				googletag.cmd.push(function() {
+	// 					pbjs.setTargetingForGPTAsync();
+	// 					requestManager.prebid = true; // signals that Prebid request has completed
+	// 					biddersBack(); // checks whether both APS and Prebid have returned
+	// 				})
+	// 			}
+	// 		});
+	// 	});
+	// }
 
-	// set failsafe timeout
-	window.setTimeout(function() {
-		sendAdserverRequest();
-	}, FAILSAFE_TIMEOUT );
+	// // initiate bid request
+	// requestHeaderBids();
+
+	// // set failsafe timeout
+	// window.setTimeout(function() {
+	// 	sendAdserverRequest();
+	// }, FAILSAFE_TIMEOUT );
 
 	/********************************************
 	 * End prebid.                              *
