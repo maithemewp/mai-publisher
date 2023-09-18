@@ -128,7 +128,7 @@ class Mai_Publisher_Settings {
 
 		add_settings_field(
 			'matomo', // id
-			__( 'Matomo global tracking', 'mai-publisher' ), // title
+			__( 'Enable', 'mai-publisher' ), // title
 			[ $this, 'matomo_callback' ], // callback
 			'mai-publisher-section', // page
 			'maipub_settings_matomo' // section
@@ -136,7 +136,7 @@ class Mai_Publisher_Settings {
 
 		add_settings_field(
 			'matomo_token', // id
-			__( 'Matomo Token', 'mai-publisher' ), // title
+			__( 'Token', 'mai-publisher' ), // title
 			[ $this, 'matomo_token_callback' ], // callback
 			'mai-publisher-section', // page
 			'maipub_settings_matomo' // section
@@ -185,9 +185,17 @@ class Mai_Publisher_Settings {
 	 *
 	 * @return string
 	 */
-	function maipub_section_info() {}
-	function maipub_section_matomo() {}
-	function maipub_section_scripts() {}
+	function maipub_section_info() {
+		printf( '<h3 style="margin-top:48px;">%s</h3>', 'General' );
+	}
+
+	function maipub_section_matomo() {
+		printf( '<h3 style="margin-top:48px;">%s</h3>', __( 'Analytics', 'mai-publisher' ) );
+	}
+
+	function maipub_section_scripts() {
+		printf( '<h3 style="margin-top:48px;">%s</h3>', __( 'Scripts', 'mai-publisher' ) );
+	}
 
 	/**
 	 * Setting callback.
