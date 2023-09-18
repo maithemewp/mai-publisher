@@ -81,12 +81,34 @@ class Mai_Publisher_Settings {
 			[ $this, 'maipub_sanitize' ] // sanitize_callback
 		);
 
+		/************
+		 * Sections *
+		 ************/
+
 		add_settings_section(
 			'maipub_settings', // id
 			'', // title
 			[ $this, 'maipub_section_info' ], // callback
 			'mai-publisher-section' // page
 		);
+
+		add_settings_section(
+			'maipub_settings_matomo', // id
+			'', // title
+			[ $this, 'maipub_section_matomo' ], // callback
+			'mai-publisher-section' // page
+		);
+
+		add_settings_section(
+			'maipub_settings_scripts', // id
+			'', // title
+			[ $this, 'maipub_section_scripts' ], // callback
+			'mai-publisher-section' // page
+		);
+
+		/************
+		 * Fields   *
+		 ************/
 
 		add_settings_field(
 			'label', // id
@@ -105,11 +127,19 @@ class Mai_Publisher_Settings {
 		);
 
 		add_settings_field(
+			'matomo', // id
+			__( 'Matomo global tracking', 'mai-publisher' ), // title
+			[ $this, 'matomo_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings_matomo' // section
+		);
+
+		add_settings_field(
 			'matomo_token', // id
 			__( 'Matomo Token', 'mai-publisher' ), // title
-			[ $this, 'token_callback' ], // callback
+			[ $this, 'matomo_token_callback' ], // callback
 			'mai-publisher-section', // page
-			'maipub_settings' // section
+			'maipub_settings_matomo' // section
 		);
 
 		add_settings_field(
@@ -117,7 +147,7 @@ class Mai_Publisher_Settings {
 			__( 'Header Scripts', 'mai-publisher' ), // title
 			[ $this, 'header_callback' ], // callback
 			'mai-publisher-section', // page
-			'maipub_settings' // section
+			'maipub_settings_scripts' // section
 		);
 
 		add_settings_field(
@@ -125,7 +155,7 @@ class Mai_Publisher_Settings {
 			__( 'Footer Scripts', 'mai-publisher' ), // title
 			[ $this, 'footer_callback' ], // callback
 			'mai-publisher-section', // page
-			'maipub_settings' // section
+			'maipub_settings_scripts' // section
 		);
 	}
 
@@ -138,10 +168,12 @@ class Mai_Publisher_Settings {
 	 */
 	function maipub_sanitize( $input ) {
 		// Sanitize.
-		$input['gam_domain'] = isset( $input['gam_domain'] ) ? maipub_get_gam_domain_sanitized( $input['gam_domain'] ) : '';
-		$input['label']      = isset( $input['label'] ) ? esc_html( $input['label'] ) : '';
-		$input['header']     = current_user_can( 'unfiltered_html' ) ? trim( $input['header'] ) : wp_kses_post( trim( $input['header'] ) );
-		$input['footer']     = current_user_can( 'unfiltered_html' ) ? trim( $input['footer'] ) : wp_kses_post( trim( $input['footer'] ) );
+		$input['gam_domain']   = isset( $input['gam_domain'] ) ? maipub_get_gam_domain_sanitized( $input['gam_domain'] ) : '';
+		$input['matomo']       = isset( $input['matomo'] ) ? rest_sanitize_boolean( $input['matomo'] ) : false;
+		$input['matomo_token'] = isset( $input['matomo_token'] ) ? esc_html( $input['matomo_token'] ) : '';
+		$input['label']        = isset( $input['label'] ) ? esc_html( $input['label'] ) : '';
+		$input['header']       = current_user_can( 'unfiltered_html' ) ? trim( $input['header'] ) : wp_kses_post( trim( $input['header'] ) );
+		$input['footer']       = current_user_can( 'unfiltered_html' ) ? trim( $input['footer'] ) : wp_kses_post( trim( $input['footer'] ) );
 
 		return $input;
 	}
@@ -154,6 +186,8 @@ class Mai_Publisher_Settings {
 	 * @return string
 	 */
 	function maipub_section_info() {}
+	function maipub_section_matomo() {}
+	function maipub_section_scripts() {}
 
 	/**
 	 * Setting callback.
@@ -184,7 +218,18 @@ class Mai_Publisher_Settings {
 	 *
 	 * @return void
 	 */
-	public function token_callback() {
+	public function matomo_callback() {
+		printf( '<input type="checkbox" name="mai_publisher[matomo]" id="matomo" value="matomo"%s disabled> <label for="matomo">%s</label>', maipub_get_option( 'matomo' ) ? ' checked' : '', __( 'Enable global tracking for this website.', 'mai-publisher' ) );
+	}
+
+	/**
+	 * Setting callback.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return void
+	 */
+	public function matomo_token_callback() {
 		printf( '<input class="regular-text" type="password" name="mai_publisher[matomo_token]" id="matomo_token" value="%s">', maipub_get_option( 'matomo_token', false ) );
 	}
 

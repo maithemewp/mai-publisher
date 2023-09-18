@@ -11,7 +11,7 @@ if ( window.googletag && googletag.apiReady ) {
 		for ( const id in ads ) {
 			// Define ad slot.
 			const slot = googletag
-				.defineSlot( '/22487526518/' + maiPubVars['gam_domain'] + '/' + id, ads[id].sizes, 'mai-ad-' + id )
+				.defineSlot( '/22487526518/' + maiPubVars['gamDomain'] + '/' + id, ads[id].sizes, 'mai-ad-' + id )
 				.addService( googletag.pubads() )
 				.setTargeting( refreshKey, refreshvalue );
 
