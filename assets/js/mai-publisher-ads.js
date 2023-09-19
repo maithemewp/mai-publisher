@@ -2,9 +2,10 @@ window.googletag = window.googletag || {};
 googletag.cmd    = googletag.cmd || [];
 
 if ( window.googletag && googletag.apiReady ) {
-	const ads          = maiPubVars['ads'];
-	const refreshKey   = 'refresh';
-	const refreshvalue = 'true';
+	const ads           = maiPubVars['ads'];
+	const refreshKey    = 'refresh';
+	const refreshvalue  = 'true';
+	const prebidTimeout = 2000;
 
 	googletag.cmd.push(() => {
 
@@ -12,7 +13,7 @@ if ( window.googletag && googletag.apiReady ) {
 		for ( const id in ads ) {
 			// Define ad slot.
 			const slot = googletag
-				.defineSlot( '/22487526518/' + maiPubVars['gam_domain'] + '/' + id, ads[id].sizes, 'mai-ad-' + id )
+				.defineSlot( '/22487526518/' + maiPubVars['gamDomain'] + '/' + id, ads[id].sizes, 'mai-ad-' + id )
 				.addService( googletag.pubads() )
 				.setTargeting( refreshKey, refreshvalue );
 
@@ -64,48 +65,48 @@ if ( window.googletag && googletag.apiReady ) {
 	 * Amazon UAD.
 	 * Debug via `apstag.debug('enableConsole')`
 	 */
-	!function(a9,a,p,s,t,A,g){if(a[a9])return;function q(c,r){a[a9]._Q.push([c,r])}a[a9]={init:function(){q("i",arguments)},fetchBids:function(){q("f",arguments)},setDisplayBids:function(){},targetingKeys:function(){return[]},_Q:[]};A=p.createElement(s);A.async=!0;A.src=t;g=p.getElementsByTagName(s)[0];g.parentNode.insertBefore(A,g)}("apstag",window,document,"script","//c.amazon-adsystem.com/aax2/apstag.js");
+	// !function(a9,a,p,s,t,A,g){if(a[a9])return;function q(c,r){a[a9]._Q.push([c,r])}a[a9]={init:function(){q("i",arguments)},fetchBids:function(){q("f",arguments)},setDisplayBids:function(){},targetingKeys:function(){return[]},_Q:[]};A=p.createElement(s);A.async=!0;A.src=t;g=p.getElementsByTagName(s)[0];g.parentNode.insertBefore(A,g)}("apstag",window,document,"script","//c.amazon-adsystem.com/aax2/apstag.js");
 
 	/********************************************
 	 * Standard auction with apstag.            *
 	 ********************************************/
 
-	// Initialize apstag and have apstag set bids on the googletag slots when they are returned to the page.
-	apstag.init({
-		pubID: '79166f25-5776-4c3e-9537-abad9a584b43', // BB.
-		adServer: 'googletag',
-		// bidTimeout: 2000,
-		// us_privacy: '-1', // https://ams.amazon.com/webpublisher/uam/docs/web-integration-documentation/integration-guide/uam-ccpa.html?source=menu
-	});
+	// // Initialize apstag and have apstag set bids on the googletag slots when they are returned to the page.
+	// apstag.init({
+	// 	pubID: '79166f25-5776-4c3e-9537-abad9a584b43', // BB.
+	// 	adServer: 'googletag',
+	// 	// bidTimeout: prebidTimeout,
+	// 	// us_privacy: '-1', // https://ams.amazon.com/webpublisher/uam/docs/web-integration-documentation/integration-guide/uam-ccpa.html?source=menu
+	// });
 
-	const uadSlots = [];
+	// const uadSlots = [];
 
-	for ( const id in ads ) {
-		uadSlots.push({
-			slotID: 'mai-ad-' + id,
-			slotName: '/22487526518/' + maiPubVars['gam_domain'] + '/' + id,
-			sizes: ads[id].sizes,
-		});
-	}
+	// for ( const id in ads ) {
+	// 	uadSlots.push({
+	// 		slotID: 'mai-ad-' + id,
+	// 		slotName: '/22487526518/' + maiPubVars['gamDomain'] + '/' + id,
+	// 		sizes: ads[id].sizes,
+	// 	});
+	// }
 
-	// Request the bids for the four googletag slots.
-	apstag.fetchBids({
-		slots: uadSlots,
-		timeout: 2000,
-	}, function( bids ) {
-		// Set apstag bids, then trigger the first request to GAM.
-		googletag.cmd.push(function() {
-			apstag.setDisplayBids();
-			googletag.pubads().refresh();
-		});
-	});
+	// // Request the bids for the four googletag slots.
+	// apstag.fetchBids({
+	// 	slots: uadSlots,
+	// 	timeout: prebidTimeout,
+	// }, function( bids ) {
+	// 	// Set apstag bids, then trigger the first request to GAM.
+	// 	googletag.cmd.push(function() {
+	// 		apstag.setDisplayBids();
+	// 		googletag.pubads().refresh();
+	// 	});
+	// });
 
 	/********************************************
 	 * End standard auction.                    *
 	 ********************************************/
 
 	/********************************************
-	 * Executes a parallel auction with prebid. *
+	 * Parallel auction with prebid.            *
 	 ********************************************/
 
 	// apstag.init({
@@ -146,7 +147,7 @@ if ( window.googletag && googletag.apiReady ) {
 	// 	for ( const id in ads ) {
 	// 		uadSlots.push({
 	// 			slotID: 'mai-ad-' + id,
-	// 			slotName: '/22487526518/' + maiPubVars['gam_domain'] + '/' + id,
+	// 			slotName: '/22487526518/' + maiPubVars['gamDomain'] + '/' + id,
 	// 			sizes: ads[id].sizes,
 	// 		});
 	// 	}
@@ -166,21 +167,21 @@ if ( window.googletag && googletag.apiReady ) {
 	// 		}
 	// 	);
 
-	// 	var pbjs = pbjs || {};
-	// 	pbjs.que = pbjs.que || [];
+		// var pbjs = pbjs || {};
+		// pbjs.que = pbjs.que || [];
 
-	// 	// put prebid request here
-	// 	pbjs.que.push(function() {
-	// 		pbjs.requestBids({
-	// 			bidsBackHandler: function() {
-	// 				googletag.cmd.push(function() {
-	// 					pbjs.setTargetingForGPTAsync();
-	// 					requestManager.prebid = true; // signals that Prebid request has completed
-	// 					biddersBack(); // checks whether both APS and Prebid have returned
-	// 				})
-	// 			}
-	// 		});
-	// 	});
+		// // put prebid request here
+		// pbjs.que.push(function() {
+		// 	pbjs.requestBids({
+		// 		bidsBackHandler: function() {
+		// 			googletag.cmd.push(function() {
+		// 				pbjs.setTargetingForGPTAsync();
+		// 				requestManager.prebid = true; // signals that Prebid request has completed
+		// 				biddersBack(); // checks whether both APS and Prebid have returned
+		// 			})
+		// 		}
+		// 	});
+		// });
 	// }
 
 	// // initiate bid request
@@ -192,7 +193,62 @@ if ( window.googletag && googletag.apiReady ) {
 	// }, FAILSAFE_TIMEOUT );
 
 	/********************************************
-	 * End prebid.                              *
+	 * End parallel auction.                    *
+	 ********************************************/
+
+	/********************************************
+	 * Parallel auction with prebid & sovrn.    *
+	 ********************************************/
+
+	const adUnits = [];
+
+	for ( const id in ads ) {
+		adUnits.push({
+			code: 'mai-ad-' + id,
+			mediaTypes: {
+				banner: {
+					sizes: ads[id].sizes
+				}
+			},
+			bids: [
+				{
+					bidder: 'sovrn',
+					params: {
+						tagid: '1166957', // sovrn_tmspn_header_970x250 (Multi-size)
+					}
+				},
+				{
+					bidder: 'sovrn',
+					params: {
+						tagid: '1166958', // sovrn_tmspn_header_970x250 (Single-size)
+					}
+				},
+			]
+		});
+	}
+
+	const pbjs = pbjs || {};
+	pbjs.que   = pbjs.que || [];
+
+	pbjs.que.push(function() {
+		pbjs.setConfig({
+			timeout: prebidTimeout,
+		});
+		pbjs.addAdUnits(adUnits);
+		pbjs.requestBids({
+			bidsBackHandler: function() {
+				googletag.cmd.push(function() {
+					pbjs.que.push(function() {
+						pbjs.setTargetingForGPTAsync();
+						googletag.pubads().refresh();
+					});
+				});
+			}
+		});
+	});
+
+	/********************************************
+	 * End parallel auction.                    *
 	 ********************************************/
 
 	/**

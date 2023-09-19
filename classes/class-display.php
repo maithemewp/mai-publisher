@@ -37,6 +37,7 @@ class Mai_Publisher_Display {
 	function run() {
 		$ads    = maipub_get_ads();
 		$domain = maipub_get_gam_domain();
+		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
 		// Bail if no ads.
 		if ( ! $ads ) {
@@ -52,12 +53,15 @@ class Mai_Publisher_Display {
 
 		// If we have GAM ad IDs, enqueue the JS.
 		if ( $gam_ads ) {
-			wp_enqueue_script( 'google-gpt', 'https://securepubads.g.doubleclick.net/tag/js/gpt.js', [],  $this->get_file_data( 'version' ), [ 'strategy' => 'async' ] );
-			wp_enqueue_script( 'mai-publisher', $this->get_file_data( 'url' ), [ 'google-gpt' ],  $this->get_file_data( 'version' ), false ); // Asyncing broke ads.
-			wp_localize_script( 'mai-publisher', 'maiPubVars',
+			$file = "assets/js/mai-publisher-ads{$suffix}.js";
+
+			wp_enqueue_script( 'google-gpt', 'https://securepubads.g.doubleclick.net/tag/js/gpt.js', [], $this->get_file_data( $file, 'version' ), [ 'strategy' => 'async' ] );
+			wp_enqueue_script( 'prebid-js', 'https://cdn.jsdelivr.net/npm/prebid.js@8.15.0/dist/not-for-prod/prebid.min.js', [], '8.15.0', [ 'strategy' => 'async' ] ); // https://www.jsdelivr.com/package/npm/prebid.js
+			wp_enqueue_script( 'mai-publisher-ads', $this->get_file_data( $file, 'url' ), [ 'google-gpt', 'prebid-js' ], $this->get_file_data( $file, 'version' ), false ); // Asyncing broke ads.
+			wp_localize_script( 'mai-publisher-ads', 'maiPubAdsVars',
 				[
-					'gam_domain' => $this->domain,
-					'ads'        => $gam_ads,
+					'gamDomain' => $this->domain,
+					'ads'       => $gam_ads,
 				]
 			);
 		}
@@ -304,41 +308,59 @@ class Mai_Publisher_Display {
 	}
 
 	/**
-	 * Gets file URL.
+	 * Gets file data.
 	 *
 	 * @since 0.1.0
 	 *
+	 * @param string $file The file path name.
 	 * @param string $key The specific key to return
 	 *
 	 * @return array|string
 	 */
-	function get_file_data( $key = '' ) {
+	function get_file_data( $file, $key = '' ) {
 		static $cache = null;
 
-		if ( ! is_null( $cache ) ) {
+		if ( ! is_null( $cache ) && isset( $cache[ $file ] ) ) {
 			if ( $key ) {
-				return $cache[ $key ];
+				return $cache[ $file ][ $key ];
 			}
 
-			return $cache;
+			return $cache[ $file ];
 		}
 
-		$suffix    = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-		$file      = "assets/js/mai-publisher{$suffix}.js";
-		$file_path = MAI_PUBLISHER_DIR . $file;
-		$file_url  = MAI_PUBLISHER_URL . $file;
-		$version   = MAI_PUBLISHER_VERSION . '.' . date( 'njYHi', filemtime( $file_path ) );
-		$cache     = [
+		$file_path      = MAI_PUBLISHER_DIR . $file;
+		$file_url       = MAI_PUBLISHER_URL . $file;
+		$version        = MAI_PUBLISHER_VERSION . '.' . date( 'njYHi', filemtime( $file_path ) );
+		$cache[ $file ] = [
 			'path'    => $file_path,
 			'url'     => $file_url,
 			'version' => $version,
 		];
 
 		if ( $key ) {
-			return $cache[ $key ];
+			return $cache[ $file ][ $key ];
 		}
 
-		return $cache;
+		return $cache[ $file ];
+	}
+
+	/**
+	 * Gets file suffix.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return string
+	 */
+	function get_suffix() {
+		static $suffix = null;
+
+		if ( ! is_null( $suffix ) ) {
+			return $suffix;
+		}
+
+		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+
+		return $suffix;
 	}
 
 	/**
