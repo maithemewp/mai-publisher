@@ -3,15 +3,15 @@ googletag.cmd    = googletag.cmd || [];
 
 if ( window.googletag && googletag.apiReady ) {
 	googletag.cmd.push(() => {
-		const ads          = maiPubVars['ads'];
+		const ads          = maiPubAdsVars['ads'];
 		const refreshKey   = 'refresh';
 		const refreshvalue = 'true';
 
-		// Loop through maiPubVars getting key and values.
+		// Loop through maiPubAdsVars getting key and values.
 		for ( const id in ads ) {
 			// Define ad slot.
 			const slot = googletag
-				.defineSlot( '/22487526518/' + maiPubVars['gamDomain'] + '/' + id, ads[id].sizes, 'mai-ad-' + id )
+				.defineSlot( '/22487526518/' + maiPubAdsVars['gamDomain'] + '/' + id, ads[id].sizes, 'mai-ad-' + id )
 				.addService( googletag.pubads() )
 				.setTargeting( refreshKey, refreshvalue );
 

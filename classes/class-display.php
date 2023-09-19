@@ -37,6 +37,7 @@ class Mai_Publisher_Display {
 	function run() {
 		$ads    = maipub_get_ads();
 		$domain = maipub_get_gam_domain();
+		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
 		// Bail if no ads.
 		if ( ! $ads ) {
@@ -52,19 +53,28 @@ class Mai_Publisher_Display {
 
 		// If we have GAM ad IDs, enqueue the JS.
 		if ( $gam_ads ) {
-			wp_enqueue_script( 'google-gpt', 'https://securepubads.g.doubleclick.net/tag/js/gpt.js', [],  $this->get_file_data( 'version' ), [ 'strategy' => 'async' ] );
-			wp_enqueue_script( 'mai-publisher', $this->get_file_data( 'url' ), [ 'google-gpt' ],  $this->get_file_data( 'version' ), false ); // Asyncing broke ads.
+			$file = "assets/js/mai-publisher-ads{$suffix}.js";
 
-			// Get localized vars.
-			$vars = [
-				'gamDomain'   => $this->domain,
-				'matomo'      => maipub_get_option( 'matomo' ),
-				'matomoToken' => maipub_get_option( 'matomo_token' ),
-				'ads'         => $gam_ads,
-			];
+			wp_enqueue_script( 'google-gpt', 'https://securepubads.g.doubleclick.net/tag/js/gpt.js', [], $this->get_file_data( $file, 'version' ), [ 'strategy' => 'async' ] );
+			wp_enqueue_script( 'mai-publisher-ads', $this->get_file_data( $file, 'url' ), [ 'google-gpt' ], $this->get_file_data( $file, 'version' ), false ); // Asyncing broke ads.
+			wp_localize_script( 'mai-publisher-ads', 'maiPubAdsVars',
+				[
+					'gamDomain' => $this->domain,
+					'ads'       => $gam_ads,
+				]
+			);
+		}
 
-			// Localize.
-			wp_localize_script( 'mai-publisher', 'maiPubVars', $vars );
+		// If tracking with Matomo.
+		if ( maipub_get_option( 'matomo' ) ) {
+			$file = "assets/js/mai-publisher-analytics{$suffix}.js";
+
+			wp_enqueue_script( 'mai-publisher-analytics', $this->get_file_data( $file, 'url' ), [ 'google-gpt' ], $this->get_file_data( $file, 'version' ), true );
+			wp_localize_script( 'mai-publisher-analytics', 'maiPubAnalyticsVars',
+				[
+					'token' => maipub_get_option( 'matomo_token' ),
+				]
+			);
 		}
 
 		// Display the ads.
@@ -309,7 +319,7 @@ class Mai_Publisher_Display {
 	}
 
 	/**
-	 * Gets file URL.
+	 * Gets file data.
 	 *
 	 * @since 0.1.0
 	 *
@@ -317,33 +327,83 @@ class Mai_Publisher_Display {
 	 *
 	 * @return array|string
 	 */
-	function get_file_data( $key = '' ) {
+	function get_ads_file_data( $key = '' ) {
+		$suffix = $this->get_suffix();
+		$file   = "assets/js/mai-publisher-ads{$suffix}.js";
+
+		return $this->get_file_data( $file, $key );
+	}
+
+	/**
+	 * Gets analytics file data.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param string $key The specific key to return
+	 *
+	 * @return array|string
+	 */
+	function get_analytics_file_data( $key = '' ) {
+		$suffix = $this->get_suffix();
+		$file   = "assets/js/mai-publisher-analytics{$suffix}.js";
+
+		return $this->get_file_data( $file, $key );
+	}
+
+	/**
+	 * Gets file data.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param string $file The file path name.
+	 * @param string $key The specific key to return
+	 *
+	 * @return array|string
+	 */
+	function get_file_data( $file, $key = '' ) {
 		static $cache = null;
 
-		if ( ! is_null( $cache ) ) {
+		if ( ! is_null( $cache ) && isset( $cache[ $file ] ) ) {
 			if ( $key ) {
-				return $cache[ $key ];
+				return $cache[ $file ][ $key ];
 			}
 
-			return $cache;
+			return $cache[ $file ];
 		}
 
-		$suffix    = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-		$file      = "assets/js/mai-publisher{$suffix}.js";
-		$file_path = MAI_PUBLISHER_DIR . $file;
-		$file_url  = MAI_PUBLISHER_URL . $file;
-		$version   = MAI_PUBLISHER_VERSION . '.' . date( 'njYHi', filemtime( $file_path ) );
-		$cache     = [
+		$file_path      = MAI_PUBLISHER_DIR . $file;
+		$file_url       = MAI_PUBLISHER_URL . $file;
+		$version        = MAI_PUBLISHER_VERSION . '.' . date( 'njYHi', filemtime( $file_path ) );
+		$cache[ $file ] = [
 			'path'    => $file_path,
 			'url'     => $file_url,
 			'version' => $version,
 		];
 
 		if ( $key ) {
-			return $cache[ $key ];
+			return $cache[ $file ][ $key ];
 		}
 
-		return $cache;
+		return $cache[ $file ];
+	}
+
+	/**
+	 * Gets file suffix.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return string
+	 */
+	function get_suffix() {
+		static $suffix = null;
+
+		if ( ! is_null( $suffix ) ) {
+			return $suffix;
+		}
+
+		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+
+		return $suffix;
 	}
 
 	/**
