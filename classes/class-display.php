@@ -56,8 +56,9 @@ class Mai_Publisher_Display {
 			$file = "assets/js/mai-publisher-ads{$suffix}.js";
 
 			wp_enqueue_script( 'google-gpt', 'https://securepubads.g.doubleclick.net/tag/js/gpt.js', [], $this->get_file_data( $file, 'version' ), [ 'strategy' => 'async' ] );
+			wp_enqueue_script( 'sovrn-beacon', '//ap.lijit.com/www/sovrn_beacon_standalone/sovrn_standalone_beacon.js?iid=472780', [], $this->get_file_data( $file, 'version' ), [ 'strategy' => 'async' ] );
 			wp_enqueue_script( 'prebid-js', 'https://cdn.jsdelivr.net/npm/prebid.js@8.15.0/dist/not-for-prod/prebid.min.js', [], '8.15.0', [ 'strategy' => 'async' ] ); // https://www.jsdelivr.com/package/npm/prebid.js
-			wp_enqueue_script( 'mai-publisher-ads', $this->get_file_data( $file, 'url' ), [ 'google-gpt', 'prebid-js' ], $this->get_file_data( $file, 'version' ), false ); // Asyncing broke ads.
+			wp_enqueue_script( 'mai-publisher-ads', $this->get_file_data( $file, 'url' ), [ 'google-gpt', 'sovrn-beacon', 'prebid-js' ], $this->get_file_data( $file, 'version' ), false ); // Asyncing broke ads.
 			wp_localize_script( 'mai-publisher-ads', 'maiPubAdsVars',
 				[
 					'gamDomain' => $this->domain,

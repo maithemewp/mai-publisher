@@ -2,18 +2,18 @@ window.googletag = window.googletag || {};
 googletag.cmd    = googletag.cmd || [];
 
 if ( window.googletag && googletag.apiReady ) {
-	const ads           = maiPubVars['ads'];
+	const ads           = maiPubAdsVars['ads'];
 	const refreshKey    = 'refresh';
 	const refreshvalue  = 'true';
 	const prebidTimeout = 2000;
 
 	googletag.cmd.push(() => {
 
-		// Loop through maiPubVars getting key and values.
+		// Loop through maiPubAdsVars getting key and values.
 		for ( const id in ads ) {
 			// Define ad slot.
 			const slot = googletag
-				.defineSlot( '/22487526518/' + maiPubVars['gamDomain'] + '/' + id, ads[id].sizes, 'mai-ad-' + id )
+				.defineSlot( '/22487526518/' + maiPubAdsVars['gamDomain'] + '/' + id, ads[id].sizes, 'mai-ad-' + id )
 				.addService( googletag.pubads() )
 				.setTargeting( refreshKey, refreshvalue );
 
@@ -84,7 +84,7 @@ if ( window.googletag && googletag.apiReady ) {
 	// for ( const id in ads ) {
 	// 	uadSlots.push({
 	// 		slotID: 'mai-ad-' + id,
-	// 		slotName: '/22487526518/' + maiPubVars['gamDomain'] + '/' + id,
+	// 		slotName: '/22487526518/' + maiPubAdsVars['gamDomain'] + '/' + id,
 	// 		sizes: ads[id].sizes,
 	// 	});
 	// }
@@ -147,7 +147,7 @@ if ( window.googletag && googletag.apiReady ) {
 	// 	for ( const id in ads ) {
 	// 		uadSlots.push({
 	// 			slotID: 'mai-ad-' + id,
-	// 			slotName: '/22487526518/' + maiPubVars['gamDomain'] + '/' + id,
+	// 			slotName: '/22487526518/' + maiPubAdsVars['gamDomain'] + '/' + id,
 	// 			sizes: ads[id].sizes,
 	// 		});
 	// 	}
