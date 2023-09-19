@@ -227,8 +227,8 @@ if ( window.googletag && googletag.apiReady ) {
 		});
 	}
 
-	const pbjs = pbjs || {};
-	pbjs.que   = pbjs.que || [];
+	var pbjs = pbjs || {};
+	pbjs.que = pbjs.que || [];
 
 	pbjs.que.push(function() {
 		pbjs.setConfig({
