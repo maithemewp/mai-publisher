@@ -214,13 +214,67 @@ if ( window.googletag && googletag.apiReady ) {
 				{
 					bidder: 'sovrn',
 					params: {
-						tagid: '1166957', // sovrn_tmspn_header_970x250 (Multi-size)
+						tagid: '1166970', // 120x600
 					}
 				},
 				{
 					bidder: 'sovrn',
 					params: {
-						tagid: '1166958', // sovrn_tmspn_header_970x250 (Single-size)
+						tagid: '1166962', // 160x600
+					}
+				},
+				{
+					bidder: 'sovrn',
+					params: {
+						tagid: '1166963', // 300x1050
+					}
+				},
+				{
+					bidder: 'sovrn',
+					params: {
+						tagid: '1166966', // 300x250
+					}
+				},
+				{
+					bidder: 'sovrn',
+					params: {
+						tagid: '1166967', // 300x600
+					}
+				},
+				{
+					bidder: 'sovrn',
+					params: {
+						tagid: '320x50', // 1166968
+					}
+				},
+				{
+					bidder: 'sovrn',
+					params: {
+						tagid: '1166971', // 336x280
+					}
+				},
+				{
+					bidder: 'sovrn',
+					params: {
+						tagid: '1166964', // 468x60
+					}
+				},
+				{
+					bidder: 'sovrn',
+					params: {
+						tagid: '1166969', // 728x90
+					}
+				},
+				{
+					bidder: 'sovrn',
+					params: {
+						tagid: '1166961', // 970x250
+					}
+				},
+				{
+					bidder: 'sovrn',
+					params: {
+						tagid: '1166965', // 970x90
 					}
 				},
 			]
