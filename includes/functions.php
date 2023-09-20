@@ -610,7 +610,7 @@ function maipub_get_default_options() {
 	$options = [
 		'first-version' => '',
 		'db-version'    => '',
-		'gam_domain'    => (string) wp_parse_url( esc_url( home_url() ), PHP_URL_HOST ),
+		'gam_domain'    => (string) maipub_get_url_host( home_url() ),
 		'label'         => '',
 		'header'        => '',
 		'footer'        => '',
@@ -629,7 +629,7 @@ function maipub_get_default_options() {
  * @return string
  */
 function maipub_get_gam_domain( $fallback = true ) {
-	return maipub_get_gam_domain_sanitized( (string) maipub_get_option( 'gam_domain', $fallback ) );
+	return maipub_get_url_host( (string) maipub_get_option( 'gam_domain', $fallback ) );
 }
 
 /**
@@ -641,7 +641,7 @@ function maipub_get_gam_domain( $fallback = true ) {
  *
  * @return string
  */
-function maipub_get_gam_domain_sanitized( string $domain ) {
+function maipub_get_url_host( string $domain ) {
 	$domain = $domain ? (string) wp_parse_url( esc_url( (string) $domain ), PHP_URL_HOST ) : '';
 	$domain = str_replace( 'www.', '', $domain );
 
