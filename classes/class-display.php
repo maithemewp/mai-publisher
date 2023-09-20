@@ -55,9 +55,17 @@ class Mai_Publisher_Display {
 		if ( $gam_ads ) {
 			$file = "assets/js/mai-publisher-ads{$suffix}.js";
 
+			// Google Ad Manager GPT.
 			wp_enqueue_script( 'google-gpt', 'https://securepubads.g.doubleclick.net/tag/js/gpt.js', [], $this->get_file_data( $file, 'version' ), [ 'strategy' => 'async' ] );
+
+			// Sovrn.
 			wp_enqueue_script( 'sovrn-beacon', '//ap.lijit.com/www/sovrn_beacon_standalone/sovrn_standalone_beacon.js?iid=472780', [], $this->get_file_data( $file, 'version' ), [ 'strategy' => 'async' ] );
+
+			// Prebid.
 			wp_enqueue_script( 'prebid-js', 'https://cdn.jsdelivr.net/npm/prebid.js@8.15.0/dist/not-for-prod/prebid.min.js', [], '8.15.0', [ 'strategy' => 'async' ] ); // https://www.jsdelivr.com/package/npm/prebid.js
+			wp_localize_script( 'prebid-js', 'maiPubPrebidVars', $this->get_ortb2_vars() );
+
+			// Mai Publisher.
 			wp_enqueue_script( 'mai-publisher-ads', $this->get_file_data( $file, 'url' ), [ 'google-gpt', 'sovrn-beacon', 'prebid-js' ], $this->get_file_data( $file, 'version' ), false ); // Asyncing broke ads.
 			wp_localize_script( 'mai-publisher-ads', 'maiPubAdsVars',
 				[
@@ -212,6 +220,39 @@ class Mai_Publisher_Display {
 		}
 
 		return $ad_ids;
+	}
+
+	/**
+	 * Gets localized args for OpenRTB.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return array
+	 */
+	function get_ortb2_vars() {
+		$site = [
+			'name'          => get_bloginfo( 'name' ),
+			'domain'        => (string) maipub_get_url_host( home_url() ),
+			'page'          => is_singular() ? get_permalink() : home_url( add_query_arg( [] ) ),   // URL of the page where the impression will be shown.
+			'kwarray'       => [ 'sports', 'news', 'rumors', 'gossip' ],                            // Array of keywords about the site.
+			'mobile'        => 1,                                                                   // Indicates if the site has been programmed to optimize layout when viewed on mobile devices, where 0 = no, 1 = yes.
+			'privacypolicy' => 1,                                                                   // Indicates if the site has a privacy policy, where 0 = no, 1 = yes.
+			'content'       => [],
+		];
+
+
+		// The taxonomy in use. Refer to the AdCOM list List: Category Taxonomies for values. If no cattax field is supplied IAB Content Category Taxonomy 1.0 is assumed.
+		// @link https://iabtechlab.com/standards/content-taxonomy/
+		// cattax: 7, // IAB Tech Lab Content Taxonomy 3.0.
+		// Array of IABTL content categories of the site. The taxonomy to be used is defined by the cattax field.
+		// cat: 483, // Sitewode category. Sports.
+		// Array of IABTL content categories that describe the current section of the site. The taxonomy to be used is defined by the cattax field.
+		// sectioncat: 547, // Category. Basketball.
+		// Array of IABTL content categories that describe the current page or view of the site.
+		// pagecat: 547, // Child category. Basketball.
+
+
+		return $site;
 	}
 
 	/**
