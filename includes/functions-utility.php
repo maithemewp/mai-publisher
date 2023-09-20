@@ -111,7 +111,7 @@ function maipub_build_attributes( $attr, $escape = 'esc_attr' ) {
 		if ( is_null( $value ) ) {
 			$html .= sprintf( ' %s', $name );
 		} else {
-			$html .= sprintf( ' %s="%s"', $name, $value );
+			$html .= sprintf( ' %s="%s"', $name, $escape( $value ) );
 		}
 	}
 
