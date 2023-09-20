@@ -127,6 +127,7 @@ final class Mai_Publisher_Plugin {
 		// Instantiate classes.
 		$admin         = new Mai_Publisher_Admin;
 		$settings      = new Mai_Publisher_Settings;
+		$settings_cats = new Mai_Publisher_Settings_Categories;
 		$field_group   = new Mai_Publisher_Ad_Field_Group;
 		$fields        = new Mai_Publisher_Ad_Fields;
 		$visibility    = new Mai_Publisher_Ad_Visibility;

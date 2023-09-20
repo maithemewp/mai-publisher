@@ -130,7 +130,7 @@ class Mai_Publisher_Settings {
 	 */
 	function maipub_sanitize( $input ) {
 		// Sanitize.
-		$input['gam_domain'] = isset( $input['gam_domain'] ) ? maipub_get_gam_domain_sanitized( $input['gam_domain'] ) : '';
+		$input['gam_domain'] = isset( $input['gam_domain'] ) ? maipub_get_url_host( $input['gam_domain'] ) : '';
 		$input['label']      = isset( $input['label'] ) ? esc_html( $input['label'] ) : '';
 		$input['header']     = current_user_can( 'unfiltered_html' ) ? trim( $input['header'] ) : wp_kses_post( trim( $input['header'] ) );
 		$input['footer']     = current_user_can( 'unfiltered_html' ) ? trim( $input['footer'] ) : wp_kses_post( trim( $input['footer'] ) );
