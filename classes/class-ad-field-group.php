@@ -24,6 +24,15 @@ class Mai_Publisher_Ad_Field_Group {
 		add_action( 'acf/init',              [ $this, 'register_field_group' ] );
 	}
 
+	/**
+	 * Enqueue script.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param string $hook The current hook.
+	 *
+	 * @return void
+	 */
 	function enqueue_script( $hook ) {
 		if ( 'post.php' !== $hook ) {
 			return;
@@ -42,6 +51,13 @@ class Mai_Publisher_Ad_Field_Group {
 		wp_enqueue_script( 'mai-publisher-admin', $file_url, [], $version, true );
 	}
 
+	/**
+	 * Register field group.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return void
+	 */
 	function register_field_group() {
 		if ( ! function_exists( 'acf_add_local_field_group' ) ) {
 			return;

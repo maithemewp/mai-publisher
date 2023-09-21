@@ -131,6 +131,7 @@ final class Mai_Publisher_Plugin {
 		$field_group   = new Mai_Publisher_Ad_Field_Group;
 		$fields        = new Mai_Publisher_Ad_Fields;
 		$visibility    = new Mai_Publisher_Ad_Visibility;
+		$categories    = new Mai_Publisher_Categories_Field_Group;
 		$generate      = new Mai_Publisher_Generate_Ads;
 		$ad_block      = new Mai_Publisher_Ad_Block;
 		$ad_unit_block = new Mai_Publisher_Ad_Unit_Block;

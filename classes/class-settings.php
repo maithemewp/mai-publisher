@@ -58,7 +58,7 @@ class Mai_Publisher_Settings {
 	function add_content() {
 		echo '<div class="wrap">';
 			printf( '<h2>%s</h2>', __( 'Mai Publisher', 'mai-publisher' ) );
-
+			printf( '<p>%s <a href="%s">%s</a></p>', __( 'Settings and configuration for Mai Publisher.', 'mai-publisher' ), admin_url( 'edit.php?post_type=mai_ad&page=categories' ), __( 'View taxonomy array here.', 'mai-publisher' ) );
 			echo '<form method="post" action="options.php">';
 				settings_fields( 'maipub_group' );
 				do_settings_sections( 'mai-publisher-section' );

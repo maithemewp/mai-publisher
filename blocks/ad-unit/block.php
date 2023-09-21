@@ -295,6 +295,10 @@ class Mai_Publisher_Ad_Unit_Block {
 	 * @return array
 	 */
 	function load_ad_unit_choices( $field ) {
+		if ( ! is_admin() ) {
+			return $field;
+		}
+
 		$choices = [ '' => __( 'None', 'mai-publisher' ) ];
 		$units   = maipub_get_config( 'ad_units' );
 
