@@ -293,69 +293,8 @@ if ( window.googletag && googletag.apiReady ) {
 			 * @link https://iabtechlab.com/wp-content/uploads/2022/04/OpenRTB-2-6_FINAL.pdf
 			 */
 			ortb2: {
-				/**
-				 * 3.2.13 Object: Site
-				 */
-				site: {
-					name: 'TMSPN',
-					domain: 'tmspn.com',
-					// The taxonomy in use. Refer to the AdCOM list List: Category Taxonomies for values. If no cattax field is supplied IAB Content Category Taxonomy 1.0 is assumed.
-					// @link https://iabtechlab.com/standards/content-taxonomy/
-					cattax: 7, // IAB Tech Lab Content Taxonomy 3.0.
-					// Array of IABTL content categories of the site. The taxonomy to be used is defined by the cattax field.
-					cat: 483, // Sitewode category. Sports.
-					// Array of IABTL content categories that describe the current section of the site. The taxonomy to be used is defined by the cattax field.
-					sectioncat: 547, // Category. Basketball.
-					// Array of IABTL content categories that describe the current page or view of the site.
-					pagecat: 547, // Child category. Basketball.
-					// URL of the page where the impression will be shown.
-					page: 'https://tmspn.com/breaking-philadelphia-76ers-dismiss-head-coach-doc-rivers/',
-					// Array of keywords about the site.
-					kwarray: [ 'sports', 'news', 'rumors', 'gossip' ],
-					// Indicates if the site has been programmed to optimize layout when viewed on mobile devices, where 0 = no, 1 = yes.
-					mobile: 1,
-					// Indicates if the site has a privacy policy, where 0 = no, 1 = yes.
-					privacypolicy: 1,
-					// Comma separated list of keywords about the site. Only one of 'keywords' or 'kwarray' may be present.
-					// keywords: 'sports, news, rumors, gossip',
-					// Referrer URL that caused navigation to the current page.
-					// ref: 'https://ref.example.com',
-					// Search string that caused navigation to the current page.
-					// search: "drill",
-					/**
-					 * 3.2.16 Object: Content
-					 */
-					content: {
-						// Post ID. ID uniquely identifying the content.
-						id: 522,
-						// Post title.
-						title: 'BREAKING: Philadelphia 76ers Dismiss Head Coach Doc Rivers',
-						// URL of the content, for buy-side contextualization or review.
-						url: 'https://tmspn.com/breaking-philadelphia-76ers-dismiss-head-coach-doc-rivers/',
-						// The taxonomy in use. Refer to the AdCOM list List: Category Taxonomies for values. If no cattax field is supplied IAB Content Category Taxonomy 1.0 is assumed.
-						// @link https://iabtechlab.com/standards/content-taxonomy/
-						cattax: 7, // IAB Tech Lab Content Taxonomy 3.0.
-						// Array of IABTL content categories of the site. The taxonomy to be used is defined by the cattax field.
-						cat: [ 547 ], // Categories. Basketball.
-						// Array of keywords about the content.
-						kwarray: [ 'philadelphia 76ers', 'doc rivers' ],
-						// Type of content (game, video, text, etc.). Refer to List 5.18.
-						context: 5, // Text (i.e., primarily textual document such as a web page, eBook, or news article.
-						// Content language using ISO-639-1-alpha-2. Only one of language or langb should be present.
-						// language: '',
-						// Content language using IETF BCP 47. Only one of language or langb should be present.
-						// langb: '',
-						/**
-						 * 3.2.21 Object: Data
-						 */
-						// data: [
-						// 	{
-
-						// 	},
-						// ]
-					}
-				}
-			}
+				site: maiPubPrebidVars,
+			},
 		});
 		pbjs.addAdUnits(adUnits);
 		pbjs.requestBids({

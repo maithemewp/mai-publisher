@@ -225,35 +225,190 @@ class Mai_Publisher_Display {
 	/**
 	 * Gets localized args for OpenRTB.
 	 *
+	 * OpenRTB 2.6 spec / Content Taxonomy.
+	 * @link https://iabtechlab.com/wp-content/uploads/2022/04/OpenRTB-2-6_FINAL.pdf
+	 *
 	 * @since 0.1.0
 	 *
 	 * @return array
 	 */
 	function get_ortb2_vars() {
+		/**
+		 * 3.2.13 Object: Site
+		 */
 		$site = [
 			'name'          => get_bloginfo( 'name' ),
 			'domain'        => (string) maipub_get_url_host( home_url() ),
-			'page'          => is_singular() ? get_permalink() : home_url( add_query_arg( [] ) ),   // URL of the page where the impression will be shown.
-			// 'kwarray'       => [ 'sports', 'news', 'rumors', 'gossip' ],                            // Array of keywords about the site.
-			// 'mobile'        => 1,                                                                   // Indicates if the site has been programmed to optimize layout when viewed on mobile devices, where 0 = no, 1 = yes.
-			// 'privacypolicy' => 1,                                                                   // Indicates if the site has a privacy policy, where 0 = no, 1 = yes.
-			'content'       => [],
+			'page'          => is_singular() ? get_permalink() : home_url( add_query_arg( [] ) ),
+			// 'kwarray'       => [ 'sports', 'news', 'rumors', 'gossip' ],
+			'mobile'        => 1,
+			'privacypolicy' => 1,
+			// 'content'       => [],
 		];
 
-		// $cat =
+		$cattax      = 7; // IAB Tech Lab Content Taxonomy 3.0.
+		$cat         = maipub_get_option( 'category' ); // Sitewide category.
+		$section_cat = ''; // Category.
+		$page_cat    = ''; // Child category.
+		$term_id     = 0;
 
-		// The taxonomy in use. Refer to the AdCOM list List: Category Taxonomies for values. If no cattax field is supplied IAB Content Category Taxonomy 1.0 is assumed.
-		// @link https://iabtechlab.com/standards/content-taxonomy/
-		// cattax: 7, // IAB Tech Lab Content Taxonomy 3.0.
-		// Array of IABTL content categories of the site. The taxonomy to be used is defined by the cattax field.
-		// cat: 483, // Sitewode category. Sports.
-		// Array of IABTL content categories that describe the current section of the site. The taxonomy to be used is defined by the cattax field.
-		// sectioncat: 547, // Category. Basketball.
-		// Array of IABTL content categories that describe the current page or view of the site.
-		// pagecat: 547, // Child category. Basketball.
+		if ( is_singular( 'post' ) ) {
+			$post_id = get_the_ID();
+			$primary = $this->get_primary_term( 'category', $post_id );
+			$term_id = $primary ? $primary->term_id : 0;
 
+			/**
+			 * 3.2.16 Object: Content
+			 */
+			$site['content'] = [
+				'id'       => $post_id,
+				'title'    => get_the_title(),
+				'url'      => get_permalink(),
+				'context'  => 5,                                        // Text (i.e., primarily textual document such as a web page, eBook, or news article.
+				// 'kwarray'  => [ 'philadelphia 76ers', 'doc rivers' ],   // Array of keywords about the content.
+				// 'language' => '',                                       // Content language using ISO-639-1-alpha-2. Only one of language or langb should be present.
+				// 'langb'    => '',                                       // Content language using IETF BCP 47. Only one of language or langb should be present.
+				/**
+				 * 3.2.21 Object: Data
+				 */
+				// 'data' => [],
+			];
+
+		} elseif ( is_category() ) {
+			$object    = get_queried_object();
+			$term_id   = $object && $object instanceof WP_Term ? $object->term_id : 0;
+		}
+
+		if ( $term_id ) {
+			$hierarchy = $this->get_term_hierarchy( $term_id );
+
+			if ( $hierarchy ) {
+				$page_cat    = array_pop( $hierarchy );
+				$section_cat = array_pop( $hierarchy );
+				$section_cat = $section_cat ?: $page_cat;
+			}
+		}
+
+		if ( $cat || $section_cat || $page_cat ) {
+			$site['cattax']            = $cattax;
+			$site['content']['cattax'] = $cattax;
+
+			if ( $cat ) {
+				$site['cat']            = $cat;
+				$site['content']['cat'] = $cat;
+			}
+
+			if ( $section_cat ) {
+				$site['sectioncat']            = $section_cat;
+				$site['content']['sectioncat'] = $section_cat;
+			}
+
+			if ( $page_cat ) {
+				$site['pagecat']            = $page_cat;
+				$site['content']['pagecat'] = $page_cat;
+			}
+		}
+
+		ray( $site );
 
 		return $site;
+	}
+
+	/**
+	 * Gets the primary term of a post, by taxonomy.
+	 * If Yoast Primary Term is used, return it,
+	 * otherwise fallback to the first term.
+	 *
+	 * @version 1.3.0
+	 *
+	 * @since 0.1.0
+	 *
+	 * @link https://gist.github.com/JiveDig/5d1518f370b1605ae9c753f564b20b7f
+	 * @link https://gist.github.com/jawinn/1b44bf4e62e114dc341cd7d7cd8dce4c
+	 * @author Mike Hemberger @JiveDig.
+	 *
+	 * @param string $taxonomy The taxonomy to get the primary term from.
+	 * @param int    $post_id  The post ID to check.
+	 *
+	 * @return WP_Term|false The term object or false if no terms.
+	 */
+	function get_primary_term( $taxonomy = 'category', $post_id = false ) {
+		// Bail if no taxonomy.
+		if ( ! $taxonomy ) {
+			return false;
+		}
+
+		// If no post ID, set it.
+		if ( ! $post_id ) {
+			$post_id = get_the_ID();
+		}
+
+		// Bail if no post ID.
+		if ( ! $post_id ) {
+			return false;
+		}
+
+		// Setup caching.
+		static $cache = null;
+
+		// Maybe return cached value.
+		if ( is_array( $cache ) ) {
+			if ( isset( $cache[ $taxonomy ][ $post_id ] ) ) {
+				return $cache[ $taxonomy ][ $post_id ];
+			}
+		} else {
+			$cache = [];
+		}
+
+		// If checking for WPSEO.
+		if ( class_exists( 'WPSEO_Primary_Term' ) ) {
+
+			// Get the primary term.
+			$wpseo_primary_term = new WPSEO_Primary_Term( $taxonomy, $post_id );
+			$wpseo_primary_term = $wpseo_primary_term->get_primary_term();
+
+			// If we have one, return it.
+			if ( $wpseo_primary_term ) {
+				$cache[ $taxonomy ][ $post_id ] = get_term( $wpseo_primary_term );
+				return $cache[ $taxonomy ][ $post_id ];
+			}
+		}
+
+		// We don't have a primary, so let's get all the terms.
+		$terms = get_the_terms( $post_id, $taxonomy );
+
+		// Bail if no terms.
+		if ( ! $terms || is_wp_error( $terms ) ) {
+			$cache[ $taxonomy ][ $post_id ] = false;
+			return $cache[ $taxonomy ][ $post_id ];
+		}
+
+		// Get the first, and store in cache.
+		$cache[ $taxonomy ][ $post_id ] = reset( $terms );
+
+		// Return the first term.
+		return $cache[ $taxonomy ][ $post_id ];
+	}
+
+	/**
+	 * Gets the hierarchy of a term.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @param int    $term_id
+	 * @param string $taxonomy
+	 *
+	 * @return int[]
+	 */
+	function get_term_hierarchy( $term_id, $taxonomy = 'category' ) {
+		$term_ids  = [ $term_id ];
+		$parent_id = wp_get_term_taxonomy_parent_id( $term_id, $taxonomy );
+
+		if ( $parent_id ) {
+			$term_ids = array_merge( $this->get_term_hierarchy( $parent_id, $taxonomy ), $term_ids );
+		}
+
+		return $term_ids;
 	}
 
 	/**
