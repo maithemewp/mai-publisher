@@ -234,12 +234,13 @@ class Mai_Publisher_Display {
 			'name'          => get_bloginfo( 'name' ),
 			'domain'        => (string) maipub_get_url_host( home_url() ),
 			'page'          => is_singular() ? get_permalink() : home_url( add_query_arg( [] ) ),   // URL of the page where the impression will be shown.
-			'kwarray'       => [ 'sports', 'news', 'rumors', 'gossip' ],                            // Array of keywords about the site.
-			'mobile'        => 1,                                                                   // Indicates if the site has been programmed to optimize layout when viewed on mobile devices, where 0 = no, 1 = yes.
-			'privacypolicy' => 1,                                                                   // Indicates if the site has a privacy policy, where 0 = no, 1 = yes.
+			// 'kwarray'       => [ 'sports', 'news', 'rumors', 'gossip' ],                            // Array of keywords about the site.
+			// 'mobile'        => 1,                                                                   // Indicates if the site has been programmed to optimize layout when viewed on mobile devices, where 0 = no, 1 = yes.
+			// 'privacypolicy' => 1,                                                                   // Indicates if the site has a privacy policy, where 0 = no, 1 = yes.
 			'content'       => [],
 		];
 
+		// $cat =
 
 		// The taxonomy in use. Refer to the AdCOM list List: Category Taxonomies for values. If no cattax field is supplied IAB Content Category Taxonomy 1.0 is assumed.
 		// @link https://iabtechlab.com/standards/content-taxonomy/

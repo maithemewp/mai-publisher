@@ -255,9 +255,7 @@ class Mai_Publisher_Ad_Fields {
 		}
 
 		$taxonomies = get_taxonomies( [ 'public' => 'true' ], 'names' );
-
 		$taxonomies = apply_filters( 'maipub_taxonomies', array_values( $taxonomies ) );
-
 		$taxonomies = array_unique( array_filter( (array) $taxonomies ) );
 
 		foreach ( $taxonomies as $index => $taxonomy ) {

@@ -58,7 +58,7 @@ class Mai_Publisher_Settings {
 	function add_content() {
 		echo '<div class="wrap">';
 			printf( '<h2>%s</h2>', __( 'Mai Publisher', 'mai-publisher' ) );
-			printf( '<p>%s <a href="%s">%s</a></p>', __( 'Settings and configuration for Mai Publisher.', 'mai-publisher' ), admin_url( 'edit.php?post_type=mai_ad&page=categories' ), __( 'View taxonomy array here.', 'mai-publisher' ) );
+			printf( '<p>%s</p>', __( 'Settings and configuration for Mai Publisher.', 'mai-publisher' ) );
 			echo '<form method="post" action="options.php">';
 				settings_fields( 'maipub_group' );
 				do_settings_sections( 'mai-publisher-section' );
@@ -105,6 +105,14 @@ class Mai_Publisher_Settings {
 		);
 
 		add_settings_field(
+			'category', // id
+			__( 'Sitewide Category', 'mai-publisher' ), // title
+			[ $this, 'category_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings' // section
+		);
+
+		add_settings_field(
 			'header_scripts', // id
 			__( 'Header Scripts', 'mai-publisher' ), // title
 			[ $this, 'header_callback' ], // callback
@@ -131,6 +139,7 @@ class Mai_Publisher_Settings {
 	function maipub_sanitize( $input ) {
 		// Sanitize.
 		$input['gam_domain'] = isset( $input['gam_domain'] ) ? maipub_get_url_host( $input['gam_domain'] ) : '';
+		$input['category']   = isset( $input['category'] ) ? sanitize_key( $input['category'] ) : '';
 		$input['label']      = isset( $input['label'] ) ? esc_html( $input['label'] ) : '';
 		$input['header']     = current_user_can( 'unfiltered_html' ) ? trim( $input['header'] ) : wp_kses_post( trim( $input['header'] ) );
 		$input['footer']     = current_user_can( 'unfiltered_html' ) ? trim( $input['footer'] ) : wp_kses_post( trim( $input['footer'] ) );
@@ -167,6 +176,27 @@ class Mai_Publisher_Settings {
 	 */
 	function domain_callback() {
 		printf( '<input class="regular-text" type="text" name="mai_publisher[domain]" id="domain" value="%s">', maipub_get_default_option( 'gam_domain' ), maipub_get_gam_domain( false ) );
+	}
+
+	/**
+	 * Setting callback.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return void
+	 */
+	function category_callback() {
+		$selected = maipub_get_option( 'category' );
+
+		echo '<div style="display:flex;align-items:center;gap:1em;">';
+			echo '<select id="category" name="mai_publisher[category]">';
+				printf( '<option value="">%s</option>', __( 'Select a sitewide category...', 'mai-publisher' ) );
+				foreach ( (array) maipub_get_all_categories() as $id => $label ) {
+					printf( '<option value="%s"%s>%s</option>', $id, selected( $selected, $id ), $label );
+				}
+			echo '</select>';
+			printf( '<p><a href="%s">%s</a></p>', admin_url( 'edit.php?post_type=mai_ad&page=categories' ), __( 'View full category list', 'mai-publisher' ) );
+		echo '</div>';
 	}
 
 	/**

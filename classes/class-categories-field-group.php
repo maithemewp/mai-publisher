@@ -87,8 +87,8 @@ class Mai_Publisher_Categories_Field_Group {
 
 		$field['choices'] = [];
 
-		foreach ( (array) maipub_get_all_categories() as $name => $value ) {
-			$field['choices'][ $name ] = $value;
+		foreach ( (array) maipub_get_all_categories() as $id => $label ) {
+			$field['choices'][ $id ] = $label;
 		}
 
 		return $field;
