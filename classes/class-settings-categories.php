@@ -10,6 +10,9 @@ defined( 'ABSPATH' ) || die;
  * @link http://jeremyhixon.com/wp-tools/option-page/
  */
 class Mai_Publisher_Settings_Categories {
+	protected $hierarchicalArray = [];
+	protected $parentsArray = [];
+
 	/**
 	 * Construct the class.
 	 */
@@ -50,6 +53,14 @@ class Mai_Publisher_Settings_Categories {
 	/**
 	 * Adds setting page content.
 	 *
+	 * 1. We need to build JSON from CSV so we can easily copy and paste into the categories.json file.
+	 *    This is so we can update easier the next time IAB updates the tsv file.
+	 *
+	 * 2. We need to show id => label with visual hierarchy for the search picker. Direct from categories.json. Simple.
+	 *
+	 * 3. We need to show a hierarchical ist of all the categories visually to help make a choice.
+	 *    Don't need IDs, just build hierarchy from categories.json on the fly, only for that setting page.
+	 *
 	 * @since 0.1.0
 	 *
 	 * @return void
@@ -60,6 +71,7 @@ class Mai_Publisher_Settings_Categories {
 
 			$doc = 'https://docs.google.com/spreadsheets/d/1uh3CcEW3N1d1hL5Mshi2EYk3lUeq6dcgn2QdkNF27IE/';
 			$iab = 'https://github.com/InteractiveAdvertisingBureau/Taxonomies/blob/main/Content%20Taxonomies/Content%20Taxonomy%203.0.tsv';
+
 			echo '<p>';
 				echo __( 'This page is for reference only, for easier copy & paste into the plugin\'s config.php.', 'mai-publisher' );
 				printf( '<br><a href="%s">%s</a>', $doc, __( 'View taxonomy spreadsheet here.', 'mai-publisher' ) );
@@ -74,20 +86,45 @@ class Mai_Publisher_Settings_Categories {
 			array_shift( $array );
 			array_shift( $array );
 
-			// Setup array for JSON later.
-			$json = [];
+			// Setup variables.
+			$json = $lists = [];
 
-			// Iterate through each row.
+			// Loop through each row.
 			foreach ( $array as $index => $data ) {
 				list( $id, $parent, $name, $t1, $t2, $t3, $t4, $ext ) = $data;
 
-				// Initialize a reference to the current level of the multidimensional array.
-				$current = &$json;
+				/**********************
+				 * Start building JSON.
+				 */
 
-				// Iterate through the hierarchy levels and create subarrays as needed
-				$levels = array( $t1, $t2, $t3, $t4 );
+				$structure = [];
+				$tiers     = array_filter( [ $t1, $t2, $t3, $t4 ] );
 
-				foreach ( $levels as $value) {
+				// If multiple, remove the last then build data.
+				if ( count( $tiers ) > 1 ) {
+					array_pop( $tiers );
+
+					// Loop through tiers.
+					foreach ( $tiers as $index => $value ) {
+						$structure[] = '&ndash;';
+					}
+				}
+
+				// Add name as last value.
+				$structure[] = $name;
+
+				// Add to taxonomies array with key of id and parent/child/grandchild/name as value, removing empty values.
+				$json[ $id ] = implode( '&nbsp;', $structure );
+
+				/**********************
+				 * Start building lists.
+				 */
+
+				$current = &$lists;
+				$tiers   = [ $t1, $t2, $t3, $t4 ];
+
+				// Loop through tiers.
+				foreach ( $tiers as $value) {
 					$value = trim( $value );
 
 					if ( $value ) {
@@ -106,12 +143,13 @@ class Mai_Publisher_Settings_Categories {
 
 			// Render in a details and summary markup.
 			echo '<details>';
-				printf( '<summary><strong>%s</strong></summary>', __( 'Show categories for categories.json', 'mai-publisher' ) );
+				printf( '<summary class="button button-secondary" style="margin-bottom:8px;"><strong>%s</strong></summary>', __( 'Show categories for categories.json', 'mai-publisher' ) );
 				echo '<textarea rows="10" cols="1" style="width:100%;min-height:50vh;background:white;" readonly>';
-						echo json_encode( $json, JSON_PRETTY_PRINT );
+					echo json_encode( $json, JSON_PRETTY_PRINT );
 				echo '</textarea>';
 			echo '</details>';
 
+			// Inline styles for the nested lists.
 			?>
 			<style>
 				ul.maipub-categories {
@@ -119,117 +157,47 @@ class Mai_Publisher_Settings_Categories {
 					margin-bottom: 24px;
 				}
 				ul.maipub-categories ul {
-					--margin-left: 16px;
+					--margin-left: 8px;
 					margin-top: 8px;
 					margin-left: var(--margin-left);
 				}
 				ul.maipub-categories ul ul {
-					--margin-left: 24px;
+					--margin-left: 16px;
 				}
 				ul.maipub-categories ul ul ul {
-					--margin-left: 32px;
+					--margin-left: 24px;
 				}
 			</style>
 			<?php
 
-			// Display the $json array as nest unordered lists.
-			foreach ( $json as $name => $children ) {
+			// Display the $lists array as nest unordered lists.
+			foreach ( $lists as $name => $children ) {
 				echo '<ul class="maipub-categories">';
-					echo "<li>{$name}{$this->get_list( $children )}</li>";
+					printf( '<li>%s%s</li>', $name, $this->get_list( $children ) );
 				echo '</ul>';
 			}
-
-		// 	// Start list.
-		// 	$lists = [];
-
-		// 	// Setup taxonomies.
-		// 	$taxonomies = [];
-
-		// 	// Loop through each row.
-		// 	foreach ( $array as $data ) {
-		// 		list( $id, $parent, $name, $t1, $t2, $t3, $t4, $ext ) = $data;
-
-		// 		$items  = [];
-		// 		$values = [];
-		// 		$tiers  = array_filter( [ $t1, $t2, $t3, $t4 ] );
-
-		// 		// If multiple, remove the last then build data.
-		// 		if ( count( $tiers ) > 1 ) {
-		// 			array_pop( $tiers );
-
-		// 			foreach ( $tiers as $index => $value ) {
-		// 				$items[]  = '&ndash;';
-		// 				$values[] = $value;
-		// 			}
-		// 		}
-
-		// 		// Add name as last value.
-		// 		$items[]  = $name;
-		// 		$values[] = $name;
-
-		// 		// Add to taxonomies array with key of id and parent/child/grandchild/name as value, removing empty values.
-		// 		$taxonomies[ $id ] = implode( ' / ', $values );
-
-		// 		// Add to list array.
-		// 		$lists[ $name ] = $items;
-		// 	}
-
-
-		// 	// Render in a details and summary markup.
-		// 	echo '<details>';
-		// 		printf( '<summary><strong>%s</strong></summary>', __( 'Show categories for config', 'mai-publisher' ) );
-		// 		echo '<div>';
-		// 			echo '<textarea rows="10" cols="1" style="width:100%;min-height:50vh;background:white;" readonly>';
-		// 				echo '['. "\r\n";
-		// 					foreach ( $taxonomies as $key => $value ) {
-		// 						printf( "%s'%s' => '%s',%s", "\t", $key, wp_slash( $value ), "\r\n" );
-		// 					}
-		// 				echo '];';
-		// 				echo "\r\n";
-		// 			echo '</textarea>';
-		// 		echo '</div>';
-		// 	echo '</details>';
-
-		// 	ray( $lists );
-
-		// 	// Loop through array to build list items.
-		// 	foreach ( $lists as $items ) {
-		// 		echo '<ul>';
-		// 		foreach ( $items as $index => $item ) {
-		// 			printf( '<li>%s</li>', implode( ' ', $items ) );
-		// 		}
-		// 		echo '</ul>';
-		// 	}
-
 		echo '</div>';
 	}
 
 	/**
 	 * Function to recursively loop through associative array data to build nested unordered lists.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return string
 	 */
-	function get_list( $array, $indent = "\t" ) {
+	function get_list( $array, $indent = "&ndash;&nbsp;" ) {
 		$html = $array ? '<ul>' : '';
 
 		foreach ( $array as $key => $value ) {
-			$html .= "{$indent}<li>{$key}</li>" . "\r\n";
+			$html .= sprintf( '<li>%s%s</li>', $indent, $key );
 
 			if ( $value ) {
-				$html .= $this->get_list( $value, $indent . "\t" );
+				$html .= $this->get_list( $value, $indent . "&ndash;&nbsp;" );
 			}
 		}
 
 		$html .= $array ? '</ul>' : '';
-
-		return $html;
-	}
-
-
-	function get_array_html( $array, $indent = "\t" ) {
-		$html = '';
-
-		foreach ( $array as $key => $value ) {
-			$html .= "{$indent}'{$key}' => '{$value}'," . "\r\n";
-		}
 
 		return $html;
 	}

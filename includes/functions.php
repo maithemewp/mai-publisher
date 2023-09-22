@@ -665,3 +665,23 @@ function maipub_update_option( $option, $value ) {
 
 	update_option( $handle, $options );
 }
+
+/**
+ * Gets all categories from categories.json.
+ * This is for the category picker.
+ *
+ * @since 0.1.0
+ *
+ * @return array
+ */
+function maipub_get_all_categories() {
+	static $cache = null;
+
+	if ( ! is_null( $cache ) ) {
+		return $cache;
+	}
+
+	$cache = json_decode( file_get_contents( MAI_PUBLISHER_DIR . '/categories.json' ), true );
+
+	return $cache;
+}

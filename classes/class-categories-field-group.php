@@ -44,7 +44,7 @@ class Mai_Publisher_Categories_Field_Group {
 					[
 
 						'label'        => __( 'IAB Category', 'mai-publisher' ),
-						'instructions' => __( 'Choose the IAB Category that is most fitting for this category. Be specific. If the category you\'re editing is Duke Basketball, choose College Basketball, not Basketball or Sports.', 'mai-publisher' ),
+						'instructions' => __( 'Choose the IAB Category that is most fitting for this category. Be specific. If the category you\'re editing is Duke Basketball, choose College Basketball, not Basketball or Sports.', 'mai-publisher' ) . sprintf( ' <a href="%s">%s</a>', admin_url( 'edit.php?post_type=mai_ad&page=categories' ), __( 'View full list of categories.', 'mai-publisher' ) ),
 						'key'          => 'maipub_category',
 						'name'         => 'maipub_category',
 						'type'         => 'select',
@@ -86,19 +86,36 @@ class Mai_Publisher_Categories_Field_Group {
 		}
 
 		$field['choices'] = [];
+		$categories       = $this->flatten_array( maipub_get_all_categories() );
 
-		foreach ( maipub_get_config( 'categories' ) as $id => $values ) {
-			$values = explode( ' / ', $values );
-			$last   = end( $values );
+		ray( $categories );
 
-			// Add a tab before $last string value for item in label array.
-			foreach ( $values as $index => $value ) {
-				$last = sprintf( '%s%s', "   ", $last );
-			}
+		foreach ( $categories as $name => $value ) {
+			$field['choices'][ $name ] = $value;
+			// $last = end( $values );
 
-			$field['choices'][ $id ] = $last;
+			// // Add a tab before $last string value for item in label array.
+			// foreach ( $values as $index => $value ) {
+			// 	$last = sprintf( '%s%s', '&ndash;&nbsp;', $last );
+			// }
+
+			// $field['choices'][ $name ] = $last;
 		}
 
 		return $field;
+	}
+
+	function flatten_array( $array, $spacer = '&ndash;&nbsp;' ) {
+		$flat = [];
+
+		foreach ( $array as $key => $value ) {
+			if ( is_array( $value ) ) {
+				$flat = array_merge( $flat, $this->flatten_array( $value, $spacer ) );
+			} else {
+				$flat[ $key ] = $value;
+			}
+		}
+
+		return $flat;
 	}
 }
