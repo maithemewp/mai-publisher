@@ -286,6 +286,10 @@ class Mai_Publisher_Display {
 				$page_cat    = array_pop( $hierarchy );
 				$section_cat = array_pop( $hierarchy );
 				$section_cat = $section_cat ?: $page_cat;
+
+				// Check for IATB category.
+				$page_cat    = $page_cat ? get_term_meta( $term_id, 'maipub_category', true ) : 0;
+				$section_cat = $section_cat ? get_term_meta( $term_id, 'maipub_category', true ) : 0;
 			}
 		}
 
