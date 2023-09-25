@@ -294,18 +294,18 @@ class Mai_Publisher_Display {
 			$site['content']['cattax'] = $cattax;
 
 			if ( $cat ) {
-				$site['cat']            = $cat;
-				$site['content']['cat'] = $cat;
+				$site['cat']            = [ $cat ];
+				$site['content']['cat'] = [ $cat ];
 			}
 
 			if ( $section_cat ) {
-				$site['sectioncat']            = $section_cat;
-				$site['content']['sectioncat'] = $section_cat;
+				$site['sectioncat']            = [ $section_cat ];
+				$site['content']['sectioncat'] = [ $section_cat ];
 			}
 
 			if ( $page_cat ) {
-				$site['pagecat']            = $page_cat;
-				$site['content']['pagecat'] = $page_cat;
+				$site['pagecat']            = [ $page_cat ];
+				$site['content']['pagecat'] = [ $page_cat ];
 			}
 		}
 
