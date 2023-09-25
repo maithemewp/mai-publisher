@@ -287,6 +287,7 @@ if ( window.googletag && googletag.apiReady ) {
 	pbjs.que.push(function() {
 		pbjs.setConfig({
 			timeout: prebidTimeout,
+			enableTIDs: true,
 			/**
 			 * OpenRTB 2.6 spec / Content Taxonomy
 			 *
