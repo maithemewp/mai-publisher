@@ -309,8 +309,6 @@ class Mai_Publisher_Display {
 			}
 		}
 
-		ray( $site );
-
 		return $site;
 	}
 
