@@ -200,16 +200,23 @@ if ( window.googletag && googletag.apiReady ) {
 	 * Parallel auction with prebid & sovrn.    *
 	 ********************************************/
 
+	// TODO: WTH is "Signal"?
+	// @link https://www.sovrn.com/blog/sovrn-ad-strategy-in-prebid/
+
 	const adUnits = [];
 
 	for ( const id in ads ) {
+		/**
+		 * @link https://github.com/prebid/Prebid.js/blob/master/modules/sovrnBidAdapter.md
+		 */
 		adUnits.push({
 			code: 'mai-ad-' + id,
-			mediaTypes: {
-				banner: {
-					sizes: ads[id].sizes
-				}
-			},
+			sizes: ads[id].sizes,
+			// mediaTypes: {
+			// 	banner: {
+			// 		sizes: ads[id].sizes
+			// 	}
+			// },
 			bids: [
 				{
 					bidder: 'sovrn',
@@ -280,6 +287,12 @@ if ( window.googletag && googletag.apiReady ) {
 			]
 		});
 	}
+
+	// Force integers.
+	maiPubPrebidVars.mobile         = parseInt( maiPubPrebidVars.mobile );
+	maiPubPrebidVars.privacypolicy  = parseInt( maiPubPrebidVars.privacypolicy );
+	maiPubPrebidVars.cattax         = parseInt( maiPubPrebidVars.cattax );
+	maiPubPrebidVars.content.cattax = parseInt( maiPubPrebidVars.content.cattax );
 
 	var pbjs = pbjs || {};
 	pbjs.que = pbjs.que || [];
