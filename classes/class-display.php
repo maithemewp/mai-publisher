@@ -75,6 +75,18 @@ class Mai_Publisher_Display {
 			);
 		}
 
+		// If tracking with Matomo.
+		if ( maipub_get_option( 'matomo' ) ) {
+			$file = "assets/js/mai-publisher-analytics{$suffix}.js";
+
+			wp_enqueue_script( 'mai-publisher-analytics', $this->get_file_data( $file, 'url' ), [ 'google-gpt' ], $this->get_file_data( $file, 'version' ), true );
+			wp_localize_script( 'mai-publisher-analytics', 'maiPubAnalyticsVars',
+				[
+					'token' => maipub_get_option( 'matomo_token' ),
+				]
+			);
+		}
+
 		// Display the ads.
 		$this->render();
 	}

@@ -611,6 +611,8 @@ function maipub_get_default_options() {
 		'first-version' => '',
 		'db-version'    => '',
 		'gam_domain'    => (string) maipub_get_url_host( home_url() ),
+		'matomo'        => true,
+		'matomo_token'  => '',
 		'label'         => '',
 		'header'        => '',
 		'footer'        => '',
