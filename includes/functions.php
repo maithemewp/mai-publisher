@@ -111,8 +111,42 @@ function maipub_get_ads() {
  *
  * @return string
  */
-function maipub_get_processed_content( $content ) {
+function maipub_get_processed_ad_content( $content ) {
 	return do_blocks( $content );
+}
+
+/**
+ * Get processed content.
+ * Take from mai_get_processed_content() in Mai Engine.
+ *
+ * @since 0.1.0
+ *
+ * @return string
+ */
+function maipub_get_processed_content( $content ) {
+	if ( function_exists( 'mai_get_processed_content' ) ) {
+		return mai_get_processed_content( $content );
+	}
+
+	/**
+	 * Embed.
+	 *
+	 * @var WP_Embed $wp_embed Embed object.
+	 */
+	global $wp_embed;
+
+	$blocks  = has_blocks( $content );
+	$content = $wp_embed->autoembed( $content );           // WP runs priority 8.
+	$content = $wp_embed->run_shortcode( $content );       // WP runs priority 8.
+	$content = $blocks ? do_blocks( $content ) : $content; // WP runs priority 9.
+	$content = wptexturize( $content );                    // WP runs priority 10.
+	$content = ! $blocks ? wpautop( $content ) : $content; // WP runs priority 10.
+	$content = shortcode_unautop( $content );              // WP runs priority 10.
+	$content = function_exists( 'wp_filter_content_tags' ) ? wp_filter_content_tags( $content ) : wp_make_content_images_responsive( $content ); // WP runs priority 10. WP 5.5 with fallback.
+	$content = do_shortcode( $content );                   // WP runs priority 11.
+	$content = convert_smilies( $content );                // WP runs priority 20.
+
+	return $content;
 }
 
 /**
@@ -185,7 +219,7 @@ function maipub_get_content( $content, $args, $counts = false ) {
 			 * @link https://stackoverflow.com/questions/4645738/domdocument-appendxml-with-special-characters
 			 * @link https://www.py4u.net/discuss/974358
 			 */
-			$tmp  = maipub_get_dom_document( maipub_get_processed_content( $args['content'] ) );
+			$tmp  = maipub_get_dom_document( maipub_get_processed_ad_content( $args['content'] ) );
 			$node = $dom->importNode( $tmp->documentElement, true );
 
 			// Skip if no node.
@@ -669,6 +703,43 @@ function maipub_update_option( $option, $value ) {
 }
 
 /**
+ * Gets file data.
+ *
+ * @since 0.1.0
+ *
+ * @param string $file The file path name.
+ * @param string $key The specific key to return
+ *
+ * @return array|string
+ */
+function maipub_get_file_data( $file, $key = '' ) {
+	static $cache = null;
+
+	if ( ! is_null( $cache ) && isset( $cache[ $file ] ) ) {
+		if ( $key ) {
+			return $cache[ $file ][ $key ];
+		}
+
+		return $cache[ $file ];
+	}
+
+	$file_path      = MAI_PUBLISHER_DIR . $file;
+	$file_url       = MAI_PUBLISHER_URL . $file;
+	$version        = MAI_PUBLISHER_VERSION . '.' . date( 'njYHi', filemtime( $file_path ) );
+	$cache[ $file ] = [
+		'path'    => $file_path,
+		'url'     => $file_url,
+		'version' => $version,
+	];
+
+	if ( $key ) {
+		return $cache[ $file ][ $key ];
+	}
+
+	return $cache[ $file ];
+}
+
+/**
  * Gets all categories from categories.json.
  * This is for the category picker.
  *
@@ -686,4 +757,80 @@ function maipub_get_all_categories() {
 	$cache = json_decode( file_get_contents( MAI_PUBLISHER_DIR . '/categories.json' ), true );
 
 	return $cache;
+}
+
+/**
+ * Gets the primary term of a post, by taxonomy.
+ * If Yoast Primary Term is used, return it,
+ * otherwise fallback to the first term.
+ *
+ * @version 1.3.0
+ *
+ * @since 0.1.0
+ *
+ * @link https://gist.github.com/JiveDig/5d1518f370b1605ae9c753f564b20b7f
+ * @link https://gist.github.com/jawinn/1b44bf4e62e114dc341cd7d7cd8dce4c
+ * @author Mike Hemberger @JiveDig.
+ *
+ * @param string $taxonomy The taxonomy to get the primary term from.
+ * @param int    $post_id  The post ID to check.
+ *
+ * @return WP_Term|false The term object or false if no terms.
+ */
+function maipub_get_primary_term( $taxonomy = 'category', $post_id = false ) {
+	// Bail if no taxonomy.
+	if ( ! $taxonomy ) {
+		return false;
+	}
+
+	// If no post ID, set it.
+	if ( ! $post_id ) {
+		$post_id = get_the_ID();
+	}
+
+	// Bail if no post ID.
+	if ( ! $post_id ) {
+		return false;
+	}
+
+	// Setup caching.
+	static $cache = null;
+
+	// Maybe return cached value.
+	if ( is_array( $cache ) ) {
+		if ( isset( $cache[ $taxonomy ][ $post_id ] ) ) {
+			return $cache[ $taxonomy ][ $post_id ];
+		}
+	} else {
+		$cache = [];
+	}
+
+	// If checking for WPSEO.
+	if ( class_exists( 'WPSEO_Primary_Term' ) ) {
+
+		// Get the primary term.
+		$wpseo_primary_term = new WPSEO_Primary_Term( $taxonomy, $post_id );
+		$wpseo_primary_term = $wpseo_primary_term->get_primary_term();
+
+		// If we have one, return it.
+		if ( $wpseo_primary_term ) {
+			$cache[ $taxonomy ][ $post_id ] = get_term( $wpseo_primary_term );
+			return $cache[ $taxonomy ][ $post_id ];
+		}
+	}
+
+	// We don't have a primary, so let's get all the terms.
+	$terms = get_the_terms( $post_id, $taxonomy );
+
+	// Bail if no terms.
+	if ( ! $terms || is_wp_error( $terms ) ) {
+		$cache[ $taxonomy ][ $post_id ] = false;
+		return $cache[ $taxonomy ][ $post_id ];
+	}
+
+	// Get the first, and store in cache.
+	$cache[ $taxonomy ][ $post_id ] = reset( $terms );
+
+	// Return the first term.
+	return $cache[ $taxonomy ][ $post_id ];
 }

@@ -136,6 +136,7 @@ final class Mai_Publisher_Plugin {
 		$ad_block      = new Mai_Publisher_Ad_Block;
 		$ad_unit_block = new Mai_Publisher_Ad_Unit_Block;
 		$display       = new Mai_Publisher_Display;
+		$analytics     = new Mai_Publisher_Analytics;
 	}
 
 	/**

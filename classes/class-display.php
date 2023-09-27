@@ -56,33 +56,21 @@ class Mai_Publisher_Display {
 			$file = "assets/js/mai-publisher-ads{$suffix}.js";
 
 			// Google Ad Manager GPT.
-			wp_enqueue_script( 'google-gpt', 'https://securepubads.g.doubleclick.net/tag/js/gpt.js', [], $this->get_file_data( $file, 'version' ), [ 'strategy' => 'async' ] );
+			wp_enqueue_script( 'google-gpt', 'https://securepubads.g.doubleclick.net/tag/js/gpt.js', [], maipub_get_file_data( $file, 'version' ), [ 'strategy' => 'async' ] );
 
 			// Sovrn.
-			wp_enqueue_script( 'sovrn-beacon', 'https://ap.lijit.com/www/sovrn_beacon_standalone/sovrn_standalone_beacon.js?iid=472780', [], $this->get_file_data( $file, 'version' ), [ 'strategy' => 'async' ] );
+			wp_enqueue_script( 'sovrn-beacon', 'https://ap.lijit.com/www/sovrn_beacon_standalone/sovrn_standalone_beacon.js?iid=472780', [], maipub_get_file_data( $file, 'version' ), [ 'strategy' => 'async' ] );
 
 			// Prebid.
 			wp_enqueue_script( 'prebid-js', '//cdn.jsdelivr.net/npm/prebid.js@latest/dist/not-for-prod/prebid.js', [], '8.16.0', [ 'strategy' => 'async' ] ); // https://www.jsdelivr.com/package/npm/prebid.js
 			wp_localize_script( 'prebid-js', 'maiPubPrebidVars', $this->get_ortb2_vars() );
 
 			// Mai Publisher.
-			wp_enqueue_script( 'mai-publisher-ads', $this->get_file_data( $file, 'url' ), [ 'google-gpt', 'sovrn-beacon', 'prebid-js' ], $this->get_file_data( $file, 'version' ), false ); // Asyncing broke ads.
+			wp_enqueue_script( 'mai-publisher-ads', maipub_get_file_data( $file, 'url' ), [ 'google-gpt', 'sovrn-beacon', 'prebid-js' ], maipub_get_file_data( $file, 'version' ), false ); // Asyncing broke ads.
 			wp_localize_script( 'mai-publisher-ads', 'maiPubAdsVars',
 				[
 					'gamDomain' => $this->domain,
 					'ads'       => $gam_ads,
-				]
-			);
-		}
-
-		// If tracking with Matomo.
-		if ( maipub_get_option( 'matomo' ) ) {
-			$file = "assets/js/mai-publisher-analytics{$suffix}.js";
-
-			wp_enqueue_script( 'mai-publisher-analytics', $this->get_file_data( $file, 'url' ), [ 'google-gpt' ], $this->get_file_data( $file, 'version' ), true );
-			wp_localize_script( 'mai-publisher-analytics', 'maiPubAnalyticsVars',
-				[
-					'token' => maipub_get_option( 'matomo_token' ),
 				]
 			);
 		}
@@ -266,7 +254,7 @@ class Mai_Publisher_Display {
 
 		if ( is_singular( 'post' ) ) {
 			$post_id = get_the_ID();
-			$primary = $this->get_primary_term( 'category', $post_id );
+			$primary = maipub_get_primary_term( 'category', $post_id );
 			$term_id = $primary ? $primary->term_id : 0;
 
 			/**
@@ -326,82 +314,6 @@ class Mai_Publisher_Display {
 		}
 
 		return $site;
-	}
-
-	/**
-	 * Gets the primary term of a post, by taxonomy.
-	 * If Yoast Primary Term is used, return it,
-	 * otherwise fallback to the first term.
-	 *
-	 * @version 1.3.0
-	 *
-	 * @since 0.1.0
-	 *
-	 * @link https://gist.github.com/JiveDig/5d1518f370b1605ae9c753f564b20b7f
-	 * @link https://gist.github.com/jawinn/1b44bf4e62e114dc341cd7d7cd8dce4c
-	 * @author Mike Hemberger @JiveDig.
-	 *
-	 * @param string $taxonomy The taxonomy to get the primary term from.
-	 * @param int    $post_id  The post ID to check.
-	 *
-	 * @return WP_Term|false The term object or false if no terms.
-	 */
-	function get_primary_term( $taxonomy = 'category', $post_id = false ) {
-		// Bail if no taxonomy.
-		if ( ! $taxonomy ) {
-			return false;
-		}
-
-		// If no post ID, set it.
-		if ( ! $post_id ) {
-			$post_id = get_the_ID();
-		}
-
-		// Bail if no post ID.
-		if ( ! $post_id ) {
-			return false;
-		}
-
-		// Setup caching.
-		static $cache = null;
-
-		// Maybe return cached value.
-		if ( is_array( $cache ) ) {
-			if ( isset( $cache[ $taxonomy ][ $post_id ] ) ) {
-				return $cache[ $taxonomy ][ $post_id ];
-			}
-		} else {
-			$cache = [];
-		}
-
-		// If checking for WPSEO.
-		if ( class_exists( 'WPSEO_Primary_Term' ) ) {
-
-			// Get the primary term.
-			$wpseo_primary_term = new WPSEO_Primary_Term( $taxonomy, $post_id );
-			$wpseo_primary_term = $wpseo_primary_term->get_primary_term();
-
-			// If we have one, return it.
-			if ( $wpseo_primary_term ) {
-				$cache[ $taxonomy ][ $post_id ] = get_term( $wpseo_primary_term );
-				return $cache[ $taxonomy ][ $post_id ];
-			}
-		}
-
-		// We don't have a primary, so let's get all the terms.
-		$terms = get_the_terms( $post_id, $taxonomy );
-
-		// Bail if no terms.
-		if ( ! $terms || is_wp_error( $terms ) ) {
-			$cache[ $taxonomy ][ $post_id ] = false;
-			return $cache[ $taxonomy ][ $post_id ];
-		}
-
-		// Get the first, and store in cache.
-		$cache[ $taxonomy ][ $post_id ] = reset( $terms );
-
-		// Return the first term.
-		return $cache[ $taxonomy ][ $post_id ];
 	}
 
 	/**
@@ -496,7 +408,7 @@ class Mai_Publisher_Display {
 						return $close;
 					}
 
-					$ad = sprintf( '<div class="maipub-ad" style="order:calc(var(--maicca-columns) * %s);">%s</div>', $args['content_count'], maipub_get_processed_content( $args['content'] ) );
+					$ad = sprintf( '<div class="maipub-ad" style="order:calc(var(--maicca-columns) * %s);">%s</div>', $args['content_count'], maipub_get_processed_ad_content( $args['content'] ) );
 
 					return $ad . $close;
 
@@ -513,47 +425,10 @@ class Mai_Publisher_Display {
 				 * @return string
 				 */
 				add_action( $locations[ $args['location'] ]['hook'], function() use ( $args, $priority ) {
-					echo maipub_get_processed_content( $args['content'] );
+					echo maipub_get_processed_ad_content( $args['content'] );
 				}, $priority );
 			 }
 		}
-	}
-
-	/**
-	 * Gets file data.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @param string $file The file path name.
-	 * @param string $key The specific key to return
-	 *
-	 * @return array|string
-	 */
-	function get_file_data( $file, $key = '' ) {
-		static $cache = null;
-
-		if ( ! is_null( $cache ) && isset( $cache[ $file ] ) ) {
-			if ( $key ) {
-				return $cache[ $file ][ $key ];
-			}
-
-			return $cache[ $file ];
-		}
-
-		$file_path      = MAI_PUBLISHER_DIR . $file;
-		$file_url       = MAI_PUBLISHER_URL . $file;
-		$version        = MAI_PUBLISHER_VERSION . '.' . date( 'njYHi', filemtime( $file_path ) );
-		$cache[ $file ] = [
-			'path'    => $file_path,
-			'url'     => $file_url,
-			'version' => $version,
-		];
-
-		if ( $key ) {
-			return $cache[ $file ][ $key ];
-		}
-
-		return $cache[ $file ];
 	}
 
 	/**
