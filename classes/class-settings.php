@@ -236,7 +236,7 @@ class Mai_Publisher_Settings {
 	 * @return void
 	 */
 	public function matomo_callback() {
-		printf( '<input type="checkbox" name="mai_publisher[matomo]" id="matomo" value="matomo"%s disabled> <label for="matomo">%s</label>', maipub_get_option( 'matomo' ) ? ' checked' : '', __( 'Enable global tracking for this website.', 'mai-publisher' ) );
+		printf( '<input type="checkbox" name="mai_publisher[matomo]" id="matomo" value="matomo"%s> <label for="matomo">%s</label>', maipub_get_option( 'matomo' ) ? ' checked' : '', __( 'Enable global tracking for this website.', 'mai-publisher' ) );
 	}
 
 	/**
