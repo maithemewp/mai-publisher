@@ -56,7 +56,7 @@ if ( window.googletag && googletag.apiReady ) {
 		googletag.pubads().setCentering( true );
 
 		// Enable SRA and services.
-		// googletag.pubads().disableInitialLoad(); // Disable initial load for header bidding.
+		googletag.pubads().disableInitialLoad(); // Disable initial load for header bidding.
 		googletag.pubads().enableSingleRequest();
 		googletag.enableServices();
 	});
@@ -64,15 +64,15 @@ if ( window.googletag && googletag.apiReady ) {
 	/**
 	 * Refresh ads only when they are in view and after expiration of refreshSeconds.
 	 */
-	googletag.pubads().addEventListener( 'impressionViewable', function( event ) {
-		const slot = event.slot;
+	// googletag.pubads().addEventListener( 'impressionViewable', function( event ) {
+	// 	const slot = event.slot;
 
-		if ( slot.getTargeting( refreshKey ).indexOf( refreshvalue ) >= 0 ) {
-			setTimeout( function() {
-				googletag.pubads().refresh( [slot] );
-			}, 30 * 1000 ); // 30 seconds.
-		}
-	});
+	// 	if ( slot.getTargeting( refreshKey ).indexOf( refreshvalue ) >= 0 ) {
+	// 		setTimeout( function() {
+	// 			googletag.pubads().refresh( [slot] );
+	// 		}, 30 * 1000 ); // 30 seconds.
+	// 	}
+	// });
 
 	/**
 	 * Amazon UAD.
@@ -216,125 +216,125 @@ if ( window.googletag && googletag.apiReady ) {
 	// TODO: WTH is "Signal"?
 	// @link https://www.sovrn.com/blog/sovrn-ad-strategy-in-prebid/
 
-	// const adUnits = [];
+	const adUnits = [];
 
-	// for ( const id in ads ) {
-	// 	/**
-	// 	 * @link https://github.com/prebid/Prebid.js/blob/master/modules/sovrnBidAdapter.md
-	// 	 */
-	// 	adUnits.push({
-	// 		code: 'mai-ad-' + id,
-	// 		sizes: ads[id].sizes,
-	// 		// mediaTypes: {
-	// 		// 	banner: {
-	// 		// 		sizes: ads[id].sizes
-	// 		// 	}
-	// 		// },
-	// 		bids: [
-	// 			{
-	// 				bidder: 'sovrn',
-	// 				params: {
-	// 					tagid: '1166970', // 120x600
-	// 				}
-	// 			},
-	// 			{
-	// 				bidder: 'sovrn',
-	// 				params: {
-	// 					tagid: '1166962', // 160x600
-	// 				}
-	// 			},
-	// 			{
-	// 				bidder: 'sovrn',
-	// 				params: {
-	// 					tagid: '1166963', // 300x1050
-	// 				}
-	// 			},
-	// 			{
-	// 				bidder: 'sovrn',
-	// 				params: {
-	// 					tagid: '1166966', // 300x250
-	// 				}
-	// 			},
-	// 			{
-	// 				bidder: 'sovrn',
-	// 				params: {
-	// 					tagid: '1166967', // 300x600
-	// 				}
-	// 			},
-	// 			{
-	// 				bidder: 'sovrn',
-	// 				params: {
-	// 					tagid: '320x50', // 1166968
-	// 				}
-	// 			},
-	// 			{
-	// 				bidder: 'sovrn',
-	// 				params: {
-	// 					tagid: '1166971', // 336x280
-	// 				}
-	// 			},
-	// 			{
-	// 				bidder: 'sovrn',
-	// 				params: {
-	// 					tagid: '1166964', // 468x60
-	// 				}
-	// 			},
-	// 			{
-	// 				bidder: 'sovrn',
-	// 				params: {
-	// 					tagid: '1166969', // 728x90
-	// 				}
-	// 			},
-	// 			{
-	// 				bidder: 'sovrn',
-	// 				params: {
-	// 					tagid: '1166961', // 970x250
-	// 				}
-	// 			},
-	// 			{
-	// 				bidder: 'sovrn',
-	// 				params: {
-	// 					tagid: '1166965', // 970x90
-	// 				}
-	// 			},
-	// 		]
-	// 	});
-	// }
+	for ( const id in ads ) {
+		/**
+		 * @link https://github.com/prebid/Prebid.js/blob/master/modules/sovrnBidAdapter.md
+		 */
+		adUnits.push({
+			code: 'mai-ad-' + id,
+			sizes: ads[id].sizes,
+			// mediaTypes: {
+			// 	banner: {
+			// 		sizes: ads[id].sizes
+			// 	}
+			// },
+			bids: [
+				{
+					bidder: 'sovrn',
+					params: {
+						tagid: '1166970', // 120x600
+					}
+				},
+				{
+					bidder: 'sovrn',
+					params: {
+						tagid: '1166962', // 160x600
+					}
+				},
+				{
+					bidder: 'sovrn',
+					params: {
+						tagid: '1166963', // 300x1050
+					}
+				},
+				{
+					bidder: 'sovrn',
+					params: {
+						tagid: '1166966', // 300x250
+					}
+				},
+				{
+					bidder: 'sovrn',
+					params: {
+						tagid: '1166967', // 300x600
+					}
+				},
+				{
+					bidder: 'sovrn',
+					params: {
+						tagid: '320x50', // 1166968
+					}
+				},
+				{
+					bidder: 'sovrn',
+					params: {
+						tagid: '1166971', // 336x280
+					}
+				},
+				{
+					bidder: 'sovrn',
+					params: {
+						tagid: '1166964', // 468x60
+					}
+				},
+				{
+					bidder: 'sovrn',
+					params: {
+						tagid: '1166969', // 728x90
+					}
+				},
+				{
+					bidder: 'sovrn',
+					params: {
+						tagid: '1166961', // 970x250
+					}
+				},
+				{
+					bidder: 'sovrn',
+					params: {
+						tagid: '1166965', // 970x90
+					}
+				},
+			]
+		});
+	}
 
-	// // Force integers.
-	// maiPubPrebidVars.mobile         = parseInt( maiPubPrebidVars.mobile );
-	// maiPubPrebidVars.privacypolicy  = parseInt( maiPubPrebidVars.privacypolicy );
-	// maiPubPrebidVars.cattax         = parseInt( maiPubPrebidVars.cattax );
-	// maiPubPrebidVars.content.cattax = parseInt( maiPubPrebidVars.content.cattax );
+	// Force integers.
+	maiPubPrebidVars.mobile         = parseInt( maiPubPrebidVars.mobile );
+	maiPubPrebidVars.privacypolicy  = parseInt( maiPubPrebidVars.privacypolicy );
+	maiPubPrebidVars.cattax         = parseInt( maiPubPrebidVars.cattax );
+	maiPubPrebidVars.content.cattax = parseInt( maiPubPrebidVars.content.cattax );
 
-	// var pbjs = pbjs || {};
-	// pbjs.que = pbjs.que || [];
+	var pbjs = pbjs || {};
+	pbjs.que = pbjs.que || [];
 
-	// pbjs.que.push(function() {
-	// 	pbjs.setConfig({
-	// 		timeout: prebidTimeout,
-	// 		enableTIDs: true,
-	// 		/**
-	// 		 * OpenRTB 2.6 spec / Content Taxonomy
-	// 		 *
-	// 		 * @link https://iabtechlab.com/wp-content/uploads/2022/04/OpenRTB-2-6_FINAL.pdf
-	// 		 */
-	// 		ortb2: {
-	// 			site: maiPubPrebidVars,
-	// 		},
-	// 	});
-	// 	pbjs.addAdUnits(adUnits);
-	// 	pbjs.requestBids({
-	// 		bidsBackHandler: function() {
-	// 			googletag.cmd.push(function() {
-	// 				pbjs.que.push(function() {
-	// 					pbjs.setTargetingForGPTAsync();
-	// 					googletag.pubads().refresh();
-	// 				});
-	// 			});
-	// 		}
-	// 	});
-	// });
+	pbjs.que.push(function() {
+		pbjs.setConfig({
+			timeout: prebidTimeout,
+			enableTIDs: true,
+			/**
+			 * OpenRTB 2.6 spec / Content Taxonomy
+			 *
+			 * @link https://iabtechlab.com/wp-content/uploads/2022/04/OpenRTB-2-6_FINAL.pdf
+			 */
+			ortb2: {
+				site: maiPubPrebidVars,
+			},
+		});
+		pbjs.addAdUnits(adUnits);
+		pbjs.requestBids({
+			bidsBackHandler: function() {
+				googletag.cmd.push(function() {
+					pbjs.que.push(function() {
+						pbjs.setTargetingForGPTAsync();
+						googletag.pubads().refresh();
+					});
+				});
+			}
+		});
+	});
 
 	/********************************************
 	 * End parallel auction.                    *

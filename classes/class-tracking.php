@@ -86,26 +86,14 @@ class Mai_Publisher_Analytics {
 	function get_custom_dimensions() {
 		$this->dimensions = [];
 
-		// TODO.
 		$this->set_dimension_1();
-		// TODO.
 		$this->set_dimension_2();
-		// TODO.
 		$this->set_dimension_3();
-		// TODO.
 		$this->set_dimension_4();
-		// TODO.
 		$this->set_dimension_5();
-		// TODO.
 		$this->set_dimension_6();
-		// TODO.
-		// Post category.
 		$this->set_dimension_7();
-		// TODO.
-		// Content length.
 		$this->set_dimension_8();
-		// TODO.
-		// Content type.
 		$this->set_dimension_9();
 
 		return $this->dimensions;
