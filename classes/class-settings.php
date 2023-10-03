@@ -57,7 +57,7 @@ class Mai_Publisher_Settings {
 	 */
 	function add_content() {
 		echo '<div class="wrap">';
-			printf( '<h2>%s</h2>', __( 'Mai Publisher', 'mai-publisher' ) );
+			printf( '<h2>%s (%s)</h2>', __( 'Mai Publisher', 'mai-publisher' ), MAI_PUBLISHER_VERSION );
 			printf( '<p>%s</p>', __( 'Settings and configuration for Mai Publisher.', 'mai-publisher' ) );
 			echo '<form method="post" action="options.php">';
 				settings_fields( 'maipub_group' );
