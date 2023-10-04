@@ -32,7 +32,7 @@ function maipub_get_ads() {
 	}
 
 	// Check for sidebars.
-	$sidebars = apply_filters( 'maipub_sidebars', [] );
+	$sidebars = apply_filters( 'mai_publisher_sidebars', [] );
 	$sidebars = $sidebars ? array_unique( array_map( 'esc_attr', $sidebars ) ) : [];
 
 	if ( $sidebars && class_exists( 'WP_HTML_Tag_Processor' ) ) {
@@ -175,7 +175,7 @@ function maipub_get_content( $content, $args, $counts = false ) {
 
 	$last     = $all->item( $all->length - 1 );
 	$tags     = 'before' !== $args['content_location'] ? [ 'div', 'p', 'ol', 'ul', 'blockquote', 'figure', 'iframe' ] : [ 'h2', 'h3' ];
-	$tags     = apply_filters( 'maipub_content_elements', $tags, $args );
+	$tags     = apply_filters( 'mai_publisher_content_elements', $tags, $args );
 	$tags     = array_filter( $tags );
 	$tags     = array_unique( $tags );
 	$elements = [];
@@ -536,7 +536,7 @@ function maipub_get_locations() {
 		];
 	}
 
-	$locations = apply_filters( 'maipub_locations', $locations );
+	$locations = apply_filters( 'mai_publisher_locations', $locations );
 
 	if ( $locations ) {
 		foreach ( $locations as $name => $location ) {
@@ -642,14 +642,22 @@ function maipub_get_default_options() {
 	}
 
 	$options = [
-		'first-version' => '',
-		'db-version'    => '',
-		'gam_domain'    => (string) maipub_get_url_host( home_url() ),
-		'matomo'        => true,
-		'matomo_token'  => '',
-		'label'         => '',
-		'header'        => '',
-		'footer'        => '',
+		'version_first'          => '',
+		'version_db'             => '',
+		'gam_domain'             => (string) maipub_get_url_host( home_url() ),
+		'category'               => '',
+		'matomo_enabled_global'  => defined( 'MAI_PUBLISHER_MATOMO_ENABLED_GLOBAL' ) ? MAI_PUBLISHER_MATOMO_ENABLED_GLOBAL : 1,
+		'matomo_enabled'         => defined( 'MAI_PUBLISHER_MATOMO_ENABLED' ) ? MAI_PUBLISHER_MATOMO_ENABLED : 0,
+		'matomo_enabled_backend' => defined( 'MAI_PUBLISHER_MATOMO_ENABLED_BACKEND' ) ? MAI_PUBLISHER_MATOMO_ENABLED_BACKEND : 0,
+		'matomo_url'             => defined( 'MAI_PUBLISHER_MATOMO_URL' ) ? MAI_PUBLISHER_MATOMO_URL : '',
+		'matomo_site_id'         => defined( 'MAI_PUBLISHER_MATOMO_SITE_ID' ) ? MAI_PUBLISHER_MATOMO_SITE_ID : '',
+		'matomo_token'           => defined( 'MAI_PUBLISHER_MATOMO_TOKEN' ) ? MAI_PUBLISHER_MATOMO_TOKEN : '',
+		'trending_days'          => 30,
+		'views_days'             => 365,
+		'views_interval'         => 60,
+		'ad_label'               => __( 'Sponsored', 'mai-publisher' ),
+		'header'                 => '',
+		'footer'                 => '',
 	];
 
 	return $options;
@@ -700,6 +708,25 @@ function maipub_update_option( $option, $value ) {
 	$options[ $option ] = $value;
 
 	update_option( $handle, $options );
+}
+
+/**
+ * Gets file suffix.
+ *
+ * @since 0.1.0
+ *
+ * @return string
+ */
+function maipub_get_suffix() {
+	static $suffix = null;
+
+	if ( ! is_null( $suffix ) ) {
+		return $suffix;
+	}
+
+	$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+
+	return $suffix;
 }
 
 /**

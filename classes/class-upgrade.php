@@ -36,20 +36,20 @@ class Mai_Publisher_Upgrade {
 		$plugin_version = MAI_PUBLISHER_VERSION;
 
 		// If no first version.
-		if ( is_null( maipub_get_option( 'first-version', false ) ) ) {
+		if ( is_null( maipub_get_option( 'version_first', false ) ) ) {
 			// Set first version and default label.
-			maipub_update_option( 'first-version', $plugin_version );
+			maipub_update_option( 'version_first', $plugin_version );
 			maipub_update_option( 'label', __( 'Sponsored', 'mai-publisher' ) );
 		}
 
-		$db_version = maipub_get_option( 'db-version', false );
+		$version_db = maipub_get_option( 'version_db', false );
 
 		// Return early if at latest.
-		if ( $plugin_version === $db_version ) {
+		if ( $plugin_version === $version_db ) {
 			return;
 		}
 
 		// Update database version after upgrade.
-		maipub_update_option( 'db-version', $plugin_version );
+		maipub_update_option( 'version_db', $plugin_version );
 	}
 }

@@ -42,7 +42,7 @@ class Mai_Publisher_Ad_Field_Group {
 			return;
 		}
 
-		$suffix    = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$suffix    = maipub_get_suffix();
 		$file      = "/assets/js/mai-publisher-admin{$suffix}.js";
 		$file_path = MAI_PUBLISHER_DIR . $file;
 		$file_url  = MAI_PUBLISHER_URL . $file;

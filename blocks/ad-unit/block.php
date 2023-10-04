@@ -55,7 +55,7 @@ class Mai_Publisher_Ad_Unit_Block {
 		$id         = get_field( 'id' );
 		$label      = get_field( 'label' );
 		$label_hide = get_field( 'label_hide' );
-		$label      = $label ? $label : maipub_get_option( 'label', false );
+		$label      = $label ? $label : maipub_get_option( 'ad_label', false );
 		$label      = $label_hide ? '' : $label;
 		$ad_units   = maipub_get_config( 'ad_units' );
 		$unit       = $id ? $ad_units[ $id ] : [];
@@ -100,7 +100,7 @@ class Mai_Publisher_Ad_Unit_Block {
 		// Build HTML, then allow filtering.
 		// $html = sprintf( '<div%s><script>googletag.cmd.push(function(){googletag.display("%s")});</script></div>', maipub_build_attributes( $attr ), $slot );
 		$html = sprintf( '<div%s><script>window.googletag = window.googletag || {};googletag.cmd = googletag.cmd || [];if ( window.googletag && googletag.apiReady ) { googletag.cmd.push(function(){ googletag.display("%s"); }); }</script></div>', maipub_build_attributes( $attr ), $slot );
-		$html = apply_filters( 'maipub_ad_unit', $html );
+		$html = apply_filters( 'mai_publisher_ad_unit', $html );
 
 		echo $html;
 	}

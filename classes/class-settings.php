@@ -110,10 +110,18 @@ class Mai_Publisher_Settings {
 		 * Fields   *
 		 ************/
 
+		 add_settings_field(
+			'enabled', // id
+			__( 'Enable tracking', 'mai-publisher' ), // title
+			[ $this, 'enabled_callback' ], // callback
+			'mai-publisher-section', // page
+			'mai_publisher_settings' // section
+		);
+
 		add_settings_field(
-			'label', // id
+			'ad_label', // id
 			__( 'Ad Label', 'mai-publisher' ), // title
-			[ $this, 'label_callback' ], // callback
+			[ $this, 'ad_label_callback' ], // callback
 			'mai-publisher-section', // page
 			'maipub_settings' // section
 		);
@@ -121,26 +129,10 @@ class Mai_Publisher_Settings {
 		add_settings_field(
 			'gam_domain', // id
 			__( 'GAM Domain', 'mai-publisher' ), // title
-			[ $this, 'domain_callback' ], // callback
+			[ $this, 'gam_domain_callback' ], // callback
 			'mai-publisher-section', // page
 			'maipub_settings' // section
 		);
-
-		add_settings_field(
-			'matomo', // id
-			__( 'Enable', 'mai-publisher' ), // title
-			[ $this, 'matomo_callback' ], // callback
-			'mai-publisher-section', // page
-			'maipub_settings_matomo' // section
-		);
-
-		// add_settings_field(
-		// 	'matomo_token', // id
-		// 	__( 'Token', 'mai-publisher' ), // title
-		// 	[ $this, 'matomo_token_callback' ], // callback
-		// 	'mai-publisher-section', // page
-		// 	'maipub_settings_matomo' // section
-		// );
 
 		add_settings_field(
 			'category', // id
@@ -148,6 +140,79 @@ class Mai_Publisher_Settings {
 			[ $this, 'category_callback' ], // callback
 			'mai-publisher-section', // page
 			'maipub_settings' // section
+		);
+
+		add_settings_field(
+			'matomo_enabled_global', // id
+			__( 'Enable Globally', 'mai-publisher' ), // title
+			[ $this, 'matomo_enabled_global_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings_matomo' // section
+		);
+
+		add_settings_field(
+			'matomo_enabled', // id
+			__( 'Enable', 'mai-publisher' ), // title
+			[ $this, 'matomo_enabled_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings_matomo' // section
+		);
+
+		// add_settings_field(
+		// 	'matomo_enabled_backend', // id
+		// 	__( 'Enable back-end tracking', 'mai-publisher' ), // title
+		// 	[ $this, 'matomo_enabled_backend_callback' ], // callback
+		// 	'mai-publisher-section', // page
+		// 	'maipub_settings_matomo' // section
+		// );
+
+		add_settings_field(
+			'matomo_url', // id
+			__( 'Tracker URL', 'mai-publisher' ), // title
+			[ $this, 'matomo_url_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings_matomo' // section
+		);
+
+		add_settings_field(
+			'matomo_site_id', // id
+			__( 'Site ID', 'mai-publisher' ), // title
+			[ $this, 'matomo_site_id_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings_matomo' // section
+		);
+
+		add_settings_field(
+			'matomo_token', // id
+			__( 'Token', 'mai-publisher' ), // title
+			[ $this, 'matomo_token_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings_matomo' // section
+		);
+
+		add_settings_field(
+			'views_days', // id
+			__( 'Total Views Days', 'mai-publisher' ), // title
+			[ $this, 'views_days_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings_matomo' // section
+		);
+
+		add_settings_field(
+			'trending_days', // id
+			__( 'Trending Days', 'mai-publisher' ), // title
+			[ $this, 'trending_days_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings_matomo' // section
+		);
+
+
+		add_settings_field(
+			'views_interval', // id
+			__( 'Trending/Popular Interval', 'mai-publisher' ), // title
+			[ $this, 'views_interval_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings_matomo' // section
 		);
 
 		add_settings_field(
@@ -176,13 +241,22 @@ class Mai_Publisher_Settings {
 	 */
 	function maipub_sanitize( $input ) {
 		// Sanitize.
-		$input['gam_domain']   = isset( $input['gam_domain'] ) ? maipub_get_gam_domain_sanitized( $input['gam_domain'] ) : '';
-		$input['matomo']       = isset( $input['matomo'] ) ? rest_sanitize_boolean( $input['matomo'] ) : false;
-		$input['matomo_token'] = isset( $input['matomo_token'] ) ? esc_html( $input['matomo_token'] ) : '';
-		$input['category']     = isset( $input['category'] ) ? sanitize_key( $input['category'] ) : '';
-		$input['label']        = isset( $input['label'] ) ? esc_html( $input['label'] ) : '';
-		$input['header']       = current_user_can( 'unfiltered_html' ) ? trim( $input['header'] ) : wp_kses_post( trim( $input['header'] ) );
-		$input['footer']       = current_user_can( 'unfiltered_html' ) ? trim( $input['footer'] ) : wp_kses_post( trim( $input['footer'] ) );
+		$input['gam_domain']             = isset( $input['gam_domain'] ) ? maipub_get_gam_domain_sanitized( $input['gam_domain'] ) : null;
+		$input['category']               = isset( $input['category'] ) ? sanitize_key( $input['category'] ) : null;
+		$input['matomo_enabled_global']  = isset( $input['matomo_enabled_global'] ) ? rest_sanitize_boolean( $input['matomo_enabled_global'] ) : null;
+		$input['matomo_enabled']         = isset( $input['matomo_enabled'] ) ? rest_sanitize_boolean( $input['matomo_enabled'] ) : null;
+		$input['matomo_enabled_backend'] = isset( $input['matomo_enabled_backend'] ) ? rest_sanitize_boolean( $input['matomo_enabled_backend'] ) : null;
+		$input['matomo_url']             = isset( $input['matomo_url'] ) ? trailingslashit( esc_html( $input['matomo_url'] ) ) : null;
+		$input['matomo_site_id']         = isset( $input['matomo_site_id'] ) ? absint( $input['matomo_site_id'] ) : null;
+		$input['matomo_token']           = isset( $input['matomo_token'] ) ? esc_html( $input['matomo_token'] ) : null;
+		$input['trending_days']          = isset( $input['trending_days'] ) ? absint( $input['trending_days'] ) : null;
+		$input['views_days']             = isset( $input['views_days'] ) ? absint( $input['views_days'] ) : null;
+		$input['views_interval']         = isset( $input['views_interval'] ) ? absint( $input['views_interval'] ) : null;
+		$input['ad_label']               = isset( $input['ad_label'] ) ? esc_html( $input['ad_label'] ) : null;
+		$input['header']                 = isset( $input['header'] ) ? trim( $input['header'] ) : null;
+		$input['footer']                 = isset( $input['footer'] ) ? trim( $input['footer'] ) : null;
+
+		// TODO: Remove old, or values we don't want to save.
 
 		return $input;
 	}
@@ -195,7 +269,7 @@ class Mai_Publisher_Settings {
 	 * @return string
 	 */
 	function maipub_section_info() {
-		printf( '<h3 style="margin-top:48px;">%s</h3>', 'General' );
+		printf( '<h3 style="margin-top:48px;">%s</h3>', __( 'Ads', 'mai-publisher' ) );
 	}
 
 	function maipub_section_matomo() {
@@ -213,8 +287,8 @@ class Mai_Publisher_Settings {
 	 *
 	 * @return void
 	 */
-	function label_callback() {
-		printf( '<input class="regular-text" type="text" name="mai_publisher[label]" id="label" value="%s">', maipub_get_option( 'label', false ) );
+	function ad_label_callback() {
+		printf( '<input class="regular-text" type="text" name="mai_publisher[ad_label]" id="ad_label" value="%s">', maipub_get_option( 'ad_label', false ) );
 	}
 
 	/**
@@ -224,31 +298,9 @@ class Mai_Publisher_Settings {
 	 *
 	 * @return void
 	 */
-	function domain_callback() {
+	function gam_domain_callback() {
 		printf( '<input class="regular-text" type="text" name="mai_publisher[domain]" id="domain" value="%s">', maipub_get_default_option( 'gam_domain' ), maipub_get_gam_domain( false ) );
 	}
-
-	/**
-	 * Setting callback.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @return void
-	 */
-	public function matomo_callback() {
-		printf( '<input type="checkbox" name="mai_publisher[matomo]" id="matomo" value="matomo"%s> <label for="matomo">%s</label>', maipub_get_option( 'matomo' ) ? ' checked' : '', __( 'Enable global tracking for this website.', 'mai-publisher' ) );
-	}
-
-	/**
-	 * Setting callback.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @return void
-	 */
-	// public function matomo_token_callback() {
-	// 	printf( '<input class="regular-text" type="password" name="mai_publisher[matomo_token]" id="matomo_token" value="%s">', maipub_get_option( 'matomo_token', false ) );
-	// }
 
 	/**
 	 * Setting callback.
@@ -274,6 +326,191 @@ class Mai_Publisher_Settings {
 	/**
 	 * Setting callback.
 	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	function matomo_enabled_global_callback() {
+		$constant = defined( 'MAI_PUBLISHER_MATOMO_ENABLED_GLOBAL' );
+		$value    = $constant ? rest_sanitize_boolean( MAI_PUBLISHER_MATOMO_ENABLED_GLOBAL ) : maipub_get_option( 'matomo_enabled_global', false );
+
+		printf(
+			'<input type="checkbox" name="mai_publisher[matomo_enabled_global]" id="matomo_enabled_global" value="matomo_enabled_global"%s%s> <label for="matomo_enabled_global">%s%s</label>',
+			$value ? ' checked' : '',
+			$constant ? ' disabled' : '',
+			__( 'Enable global tracking for the Mai Publisher Network.', 'mai-publisher' ),
+			$constant ? ' ' . $this->config_notice() : ''
+		);
+
+		// Can't get connection info because we need a token and the repo is currently public so updates work.
+		// $this->connection_info( 'https://bizbudding.info/', maipub_get_option( 'matomo_token' ), '123456' );
+	}
+
+	/**
+	 * Setting callback.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	function matomo_enabled_callback() {
+		$constant = defined( 'MAI_PUBLISHER_MATOMO_ENABLED' );
+		$value    = $constant ? rest_sanitize_boolean( MAI_PUBLISHER_MATOMO_ENABLED ) : maipub_get_option( 'matomo_enabled', false );
+
+		printf(
+			'<input type="checkbox" name="mai_publisher[matomo_enabled]" id="matomo_enabled" value="matomo_enabled"%s%s> <label for="matomo_enabled">%s%s</label><br><br>',
+			$value ? ' checked' : '',
+			$constant ? ' disabled' : '',
+			__( 'Enable tracking for this website.', 'mai-publisher' ),
+			$constant ? ' ' . $this->config_notice() : ''
+		);
+
+		$this->connection_info( maipub_get_option( 'matomo_url' ), maipub_get_option( 'matomo_token' ), maipub_get_option( 'matomo_enabled' ) );
+	}
+
+	/**
+	 * Setting callback.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	// function matomo_enabled_backend_callback() {
+	// 	$constant = defined( 'MAI_PUBLISHER_MATOMO_ENABLED_BACKEND' );
+	// 	$value    = $constant ? rest_sanitize_boolean( MAI_PUBLISHER_MATOMO_ENABLED_BACKEND ) : maipub_get_option( 'matomo_enabled_backend', false );
+
+	// 	printf(
+	// 		'<input type="checkbox" name="mai_publisher[matomo_enabled_backend]" id="matomo_enabled_backend" value="matomo_enabled_backend"%s%s> <label for="matomo_enabled_backend">%s%s</label>',
+	// 		$value ? ' checked' : '',
+	// 		$constant ? ' disabled' : '',
+	// 		__( 'Enable tracking in the WordPress Dashboard.', 'mai-publisher' ),
+	// 		$constant ? ' ' . $this->config_notice() : ''
+	// 	);
+	// }
+
+	/**
+	 * Setting callback.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	function matomo_url_callback() {
+		$constant = defined( 'MAI_PUBLISHER_MATOMO_URL' );
+		$value    = $constant ? trailingslashit( esc_url( MAI_PUBLISHER_MATOMO_URL ) ) : maipub_get_option( 'matomo_url', false );
+
+		printf(
+			'<input class="regular-text" type="text" name="mai_publisher[matomo_url]" id="matomo_url" value="%s"%s>%s',
+			$value,
+			$constant ? ' disabled' : '',
+			$constant ? ' ' . $this->config_notice() : ''
+		);
+	}
+
+	/**
+	 * Setting callback.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	function matomo_site_id_callback() {
+		$constant = defined( 'MAI_PUBLISHER_MATOMO_SITE_ID' );
+		$value    = $constant ? absint( MAI_PUBLISHER_MATOMO_SITE_ID ) : maipub_get_option( 'matomo_site_id', false );
+
+		printf(
+			'<input class="regular-text" type="number" name="mai_publisher[matomo_site_id]" id="matomo_site_id" value="%s"%s>%s',
+			$value,
+			$constant ? ' disabled' : '',
+			$constant ? ' ' . $this->config_notice() : ''
+		);
+	}
+
+	/**
+	 * Setting callback.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	function matomo_token_callback() {
+		$constant = defined( 'MAI_PUBLISHER_MATOMO_TOKEN' );
+		$value    = $constant ? sanitize_key( MAI_PUBLISHER_MATOMO_TOKEN ) : maipub_get_option( 'matomo_token', false );
+
+		printf(
+			'<input class="regular-text" type="password" name="mai_publisher[matomo_token]" id="matomo_token" value="%s"%s>%s',
+			$value,
+			$constant ? ' disabled' : '',
+			$constant ? ' ' . $this->config_notice() : ''
+		);
+	}
+
+
+	/**
+	 * Setting callback.
+	 *
+	 * @since 0.4.0
+	 *
+	 * @return void
+	 */
+	function views_days_callback() {
+		printf(
+			'<input class="small-text" type="number" name="mai_publisher[views_days]" id="views_days" value="%s"> %s',
+			maipub_get_option( 'views_days' ),
+			__( 'days', 'mai-publisher' ),
+		);
+
+		printf( '<p class="description">%s %s %s</p>',
+			__( 'Retrieve total post views going back this many days.', 'mai-publisher' ),
+			__( 'Use 0 to disable fetching total views.', 'mai-publisher' ),
+			__( 'Values are stored in the <code>mai_views</code> meta key.', 'mai-publisher' )
+		);
+	}
+
+	/**
+	 * Setting callback.
+	 *
+	 * @since 0.4.0
+	 *
+	 * @return void
+	 */
+	function trending_days_callback() {
+		printf(
+			'<input class="small-text" type="number" name="mai_publisher[trending_days]" id="trending_days" value="%s"> %s',
+			maipub_get_option( 'trending_days' ),
+			__( 'days', 'mai-publisher' ),
+		);
+
+		printf( '<p class="description">%s %s %s</p>',
+			__( 'Retrieve trending post views going back this many days.', 'mai-publisher' ),
+			__( 'Use 0 to disable fetching trending post views.', 'mai-publisher' ),
+			__( 'Values are stored in the <code>mai_trending</code> meta key.', 'mai-publisher' )
+		);
+	}
+
+	/**
+	 * Setting callback.
+	 *
+	 * @since 0.4.0
+	 *
+	 * @return void
+	 */
+	function views_interval_callback() {
+		printf(
+			'<input class="small-text" type="number" name="mai_publisher[views_interval]" id="views_interval" value="%s"> %s',
+			maipub_get_option( 'views_interval' ),
+			__( 'minutes', 'mai-publisher' ),
+		);
+
+		printf( '<p class="description">%s %s</p>',
+			__( 'Wait this long between fetching the view counts for a given post.', 'mai-publisher' ),
+			__( 'Views are only fetched when a post is visited on the front end of the site.', 'mai-publisher' )
+		);
+	}
+
+	/**
+	 * Setting callback.
+	 *
 	 * @since 0.1.0
 	 *
 	 * @return void
@@ -291,6 +528,112 @@ class Mai_Publisher_Settings {
 	 */
 	function footer_callback() {
 		printf( '<textarea name="mai_publisher[footer]" id="footer" rows="8" style="width:100%%;max-width:600px">%s</textarea>', maipub_get_option( 'footer' ) );
+	}
+
+	/**
+	 * Checks if connection is valid.
+	 *
+	 * @link https://matomo.org/faq/how-to/faq_20278/
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	function connection_info( $url, $token, $enabled ) {
+		if ( ! ( $url && $token ) ) {
+			return;
+		}
+
+		$notices = [];
+
+		if ( $enabled ) {
+
+			$connections = [
+				'Matomo Version' => $url . sprintf( 'index.php?module=API&method=API.getMatomoVersion&format=json&token_auth=%s', $token ),
+				'Matomo Tracker' => $url . 'matomo.php',
+			];
+
+			foreach ( $connections as $label => $url ) {
+				$response = wp_remote_get( $url );
+
+				if ( is_wp_error( $response ) ) {
+					$type    = 'error';
+					$message = $response->get_error_message();
+				} else {
+					$body   = wp_remote_retrieve_body( $response );
+					$decode = json_decode( $body );
+
+					if ( json_last_error() === JSON_ERROR_NONE ) {
+						$body = $decode;
+					}
+
+					// Get response code.
+					$code = wp_remote_retrieve_response_code( $response );
+
+					if ( 200 !== $code ) {
+						$type    = 'error';
+						$message =  $code . ' ' . wp_remote_retrieve_response_message( $response );
+					} elseif ( is_string( $body ) ) {
+						$type    = 'success';
+						$message = __( 'Connected', 'mai-publisher' );
+					} elseif ( is_object( $body ) && isset( $body->value ) ) {
+						$type    = 'success';
+						$message = $body->value;
+					} elseif ( is_object( $body ) && isset( $body->result ) && isset( $body->message ) ) {
+						$type    = 'error' === $body->result ? 'error' : 'success';
+						$message = $body->message;
+					}
+
+					$notices[] = [
+						'type'    => $type,
+						'label'   => $label,
+						'message' => $message,
+					];
+				}
+
+				// Stop checking if we have an error.
+				if ( 'error' === $type ) {
+					break;
+				}
+			}
+		} else {
+			$notices[] = [
+				'type'    => 'warning',
+				'label'   => 'Matomo',
+				'message' => __( 'Tracking is disabled.', 'mai-publisher' ),
+			];
+		}
+
+		// Display notices.
+		foreach ( $notices as $notice ) {
+			// WP default colors.
+			switch ( $notice['type'] ) {
+				case 'success':
+					$color = '#00a32a';
+				break;
+				case 'warning':
+					$color = '#dba617';
+				break;
+				case 'error':
+					$color = '#d63638';
+				break;
+				default:
+					$color = 'blue'; // This should never happen.
+			}
+
+			printf( '<div style="color:%s;">%s: %s</div>', $color, $notice['label'], wp_kses_post( $notice['message'] ) );
+		}
+	}
+
+	/**
+	 * Gets notice for when config values are used.
+	 *
+	 * @since TBD
+	 *
+	 * @return string
+	 */
+	function config_notice() {
+		return sprintf( '<span style="color:green;">%s</span>', __( 'Overridden in wp-config.php', 'mai-publisher' ) );
 	}
 
 	/**

@@ -204,7 +204,7 @@ class Mai_Publisher_Ad_Fields {
 		$post_types = get_post_types( [ 'public' => true ], 'names' );
 		unset( $post_types['attachment'] );
 
-		$post_types = apply_filters( 'maipub_post_types', array_values( $post_types ) );
+		$post_types = apply_filters( 'mai_publisher_post_types', array_values( $post_types ) );
 
 		$post_types = array_unique( array_filter( (array) $post_types ) );
 
@@ -255,7 +255,7 @@ class Mai_Publisher_Ad_Fields {
 		}
 
 		$taxonomies = get_taxonomies( [ 'public' => 'true' ], 'names' );
-		$taxonomies = apply_filters( 'maipub_taxonomies', array_values( $taxonomies ) );
+		$taxonomies = apply_filters( 'mai_publisher_taxonomies', array_values( $taxonomies ) );
 		$taxonomies = array_unique( array_filter( (array) $taxonomies ) );
 
 		foreach ( $taxonomies as $index => $taxonomy ) {

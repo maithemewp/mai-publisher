@@ -1,34 +1,13 @@
 <?php
-/**
- * Mai Matomo Tracker Module.
- *  - This code extends the Mai Theme & related plugin functionallity to use Matomo Anlytics
- *  - required Matomo Analytics to be implemented
- *
- * @package   BizBudding
- * @link      https://bizbudding.com/
- * @version   0.2.0
- * @author    BizBudding
- * @copyright Copyright © 2022 BizBudding
- * @license   GPL-2.0-or-later
- *
-
-* Matomo - free/libre analytics platform
-*
-* For more information, see README.md
-*
-* @license released under BSD License http://www.opensource.org/licenses/bsd-license.php
-* @link https://matomo.org/docs/tracking-api/
-*
-* @category Matomo
-* @package MatomoTracker
-*/
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class Mai_Publisher_Analytics {
-	private $dimensions;
-	private $primary = false;
+class Mai_Publisher_Tracking {
+	private $user              = null;
+	private $user_email        = null;
+	private $site_dimensions   = [];
+	private $global_dimensions = [];
 
 	/**
 	 * Construct the class.
@@ -42,99 +21,521 @@ class Mai_Publisher_Analytics {
 	/**
 	 * Runs frontend hooks.
 	 *
-	 * @since 0.1.0
+	 * @since TBD
 	 *
 	 * @return void
 	 */
 	function hooks() {
+		if ( ! ( maipub_get_option( 'matomo_enabled' ) || maipub_get_option( 'matomo_enabled_global' ) ) ) {
+			return;
+		}
+
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue' ], 99 );
 	}
 
 	/**
 	 * Enqueues script if we're tracking the current page.
-	 * This should not be necessary yet, if we have the main Matomo header script.
 	 *
-	 * @since 0.1.0
+	 * @since TBD
 	 *
 	 * @return void
 	 */
 	function enqueue() {
-		if ( ! maipub_get_option( 'matomo' ) ) {
-			return;
-		}
-
-		$suffix  = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-		$file    = "assets/js/mai-publisher-analytics{$suffix}.js";
-		$vars    = [
-			'dimensions' => $this->get_custom_dimensions(),
-		];
+		$suffix = maipub_get_suffix();
+		$file   = "assets/js/mai-publisher-analytics{$suffix}.js";
 
 		wp_enqueue_script( 'mai-publisher-analytics', maipub_get_file_data( $file, 'url' ), [], maipub_get_file_data( $file, 'version' ), [ 'strategy' => 'async', 'in_footer' => true ] );
-		wp_localize_script( 'mai-publisher-analytics', 'maiPubAnalyticsVars', $vars );
+		wp_localize_script( 'mai-publisher-analytics', 'maiPubAnalyticsVars', $this->get_vars() );
+	}
+
+	/**
+	 * Get localized vars for JS.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	function get_vars() {
+		$vars = [
+			'enabledSite'   => maipub_get_option( 'matomo_enabled' ),
+			'enabledGlobal' => maipub_get_option( 'matomo_enabled_global' ),
+			// 'siteId'     => null,
+			// 'trackerUrl' => null,
+			// 'userId'     => null,
+			// 'ajaxUrl'    => null,
+			// 'nonce'      => null,
+			// 'type'       => null,
+			// 'id'         => null,
+			// 'url'        => null,
+			// 'current'    => null,
+			// 'dimSite'    => null,
+			// 'dimGlobal'  => null,
+		];
+
+		if ( maipub_get_option( 'matomo_enabled' ) ) {
+			// Set user.
+			$this->user = wp_get_current_user(); // Returns 0 if not logged in.
+
+			// Set vars for JS.
+			$vars['siteId']     = maipub_get_option( 'matomo_site_id' );
+			$vars['trackerUrl'] = maipub_get_option( 'matomo_url' );
+			$vars['userId']     = $this->user ? $this->user->user_email : '';
+			$vars['dimSite']    = $this->get_site_dimensions();
+
+			// If singular or a term archive (all we care about now).
+			if ( is_singular() || is_category() || is_tag() || is_tax() ) {
+				$trending_days = (int) maipub_get_option( 'trending_days' );
+				$views_days    = (int) maipub_get_option( 'views_days' );
+				$interval      = (int) maipub_get_option( 'views_interval' );
+
+				// If we're fetching trending or popular counts.
+				if ( ( $trending_days || $views_days ) && $interval ) {
+					// Get page data and current timestamp.
+					$page    = $this->get_current_page();
+					$current = current_datetime()->getTimestamp();
+
+					// Get last updated timestamp.
+					if ( is_singular() ) {
+						$updated = get_post_meta( $page['id'], 'mai_views_updated', true );
+					} else {
+						$updated = get_term_meta( $page['id'], 'mai_views_updated', true );
+					}
+
+					// If last updated timestampe is more than N minutes (converted to seconds) ago.
+					// if ( ! $updated || $updated < ( $current - ( $interval * 60 ) ) ) {
+						$vars['ajaxUrl'] = admin_url( 'admin-ajax.php' );
+						$vars['nonce']   = wp_create_nonce( 'maipub_views_nonce' );
+						$vars['type']    = $page['type'];
+						$vars['id']      = $page['id'];
+						$vars['url']     = $page['url'];
+						$vars['current'] = $current;
+					// }
+				}
+			}
+		}
+
+		if ( maipub_get_option( 'matomo_enabled_global' ) ) {
+			$vars['dimGlobal'] = $this->get_global_dimensions();
+		}
+
+		return $vars;
 	}
 
 	/**
 	 * Gets custom dimensions.
 	 *
-	 * A lot of this is shared with Mai Analytics.
-	 * Any changes here should be referenced there.
-	 *
-	 * @since 0.1.0
+	 * @since TBD
 	 *
 	 * @return array
 	 */
-	function get_custom_dimensions() {
-		$this->dimensions = [];
+	function get_site_dimensions() {
+		if ( ! maipub_get_option( 'matomo_enabled' ) ) {
+			return [];
+		}
 
-		$this->set_dimension_1();
-		$this->set_dimension_2();
-		$this->set_dimension_3();
-		$this->set_dimension_4();
-		$this->set_dimension_5();
-		$this->set_dimension_6();
-		$this->set_dimension_7();
-		$this->set_dimension_8();
-		$this->set_dimension_9();
+		$this->site_dimensions = [];
 
-		return $this->dimensions;
+		$this->set_site_dimension_1();
+		$this->set_site_dimension_2();
+		$this->set_site_dimension_3();
+		$this->set_site_dimension_4();
+		$this->set_site_dimension_5();
+		$this->set_site_dimension_6();
+		$this->set_site_dimension_7();
+		$this->set_site_dimension_8();
+		$this->set_site_dimension_9();
+
+		return $this->site_dimensions;
+	}
+
+	/**
+	 * Gets global custom dimensions.
+	 *
+	 * @since TBD
+	 *
+	 * @return array
+	 */
+	function get_global_dimensions() {
+		if ( ! maipub_get_option( 'matomo_enabled_global' ) ) {
+			return [];
+		}
+
+		$this->global_dimensions = [];
+
+		$this->set_global_dimension_1();
+		$this->set_global_dimension_2();
+		$this->set_global_dimension_3();
+		$this->set_global_dimension_4();
+		$this->set_global_dimension_5();
+		$this->set_global_dimension_6();
+		$this->set_global_dimension_7();
+		$this->set_global_dimension_8();
+		$this->set_global_dimension_9();
+
+		return $this->global_dimensions;
+	}
+
+	// TODO.
+	function set_site_dimension_1() {}
+	function set_site_dimension_2() {}
+	function set_site_dimension_3() {}
+	function set_site_dimension_4() {}
+
+	/**
+	 * Gets user group/membership/team.
+	 *
+	 * There is a filter that passes generic args for the group.
+	 * This leaves us open to use dimension 5 for any sort of User Grouping we want, not just WooCommerce.
+	 * We could use WP User Groups (taxonomy) or anything else, without modifying the plugin code.
+	 *
+	 * @since TBD
+	 *
+	 * @return array
+	 */
+	function set_site_dimension_5() {
+		$args = [];
+		$args = $this->set_membership_plan_ids( $args );
+		$args = $this->set_user_taxonomies( $args );
+
+		/**
+		 * Filter to manually add group per-site.
+		 *
+		 * @param string $name    The group name (empty for now).
+		 * @param int    $user_id The logged in user ID.
+		 * @param array  $args    The user data args.
+		 *
+		 * @return string
+		 */
+		$name  = '';
+		$group = apply_filters( 'mai_publisher_group_name', $name, $this->user->ID, $args );
+		$group = trim( esc_html( $group ) );
+
+		if ( ! $group ) {
+			return;
+		}
+
+		// Set the Group data.
+		$this->site_dimensions[5] = $group;
+	}
+
+	/**
+	 * Gets content age.
+	 *
+	 * @since TBD
+	 *
+	 * @return array
+	 */
+	function set_site_dimension_6() {
+		$date = get_the_date( 'F j, Y' );
+
+		if ( ! $date ) {
+			return;
+		}
+
+		$range  = false;
+		$date   = new DateTime( $date );
+		$today  = new DateTime( 'now' );
+		$days   = $today->diff( $date )->format( '%a' );
+		$ranges = [
+			[ 0, 29 ],
+			[ 30, 89 ],
+			[ 90, 179 ],
+			[ 180, 364 ],
+			[ 367, 729 ],
+		];
+
+		foreach ( $ranges as $index => $values ) {
+			if ( ! filter_var( $days, FILTER_VALIDATE_INT,
+				[
+					'options' => [
+						'min_range' => $values[0],
+						'max_range' => $values[1],
+					],
+				],
+			)) {
+				continue;
+			}
+
+			$range = sprintf( '%s-%s', $values[0], $values[1] );
+		}
+
+		if ( ! $range && $days > 729 ) {
+			$range = '2000+';
+		}
+
+		if ( ! $range ) {
+			return;
+		}
+
+		$this->site_dimensions[6] = $range . ' days';
+	}
+
+	/**
+	 * Gets post category.
+	 *
+	 * @todo Add support for CPT and Custom Taxonomies?
+	 *
+	 * @since TBD
+	 *
+	 * @return array
+	 */
+	function set_site_dimension_7() {
+		$category = $this->get_content_category();
+
+		if ( ! $category ) {
+			return;
+		}
+
+		$this->site_dimensions[7] = $category;
+	}
+
+	/**
+	 * Gets content length.
+	 *
+	 * @since TBD
+	 *
+	 * @return array
+	 */
+	function set_site_dimension_8() {
+		$range   = false;
+		$content = '';
+
+		if ( is_singular() ) {
+			$content .= get_post_field( 'post_content', get_the_ID() );
+		}
+		// Get ads from Mai Archive Pages.
+		elseif ( function_exists( 'maiap_get_archive_page' ) ) {
+			$pages = [
+				maiap_get_archive_page( true ),
+				maiap_get_archive_page( false ),
+			];
+
+			$pages = array_filter( $pages );
+
+			if ( $pages ) {
+				foreach ( $pages as $page ) {
+					$content .= $page->post_content;
+				}
+			}
+		}
+
+		if ( ! $content ) {
+			return;
+		}
+
+		$content = maipub_get_processed_content( $content );
+		$count   = str_word_count( strip_tags( $content ) );
+		$ranges  = [
+			[ 0, 499 ],
+			[ 500, 999 ],
+			[ 1000, 1999 ],
+		];
+
+		foreach ( $ranges as $index => $values ) {
+			if ( ! filter_var( $count, FILTER_VALIDATE_INT,
+				[
+					'options' => [
+						'min_range' => $values[0],
+						'max_range' => $values[1],
+					],
+				],
+			)) {
+				continue;
+			}
+
+			$range = sprintf( '%s-%s', $values[0], $values[1] );
+		}
+
+		if ( ! $range && $count > 1999 ) {
+			$range = '2000+';
+		}
+
+		if ( ! $range ) {
+			return;
+		}
+
+		$this->site_dimensions[8] = $range . ' words';
+	}
+
+	/**
+	 * Gets content type.
+	 *
+	 * @since TBD
+	 *
+	 * @return array
+	 */
+	function set_site_dimension_9() {
+		// Uses readable name as the type. 'Post' instead of 'post'.
+		$type = $this->get_current_page( 'name' );
+
+		if ( ! $type ) {
+			return;
+		}
+
+		$this->site_dimensions[9] = $type;
+	}
+
+	/**
+	 * Sets membership plan IDs in args.
+	 *
+	 * @since TBD
+	 *
+	 * @param array $args
+	 *
+	 * @return array
+	 */
+	function set_membership_plan_ids( $args ) {
+		$plan_ids = $this->get_membership_plan_ids( $this->user->ID );
+
+		// Handles plan IDs.
+		if ( $plan_ids ) {
+			$args['plan_ids'] = $plan_ids;
+		}
+
+		return $args;
+	}
+
+	/**
+	 * Gets membership plan IDs.
+	 * Cached incase we need to call this again later on same page load.
+	 *
+	 * @since TBD
+	 *
+	 * @param int $user_id The logged in user ID.
+	 *
+	 * @return array|int[]
+	 */
+	function get_membership_plan_ids( $user_id ) {
+		static $cache = [];
+
+		if ( isset( $cache[ $user_id ] ) ) {
+			return $cache[ $user_id ];
+		}
+
+		$cache[ $user_id ] = [];
+
+		// Bail if Woo Memberships is not active.
+		if ( ! ( class_exists( 'WooCommerce' ) && function_exists( 'wc_memberships_get_user_memberships' ) ) ) {
+			return $cache[ $user_id ];
+		}
+
+		// Get active memberships.
+		$memberships = wc_memberships_get_user_memberships( $user_id, array( 'status' => 'active' ) );
+
+		if ( $memberships ) {
+			// Get active membership IDs.
+			$cache[ $user_id ] = wp_list_pluck( $memberships, 'plan_id' );
+		}
+
+		return $cache[ $user_id ];
+	}
+
+	/**
+	 * Sets user taxonomies.
+	 *
+	 * @since TBD
+	 *
+	 * @param array $args
+	 *
+	 * @return array
+	 */
+	function set_user_taxonomies( $args ) {
+		$taxonomies = $this->get_user_taxonomies( $this->user->ID );
+
+		// If taxonomies.
+		if ( $taxonomies ) {
+			foreach ( $taxonomies as $name => $values ) {
+				$args[ $name ] = $values;
+			}
+		}
+
+		return $args;
+	}
+
+	/**
+	 * Gets user taxonomies.
+	 * Cached incase we need to call this again later on same page load.
+	 *
+	 * Returns:
+	 * [
+	 *   'taxonomy_one' => [
+	 *     123 => 'Term Name 1',
+	 *     321 => 'Term Name 2',
+	 *   ],
+	 *   'taxonomy_two' => [
+	 *     456 => 'Term Name 3',
+	 *     654 => 'Term Name 4',
+	 *   ],
+	 * ]
+	 *
+	 * @since TBD
+	 *
+	 * @return array
+	 */
+	function get_user_taxonomies( $user_id = 0 ) {
+		static $cache = [];
+
+		if ( isset( $cache[ $user_id ] ) ) {
+			return $cache[ $user_id ];
+		}
+
+		$cache[ $user_id ] = [];
+		$taxonomies        = get_object_taxonomies( 'user' );
+
+		// Bail if no taxonomies registered on users.
+		if ( ! $taxonomies ) {
+			return $cache[ $user_id ];
+		}
+
+		foreach ( $taxonomies as $taxonomy ) {
+			$terms = wp_get_object_terms( $user_id, $taxonomy );
+
+			if ( $terms && ! is_wp_error( $terms ) ) {
+				$cache[ $user_id ][ $taxonomy ] = wp_list_pluck( $terms, 'name', 'term_id' );
+			}
+		}
+
+		return $cache[ $user_id ];
 	}
 
 	/**
 	 * Websites.
 	 * Sets site domain.
 	 *
-	 * @since 0.1.0
+	 * @since TBD
 	 *
 	 * @return array
 	 */
-	function set_dimension_1() {
+	function set_global_dimension_1() {
 		$host = parse_url( get_site_url(), PHP_URL_HOST );
-		$host = str_replace( 'www.', '', $host );
+		$host = ltrim( $host, 'www.' );
 
-		$this->dimensions[1] = esc_html( $host );
+		$this->global_dimensions[1] = esc_html( $host );
 	}
 
 	/**
 	 * Sets post IAB category.
 	 *
-	 * @since 0.1.0
+	 * @since TBD
 	 *
 	 * @return void
 	 */
-	function set_dimension_2() {
+	function set_global_dimension_2() {
+		$primary = false;
+
 		if ( is_singular( 'post' ) ) {
-			$this->primary = maipub_get_primary_term( 'category', get_the_ID() );
+			$primary = maipub_get_primary_term( 'category', get_the_ID() );
 
 		} elseif ( is_category() ) {
-			$object        = get_queried_object();
-			$this->primary = $object && $object instanceof WP_Term ? $object : 0;
+			$object  = get_queried_object();
+			$primary = $object && $object instanceof WP_Term ? $object : 0;
 		}
 
-		if ( ! $this->primary ) {
+		if ( ! $primary ) {
 			return;
 		}
 
-		$iab = get_term_meta( $this->primary->term_id, 'maipub_category', true );
+		$iab = get_term_meta( $primary->term_id, 'maipub_category', true );
 
 		if ( ! $iab ) {
 			return;
@@ -147,21 +548,21 @@ class Mai_Publisher_Analytics {
 			return;
 		}
 
-		$this->dimensions[2] = esc_html( ltrim( $iab, '– ' ) );
+		$this->global_dimensions[2] = esc_html( ltrim( $iab, '– ' ) );
 	}
 
 	/**
 	 * Sets content category.
 	 *
-	 * @since 0.1.0
+	 * @since TBD
 	 *
 	 * @return void
 	 */
-	function set_dimension_3() {
+	function set_global_dimension_3() {
 		$term = false;
 
 		if ( is_singular( 'post' ) ) {
-			$term = $this->primary;
+			$term = maipub_get_primary_term( 'category', get_the_ID() );
 
 		} elseif ( is_category() || is_tag() || is_tax() ) {
 			$object = get_queried_object();
@@ -172,17 +573,17 @@ class Mai_Publisher_Analytics {
 			return;
 		}
 
-		$this->dimensions[3] = $term->name; // Term name.
+		$this->global_dimensions[3] = $term->name; // Term name.
 	}
 
 	/**
 	 * Gets content type.
 	 *
-	 * @since 0.1.0
+	 * @since TBD
 	 *
 	 * @return array
 	 */
-	function set_dimension_4() {
+	function set_global_dimension_4() {
 		// Uses readable name as the type. 'Post' instead of 'post'.
 		$type = $this->get_current_page( 'name' );
 
@@ -190,21 +591,20 @@ class Mai_Publisher_Analytics {
 			return;
 		}
 
-		$this->dimensions[4] = $type;
+		$this->global_dimensions[4] = $type;
 	}
 
 	// TODO.
-	function set_dimension_5() {}
-	function set_dimension_6() {}
-	function set_dimension_7() {}
-	function set_dimension_8() {}
-	function set_dimension_9() {}
+	function set_global_dimension_5() {}
+	function set_global_dimension_6() {}
+	function set_global_dimension_7() {}
+	function set_global_dimension_8() {}
+	function set_global_dimension_9() {}
 
 	/**
 	 * Get current page data.
-	 * Taken from `mai_analytics_get_current_page()` in Mai Analytics.
 	 *
-	 * @since 0.1.0
+	 * @since TBD
 	 *
 	 * @param string $key
 	 *
@@ -287,75 +687,36 @@ class Mai_Publisher_Analytics {
 	}
 
 	/**
-	 * Gets the primary term of a post, by taxonomy.
-	 * If Yoast Primary Term is used, return it,
-	 * otherwise fallback to the first term.
+	 * Gets content category name.
 	 *
-	 * @version 1.3.0
+	 * @since TBD
 	 *
-	 * @since 0.1.0
-	 *
-	 * @link https://gist.github.com/JiveDig/5d1518f370b1605ae9c753f564b20b7f
-	 * @link https://gist.github.com/jawinn/1b44bf4e62e114dc341cd7d7cd8dce4c
-	 *
-	 * @param string $taxonomy The taxonomy to get the primary term from.
-	 * @param int    $post_id  The post ID to check.
-	 *
-	 * @return WP_Term|false The term object or false if no terms.
+	 * @return string
 	 */
-	function get_primary_term( $taxonomy = 'category', $post_id = false ) {
-		if ( ! $taxonomy ) {
-			return false;
+	function get_content_category() {
+		static $category = null;
+
+		if ( ! is_null( $category ) ) {
+			return $category;
 		}
 
-		// If no post ID, set it.
-		if ( ! $post_id ) {
-			$post_id = get_the_ID();
+		$term = false;
+
+		if ( is_singular( 'post' ) ) {
+			$term = maipub_get_primary_term( 'category', get_the_ID() );
+
+		} elseif ( is_category() || is_tag() || is_tax() ) {
+			$object = get_queried_object();
+			$term   = $object && $object instanceof WP_Term ? $object : 0;
 		}
 
-		// Bail if no post ID.
-		if ( ! $post_id ) {
-			return false;
+		if ( ! $term ) {
+			$category = '';
+			return $category;
 		}
 
-		// Setup caching.
-		static $cache = null;
+		$category = $term->name; // Term name.
 
-		// Maybe return cached value.
-		if ( is_array( $cache ) ) {
-			if ( isset( $cache[ $taxonomy ][ $post_id ] ) ) {
-				return $cache[ $taxonomy ][ $post_id ];
-			}
-		} else {
-			$cache = [];
-		}
-
-		// If checking for WPSEO.
-		if ( class_exists( 'WPSEO_Primary_Term' ) ) {
-
-			// Get the primary term.
-			$wpseo_primary_term = new WPSEO_Primary_Term( $taxonomy, $post_id );
-			$wpseo_primary_term = $wpseo_primary_term->get_primary_term( 'category', get_the_ID());
-			// If we have one, return it.
-			if ( $wpseo_primary_term ) {
-				$cache[ $taxonomy ][ $post_id ] = get_term( $wpseo_primary_term );
-				return $cache[ $taxonomy ][ $post_id ];
-			}
-		}
-
-		// We don't have a primary, so let's get all the terms.
-		$terms = get_the_terms( $post_id, $taxonomy );
-
-		// Bail if no terms.
-		if ( ! $terms || is_wp_error( $terms ) ) {
-			$cache[ $taxonomy ][ $post_id ] = false;
-			return $cache[ $taxonomy ][ $post_id ];
-		}
-
-		// Get the first, and store in cache.
-		$cache[ $taxonomy ][ $post_id ] = reset( $terms );
-
-		// Return the first term.
-		return $cache[ $taxonomy ][ $post_id ];
+		return $category;
 	}
 }

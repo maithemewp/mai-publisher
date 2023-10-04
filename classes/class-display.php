@@ -37,7 +37,7 @@ class Mai_Publisher_Display {
 	function run() {
 		$ads    = maipub_get_ads();
 		$domain = maipub_get_gam_domain();
-		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$suffix = maipub_get_suffix();
 
 		// Bail if no ads.
 		if ( ! $ads ) {
@@ -429,25 +429,6 @@ class Mai_Publisher_Display {
 				}, $priority );
 			 }
 		}
-	}
-
-	/**
-	 * Gets file suffix.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @return string
-	 */
-	function get_suffix() {
-		static $suffix = null;
-
-		if ( ! is_null( $suffix ) ) {
-			return $suffix;
-		}
-
-		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-
-		return $suffix;
 	}
 
 	/**
