@@ -550,7 +550,7 @@ class Mai_Publisher_Tracking {
 	 * @return void
 	 */
 	function set_global_dimension_7() {
-		$primary = false;
+		$iab = $primary = false;
 
 		if ( is_singular( 'post' ) ) {
 			$primary = maipub_get_primary_term( 'category', get_the_ID() );
@@ -560,16 +560,19 @@ class Mai_Publisher_Tracking {
 			$primary = $object && $object instanceof WP_Term ? $object : 0;
 		}
 
-		if ( ! $primary ) {
-			return;
+		if ( $primary ) {
+			$iab = get_term_meta( $primary->term_id, 'maipub_category', true );
 		}
 
-		$iab = get_term_meta( $primary->term_id, 'maipub_category', true );
+		if ( ! $iab ) {
+			$iab = maipub_get_option( 'category', false );
+		}
 
 		if ( ! $iab ) {
 			return;
 		}
 
+		// Get category label from ID.
 		$categories = maipub_get_all_categories();
 		$iab        = isset( $categories[ $iab ] ) ? $categories[ $iab ] : false;
 
