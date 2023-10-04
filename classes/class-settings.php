@@ -326,7 +326,7 @@ class Mai_Publisher_Settings {
 	/**
 	 * Setting callback.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @return void
 	 */
@@ -349,7 +349,7 @@ class Mai_Publisher_Settings {
 	/**
 	 * Setting callback.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @return void
 	 */
@@ -371,7 +371,7 @@ class Mai_Publisher_Settings {
 	/**
 	 * Setting callback.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @return void
 	 */
@@ -391,7 +391,7 @@ class Mai_Publisher_Settings {
 	/**
 	 * Setting callback.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @return void
 	 */
@@ -410,7 +410,7 @@ class Mai_Publisher_Settings {
 	/**
 	 * Setting callback.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @return void
 	 */
@@ -429,7 +429,7 @@ class Mai_Publisher_Settings {
 	/**
 	 * Setting callback.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @return void
 	 */
@@ -535,7 +535,7 @@ class Mai_Publisher_Settings {
 	 *
 	 * @link https://matomo.org/faq/how-to/faq_20278/
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @return void
 	 */
@@ -628,7 +628,7 @@ class Mai_Publisher_Settings {
 	/**
 	 * Gets notice for when config values are used.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @return string
 	 */

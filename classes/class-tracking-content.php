@@ -21,7 +21,7 @@ class Mai_Publisher_Tracking_Content {
 	/**
 	 * Runs frontend hooks.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @return void
 	 */
@@ -36,7 +36,7 @@ class Mai_Publisher_Tracking_Content {
 	/**
 	 * Add attributes to menu.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @param string   $nav_menu The HTML content for the navigation menu.
 	 * @param stdClass $args     An object containing wp_nav_menu() arguments.
@@ -61,7 +61,7 @@ class Mai_Publisher_Tracking_Content {
 	/**
 	 * Maybe add attributes to Mai CCA.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @param string $content The CCA content.
 	 * @param array  $args    The CCA args.
@@ -85,7 +85,7 @@ class Mai_Publisher_Tracking_Content {
 	/**
 	 * Maybe add attributes to Mai Ad.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @param string $content The CCA content.
 	 * @param string $args    The CCA args.
@@ -109,7 +109,7 @@ class Mai_Publisher_Tracking_Content {
 	/**
 	 * Add attributes to Navigation menu block.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @param string $block_content The existing block content.
 	 * @param array  $block         The button block object.
@@ -152,7 +152,7 @@ class Mai_Publisher_Tracking_Content {
 	/**
 	 * Maybe add attributes to Mai Post Preview block.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @param string $block_content The existing block content.
 	 * @param array  $block         The button block object.
@@ -199,7 +199,7 @@ class Mai_Publisher_Tracking_Content {
 	 * This would happen if a Mai Ad block was used inside of a Mai CCA (i think, this is from Mai Analytics),
 	 * the CCA would take precedence and the Ad links will have the content piece.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @param string $content The content.
 	 * @param string $name    The name.
@@ -293,7 +293,7 @@ class Mai_Publisher_Tracking_Content {
 	/**
 	 * Get incremented menu slug.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @param string $slug The menu slug.
 	 *
@@ -309,7 +309,7 @@ class Mai_Publisher_Tracking_Content {
 	/**
 	 * Get current page menus to increment.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @param string $slug The menu slug.
 	 *
@@ -332,7 +332,7 @@ class Mai_Publisher_Tracking_Content {
 	/**
 	 * Checks if we should track.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @return bool
 	 */

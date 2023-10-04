@@ -91,7 +91,7 @@ function maipub_str_contains( $haystack, $needle ) {
  *
  * @access private
  *
- * @since TBD
+ * @since 0.3.0
  *
  * @return bool
  */

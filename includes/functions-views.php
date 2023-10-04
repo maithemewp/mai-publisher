@@ -6,7 +6,7 @@ defined( 'ABSPATH' ) || die;
 /**
  * Gets views for display.
  *
- * @since TBD
+ * @since 0.3.0
  *
  * @param array $atts The shortcode atts.
  *
@@ -88,7 +88,7 @@ function maipub_get_views( $atts = [] ) {
 /**
  * Retrieve view count for a post.
  *
- * @since TBD
+ * @since 0.3.0
  *
  * @param array $args The view args.
  *
@@ -122,7 +122,7 @@ function maipub_get_view_count( $args = [] ) {
 /**
  * Gets a shortened number value for number.
  *
- * @since TBD
+ * @since 0.3.0
  *
  * @param int $number The number.
  *

@@ -21,7 +21,7 @@ class Mai_Publisher_Tracking {
 	/**
 	 * Runs frontend hooks.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @return void
 	 */
@@ -32,7 +32,7 @@ class Mai_Publisher_Tracking {
 	/**
 	 * Enqueues script if we're tracking the current page.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @return void
 	 */
@@ -52,7 +52,7 @@ class Mai_Publisher_Tracking {
 	/**
 	 * Get localized vars for JS.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @return void
 	 */
@@ -154,7 +154,7 @@ class Mai_Publisher_Tracking {
 	/**
 	 * Gets custom dimensions.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @return array
 	 */
@@ -177,7 +177,7 @@ class Mai_Publisher_Tracking {
 	/**
 	 * Gets global custom dimensions.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @return array
 	 */
@@ -210,7 +210,7 @@ class Mai_Publisher_Tracking {
 	 * This leaves us open to use dimension 5 for any sort of User Grouping we want, not just WooCommerce.
 	 * We could use WP User Groups (taxonomy) or anything else, without modifying the plugin code.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @return array
 	 */
@@ -243,7 +243,7 @@ class Mai_Publisher_Tracking {
 	/**
 	 * Gets content age.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @return array
 	 */
@@ -297,7 +297,7 @@ class Mai_Publisher_Tracking {
 	 *
 	 * @todo Add support for CPT and Custom Taxonomies?
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @return array
 	 */
@@ -314,7 +314,7 @@ class Mai_Publisher_Tracking {
 	/**
 	 * Gets content length.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @return array
 	 */
@@ -382,7 +382,7 @@ class Mai_Publisher_Tracking {
 	/**
 	 * Gets content type.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @return array
 	 */
@@ -400,7 +400,7 @@ class Mai_Publisher_Tracking {
 	/**
 	 * Sets membership plan IDs in args.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @param array $args
 	 *
@@ -421,7 +421,7 @@ class Mai_Publisher_Tracking {
 	 * Gets membership plan IDs.
 	 * Cached incase we need to call this again later on same page load.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @param int $user_id The logged in user ID.
 	 *
@@ -455,7 +455,7 @@ class Mai_Publisher_Tracking {
 	/**
 	 * Sets user taxonomies.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @param array $args
 	 *
@@ -490,7 +490,7 @@ class Mai_Publisher_Tracking {
 	 *   ],
 	 * ]
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @return array
 	 */
@@ -524,7 +524,7 @@ class Mai_Publisher_Tracking {
 	 * Websites.
 	 * Sets site domain.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @return array
 	 */
@@ -538,7 +538,7 @@ class Mai_Publisher_Tracking {
 	/**
 	 * Sets post IAB category.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @return void
 	 */
@@ -576,7 +576,7 @@ class Mai_Publisher_Tracking {
 	/**
 	 * Sets content category.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @return void
 	 */
@@ -601,7 +601,7 @@ class Mai_Publisher_Tracking {
 	/**
 	 * Gets content type.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @return array
 	 */
@@ -626,7 +626,7 @@ class Mai_Publisher_Tracking {
 	/**
 	 * Get current page data.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @param string $key
 	 *
@@ -711,7 +711,7 @@ class Mai_Publisher_Tracking {
 	/**
 	 * Gets content category name.
 	 *
-	 * @since TBD
+	 * @since 0.3.0
 	 *
 	 * @return string
 	 */
