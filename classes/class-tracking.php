@@ -520,6 +520,13 @@ class Mai_Publisher_Tracking {
 		return $cache[ $user_id ];
 	}
 
+	// TODO.
+	function set_global_dimension_1() {}
+	function set_global_dimension_2() {}
+	function set_global_dimension_3() {}
+	function set_global_dimension_4() {}
+	function set_global_dimension_5() {}
+
 	/**
 	 * Websites.
 	 * Sets site domain.
@@ -528,7 +535,7 @@ class Mai_Publisher_Tracking {
 	 *
 	 * @return array
 	 */
-	function set_global_dimension_1() {
+	function set_global_dimension_6() {
 		$host = parse_url( get_site_url(), PHP_URL_HOST );
 		$host = ltrim( $host, 'www.' );
 
@@ -542,7 +549,7 @@ class Mai_Publisher_Tracking {
 	 *
 	 * @return void
 	 */
-	function set_global_dimension_2() {
+	function set_global_dimension_7() {
 		$primary = false;
 
 		if ( is_singular( 'post' ) ) {
@@ -580,7 +587,7 @@ class Mai_Publisher_Tracking {
 	 *
 	 * @return void
 	 */
-	function set_global_dimension_3() {
+	function set_global_dimension_8() {
 		$term = false;
 
 		if ( is_singular( 'post' ) ) {
@@ -605,7 +612,7 @@ class Mai_Publisher_Tracking {
 	 *
 	 * @return array
 	 */
-	function set_global_dimension_4() {
+	function set_global_dimension_9() {
 		// Uses readable name as the type. 'Post' instead of 'post'.
 		$type = $this->get_current_page( 'name' );
 
@@ -615,13 +622,6 @@ class Mai_Publisher_Tracking {
 
 		$this->global_dimensions[4] = $type;
 	}
-
-	// TODO.
-	function set_global_dimension_5() {}
-	function set_global_dimension_6() {}
-	function set_global_dimension_7() {}
-	function set_global_dimension_8() {}
-	function set_global_dimension_9() {}
 
 	/**
 	 * Get current page data.
