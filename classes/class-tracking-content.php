@@ -55,24 +55,6 @@ class Mai_Publisher_Tracking_Content {
 			return $nav_menu;
 		}
 
-		// if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
-		// 	return $nav_menu;
-		// }
-
-		// $tags = new WP_HTML_Tag_Processor( $nav_menu );
-
-		// while ( $tags->next_tag( [ 'tag_name' => 'ul' ] ) ) {
-		// 	$tags->set_attribute( 'data-content-name', 'mai-menu-' . esc_attr( $slug ) );
-		// 	$tags->set_attribute( 'data-track-content', '' );
-		// 	break;
-		// }
-
-		// while ( $tags->next_tag( [ 'tag_name' => 'a' ] ) ) {
-		// 	$tags->set_attribute( 'data-content-piece', '' );
-		// }
-
-		// return $tags->get_updated_html();
-
 		return $this->add_attributes( $nav_menu, 'mai-menu-' . $this->get_menu_slug( $slug ) );
 	}
 
