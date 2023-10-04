@@ -125,19 +125,20 @@ final class Mai_Publisher_Plugin {
 		include MAI_PUBLISHER_DIR . 'blocks/ad/block.php';
 		include MAI_PUBLISHER_DIR . 'blocks/ad-unit/block.php';
 		// Instantiate classes.
-		$admin         = new Mai_Publisher_Admin;
-		$settings      = new Mai_Publisher_Settings;
-		$settings_cats = new Mai_Publisher_Settings_Categories;
-		$field_group   = new Mai_Publisher_Ad_Field_Group;
-		$fields        = new Mai_Publisher_Ad_Fields;
-		$visibility    = new Mai_Publisher_Ad_Visibility;
-		$categories    = new Mai_Publisher_Categories_Field_Group;
-		$generate      = new Mai_Publisher_Generate_Ads;
-		$ad_block      = new Mai_Publisher_Ad_Block;
-		$ad_unit_block = new Mai_Publisher_Ad_Unit_Block;
-		$display       = new Mai_Publisher_Display;
-		$views         = new Mai_Publisher_Views;
-		$tracking      = new Mai_Publisher_Tracking;
+		$admin            = new Mai_Publisher_Admin;
+		$settings         = new Mai_Publisher_Settings;
+		$settings_cats    = new Mai_Publisher_Settings_Categories;
+		$field_group      = new Mai_Publisher_Ad_Field_Group;
+		$fields           = new Mai_Publisher_Ad_Fields;
+		$visibility       = new Mai_Publisher_Ad_Visibility;
+		$categories       = new Mai_Publisher_Categories_Field_Group;
+		$generate         = new Mai_Publisher_Generate_Ads;
+		$ad_block         = new Mai_Publisher_Ad_Block;
+		$ad_unit_block    = new Mai_Publisher_Ad_Unit_Block;
+		$display          = new Mai_Publisher_Display;
+		$views            = new Mai_Publisher_Views;
+		$tracking         = new Mai_Publisher_Tracking;
+		$tracking_content = new Mai_Publisher_Tracking_Content;
 	}
 
 	/**

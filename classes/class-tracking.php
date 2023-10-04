@@ -26,10 +26,6 @@ class Mai_Publisher_Tracking {
 	 * @return void
 	 */
 	function hooks() {
-		if ( ! ( maipub_get_option( 'matomo_enabled', false ) || maipub_get_option( 'matomo_enabled_global', false ) ) ) {
-			return;
-		}
-
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue' ], 99 );
 	}
 
@@ -41,8 +37,13 @@ class Mai_Publisher_Tracking {
 	 * @return void
 	 */
 	function enqueue() {
-		$suffix     = maipub_get_suffix();
-		$file       = "assets/js/mai-publisher-analytics{$suffix}.js";
+		// Can run this too early so it's inside the callback.
+		if ( ! maipub_should_track() ) {
+			return;
+		}
+
+		$suffix = maipub_get_suffix();
+		$file   = "assets/js/mai-publisher-analytics{$suffix}.js";
 
 		wp_enqueue_script( 'mai-publisher-analytics', maipub_get_file_data( $file, 'url' ), [], maipub_get_file_data( $file, 'version' ), [ 'strategy' => 'async', 'in_footer' => true ] );
 		wp_localize_script( 'mai-publisher-analytics', 'maiPubAnalyticsVars', $this->get_vars() );
@@ -82,13 +83,10 @@ class Mai_Publisher_Tracking {
 					}
 				}
 
+				$analytics['push'][] = [ 'enableLinkTracking' ];
+				$analytics['push'][] = [ 'trackPageView' ];
 				$analytics['push'][] = [ 'trackVisibleContentImpressions' ];
 				// $analytics['push'][] = [ 'trackAllContentImpressions' ];
-				$analytics['push'][] = [ 'trackPageView' ];
-				$analytics['push'][] = [ 'enableLinkTracking' ];
-
-				// _paq.push( [ 'setTrackerUrl', primaryUrl + 'matomo.php' ] );
-				// _paq.push( [ 'setSiteId', idSite ] );
 
 				// Add site analytics.
 				$vars['analytics'][] = $analytics;
@@ -113,7 +111,7 @@ class Mai_Publisher_Tracking {
 						}
 
 						// If last updated timestampe is more than N minutes (converted to seconds) ago.
-						// if ( ! $updated || $updated < ( $current - ( $interval * 60 ) ) ) {
+						if ( ! $updated || $updated < ( $current - ( $interval * 60 ) ) ) {
 							$vars['ajaxUrl'] = admin_url( 'admin-ajax.php' );
 							$vars['body']    = [
 								'action'  => 'maipub_views',
@@ -123,7 +121,7 @@ class Mai_Publisher_Tracking {
 								'url'     => $page['url'],
 								'current' => $current,
 							];
-						// }
+						}
 					}
 				}
 			}

@@ -85,3 +85,70 @@ function maipub_str_contains( $haystack, $needle ) {
 
 	return str_contains( $haystack, $needle );
 }
+
+/**
+ * If on a page that we should be tracking.
+ *
+ * @access private
+ *
+ * @since TBD
+ *
+ * @return bool
+ */
+function maipub_should_track() {
+	static $cache = null;
+
+	if ( ! is_null( $cache ) ) {
+		return $cache;
+	}
+
+	$cache          = false;
+	$enabled_global = maipub_get_option( 'matomo_enabled_global', false );
+	$enabled        = maipub_get_option( 'matomo_enabled', false );
+
+	// Bail if not enabled.
+	if ( ! ( $enabled_global || $enabled ) ) {
+		return $cache;
+	}
+
+	// If not enabled globally, check if we have hte data we need.
+	if ( ! $enabled_global ) {
+		$site_url = maipub_get_option( 'matomo_url', false );
+		$site_id  = maipub_get_option( 'matomo_site_id', false );
+
+		// Bail if we don't have the data we need.
+		if ( ! ( $site_url && $site_id ) ) {
+			return $cache;
+		}
+	}
+
+	// Bail if contributor or above.
+	if ( current_user_can( 'edit_posts' ) ) {
+		return $cache;
+	}
+
+	// Bail if we are in an ajax call.
+	if ( wp_doing_ajax() ) {
+		return $cache;
+	}
+
+	// Bail if this is a JSON request.
+	if ( wp_is_json_request() ) {
+		return $cache;
+	}
+
+	// Bail if this running via a CLI command.
+	if ( defined( 'WP_CLI' ) && WP_CLI ) {
+		return $cache;
+	}
+
+	// Bail if admin page and we're not tracking.
+	// if ( ! maipub_get_option( 'matomo_enabled_backend' ) && is_admin() ) {
+	// 	return $cache;
+	// }
+
+	// We got here, set cache and let's track it.
+	$cache = true;
+
+	return $cache;
+}
