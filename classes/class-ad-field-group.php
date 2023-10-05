@@ -339,7 +339,7 @@ class Mai_Publisher_Ad_Field_Group {
 				'key'               => 'maipub_archive_content_count',
 				'name'              => 'maipub_archive_content_count',
 				'type'              => 'text',
-				'append'            => __( 'entries', 'mai-publisher' ),
+				'append'            => __( 'rows', 'mai-publisher' ),
 				'required'          => 1,
 				'default_value'     => 3,
 				'conditional_logic' => [
