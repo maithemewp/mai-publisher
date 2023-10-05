@@ -240,23 +240,30 @@ class Mai_Publisher_Settings {
 	 * @return array
 	 */
 	function maipub_sanitize( $input ) {
-		// Sanitize.
-		$input['gam_domain']             = isset( $input['gam_domain'] ) ? maipub_get_gam_domain_sanitized( $input['gam_domain'] ) : null;
-		$input['category']               = isset( $input['category'] ) ? sanitize_key( $input['category'] ) : null;
-		$input['matomo_enabled_global']  = isset( $input['matomo_enabled_global'] ) ? rest_sanitize_boolean( $input['matomo_enabled_global'] ) : null;
-		$input['matomo_enabled']         = isset( $input['matomo_enabled'] ) ? rest_sanitize_boolean( $input['matomo_enabled'] ) : null;
-		$input['matomo_enabled_backend'] = isset( $input['matomo_enabled_backend'] ) ? rest_sanitize_boolean( $input['matomo_enabled_backend'] ) : null;
-		$input['matomo_url']             = isset( $input['matomo_url'] ) ? trailingslashit( esc_html( $input['matomo_url'] ) ) : null;
-		$input['matomo_site_id']         = isset( $input['matomo_site_id'] ) ? absint( $input['matomo_site_id'] ) : null;
-		$input['matomo_token']           = isset( $input['matomo_token'] ) ? esc_html( $input['matomo_token'] ) : null;
-		$input['trending_days']          = isset( $input['trending_days'] ) ? absint( $input['trending_days'] ) : null;
-		$input['views_days']             = isset( $input['views_days'] ) ? absint( $input['views_days'] ) : null;
-		$input['views_interval']         = isset( $input['views_interval'] ) ? absint( $input['views_interval'] ) : null;
-		$input['ad_label']               = isset( $input['ad_label'] ) ? esc_html( $input['ad_label'] ) : null;
-		$input['header']                 = isset( $input['header'] ) ? trim( $input['header'] ) : null;
-		$input['footer']                 = isset( $input['footer'] ) ? trim( $input['footer'] ) : null;
+		$allowed = [
+			'gam_domain'             => 'maipub_get_gam_domain_sanitized',
+			'category'               => 'sanitize_text_field',
+			'matomo_enabled_global'  => 'rest_sanitize_boolean',
+			'matomo_enabled'         => 'rest_sanitize_boolean',
+			'matomo_enabled_backend' => 'rest_sanitize_boolean',
+			'matomo_url'             => 'trailingslashit',
+			'matomo_site_id'         => 'absint',
+			'matomo_token'           => 'sanitize_text_field',
+			'trending_days'          => 'absint',
+			'views_days'             => 'absint',
+			'views_interval'         => 'absint',
+			'ad_label'               => 'sanitize_text_field',
+			'header'                 => 'trim',
+			'footer'                 => 'trim',
+		];
 
-		// TODO: Remove old, or values we don't want to save.
+		// Get an array of matching keys from $input.
+		$input = array_intersect_key( $input, $allowed );
+
+		// Sanitize.
+		foreach ( $input as $key => $value ) {
+			$input[ $key ] = $allowed[ $key ]( $value );
+		}
 
 		return $input;
 	}
@@ -435,7 +442,7 @@ class Mai_Publisher_Settings {
 	 */
 	function matomo_token_callback() {
 		$constant = defined( 'MAI_PUBLISHER_MATOMO_TOKEN' );
-		$value    = $constant ? sanitize_key( MAI_PUBLISHER_MATOMO_TOKEN ) : maipub_get_option( 'matomo_token', false );
+		$value    = $constant ? sanitize_text_field( MAI_PUBLISHER_MATOMO_TOKEN ) : maipub_get_option( 'matomo_token', false );
 
 		printf(
 			'<input class="regular-text" type="password" name="mai_publisher[matomo_token]" id="matomo_token" value="%s"%s>%s',
