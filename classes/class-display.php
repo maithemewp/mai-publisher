@@ -408,9 +408,14 @@ class Mai_Publisher_Display {
 						return $close;
 					}
 
-					$ad = sprintf( '<div class="maipub-ad" style="order:calc(var(--maicca-columns) * %s);">%s</div>', $args['content_count'], maipub_get_processed_ad_content( $args['content'] ) );
+					$ads = '';
 
-					return $ad . $close;
+					// Show an ad for each set row.
+					foreach ( $args['content_count'] as $count ) {
+						$ads .= sprintf( '<div class="maipub-ad" style="order:calc(var(--maipub-columns) * %s);">%s</div>', $count, maipub_get_processed_ad_content( $args['content'] ) );
+					}
+
+					return $ads . $close;
 
 				}, 10, 2 );
 			}

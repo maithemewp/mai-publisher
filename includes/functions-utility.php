@@ -413,7 +413,7 @@ function maipub_validate_args_archive( $args ) {
 		'slug'          => sanitize_key( $args['slug'] ),
 		'location'      => esc_html( $args['location'] ),
 		'content'       => trim( $args['content'] ),
-		'content_count' => absint( $args['content_count'] ),
+		'content_count' => $args['content_count'] ? array_map( 'absint', explode( ',', $args['content_count'] ) ) : [],
 		'types'         => $args['types'] ? array_map( 'esc_html', (array) $args['types'] ) : [],
 		'taxonomies'    => $args['taxonomies'] ? array_map( 'esc_html', (array) $args['taxonomies'] ) : [],
 		'terms'         => $args['terms'] ? array_map( 'absint', (array) $args['terms'] ) : [],
@@ -469,6 +469,42 @@ function maipub_validate_args_archive( $args ) {
 		// Bail if not set to show on search results.
 		if ( ! ( $args['includes'] || in_array( 'search', $args['includes'] ) ) ) {
 			return [];
+		}
+	}
+
+	// If in entries.
+	if ( 'entries' === $args['location'] ) {
+		// Mai Theme v2 logic for rows/columns.
+		if ( function_exists( 'mai_get_template_args' ) ) {
+			$settings = mai_get_template_args();
+ 			$columns  = mai_get_breakpoint_columns( $args );
+
+			// Bail if no posts per page.
+			if ( ! ( isset( $settings['posts_per_page'] ) && $settings['posts_per_page'] ) ) {
+				return [];
+			}
+
+			// Bail if no columns.
+			if ( ! ( isset( $columns['lg'] ) && $columns['lg'] ) ) {
+				return [];
+			}
+
+			// Get desktop rows and round up.
+			$rows = $settings['posts_per_page'] / $columns['lg'];
+			$rows = absint( ceil( $rows ) );
+
+			// Remove counts that are greater than the posts per page.
+			foreach ( $args['content_count'] as $index => $count ) {
+				if ( $count >= $rows ) {
+					// Remove this one and any after it, and break.
+					$args['content_count'] = array_slice( $args['content_count'], 0, $index );
+				}
+			}
+
+			// Bail if no rows to count.
+			if ( ! $args['content_count'] ) {
+				return [];
+			}
 		}
 	}
 
