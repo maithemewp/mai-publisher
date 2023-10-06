@@ -117,17 +117,18 @@ final class Mai_Publisher_Plugin {
 	private function includes() {
 		// Include vendor libraries.
 		require_once __DIR__ . '/vendor/autoload.php';
+
 		// Includes.
 		foreach ( glob( MAI_PUBLISHER_DIR . 'includes/' . '*.php' ) as $file ) { include $file; }
+
 		// Classes.
 		foreach ( glob( MAI_PUBLISHER_DIR . 'classes/' . '*.php' ) as $file ) { include $file; }
+
 		// Blocks.
 		include MAI_PUBLISHER_DIR . 'blocks/ad/block.php';
 		include MAI_PUBLISHER_DIR . 'blocks/ad-unit/block.php';
+
 		// Instantiate classes.
-		$admin            = new Mai_Publisher_Admin;
-		$settings         = new Mai_Publisher_Settings;
-		$settings_cats    = new Mai_Publisher_Settings_Categories;
 		$field_group      = new Mai_Publisher_Ad_Field_Group;
 		$fields           = new Mai_Publisher_Ad_Fields;
 		$visibility       = new Mai_Publisher_Ad_Visibility;
@@ -139,6 +140,13 @@ final class Mai_Publisher_Plugin {
 		$views            = new Mai_Publisher_Views;
 		$tracking         = new Mai_Publisher_Tracking;
 		$tracking_content = new Mai_Publisher_Tracking_Content;
+
+		if ( is_admin() ) {
+			$admin         = new Mai_Publisher_Admin;
+			$settings      = new Mai_Publisher_Settings;
+			$settings_cats = new Mai_Publisher_Settings_Categories;
+			$settings_ad   = new Mai_Publisher_Settings_Ad_Units_Config;
+		}
 	}
 
 	/**

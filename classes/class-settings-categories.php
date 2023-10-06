@@ -10,9 +10,6 @@ defined( 'ABSPATH' ) || die;
  * @link http://jeremyhixon.com/wp-tools/option-page/
  */
 class Mai_Publisher_Settings_Categories {
-	protected $hierarchicalArray = [];
-	protected $parentsArray = [];
-
 	/**
 	 * Construct the class.
 	 */
@@ -42,7 +39,6 @@ class Mai_Publisher_Settings_Categories {
 		add_submenu_page(
 			null, // No parent page, so no menu item.
 			__( 'IAB Tech Lab Taxonomy Mapping', 'mai-publisher' ), // page_title
-			// __( 'Categories', 'mai-publisher' ), // menu_title
 			'', // No menu title.
 			'manage_options', // capability
 			'categories', // menu_slug

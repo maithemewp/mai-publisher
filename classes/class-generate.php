@@ -158,10 +158,10 @@ class Mai_Publisher_Generate_Ads {
 				[
 					'post_type'    => 'mai_ad',
 					'post_name'    => $slug,
-					'post_status'  => 'publish',
+					'post_status'  => 'draft',
 					'post_title'   => sprintf( 'mai-ad-%s', $slug ),
 					'post_content' => $ad['post_content'],
-					// 'menu_order'   => $ad['menu_order'],
+					'meta_input'   => $ad['meta_input'],
 				]
 			);
 
@@ -184,7 +184,7 @@ class Mai_Publisher_Generate_Ads {
 	 */
 	function get_missing_ads() {
 		$ads      = [];
-		$config   = maipub_get_config( 'ad_units' );
+		$config   = json_decode( file_get_contents( MAI_PUBLISHER_DIR . '/ads.json' ), true );
 		$existing = $this->get_existing_ads();
 
 		if ( ! $config ) {
