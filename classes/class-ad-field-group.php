@@ -114,13 +114,7 @@ class Mai_Publisher_Ad_Field_Group {
 				'key'          => 'maipub_global_location',
 				'name'         => 'maipub_global_location',
 				'type'         => 'select',
-				'choices'      => [
-					''              => __( 'None (inactive)', 'mai-publisher' ),
-					'before_header' => __( 'Before header', 'mai-publisher' ),
-					'after_header'  => __( 'After header', 'mai-publisher' ),
-					'before_footer' => __( 'Before footer', 'mai-publisher' ),
-					'after_footer'  => __( 'After footer', 'mai-publisher' ),
-				],
+				'choices'      => maipub_get_location_choices( 'global' ),
 			],
 			[
 				'key'       => 'maipub_single_tab',
@@ -140,17 +134,7 @@ class Mai_Publisher_Ad_Field_Group {
 				'key'          => 'maipub_single_location',
 				'name'         => 'maipub_single_location',
 				'type'         => 'select',
-				'choices'      => [
-					''                     => __( 'None (inactive)', 'mai-publisher' ),
-					'before_header'        => __( 'Before header', 'mai-publisher' ),
-					'after_header'         => __( 'After header', 'mai-publisher' ),
-					'before_entry'         => __( 'Before entry', 'mai-publisher' ),
-					'before_entry_content' => __( 'Before entry content', 'mai-publisher' ),
-					'content'              => __( 'In content', 'mai-publisher' ),
-					'after_entry_content'  => __( 'After entry content', 'mai-publisher' ),
-					'after_entry'          => __( 'After entry', 'mai-publisher' ),
-					'before_footer'        => __( 'Before footer', 'mai-publisher' ),
-				],
+				'choices'      => maipub_get_location_choices( 'single' ),
 			],
 			[
 				'label'         => __( 'Content location', 'mai-publisher' ),
@@ -323,15 +307,7 @@ class Mai_Publisher_Ad_Field_Group {
 				'key'          => 'maipub_archive_location',
 				'name'         => 'maipub_archive_location',
 				'type'         => 'select',
-				'choices'      => [
-					''              => __( 'None (inactive)', 'mai-publisher' ),
-					'before_header' => __( 'Before header', 'mai-publisher' ),
-					'after_header'  => __( 'After header', 'mai-publisher' ),
-					'before_loop'   => __( 'Before entries', 'mai-publisher' ),
-					'entries'       => __( 'In entries', 'mai-publisher' ),        // TODO: Is this doable without breaking columns, etc?
-					'after_loop'    => __( 'After entries', 'mai-publisher' ),
-					'before_footer' => __( 'Before footer', 'mai-publisher' ),
-				],
+				'choices'      => maipub_get_location_choices( 'archive' ),
 			],
 			[
 				'label'             => __( 'Row count', 'mai-publisher' ),

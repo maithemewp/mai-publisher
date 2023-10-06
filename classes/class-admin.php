@@ -95,29 +95,32 @@ class Mai_Publisher_Admin {
 
 		$html       = '';
 		$global     = get_post_meta( $post_id, 'maipub_global_location', true );
+		$single     = get_post_meta( $post_id, 'maipub_single_location', true );
 		$singles    = get_post_meta( $post_id, 'maipub_single_types', true );
+		$archive    = get_post_meta( $post_id, 'maipub_archive_location', true );
 		$archives   = get_post_meta( $post_id, 'maipub_archive_types', true );
 		$taxonomies = get_post_meta( $post_id, 'maipub_archive_taxonomies', true );
 		$terms      = get_post_meta( $post_id, 'maipub_archive_terms', true );
+		$choices    = maipub_get_location_choices();
 
 		// Bail if no locations.
-		if ( ! ( $global || $singles || $archives || $taxonomies || $terms ) ) {
+		if ( ! ( $global || ( $single && $singles ) || ( $archive && ( $archives || $taxonomies || $terms ) ) ) ) {
 			return;
 		}
 
 		if ( $global ) {
-			$html .= __( 'Global', 'mai-publisher' ) . '<br>';
+			$html .= sprintf( '%s (%s)', __( 'Global', 'mai-publisher' ), $choices['global'][ $global ] ) . '<br>';
 		}
 
 		if ( $singles ) {
 			$array = [];
 
-			foreach ( $singles as $single ) {
-				$array[] = get_post_type_object( $single )->label;
+			foreach ( $singles as $post_type ) {
+				$array[] = get_post_type_object( $post_type )->label;
 			}
 
 			if ( $array ) {
-				$html .= 'Single -- ' . implode( ', ', $array ) . '<br>';
+				$html .= sprintf( '%s (%s) -- %s', __( 'Single', 'mai-publisher' ), $choices['single'][ $single ], implode( ', ', $array ) ) . '<br>';
 			}
 		}
 
@@ -125,8 +128,8 @@ class Mai_Publisher_Admin {
 			$array = [];
 
 			if ( $archives ) {
-				foreach ( $archives as $archive ) {
-					$object = get_post_type_object( $archive );
+				foreach ( $archives as $post_type ) {
+					$object = get_post_type_object( $post_type );
 
 					if ( $object ) {
 						$array[] = $object->label;
@@ -139,13 +142,13 @@ class Mai_Publisher_Admin {
 					$object = get_taxonomy( $taxonomy );
 
 					if ( $object ) {
-						$array[] =$object->label;
+						$array[] = $object->label;
 					}
 				}
 			}
 
 			if ( $array ) {
-				$html .= 'Archives -- ' . implode( ', ', $array ) . '<br>';
+				$html .= sprintf( '%s (%s) -- %s', __( 'Archives', 'mai-publisher' ), $choices['archive'][ $archive ], implode( ', ', $array ) ) . '<br>';
 			}
 		}
 
@@ -161,7 +164,8 @@ class Mai_Publisher_Admin {
 			}
 
 			if ( $array ) {
-				$html .= 'Terms -- ' . implode( ', ', $array ) . '<br>';
+				// $html .= 'Terms -- ' . implode( ', ', $array ) . '<br>';
+				$html .= sprintf( '%s (%s) -- %s', __( 'Terms', 'mai-publisher' ), $choices['archive'][ $archive ], implode( ', ', $array ) ) . '<br>';
 			}
 		}
 

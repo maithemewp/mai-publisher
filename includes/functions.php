@@ -553,6 +553,63 @@ function maipub_get_locations() {
 }
 
 /**
+ * Get location choices.
+ *
+ * @string TBD
+ *
+ * @param string $type
+ *
+ * @return array
+ */
+function maipub_get_location_choices( $type = '' ) {
+	static $cache = null;
+
+	if ( ! is_null( $cache ) ) {
+		if ( $type ) {
+			return $cache[ $type ];
+		}
+
+		return $cache;
+	}
+
+	$cache = [
+		'global' => [
+			''                     => __( 'None (inactive)', 'mai-publisher' ),
+			'before_header'        => __( 'Before header', 'mai-publisher' ),
+			'after_header'         => __( 'After header', 'mai-publisher' ),
+			'before_footer'        => __( 'Before footer', 'mai-publisher' ),
+			'after_footer'         => __( 'After footer', 'mai-publisher' ),
+		],
+		'single' => [
+			''                     => __( 'None (inactive)', 'mai-publisher' ),
+			'before_header'        => __( 'Before header', 'mai-publisher' ),
+			'after_header'         => __( 'After header', 'mai-publisher' ),
+			'before_entry'         => __( 'Before entry', 'mai-publisher' ),
+			'before_entry_content' => __( 'Before entry content', 'mai-publisher' ),
+			'content'              => __( 'In content', 'mai-publisher' ),
+			'after_entry_content'  => __( 'After entry content', 'mai-publisher' ),
+			'after_entry'          => __( 'After entry', 'mai-publisher' ),
+			'before_footer'        => __( 'Before footer', 'mai-publisher' ),
+		],
+		'archive' => [
+			''                     => __( 'None (inactive)', 'mai-publisher' ),
+			'before_header'        => __( 'Before header', 'mai-publisher' ),
+			'after_header'         => __( 'After header', 'mai-publisher' ),
+			'before_loop'          => __( 'Before entries', 'mai-publisher' ),
+			'entries'              => __( 'In entries', 'mai-publisher' ),        // TODO: Is this doable without breaking columns, etc?
+			'after_loop'           => __( 'After entries', 'mai-publisher' ),
+			'before_footer'        => __( 'Before footer', 'mai-publisher' ),
+		],
+	];
+
+	if ( $type ) {
+		return $cache[ $type ];
+	}
+
+	return $cache;
+}
+
+/**
  * Returns the sub config.
  *
  * @since 0.1.0
