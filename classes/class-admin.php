@@ -44,13 +44,17 @@ class Mai_Publisher_Admin {
 			return $states;
 		}
 
-		// Get locations.
-		$global  = get_post_meta( $post->ID, 'maipub_global_location', true );
-		$single  = get_post_meta( $post->ID, 'maipub_single_location', true );
-		$archive = get_post_meta( $post->ID, 'maipub_archive_location', true );
+		// Get vars.
+		$global     = get_post_meta( $post->ID, 'maipub_global_location', true );
+		$single     = get_post_meta( $post->ID, 'maipub_single_location', true );
+		$singles    = get_post_meta( $post->ID, 'maipub_single_types', true );
+		$archive    = get_post_meta( $post->ID, 'maipub_archive_location', true );
+		$archives   = get_post_meta( $post->ID, 'maipub_archive_types', true );
+		$taxonomies = get_post_meta( $post->ID, 'maipub_archive_taxonomies', true );
+		$terms      = get_post_meta( $post->ID, 'maipub_archive_terms', true );
 
 		// Bail if no locations.
-		if ( ! ( $global || $single || $archive ) ) {
+		if ( ! ( $global || ( $single && $singles ) || ( $archive && ( $archives || $taxonomies || $terms ) ) ) ) {
 			return $states;
 		}
 
