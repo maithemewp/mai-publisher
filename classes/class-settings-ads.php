@@ -76,6 +76,8 @@ class Mai_Publisher_Settings_Ad_Units_Config {
 					'posts_per_page'         => 100,
 					'offset'                 => 0,
 					'post_status'            => 'any',
+					'orderby'                => 'name',
+					'order'                  => 'ASC',
 					'no_found_rows'          => true,
 					'update_post_meta_cache' => false,
 					'update_post_term_cache' => false,
