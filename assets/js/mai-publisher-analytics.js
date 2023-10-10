@@ -37,15 +37,11 @@
 			try {
 				const matomoTracker = Matomo.getTracker( analytics[ tracker ].url + 'matomo.php', analytics[ tracker ].id );
 
-				console.log( analytics[ tracker ].url );
-
 				// Loop through and push items.
 				for ( const key in analytics[ tracker ].push ) {
 					var func = analytics[ tracker ].push[ key ][0];
 					var vals = analytics[ tracker ].push[ key ].slice(1);
 					    vals = vals ? vals : null;
-
-					console.log( ...vals );
 
 					if ( vals ) {
 						matomoTracker[func]( ...vals );
