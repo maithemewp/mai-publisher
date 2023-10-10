@@ -22,6 +22,7 @@ class Mai_Publisher_Generate_Ads {
 	function hooks() {
 		add_action( 'load-edit.php',                         [ $this, 'admin_notice' ] );
 		add_action( 'load-edit.php',                         [ $this, 'admin_notice_success' ] );
+		add_filter( 'post_row_actions',                      [ $this, 'content_import_link' ], 10, 2);
 		add_action( 'admin_post_maipub_generate_ads_action', [ $this, 'action' ] );
 	}
 
@@ -96,6 +97,35 @@ class Mai_Publisher_Generate_Ads {
 	}
 
 	/**
+	 * Create link to reimport content for each post.
+	 *
+	 * @since TBD
+	 *
+	 * @param array   $actions The existing actions.
+	 * @param WP_Post $post    The post object.
+	 *
+	 * @return array
+	 */
+	function content_import_link( $actions, $post ) {
+		if ( 'mai_ad' !== $post->post_type ) {
+			return $actions;
+		}
+
+		$config = $this->get_ads_config();
+
+		// Bail if slug is not in our config.
+		if ( ! isset( $config[ $post->post_name ] ) ) {
+			return $actions;
+		}
+
+		$generate_url              = add_query_arg( [ 'action' => 'maipub_generate_ads_action', 'id' => $post->ID ], admin_url( 'admin-post.php' ) );
+		$generate_url              = wp_nonce_url( $generate_url, 'maipub_generate_ads_action', 'maipub_generate_ads_nonce' );
+		$actions['import_content'] = sprintf( '<a href="%s">%s</a>', $generate_url, __( 'Reimport Content', 'mai-publisher' ) );
+
+		return $actions;
+	}
+
+	/**
 	 * Listener for generating default ads.
 	 *
 	 * @since 0.1.0
@@ -119,18 +149,27 @@ class Mai_Publisher_Generate_Ads {
 		}
 
 		$redirect = admin_url( 'edit.php?post_type=mai_ad' );
-		$ads      = $this->create_ads();
-		$count    = count( $ads );
+		$post_id  = isset( $_GET['id'] ) ? absint( $_GET['id'] ) : null;
+
+		if ( $post_id ) {
+			$ads    = $this->import_content( $post_id );
+			$action = __( 'updated', 'mai-publisher' );
+		} else {
+			$ads    = $this->create_ads();
+			$action = __( 'created', 'mai-publisher' );
+		}
+
+		$count = count( $ads );
 
 		switch ( $count ) {
 			case 0:
 				$message = __( 'Sorry, no ads are available.', 'mai-publisher' );
 			break;
 			case 1:
-				$message = sprintf( '%s %s', $count, __( 'default ads successfully created.', 'mai-publisher' ) );
+				$message = sprintf( '%s %s %s', $count, __( 'default ad successfully', 'mai-publisher' ), $action );
 			break;
 			default:
-				$message = sprintf( '%s %s', $count, __( 'default ads successfully created.', 'mai-publisher' ) );
+				$message = sprintf( '%s %s %s', $count, __( 'default ads successfully', 'mai-publisher' ), $action );
 		}
 
 		if ( $message ) {
@@ -139,6 +178,41 @@ class Mai_Publisher_Generate_Ads {
 
 		wp_safe_redirect( $redirect );
 		exit;
+	}
+
+	/**
+	 * Import content for a single ad.
+	 *
+	 * @since TBD
+	 *
+	 * @param int $post_id The ad post ID.
+	 *
+	 * @return array
+	 */
+	function import_content( $post_id ) {
+		$post = get_post( $post_id );
+
+		if ( ! $post ) {
+			return [];
+		}
+
+		$slug   = $post->post_name;
+		$config = $this->get_ads_config();
+
+		if ( ! isset( $config[ $slug ] ) ) {
+			return [];
+		}
+
+		// Update post content.
+		wp_update_post(
+			[
+				'ID'           => $post_id,
+				// 'post_status'  => $post->post_status,
+				'post_content' => $config[ $slug ]['post_content'],
+			]
+		);
+
+		return [ $post_id => $slug ];
 	}
 
 	/**
@@ -184,7 +258,7 @@ class Mai_Publisher_Generate_Ads {
 	 */
 	function get_missing_ads() {
 		$ads      = [];
-		$config   = json_decode( file_get_contents( MAI_PUBLISHER_DIR . '/ads.json' ), true );
+		$config   = $this->get_ads_config();
 		$existing = $this->get_existing_ads();
 
 		if ( ! $config ) {
@@ -244,5 +318,24 @@ class Mai_Publisher_Generate_Ads {
 		wp_reset_postdata();
 
 		return $existing;
+	}
+
+	/**
+	 * Gets the ads config.
+	 *
+	 * @since TBD
+	 *
+	 * @return array
+	 */
+	function get_ads_config() {
+		static $cache = null;
+
+		if ( ! is_null( $cache ) ) {
+			return $cache;
+		}
+
+		$cache = json_decode( file_get_contents( MAI_PUBLISHER_DIR . '/ads.json' ), true );
+
+		return $cache;
 	}
 }
