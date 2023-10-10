@@ -67,6 +67,10 @@ class Mai_Publisher_Ad_Unit_Block {
 			'class' => 'mai-ad-unit',
 		];
 
+		if ( isset( $block['className'] ) && $block['className'] ) {
+			$attr['class'] .= ' ' . esc_attr( $block['className'] );
+		}
+
 		if ( $styles ) {
 			$attr['style'] = $styles;
 		}
