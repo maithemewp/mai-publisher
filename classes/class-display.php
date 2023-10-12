@@ -59,15 +59,15 @@ class Mai_Publisher_Display {
 			// Google Ad Manager GPT.
 			wp_enqueue_script( 'google-gpt', 'https://securepubads.g.doubleclick.net/tag/js/gpt.js', [], maipub_get_file_data( $file, 'version' ), [ 'strategy' => 'async' ] );
 
-			// Sovrn.
-			wp_enqueue_script( 'sovrn-beacon', 'https://ap.lijit.com/www/sovrn_beacon_standalone/sovrn_standalone_beacon.js?iid=472780', [], maipub_get_file_data( $file, 'version' ), [ 'strategy' => 'async' ] );
+			// // Sovrn.
+			// wp_enqueue_script( 'sovrn-beacon', 'https://ap.lijit.com/www/sovrn_beacon_standalone/sovrn_standalone_beacon.js?iid=472780', [], maipub_get_file_data( $file, 'version' ), [ 'strategy' => 'async' ] );
 
-			// Prebid.
-			wp_enqueue_script( 'prebid-js', '//cdn.jsdelivr.net/npm/prebid.js@latest/dist/not-for-prod/prebid.js', [], '8.16.0', [ 'strategy' => 'async' ] ); // https://www.jsdelivr.com/package/npm/prebid.js
-			wp_localize_script( 'prebid-js', 'maiPubPrebidVars', $this->get_ortb2_vars() );
+			// // Prebid.
+			// wp_enqueue_script( 'prebid-js', '//cdn.jsdelivr.net/npm/prebid.js@latest/dist/not-for-prod/prebid.js', [], '8.16.0', [ 'strategy' => 'async' ] ); // https://www.jsdelivr.com/package/npm/prebid.js
+			// wp_localize_script( 'prebid-js', 'maiPubPrebidVars', $this->get_ortb2_vars() );
 
 			// Mai Publisher.
-			wp_enqueue_script( 'mai-publisher-ads', maipub_get_file_data( $file, 'url' ), [ 'google-gpt', 'sovrn-beacon', 'prebid-js' ], maipub_get_file_data( $file, 'version' ), false ); // Asyncing broke ads.
+			wp_enqueue_script( 'mai-publisher-ads', maipub_get_file_data( $file, 'url' ), [ 'google-gpt' ], maipub_get_file_data( $file, 'version' ), false ); // Asyncing broke ads.
 			wp_localize_script( 'mai-publisher-ads', 'maiPubAdsVars',
 				[
 					'gamDomain'      => $this->domain,
