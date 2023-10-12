@@ -555,7 +555,7 @@ function maipub_get_locations() {
 /**
  * Get location choices.
  *
- * @string TBD
+ * @string 0.1.0
  *
  * @param string $type
  *

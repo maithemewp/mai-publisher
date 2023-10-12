@@ -99,7 +99,7 @@ class Mai_Publisher_Generate_Ads {
 	/**
 	 * Create link to reimport content for each post.
 	 *
-	 * @since TBD
+	 * @since 0.4.0
 	 *
 	 * @param array   $actions The existing actions.
 	 * @param WP_Post $post    The post object.
@@ -183,7 +183,7 @@ class Mai_Publisher_Generate_Ads {
 	/**
 	 * Import content for a single ad.
 	 *
-	 * @since TBD
+	 * @since 0.4.0
 	 *
 	 * @param int $post_id The ad post ID.
 	 *
@@ -323,7 +323,7 @@ class Mai_Publisher_Generate_Ads {
 	/**
 	 * Gets the ads config.
 	 *
-	 * @since TBD
+	 * @since 0.4.0
 	 *
 	 * @return array
 	 */
