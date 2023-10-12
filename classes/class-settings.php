@@ -135,6 +135,14 @@ class Mai_Publisher_Settings {
 		);
 
 		add_settings_field(
+			'gam_network_code', // id
+			__( 'GAM Network Code', 'mai-publisher' ), // title
+			[ $this, 'gam_network_code_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings' // section
+		);
+
+		add_settings_field(
 			'category', // id
 			__( 'Sitewide Category', 'mai-publisher' ), // title
 			[ $this, 'category_callback' ], // callback
@@ -241,7 +249,8 @@ class Mai_Publisher_Settings {
 	 */
 	function maipub_sanitize( $input ) {
 		$allowed = [
-			'gam_domain'             => 'maipub_get_gam_domain_sanitized',
+			'gam_domain'             => 'maipub_get_url_host',
+			'gam_network_code'       => 'absint',
 			'category'               => 'sanitize_text_field',
 			'matomo_enabled_global'  => 'rest_sanitize_boolean',
 			'matomo_enabled'         => 'rest_sanitize_boolean',
@@ -306,7 +315,18 @@ class Mai_Publisher_Settings {
 	 * @return void
 	 */
 	function gam_domain_callback() {
-		printf( '<input class="regular-text" type="text" name="mai_publisher[domain]" id="domain" value="%s">', maipub_get_default_option( 'gam_domain' ), maipub_get_gam_domain( false ) );
+		printf( '<input class="regular-text" type="text" name="mai_publisher[gam_domain]" id="gam_domain" value="%s" readonly>', maipub_get_gam_domain() );
+	}
+
+	/**
+	 * Setting callback.
+	 *
+	 * @since 0.5.1
+	 *
+	 * @return void
+	 */
+	function gam_network_code_callback() {
+		printf( '<input class="regular-text" type="text" name="mai_publisher[gam_network_code]" id="gam_network_code" value="%s">', maipub_get_option( 'gam_network_code', false ) );
 	}
 
 	/**

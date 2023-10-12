@@ -35,12 +35,13 @@ class Mai_Publisher_Display {
 	 * @return void
 	 */
 	function run() {
-		$ads    = maipub_get_ads();
-		$domain = maipub_get_gam_domain();
-		$suffix = maipub_get_suffix();
+		$ads          = maipub_get_ads();
+		$domain       = maipub_get_gam_domain();
+		$network_code = maipub_get_option( 'gam_network_code' );
+		$suffix       = maipub_get_suffix();
 
 		// Bail if no ads.
-		if ( ! $ads ) {
+		if ( ! ( $ads && $domain && $network_code ) ) {
 			return;
 		}
 
@@ -69,8 +70,9 @@ class Mai_Publisher_Display {
 			wp_enqueue_script( 'mai-publisher-ads', maipub_get_file_data( $file, 'url' ), [ 'google-gpt', 'sovrn-beacon', 'prebid-js' ], maipub_get_file_data( $file, 'version' ), false ); // Asyncing broke ads.
 			wp_localize_script( 'mai-publisher-ads', 'maiPubAdsVars',
 				[
-					'gamDomain' => $this->domain,
-					'ads'       => $gam_ads,
+					'gamDomain'      => $this->domain,
+					'gamNetworkCode' => $network_code,
+					'ads'            => $gam_ads,
 				]
 			);
 		}
