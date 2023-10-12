@@ -37,11 +37,11 @@ class Mai_Publisher_Display {
 	function run() {
 		$ads          = maipub_get_ads();
 		$domain       = maipub_get_gam_domain();
-		$network_code = maipub_get_option( 'gam_network_code' );
+		$network_code = (string) maipub_get_option( 'gam_network_code' );
 		$suffix       = maipub_get_suffix();
 
 		// Bail if no ads.
-		if ( ! ( $ads && $domain && $network_code ) ) {
+		if ( ! ( $ads ) ) {
 			return;
 		}
 
@@ -52,8 +52,8 @@ class Mai_Publisher_Display {
 		// Get GAM ads.
 		$gam_ads = $this->get_gam_ads();
 
-		// If we have GAM ad IDs, enqueue the JS.
-		if ( $gam_ads ) {
+		// If we have GAM ad IDs and a domain, enqueue the JS.
+		if ( $gam_ads && $this->domain ) {
 			$file = "assets/js/mai-publisher-ads{$suffix}.js";
 
 			// Google Ad Manager GPT.
