@@ -346,7 +346,7 @@ class Mai_Publisher_Settings {
 					printf( '<option value="%s"%s>%s</option>', $id, selected( $selected, $id ), $label );
 				}
 			echo '</select>';
-			printf( '<p><a href="%s">%s</a></p>', admin_url( 'edit.php?post_type=mai_ad&page=categories' ), __( 'View full category list', 'mai-publisher' ) );
+			printf( '<p><a target="_blank" href="%s">%s</a></p>', admin_url( 'edit.php?post_type=mai_ad&page=categories' ), __( 'View full category list', 'mai-publisher' ) );
 		echo '</div>';
 	}
 
