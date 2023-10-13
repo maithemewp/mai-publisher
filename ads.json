@@ -25,9 +25,9 @@
         }
     },
     "footer-sticky": {
-        "post_content": "<!-- wp:group {\"tagName\":\"aside\",\"align\":\"full\",\"backgroundColor\":\"alt\",\"className\":\"mai-ad-sticky-footer\",\"layout\":{\"type\":\"constrained\"},\"verticalSpacingTop\":\"sm\"} -->\n<aside class=\"wp-block-group alignfull mai-ad-sticky-footer has-alt-background-color has-background\"><!-- wp:html -->\n<style>\n.mai-ad-sticky-footer {\n\tz-index: var(--mai-ad-unit-z-index, 999999) !important;\n}\n\n.mai-ad-sticky-footer .mai-ad-unit {\n\tpadding-bottom: calc(var(--mai-ad-unit-aspect-ratio) * 1%) !important;\n}\n\n.mai-ad-sticky-footer .mai-ad-unit > div:first-of-type {\n\tposition: fixed !important;\n\tbottom: 0 !important;\n\tmax-width: unset !important;\n\tmargin-left: auto !important;\n\tmargin-right: auto !important;\n}\n<\/style>\n<!-- \/wp:html -->\n\n<!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"footer\",\"_id\":\"maipub_ad_unit_id\",\"label_hide\":\"1\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\"} \/--><\/aside>\n<!-- \/wp:group -->",
+        "post_content": "<!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"footer-sticky\",\"_id\":\"maipub_ad_unit_id\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\",\"backgroundColor\":\"heading\"} \/-->",
         "meta_input": {
-            "maipub_global_location": "after_footer"
+            "maipub_global_location": "sticky_footer"
         }
     },
     "fullscreen": {
