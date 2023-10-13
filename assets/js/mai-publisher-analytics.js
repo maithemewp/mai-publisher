@@ -38,9 +38,10 @@
 				const matomoTracker = Matomo.getTracker( analytics[ tracker ].url + 'matomo.php', analytics[ tracker ].id );
 
 				// Loop through and push items.
-				for ( const key in analytics[ tracker ].push ) {
-					var func = analytics[ tracker ].push[ key ][0];
-					var vals = analytics[ tracker ].push[ key ].slice(1);
+				for ( const key in analytics[ tracker ].toPush ) {
+
+					var func = analytics[ tracker ].toPush[ key ][0];
+					var vals = analytics[ tracker ].toPush[ key ].slice(1);
 					    vals = vals ? vals : null;
 
 					if ( vals ) {

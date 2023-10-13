@@ -68,25 +68,25 @@ class Mai_Publisher_Tracking {
 				$vars['analytics'] = [];
 				$dimensions        = $this->get_site_dimensions();
 				$analytics         = [
-					'url'  => trailingslashit( $site_url ),
-					'id'   => absint( $site_id ),
-					'push' => [],
+					'url'    => trailingslashit( $site_url ),
+					'id'     => absint( $site_id ),
+					'toPush' => [],
 				];
 
 				if ( $this->user->ID ) {
-					$analytics['push'][] = [ 'setUserId', $this->user->user_email ];
+					$analytics['toPush'][] = [ 'setUserId', $this->user->user_email ];
 				}
 
 				if ( $dimensions ) {
 					foreach ( $dimensions as $index => $value ) {
-						$analytics['push'][] = [ 'setCustomDimension', $index, $value ];
+						$analytics['toPush'][] = [ 'setCustomDimension', $index, $value ];
 					}
 				}
 
-				$analytics['push'][] = [ 'enableLinkTracking' ];
-				$analytics['push'][] = [ 'trackPageView' ];
-				$analytics['push'][] = [ 'trackVisibleContentImpressions' ];
-				// $analytics['push'][] = [ 'trackAllContentImpressions' ];
+				$analytics['toPush'][] = [ 'enableLinkTracking' ];
+				$analytics['toPush'][] = [ 'trackPageView' ];
+				$analytics['toPush'][] = [ 'trackVisibleContentImpressions' ];
+				// $analytics['toPush'][] = [ 'trackAllContentImpressions' ];
 
 				// Add site analytics.
 				$vars['analytics'][] = $analytics;
@@ -131,18 +131,18 @@ class Mai_Publisher_Tracking {
 			$vars['analytics'] = isset( $vars['analytics'] ) ? $vars['analytics'] : [];
 			$dimensions        = $this->get_global_dimensions();
 			$analytics         = [
-				'url'  => 'https://bizbudding.info/',
-				'id'   => 1,
-				'push' => [],
+				'url'    => 'https://bizbudding.info/',
+				'id'     => 1,
+				'toPush' => [],
 			];
 
 			if ( $dimensions ) {
 				foreach ( $dimensions as $index => $value ) {
-					$analytics['push'][] = [ 'setCustomDimension', $index, $value ];
+					$analytics['toPush'][] = [ 'setCustomDimension', $index, $value ];
 				}
 			}
 
-			$analytics['push'][] = [ 'trackPageView' ];
+			$analytics['toPush'][] = [ 'trackPageView' ];
 
 			// Add global analytics.
 			$vars['analytics'][] = $analytics;
@@ -539,7 +539,7 @@ class Mai_Publisher_Tracking {
 		$host = parse_url( get_site_url(), PHP_URL_HOST );
 		$host = ltrim( $host, 'www.' );
 
-		$this->global_dimensions[1] = esc_html( $host );
+		$this->global_dimensions[6] = esc_html( $host );
 	}
 
 	/**
@@ -580,7 +580,7 @@ class Mai_Publisher_Tracking {
 			return;
 		}
 
-		$this->global_dimensions[2] = esc_html( ltrim( $iab, '– ' ) );
+		$this->global_dimensions[7] = esc_html( ltrim( $iab, '– ' ) );
 	}
 
 	/**
@@ -605,7 +605,7 @@ class Mai_Publisher_Tracking {
 			return;
 		}
 
-		$this->global_dimensions[3] = $term->name; // Term name.
+		$this->global_dimensions[8] = $term->name; // Term name.
 	}
 
 	/**
@@ -623,7 +623,7 @@ class Mai_Publisher_Tracking {
 			return;
 		}
 
-		$this->global_dimensions[4] = $type;
+		$this->global_dimensions[9] = $type;
 	}
 
 	/**
