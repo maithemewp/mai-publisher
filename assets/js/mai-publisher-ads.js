@@ -8,22 +8,13 @@ if ( window.googletag && googletag.apiReady ) {
 	const prebidTimeout = 2000;
 
 	googletag.cmd.push(() => {
-		// Define slot base.
-		let slotBase = '/23001026477';
-
-		// Maybe add network code.
-		if ( maiPubAdsVars['gamNetworkCode'] ) {
-			slotBase = slotBase + ',' + maiPubAdsVars['gamNetworkCode'];
-		}
-
-		// Add domain and id.
-		slotBase += '/' + maiPubAdsVars['gamDomain'] + '/';
+		const gamBase = gamBase;
 
 		// Loop through maiPubAdsVars getting key and values.
 		for ( const id in ads ) {
 			// Define ad slot.
 			const slot = googletag
-				.defineSlot( slotBase + id, ads[id].sizes, 'mai-ad-' + id )
+				.defineSlot( gamBase + id, ads[id].sizes, 'mai-ad-' + id )
 				.addService( googletag.pubads() )
 				.setTargeting( refreshKey, refreshvalue );
 

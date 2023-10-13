@@ -730,7 +730,11 @@ function maipub_get_default_options() {
  * @return string
  */
 function maipub_get_gam_domain( $fallback = true ) {
-	return maipub_get_url_host( (string) maipub_get_option( 'gam_domain', $fallback ) );
+	$domain = (string) maipub_get_option( 'gam_domain', $fallback );
+	$domain = esc_url( $domain );
+	$domain = maipub_get_url_host( $domain );
+
+	return $domain;
 }
 
 /**
