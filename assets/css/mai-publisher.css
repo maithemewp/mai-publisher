@@ -66,13 +66,7 @@
 	top: -48px;
 	bottom: 0;
 	width: 100vw;
-	background: linear-gradient(
-		transparent,
-		rgba(255, 255, 255, 0.1) 5px,
-		rgba(255, 255, 255, 0.3) 10px,
-		rgba(255, 255, 255, 0.6) 15px,
-		rgba(255, 255, 255, 0.8) 20px
-	);
+	background: linear-gradient(transparent, rgba(255, 255, 255, 0.8) 36px);
 	z-index: -1;
 	content: "";
 }
