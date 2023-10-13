@@ -502,10 +502,6 @@ function maipub_get_locations() {
 			'hook'     => 'wp_footer',
 			'priority' => 20,
 		],
-		'sticky_footer' => [
-			'hook'     => 'wp_footer',
-			'priority' => 30,
-		],
 	];
 
 	if ( maipub_is_product_archive() || maipub_is_product_singular() ) {
@@ -583,7 +579,6 @@ function maipub_get_location_choices( $type = '' ) {
 			'after_header'         => __( 'After header', 'mai-publisher' ),
 			'before_footer'        => __( 'Before footer', 'mai-publisher' ),
 			'after_footer'         => __( 'After footer', 'mai-publisher' ),
-			'sticky_footer'        => __( 'Sticky footer', 'mai-publisher' ),
 		],
 		'single' => [
 			''                     => __( 'None (inactive)', 'mai-publisher' ),
@@ -595,7 +590,6 @@ function maipub_get_location_choices( $type = '' ) {
 			'after_entry_content'  => __( 'After entry content', 'mai-publisher' ),
 			'after_entry'          => __( 'After entry', 'mai-publisher' ),
 			'before_footer'        => __( 'Before footer', 'mai-publisher' ),
-			'sticky_footer'        => __( 'Sticky footer', 'mai-publisher' ),
 		],
 		'archive' => [
 			''                     => __( 'None (inactive)', 'mai-publisher' ),
@@ -605,7 +599,6 @@ function maipub_get_location_choices( $type = '' ) {
 			'entries'              => __( 'In entries', 'mai-publisher' ),
 			'after_loop'           => __( 'After entries', 'mai-publisher' ),
 			'before_footer'        => __( 'Before footer', 'mai-publisher' ),
-			'sticky_footer'        => __( 'Sticky footer', 'mai-publisher' ),
 		],
 	];
 

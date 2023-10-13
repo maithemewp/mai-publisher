@@ -27,7 +27,7 @@
     "footer-sticky": {
         "post_content": "<!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"footer-sticky\",\"_id\":\"maipub_ad_unit_id\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\",\"backgroundColor\":\"alt\"} \/-->",
         "meta_input": {
-            "maipub_global_location": "sticky_footer"
+            "maipub_global_location": "after_footer"
         }
     },
     "fullscreen": {
