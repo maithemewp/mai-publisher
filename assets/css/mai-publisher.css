@@ -68,10 +68,10 @@
 	width: 100vw;
 	background: linear-gradient(
 		transparent,
-		rgba(255, 255, 255, 0.1) 8px,
-		rgba(255, 255, 255, 0.3) 16px,
-		rgba(255, 255, 255, 0.6) 32px,
-		rgba(255, 255, 255, 0.8) 48px
+		rgba(255, 255, 255, 0.1) 10px,
+		rgba(255, 255, 255, 0.3) 20px,
+		rgba(255, 255, 255, 0.6) 30px,
+		rgba(255, 255, 255, 0.8) 40px
 	);
 	z-index: -1;
 	content: "";
