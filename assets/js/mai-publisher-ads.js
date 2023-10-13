@@ -48,9 +48,9 @@ if ( window.googletag && googletag.apiReady ) {
 		 * @link https://developers.google.com/publisher-tag/reference?utm_source=lighthouse&utm_medium=lr#googletag.PubAdsService_enableLazyLoad
 		 */
 		googletag.pubads().enableLazyLoad({
-			// Fetch slots within 5 viewports.
+			// Fetch slots within 2 viewports.
 			fetchMarginPercent: 200,
-			// Render slots within 2 viewports.
+			// Render slots within 1.5 viewports.
 			renderMarginPercent: 150,
 			// Double the above values on mobile.
 			// mobileScaling: 2.0,

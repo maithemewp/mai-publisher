@@ -454,19 +454,19 @@ function maipub_get_locations() {
 	}
 
 	$locations = [
-		'before_header'        => [
+		'before_header' => [
 			'hook'     => 'genesis_before_header',
 			'priority' => 5, // Before header default content area is 10.
 		],
-		'after_header'        => [
+		'after_header' => [
 			'hook'     => 'genesis_after_header',
 			'priority' => 15,
 		],
-		'before_loop'         => [
+		'before_loop' => [
 			'hook'     => 'genesis_loop',
 			'priority' => 5,
 		],
-		'before_entry'         => [
+		'before_entry' => [
 			'hook'     => 'genesis_before_entry',
 			'priority' => 10,
 		],
@@ -474,11 +474,11 @@ function maipub_get_locations() {
 			'hook'     => 'genesis_before_entry_content',
 			'priority' => 10,
 		],
-		'content'              => [
+		'content' => [
 			'hook'     => '', // No hooks, counted in content.
 			'priority' => null,
 		],
-		'entries'              => [
+		'entries' => [
 			'hook'     => '', // No hooks, handled in function.
 			'priority' => 10,
 		],
@@ -486,21 +486,25 @@ function maipub_get_locations() {
 			'hook'     => 'genesis_after_entry_content',
 			'priority' => 10,
 		],
-		'after_entry'          => [
+		'after_entry' => [
 			'hook'     => 'genesis_after_entry',
 			'priority' => 8, // Comments are at 10.
 		],
-		'after_loop'           => [
+		'after_loop' => [
 			'hook'     => 'genesis_loop',
 			'priority' => 15,
 		],
-		'before_footer'        => [
+		'before_footer' => [
 			'hook'     => 'genesis_after_content_sidebar_wrap',
 			'priority' => 10,
 		],
-		'after_footer'        => [
+		'after_footer' => [
 			'hook'     => 'wp_footer',
 			'priority' => 20,
+		],
+		'sticky_footer' => [
+			'hook'     => 'wp_footer',
+			'priority' => 30,
 		],
 	];
 
@@ -510,7 +514,7 @@ function maipub_get_locations() {
 			'priority' => 12, // Notices are at 10.
 		];
 
-		$locations['before_entry']         = [
+		$locations['before_entry'] = [
 			'hook'     => 'woocommerce_before_single_product',
 			'priority' => 12, // Notices are at 10.
 		];
@@ -520,17 +524,17 @@ function maipub_get_locations() {
 			'priority' => 8, // Tabs are at 10.
 		];
 
-		$locations['after_entry_content']  = [
+		$locations['after_entry_content'] = [
 			'hook'     => 'woocommerce_after_single_product_summary',
 			'priority' => 12, // Tabs are at 10, upsells and related products are 15.
 		];
 
-		$locations['after_entry']          = [
+		$locations['after_entry'] = [
 			'hook'     => 'woocommerce_after_single_product',
 			'priority' => 10,
 		];
 
-		$locations['after_loop']           = [
+		$locations['after_loop'] = [
 			'hook'     => 'woocommerce_after_shop_loop',
 			'priority' => 12, // Pagination is at 10.
 		];
@@ -579,6 +583,7 @@ function maipub_get_location_choices( $type = '' ) {
 			'after_header'         => __( 'After header', 'mai-publisher' ),
 			'before_footer'        => __( 'Before footer', 'mai-publisher' ),
 			'after_footer'         => __( 'After footer', 'mai-publisher' ),
+			'sticky_footer'        => __( 'Sticky footer', 'mai-publisher' ),
 		],
 		'single' => [
 			''                     => __( 'None (inactive)', 'mai-publisher' ),
@@ -590,15 +595,17 @@ function maipub_get_location_choices( $type = '' ) {
 			'after_entry_content'  => __( 'After entry content', 'mai-publisher' ),
 			'after_entry'          => __( 'After entry', 'mai-publisher' ),
 			'before_footer'        => __( 'Before footer', 'mai-publisher' ),
+			'sticky_footer'        => __( 'Sticky footer', 'mai-publisher' ),
 		],
 		'archive' => [
 			''                     => __( 'None (inactive)', 'mai-publisher' ),
 			'before_header'        => __( 'Before header', 'mai-publisher' ),
 			'after_header'         => __( 'After header', 'mai-publisher' ),
 			'before_loop'          => __( 'Before entries', 'mai-publisher' ),
-			'entries'              => __( 'In entries', 'mai-publisher' ),        // TODO: Is this doable without breaking columns, etc?
+			'entries'              => __( 'In entries', 'mai-publisher' ),
 			'after_loop'           => __( 'After entries', 'mai-publisher' ),
 			'before_footer'        => __( 'Before footer', 'mai-publisher' ),
+			'sticky_footer'        => __( 'Sticky footer', 'mai-publisher' ),
 		],
 	];
 

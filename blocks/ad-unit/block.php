@@ -63,24 +63,24 @@ class Mai_Publisher_Ad_Unit_Block {
 		$styles     = $id ? $this->get_styles( $sizes, $is_preview ) : '';
 		$slot       = $id ? $this->get_slot( $id ) : '';
 
-		$attr = [
-			'class' => 'mai-ad-unit',
-		];
-
-		if ( isset( $block['className'] ) && $block['className'] ) {
-			$attr['class'] .= ' ' . esc_attr( $block['className'] );
-		}
-
-		if ( $styles ) {
-			$attr['style'] = $styles;
-		}
-
-		if ( $label ) {
-			$attr['data-label'] = $label;
-		}
-
 		// If previewing in editor, show placeholder.
 		if ( $is_preview ) {
+			$attr = [
+				'class' => 'mai-ad-unit',
+			];
+
+			if ( isset( $block['className'] ) && $block['className'] ) {
+				$attr['class'] .= ' ' . esc_attr( $block['className'] );
+			}
+
+			if ( $styles ) {
+				$attr['style'] = $styles;
+			}
+
+			if ( $label ) {
+				$attr['data-label'] = $label;
+			}
+
 			$text  = $id ? __( 'Ad Placeholder', 'mai-publisher' ) : __( 'No Ad Unit Selected', 'mai-publisher' );
 			printf( '<div%s><span style="font-size:1.1rem;font-variant:all-small-caps;letter-spacing:1px;">%s</span></div>', maipub_build_attributes( $attr ), $text );
 			return;
@@ -91,19 +91,116 @@ class Mai_Publisher_Ad_Unit_Block {
 			return;
 		}
 
-		// Build slot and add id first.
+		// Build slot.
 		$slot = sprintf( 'mai-ad-%s', $slot );
-		$attr = array_merge( [ 'id' => $slot ], $attr );
+		// $attr = array_merge( [ 'id' => $slot ], $attr );
 
-		// Maybe add anaytlics tracking.
-		if ( class_exists( 'Mai_Analytics_Plugin' ) ) {
+		// Build script.
+		$script = sprintf( '<script>window.googletag = window.googletag || {};googletag.cmd = googletag.cmd || [];if ( window.googletag && googletag.apiReady ) { googletag.cmd.push(function(){ googletag.display("%s"); }); }</script>', $slot );
+
+		// Start HTML.
+		$html = '';
+
+
+		// $attr = [
+		// 	'class' => 'mai-ad-unit',
+		// ];
+
+		// if ( isset( $block['className'] ) && $block['className'] ) {
+		// 	$attr['class'] .= ' ' . esc_attr( $block['className'] );
+		// }
+
+		// if ( $label ) {
+		// 	$attr['data-label'] = $label;
+		// }
+
+		// Sticky footer adds another wrapper.
+		if ( 'footer-sticky' === $id ) {
+			// Start outer attributes.
+			$attr_outer = [
+				'class' => 'mai-ad-unit-container mai-ad-unit-has-sticky mai-ad-unit-has-sticky-footer',
+			];
+
+			// Add custom classes.
+			if ( isset( $block['className'] ) && $block['className'] ) {
+				$attr_outer['class'] .= ' ' . esc_attr( $block['className'] );
+			}
+
+			// Add styles.
+			if ( $styles ) {
+				$attr_outer['style'] = $styles;
+			}
+
+			// Start inner attributes.
+			$attr_inner = [
+				'id'    => $slot,
+				'class' => 'mai-ad-unit mai-ad-unit-sticky mai-ad-unit-sticky-footer',
+			];
+
+			// Add label.
+			if ( $label ) {
+				$attr_inner['data-label'] = $label;
+			}
+
+			// Add analytics tracking.
+			$attr_inner['data-content-name']  = $slot;
+			$attr_inner['data-track-content'] = null;
+
+			// Build HTML with extra wrap.
+			$html .= sprintf( '<div %s>', get_block_wrapper_attributes( $attr_outer ) );
+				$html .= sprintf( '<div%s>', maipub_build_attributes( $attr_inner ) );
+					$html .= $script;
+				$html .= '</div>';
+			$html .= '</div>';
+		}
+		// Not sticky footer.
+		else {
+			// Start attributes.
+			$attr = [
+				'id'    => $slot,
+				'class' => 'mai-ad-unit',
+			];
+
+			// Add custom classes.
+			if ( isset( $block['className'] ) && $block['className'] ) {
+				$attr['class'] .= ' ' . esc_attr( $block['className'] );
+			}
+
+			// Add styles.
+			if ( $styles ) {
+				$attr['style'] = $styles;
+			}
+
+			// Add label.
+			if ( $label ) {
+				$attr['data-label'] = $label;
+			}
+
+			// Add analytics tracking.
 			$attr['data-content-name']  = $slot;
 			$attr['data-track-content'] = null;
+
+			// Build HTML.
+			$html .= sprintf( '<div %s>', get_block_wrapper_attributes( $attr ) );
+				$html .= $script;
+			$html .= '</div>';
 		}
 
-		// Build HTML, then allow filtering.
-		// $html = sprintf( '<div%s><script>googletag.cmd.push(function(){googletag.display("%s")});</script></div>', maipub_build_attributes( $attr ), $slot );
-		$html = sprintf( '<div%s><script>window.googletag = window.googletag || {};googletag.cmd = googletag.cmd || [];if ( window.googletag && googletag.apiReady ) { googletag.cmd.push(function(){ googletag.display("%s"); }); }</script></div>', maipub_build_attributes( $attr ), $slot );
+		// $html  = '';
+		// $html .= 'footer-sticky' === $id ? sprintf( '<div%s>', maipub_build_attributes( $attr ) ) : ''; // Add id to wrapper.
+		// $html .= 'footer-sticky' === $id ? sprintf( '<div id="%s">', $slot ) : sprintf( '<div%s>', maipub_build_attributes( $attr ) );
+		// $html .= '</div>';
+		// $html .= 'footer-sticky' === $id ? '</div>' : '';
+
+
+
+		// $html .= 'footer-sticky' === $id ? sprintf( '<div%s>', maipub_build_attributes( $attr ) ) : ''; // Add id to wrapper.
+		// $html .= 'footer-sticky' === $id ? sprintf( '<div id="%s">', $slot ) : sprintf( '<div%s>', maipub_build_attributes( $attr ) );
+		// $html .= sprintf( '<script>window.googletag = window.googletag || {};googletag.cmd = googletag.cmd || [];if ( window.googletag && googletag.apiReady ) { googletag.cmd.push(function(){ googletag.display("%s"); }); }</script>', $slot );
+		// $html .= '</div>';
+		// $html .= 'footer-sticky' === $id ? '</div>' : '';
+
+		// Allow filtering.
 		$html = apply_filters( 'mai_publisher_ad_unit', $html );
 
 		echo $html;

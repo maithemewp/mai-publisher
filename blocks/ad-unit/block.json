@@ -10,5 +10,13 @@
 	"acf": {
 		"mode": "preview"
 	},
-	"supports": {}
+	"supports": {
+		"anchor": false,
+		"align": false,
+		"color": {
+			"text": false,
+			"background": true,
+			"link": false
+		}
+	}
 }
