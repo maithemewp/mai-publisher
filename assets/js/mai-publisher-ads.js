@@ -8,7 +8,7 @@ if ( window.googletag && googletag.apiReady ) {
 	const prebidTimeout = 2000;
 
 	googletag.cmd.push(() => {
-		const gamBase = gamBase;
+		const gamBase = maiPubAdsVars['gamBase'];
 
 		// Loop through maiPubAdsVars getting key and values.
 		for ( const id in ads ) {

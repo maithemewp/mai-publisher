@@ -340,7 +340,7 @@ class Mai_Publisher_Settings {
 		$selected = maipub_get_option( 'category' );
 
 		echo '<div style="display:flex;align-items:center;gap:1em;">';
-			echo '<select id="category" name="mai_publisher[category]">';
+			echo '<select id="iab-category" name="mai_publisher[category]">';
 				printf( '<option value="">%s</option>', __( 'Select a sitewide category...', 'mai-publisher' ) );
 				foreach ( (array) maipub_get_all_categories() as $id => $label ) {
 					printf( '<option value="%s"%s>%s</option>', $id, selected( $selected, $id ), $label );
