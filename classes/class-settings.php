@@ -52,7 +52,7 @@ class Mai_Publisher_Settings {
 	/**
 	 * Enqueue script for select2.
 	 *
-	 * @since TBD
+	 * @since 0.7.0
 	 *
 	 * @return void
 	 */

@@ -137,7 +137,7 @@ class Mai_Publisher_Display {
 	/**
 	 * Set sidebar prefix.
 	 *
-	 * @since TBD
+	 * @since 0.7.0
 	 *
 	 * @return void
 	 */
@@ -148,7 +148,7 @@ class Mai_Publisher_Display {
 	/**
 	 * Unset sidebar prefix.
 	 *
-	 * @since TBD
+	 * @since 0.7.0
 	 *
 	 * @return void
 	 */
@@ -170,7 +170,7 @@ class Mai_Publisher_Display {
 		$config = maipub_get_config( 'ad_units' );
 
 		foreach ( $ad_ids as $slug ) {
-			$trimmed = ltrim( $slug, 'sidebar-' );
+			$trimmed = $this->get_trimmed_slug( $slug );
 
 			if ( ! isset( $config[ $trimmed ] ) ) {
 				continue;
@@ -198,6 +198,25 @@ class Mai_Publisher_Display {
 		}
 
 		return $ads;
+	}
+
+	/**
+	 * Get slug with contextual prefix removed.
+	 *
+	 * @since 0.7.0
+	 *
+	 * @param string $slug
+	 *
+	 * @return string
+	 */
+	function get_trimmed_slug( $slug ) {
+		$substring = 'sidebar-';
+
+		if ( str_starts_with( $slug, $substring ) ) {
+			return substr( $slug, strlen( $substring ) );
+		} else {
+			return $slug;
+		}
 	}
 
 	/**

@@ -11,7 +11,7 @@ class Mai_Publisher_Ad_Widget extends WP_Widget {
 	/**
 	 * Register the widget.
 	 *
-	 * @since TBD
+	 * @since 0.7.0
 	 *
 	 * @return void
 	 */
@@ -28,7 +28,7 @@ class Mai_Publisher_Ad_Widget extends WP_Widget {
 	/**
 	 * Front-end display of widget.
 	 *
-	 * @since TBD
+	 * @since 0.7.0
 	 *
 	 * @see WP_Widget::widget()
 	 *
@@ -60,7 +60,7 @@ class Mai_Publisher_Ad_Widget extends WP_Widget {
 	/**
 	 * Outputs the options form on admin.
 	 *
-	 * @since TBD
+	 * @since 0.7.0
 	 *
 	 * @param array $instance The widget options.
 	 *
@@ -116,7 +116,7 @@ class Mai_Publisher_Ad_Widget extends WP_Widget {
 	/**
 	 * Processing widget options on save.
 	 *
-	 * @since TBD
+	 * @since 0.7.0
 	 *
 	 * @param array $new_instance The new options.
 	 * @param array $old_instance The previous options.
@@ -135,7 +135,7 @@ class Mai_Publisher_Ad_Widget extends WP_Widget {
 /**
  * Register widget.
  *
- * @since TBD
+ * @since 0.7.0
  *
  * @return void
  */

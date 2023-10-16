@@ -27,7 +27,7 @@ class Mai_Publisher_Analytics_Tracker_Block {
 	/**
 	 * Register block.
 	 *
-	 * @since TBD
+	 * @since 0.7.0
 	 *
 	 * @return void
 	 */
@@ -42,7 +42,7 @@ class Mai_Publisher_Analytics_Tracker_Block {
 	/**
 	 * Callback function to render the block.
 	 *
-	 * @since TBD
+	 * @since 0.7.0
 	 *
 	 * @param array    $attributes The block attributes.
 	 * @param string   $content The block content.
@@ -68,7 +68,7 @@ class Mai_Publisher_Analytics_Tracker_Block {
 	/**
 	 * Register field group.
 	 *
-	 * @since TBD
+	 * @since 0.7.0
 	 *
 	 * @return void
 	 */
@@ -105,7 +105,7 @@ class Mai_Publisher_Analytics_Tracker_Block {
 	/**
 	 * Enqueue JS.
 	 *
-	 * @since TBD
+	 * @since 0.7.0
 	 *
 	 * @return void
 	 */

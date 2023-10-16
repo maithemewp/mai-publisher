@@ -107,7 +107,7 @@ class Mai_Publisher_Admin {
 	/**
 	 * Display location info.
 	 *
-	 * @since TBD
+	 * @since 0.7.0
 	 *
 	 * @param int $post_id The current post ID.
 	 *
@@ -196,7 +196,7 @@ class Mai_Publisher_Admin {
 	/**
 	 * Display location info.
 	 *
-	 * @since TBD
+	 * @since 0.7.0
 	 *
 	 * @param int $post_id The current post ID.
 	 *
@@ -231,7 +231,7 @@ class Mai_Publisher_Admin {
 	/**
 	 * Gets ad unit slugs from post content.
 	 *
-	 * @since TBD
+	 * @since 0.7.0
 	 *
 	 * @param array|string $input The post content or parsed blocks.
 	 *
@@ -258,7 +258,7 @@ class Mai_Publisher_Admin {
 	/**
 	 * Format sizes for display in admin column.
 	 *
-	 * @since TBD
+	 * @since 0.7.0
 	 *
 	 * @param array $array The sizes array.
 	 *

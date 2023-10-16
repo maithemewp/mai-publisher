@@ -126,7 +126,7 @@ function maipub_build_attributes( $attr, $escape = 'esc_attr' ) {
  * This would happen if a Mai Ad block was used inside of a Mai CCA (i think, this is from Mai Analytics),
  * the CCA would take precedence and the Ad links will have the content piece.
  *
- * @since TBD
+ * @since 0.7.0
  *
  * @param string $content The content.
  * @param string $name    The name.
@@ -243,7 +243,7 @@ function maipub_filter_associative_array( $array ) {
  *
  * @access private
  *
- * @since TBD
+ * @since 0.7.0
  *
  * @param bool|null $set If not null, sets the value.
  *
@@ -264,7 +264,7 @@ function maipub_contextual_prefix( $set = null ) {
  *
  * @access private
  *
- * @since TBD
+ * @since 0.7.0
  *
  * @param bool|null $set If not null, sets the value.
  *
