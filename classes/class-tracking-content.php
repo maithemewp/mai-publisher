@@ -55,7 +55,7 @@ class Mai_Publisher_Tracking_Content {
 			return $nav_menu;
 		}
 
-		return $this->add_attributes( $nav_menu, 'mai-menu-' . $this->get_menu_slug( $slug ) );
+		return maipub_add_attributes( $nav_menu, 'mai-menu-' . $this->get_menu_slug( $slug ) );
 	}
 
 	/**
@@ -79,7 +79,7 @@ class Mai_Publisher_Tracking_Content {
 			return $content;
 		}
 
-		return $this->add_attributes( $content, get_the_title( $args['id'] ) );
+		return maipub_add_attributes( $content, get_the_title( $args['id'] ) );
 	}
 
 	/**
@@ -103,7 +103,7 @@ class Mai_Publisher_Tracking_Content {
 			return $content;
 		}
 
-		return $this->add_attributes( $content, trim( $args['name'] ) );
+		return maipub_add_attributes( $content, trim( $args['name'] ) );
 	}
 
 	/**
@@ -146,7 +146,7 @@ class Mai_Publisher_Tracking_Content {
 			return $block_content;
 		}
 
-		return $this->add_attributes( $block_content, 'mai-menu-' . $this->get_menu_slug( $slug ) );
+		return maipub_add_attributes( $block_content, 'mai-menu-' . $this->get_menu_slug( $slug ) );
 	}
 
 	/**
@@ -188,106 +188,7 @@ class Mai_Publisher_Tracking_Content {
 		$url  = isset( $url['host'] ) ? $url['host'] : '' . $url['path'];
 		$name = 'Mai Post Preview | ' . $url;
 
-		return $this->add_attributes( $block_content, $name );
-	}
-
-	/**
-	 * Adds element attributes.
-	 *
-	 * If you set the same attribute or the same class on multiple elements within one block,
-	 * the first element found will always win. Nested content blocks are currently not supported in Matomo.
-	 * This would happen if a Mai Ad block was used inside of a Mai CCA (i think, this is from Mai Analytics),
-	 * the CCA would take precedence and the Ad links will have the content piece.
-	 *
-	 * @since 0.3.0
-	 *
-	 * @param string $content The content.
-	 * @param string $name    The name.
-	 * @param bool   $force   Whether to force override existing tracking attributes, if they already exist.
-	 *
-	 * @return string
-	 */
-	function add_attributes( $content, $name ) {
-		// Bail if no content.
-		if ( ! $content ) {
-			return $content;
-		}
-
-		$dom      = maipub_get_dom_document( $content );
-		$children = $dom->childNodes;
-
-		// Bail if no nodes.
-		if ( ! $children->length ) {
-			return $content;
-		}
-
-		// Remove trackers from children.
-		$xpath   = new DOMXPath( $dom );
-		$tracked = $xpath->query( '//*[@data-track-content] | //*[@data-tcontent-name]' );
-
-		if ( $tracked->length ) {
-			foreach ( $tracked as $node ) {
-				// Skip if not an element we can add attributes to.
-				if ( 'DOMElement' !== get_class( $node ) ) {
-					continue;
-				}
-
-				$node->removeAttribute( 'data-content-name' );
-				$node->removeAttribute( 'data-track-content' );
-				$node->normalize();
-			}
-		}
-
-		if ( 1 === $children->length ) {
-			// Get first element and set main attributes.
-			$first = $children->item(0);
-
-			// Make sure it's an element we can add attributes to.
-			if ( 'DOMElement' === get_class( $first ) ) {
-				$first->setAttribute( 'data-content-name', esc_attr( $name ) );
-				$first->setAttribute( 'data-track-content', '' );
-			}
-
-		} else {
-			foreach ( $children as $node ) {
-				// Skip if not an element we can add attributes to.
-				if ( 'DOMElement' !== get_class( $node ) ) {
-					continue;
-				}
-
-				// Set main attributes to all top level child elements.
-				$node->setAttribute( 'data-content-name', esc_attr( $name ) );
-				$node->setAttribute( 'data-track-content', '' );
-			}
-		}
-
-		// Query elements.
-		$xpath   = new DOMXPath( $dom );
-		$actions = $xpath->query( '//a | //button | //input[@type="submit"]' );
-
-		if ( $actions->length ) {
-			foreach ( $actions as $node ) {
-				$piece = 'input' === $node->tagName ? $node->getAttribute( 'value' ) : $node->textContent;
-				$piece = trim( esc_attr( $piece ) );
-
-				if ( $piece ) {
-					if ( ! $node->hasAttribute( 'data-content-piece' ) ) {
-						$node->setAttribute( 'data-content-piece', $piece );
-					}
-				}
-
-				// Disabled, because target should happen automatically via href in Matomo.
-				// $target = 'a' === $node->tagName ? $node->getAttribute( 'href' ) : '';
-				// if ( $target ) {
-				// 	$node->setAttribute( 'data-content-target', $target );
-				// }
-			}
-		}
-
-		// Save new content.
-		$content = $dom->saveHTML();
-
-		return $content;
+		return maipub_add_attributes( $block_content, $name );
 	}
 
 	/**

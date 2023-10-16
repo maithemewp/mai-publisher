@@ -1,0 +1,17 @@
+{
+	"name": "acf/mai-analytics-tracker",
+	"title": "Mai Analytics Tracker",
+	"description": "Add tracking attributes to any blocks inside this container.",
+	"category": "widgets",
+	"keywords": [ "analytics", "tracker", "tracking" ],
+	"icon": "welcome-view-site",
+	"textdomain": "mai-publisher",
+	"editorScript": "mai-publisher-analytics-tracker",
+	"acf": {
+		"mode": "preview"
+	},
+	"supports": {
+		"align": false,
+		"customClassName": false
+	}
+}

@@ -127,6 +127,7 @@ final class Mai_Publisher_Plugin {
 		// Blocks.
 		include MAI_PUBLISHER_DIR . 'blocks/ad/block.php';
 		include MAI_PUBLISHER_DIR . 'blocks/ad-unit/block.php';
+		include MAI_PUBLISHER_DIR . 'blocks/analytics-tracker/block.php';
 
 		// Instantiate classes.
 		$field_group      = new Mai_Publisher_Ad_Field_Group;
@@ -140,6 +141,10 @@ final class Mai_Publisher_Plugin {
 		$views            = new Mai_Publisher_Views;
 		$tracking         = new Mai_Publisher_Tracking;
 		$tracking_content = new Mai_Publisher_Tracking_Content;
+
+		if ( ! class_exists( 'Mai_Analytics_Plugin' ) ) {
+			$tracker_block = new Mai_Publisher_Analytics_Tracker_Block;
+		}
 
 		if ( is_admin() ) {
 			$admin         = new Mai_Publisher_Admin;
