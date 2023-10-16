@@ -20,8 +20,8 @@ class Mai_Publisher_Admin {
 	 */
 	function hooks() {
 		add_filter( 'display_post_states',                [ $this, 'add_post_state' ], 10, 2 );
-		add_filter( 'manage_mai_ad_posts_columns',        [ $this, 'display_column' ] );
-		add_action( 'manage_mai_ad_posts_custom_column' , [ $this, 'display_column_content' ], 10, 2 );
+		add_filter( 'manage_mai_ad_posts_columns',        [ $this, 'add_columns' ] );
+		add_action( 'manage_mai_ad_posts_custom_column' , [ $this, 'display_columns' ], 10, 2 );
 	}
 
 	/**
@@ -72,14 +72,16 @@ class Mai_Publisher_Admin {
 	 *
 	 * @return array
 	 */
-	function display_column( $columns ) {
+	function add_columns( $columns ) {
 		// Remove date column.
 		unset( $columns['date'] );
 
 		// Add location column.
-		$new = [ 'maipub_location' => __( 'Location', 'mai-publisher' ) ];
+		$location                = [ 'maipub_location' => __( 'Location', 'mai-publisher' ) ];
+		$columns                 = maipub_array_insert_after( $columns, 'title', $location );
+		$columns['maipub_sizes'] = __( 'Sizes', 'mai-publisher' );
 
-		return maipub_array_insert_after( $columns, 'title', $new );
+		return $columns;
 	}
 
 	/**
@@ -92,10 +94,26 @@ class Mai_Publisher_Admin {
 	 *
 	 * @return void
 	 */
-	function display_column_content( $column, $post_id ) {
-		if ( 'maipub_location' !== $column ) {
-			return;
+	function display_columns( $column, $post_id ) {
+		if ( 'maipub_location' === $column ) {
+			$this->display_location( $post_id );
 		}
+
+		if ( 'maipub_sizes' === $column ) {
+			$this->display_sizes( $post_id );
+		}
+	}
+
+	/**
+	 * Display location info.
+	 *
+	 * @since TBD
+	 *
+	 * @param int $post_id The current post ID.
+	 *
+	 * @return void
+	 */
+	function display_location( $post_id ) {
 
 		$html       = '';
 		$global     = get_post_meta( $post_id, 'maipub_global_location', true );
@@ -174,5 +192,77 @@ class Mai_Publisher_Admin {
 		}
 
 		echo wptexturize( $html );
+	}
+
+	/**
+	 * Display location info.
+	 *
+	 * @since TBD
+	 *
+	 * @param int $post_id The current post ID.
+	 *
+	 * @return void
+	 */
+	function display_sizes( $post_id ) {
+		$ad_units = maipub_get_config( 'ad_units' );
+		$post     = get_post( $post_id );
+		$slugs    = $this->get_ad_unit_slugs( $post->post_content );
+
+		ray( $slugs );
+
+		if ( ! $slugs ) {
+			return;
+		}
+
+		$sizes = [];
+
+		foreach ( $slugs as $slug ) {
+			if ( ! isset( $ad_units[ $slug ]['sizes'] ) ) {
+				continue;
+			}
+
+			$sizes[] = $slug . ': ' . $this->format_sizes( $ad_units[ $slug ]['sizes'] );
+		}
+
+		if ( ! $sizes ) {
+			return;
+		}
+
+		echo implode( '<br>', $sizes );
+	}
+
+	function get_ad_unit_slugs( $input ) {
+		$units  = [];
+		$blocks = is_array( $input ) ? $input : parse_blocks( $input );
+
+		foreach ( $blocks as $block ) {
+			if ( 'acf/mai-ad-unit' === $block['blockName'] && isset( $block['attrs']['data']['id'] ) && ! empty( $block['attrs']['data']['id'] ) ) {
+				$units[] = $block['attrs']['data']['id'];
+			}
+		}
+
+		// If we have inner blocks, recurse.
+		if ( isset( $block['innerBlocks'] ) && $block['innerBlocks'] ) {
+			$units = array_merge( $units, $this->get_ad_unit_slugs( $block['innerBlocks'] ) );
+		}
+
+		return $units;
+	}
+
+	/**
+	 * Format sizes for display in admin column.
+	 *
+	 * @since TBD
+	 *
+	 * @param array $array The sizes array.
+	 *
+	 * @return string
+	 */
+	function format_sizes( $array ) {
+		$result = array_map( function( $inner_array ) {
+			return '[' . implode(', ', $inner_array) . ']';
+		}, $array );
+
+		return implode( ', ', $result );
 	}
 }
