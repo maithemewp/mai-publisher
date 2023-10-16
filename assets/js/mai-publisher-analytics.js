@@ -37,6 +37,8 @@
 			try {
 				const matomoTracker = Matomo.getTracker( analytics[ tracker ].url + 'matomo.php', analytics[ tracker ].id );
 
+				// TODO: Unset dimensions. Somehow wrong ones are still getting through to global analytics.
+
 				// Loop through and push items.
 				for ( const key in analytics[ tracker ].toPush ) {
 
