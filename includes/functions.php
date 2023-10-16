@@ -52,7 +52,7 @@ function maipub_get_ads() {
 			$tags = new WP_HTML_Tag_Processor( $sidebar );
 
 			while ( $tags->next_tag( [ 'tag_name' => 'div', 'class_name' => 'mai-ad-unit' ] ) ) {
-				// Get slug from ID. Converts `mai-ad-infeed` and `mai-ad-infeed-2` to `infeed`.
+				// Get slug from ID. Converts `mai-ad-medium-rectangle` and `mai-ad-medium-rectangle-2` to `medium-rectangle`.
 				$id    = $tags->get_attribute( 'id' );
 				// $slug  = maipub_get_string_between_strings( $id, 'mai-ad-', '-' );
 				$id    = str_replace( 'mai-ad-', '', $id );

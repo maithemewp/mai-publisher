@@ -26,6 +26,7 @@ class Mai_Publisher_Settings {
 	 */
 	function hooks() {
 		add_action( 'admin_menu',                                          [ $this, 'add_menu_item' ], 12 );
+		add_action( 'admin_enqueue_scripts',                               [ $this, 'enqueue_script' ] );
 		add_action( 'admin_init',                                          [ $this, 'init' ] );
 		add_filter( 'plugin_action_links_mai-publisher/mai-publisher.php', [ $this, 'add_plugin_links' ], 10, 4 );
 	}
@@ -46,6 +47,29 @@ class Mai_Publisher_Settings {
 			'settings', // menu_slug
 			[ $this, 'add_content' ], // callback
 		);
+	}
+
+	/**
+	 * Enqueue script for select2.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	function enqueue_script() {
+		$screen = get_current_screen();
+
+		if ( 'mai_ad_page_settings' !== $screen->id ) {
+			return;
+		}
+
+		// Select2 from CDN.
+		wp_enqueue_style( 'mai-publisher-select2', 'https://cdn.jsdelivr.net/npm/select2/dist/css/select2.min.css' );
+		wp_enqueue_script( 'mai-publisher-select2', 'https://cdn.jsdelivr.net/npm/select2/dist/js/select2.min.js' );
+
+		$suffix = maipub_get_suffix();
+		$file   = "assets/js/mai-publisher-settings{$suffix}.js";
+		wp_enqueue_script( 'mai-publisher-settings', maipub_get_file_data( $file, 'url' ), [ 'jquery', 'mai-publisher-select2' ], maipub_get_file_data( $file, 'version' ), [ 'in_footer' => true ] );
 	}
 
 	/**
