@@ -31,30 +31,31 @@ function maipub_get_ads() {
 		}
 	}
 
-	// Check for sidebars.
-	$sidebars = apply_filters( 'mai_publisher_sidebars', [] );
-	$sidebars = $sidebars ? array_unique( array_map( 'esc_attr', $sidebars ) ) : [];
+	$mai_sidebar     = function_exists( 'mai_has_sidebar' ) && mai_has_sidebar();
+	$genesis_sidebar = function_exists( 'genesis_site_layout' ) && in_array( genesis_site_layout(), [ 'sidebar', 'sidebar-alt' ] );
 
-	if ( $sidebars && class_exists( 'WP_HTML_Tag_Processor' ) ) {
-		$ad_ids = [];
+	// Check sidebars.
+	if ( ( $mai_sidebar || $genesis_sidebar ) && class_exists( 'WP_HTML_Tag_Processor' ) ) {
+		// Set prefix to sidebar.
+		maipub_contextual_prefix( 'sidebar' );
 
-		foreach ( $sidebars as $id ) {
-			// Render sidebar to variable.
-			ob_start();
-			dynamic_sidebar( $id );
-			$sidebar = ob_get_clean();
+		// Get sidebar html.
+		ob_start();
+		do_action( 'genesis_sidebar' );
+		$sidebar = ob_get_clean();
 
-			if ( ! $sidebar ) {
-				continue;
-			}
+		// Remove prefix.
+		maipub_contextual_prefix( '' );
 
+		// If sidebar content.
+		if ( $sidebar ) {
 			// Check for ad-units.
-			$tags = new WP_HTML_Tag_Processor( $sidebar );
+			$ad_ids = [];
+			$tags   = new WP_HTML_Tag_Processor( $sidebar );
 
 			while ( $tags->next_tag( [ 'tag_name' => 'div', 'class_name' => 'mai-ad-unit' ] ) ) {
 				// Get slug from ID. Converts `mai-ad-medium-rectangle` and `mai-ad-medium-rectangle-2` to `medium-rectangle`.
 				$id    = $tags->get_attribute( 'id' );
-				// $slug  = maipub_get_string_between_strings( $id, 'mai-ad-', '-' );
 				$id    = str_replace( 'mai-ad-', '', $id );
 				$array = explode( '-', $id );
 				$last  = end( $array );
@@ -73,15 +74,15 @@ function maipub_get_ads() {
 
 				$ad_ids[] = $slug;
 			}
-		}
 
-		// Add to ads.
-		if ( $ad_ids ) {
-			$ads[] = [
-				'id'      => 'sidebars',
-				'content' => '',
-				'ad_ids'  => $ad_ids,
-			];
+			// Add our sidebar ads.
+			if ( $ad_ids ) {
+				$ads[] = [
+					'id'      => 'sidebars',
+					'content' => '',
+					'ad_ids'  => $ad_ids,
+				];
+			}
 		}
 	}
 

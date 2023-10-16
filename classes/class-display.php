@@ -25,6 +25,8 @@ class Mai_Publisher_Display {
 		add_action( 'wp_enqueue_scripts', [ $this, 'run' ], 0 );
 		add_action( 'wp_head',            [ $this, 'header' ] );
 		add_action( 'wp_footer',          [ $this, 'footer' ], 20 );
+		add_action( 'genesis_sidebar',    [ $this, 'set_sidebar_prefix' ], 0 );
+		add_action( 'genesis_sidebar',    [ $this, 'unset_sidebar_prefix' ], 999 );
 	}
 
 	/**
@@ -36,6 +38,7 @@ class Mai_Publisher_Display {
 	 */
 	function run() {
 		$ads          = maipub_get_ads();
+		$reset        = maipub_reset_slots( true );
 		$domain       = maipub_get_gam_domain();
 		$network_code = (string) maipub_get_option( 'gam_network_code' );
 		$suffix       = maipub_get_suffix();
@@ -132,6 +135,28 @@ class Mai_Publisher_Display {
 	}
 
 	/**
+	 * Set sidebar prefix.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	function set_sidebar_prefix() {
+		maipub_contextual_prefix( 'sidebar' );
+	}
+
+	/**
+	 * Unset sidebar prefix.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	function unset_sidebar_prefix() {
+		maipub_contextual_prefix( '' );
+	}
+
+	/**
 	 * Get GAM ads for JS.
 	 *
 	 * @since 0.1.0
@@ -145,7 +170,9 @@ class Mai_Publisher_Display {
 		$config = maipub_get_config( 'ad_units' );
 
 		foreach ( $ad_ids as $slug ) {
-			if ( ! isset( $config[ $slug ] ) ) {
+			$trimmed = ltrim( $slug, 'sidebar-' );
+
+			if ( ! isset( $config[ $trimmed ] ) ) {
 				continue;
 			}
 
@@ -153,19 +180,19 @@ class Mai_Publisher_Display {
 				$counts[ $slug ]++;
 				$ads[ $slug . '-' . $counts[ $slug ] ] = [
 					'id'           => $slug,
-					'sizes'        => $config[ $slug ]['sizes'],
-					'sizesDesktop' => $config[ $slug ]['sizes_desktop'],
-					'sizesTablet'  => $config[ $slug ]['sizes_tablet'],
-					'sizesMobile'  => $config[ $slug ]['sizes_mobile'],
+					'sizes'        => $config[ $trimmed ]['sizes'],
+					'sizesDesktop' => $config[ $trimmed ]['sizes_desktop'],
+					'sizesTablet'  => $config[ $trimmed ]['sizes_tablet'],
+					'sizesMobile'  => $config[ $trimmed ]['sizes_mobile'],
 				];
 			} else {
 				$counts[ $slug ] = 1;
 				$ads[ $slug ]    = [
 					'id'           => $slug,
-					'sizes'        => $config[ $slug ]['sizes'],
-					'sizesDesktop' => $config[ $slug ]['sizes_desktop'],
-					'sizesTablet'  => $config[ $slug ]['sizes_tablet'],
-					'sizesMobile'  => $config[ $slug ]['sizes_mobile'],
+					'sizes'        => $config[ $trimmed ]['sizes'],
+					'sizesDesktop' => $config[ $trimmed ]['sizes_desktop'],
+					'sizesTablet'  => $config[ $trimmed ]['sizes_tablet'],
+					'sizesMobile'  => $config[ $trimmed ]['sizes_mobile'],
 				];
 			}
 		}

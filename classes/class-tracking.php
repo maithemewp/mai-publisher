@@ -631,7 +631,7 @@ class Mai_Publisher_Tracking {
 	 *
 	 * @since 0.3.0
 	 *
-	 * @param string $key
+	 * @param string $key The key to return.
 	 *
 	 * @return array|string
 	 */

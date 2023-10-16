@@ -239,6 +239,48 @@ function maipub_filter_associative_array( $array ) {
 }
 
 /**
+ * Sets contextual prefix for ad unit slots.
+ *
+ * @access private
+ *
+ * @since TBD
+ *
+ * @param bool|null $set If not null, sets the value.
+ *
+ * @return string
+ */
+function maipub_contextual_prefix( $set = null ) {
+	static $prefix = '';
+
+	if ( ! is_null( $set ) ) {
+		$prefix = $set;
+	}
+
+	return $prefix;
+}
+
+/**
+ * Whether to reset slot incrementer.
+ *
+ * @access private
+ *
+ * @since TBD
+ *
+ * @param bool|null $set If not null, sets the value.
+ *
+ * @return bool
+ */
+function maipub_reset_slots( $set = null ) {
+	static $reset = false;
+
+	if ( ! is_null( $set ) ) {
+		$reset = $set;
+	}
+
+	return $reset;
+}
+
+/**
  * Sanitized a string to lowercase, keeping character encoding.
  *
  * @since 0.1.0
@@ -608,29 +650,4 @@ function maipub_validate_args_archive( $args ) {
 	}
 
 	return $args;
-}
-
-/**
- * TODO: No longer used?
- *
- * Get a string between a starting and ending point.
- *
- * @since 0.1.0
- *
- * @param string $string          The full string to check.
- * @param string $starting_string The starting point to check for.
- * @param string $ending_string   The end point to check for.
- *
- * @return string
- */
-function maipub_get_string_between_strings( $string, $starting_string, $ending_string ) {
-	$arr = explode( $starting_string, $string );
-
-	if ( isset( $arr[1] ) ) {
-		$arr = explode( $ending_string, $arr[1] );
-
-		return $arr[0];
-	}
-
-	return '';
 }
