@@ -611,6 +611,8 @@ function maipub_validate_args_archive( $args ) {
 }
 
 /**
+ * TODO: No longer used?
+ *
  * Get a string between a starting and ending point.
  *
  * @since 0.1.0

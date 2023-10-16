@@ -53,8 +53,19 @@ function maipub_get_ads() {
 
 			while ( $tags->next_tag( [ 'tag_name' => 'div', 'class_name' => 'mai-ad-unit' ] ) ) {
 				// Get slug from ID. Converts `mai-ad-infeed` and `mai-ad-infeed-2` to `infeed`.
-				$id   = $tags->get_attribute( 'id' );
-				$slug = maipub_get_string_between_strings( $id, 'mai-ad-', '-' );
+				$id    = $tags->get_attribute( 'id' );
+				// $slug  = maipub_get_string_between_strings( $id, 'mai-ad-', '-' );
+				$id    = str_replace( 'mai-ad-', '', $id );
+				$array = explode( '-', $id );
+				$last  = end( $array );
+
+				// Remove last item if numeric.
+				if ( is_numeric( $last ) ) {
+					array_pop( $array );
+				}
+
+				// Back to string.
+				$slug = implode( '-', $array );
 
 				if ( ! $slug ) {
 					continue;
