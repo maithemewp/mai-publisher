@@ -101,19 +101,6 @@ class Mai_Publisher_Ad_Unit_Block {
 		// Start HTML.
 		$html = '';
 
-
-		// $attr = [
-		// 	'class' => 'mai-ad-unit',
-		// ];
-
-		// if ( isset( $block['className'] ) && $block['className'] ) {
-		// 	$attr['class'] .= ' ' . esc_attr( $block['className'] );
-		// }
-
-		// if ( $label ) {
-		// 	$attr['data-label'] = $label;
-		// }
-
 		// Sticky footer adds another wrapper.
 		if ( 'footer-sticky' === $id ) {
 			// Start outer attributes.
@@ -146,8 +133,12 @@ class Mai_Publisher_Ad_Unit_Block {
 			$attr_inner['data-content-name']  = $slot;
 			$attr_inner['data-track-content'] = null;
 
+			// Get attributes string.
+			$attributes = get_block_wrapper_attributes( $attr_outer );
+			$attributes = str_replace( ' wp-block-acf-mai-ad-unit', '', $attributes );
+
 			// Build HTML with extra wrap.
-			$html .= sprintf( '<div %s>', get_block_wrapper_attributes( $attr_outer ) );
+			$html .= sprintf( '<div %s>', $attributes );
 				$html .= sprintf( '<div%s>', maipub_build_attributes( $attr_inner ) );
 					$html .= $script;
 				$html .= '</div>';
@@ -180,25 +171,15 @@ class Mai_Publisher_Ad_Unit_Block {
 			$attr['data-content-name']  = $slot;
 			$attr['data-track-content'] = null;
 
+			// Get attributes string.
+			$attributes = get_block_wrapper_attributes( $attr );
+			$attributes = str_replace( ' wp-block-acf-mai-ad-unit', '', $attributes );
+
 			// Build HTML.
-			$html .= sprintf( '<div %s>', get_block_wrapper_attributes( $attr ) );
+			$html .= sprintf( '<div %s>', $attributes );
 				$html .= $script;
 			$html .= '</div>';
 		}
-
-		// $html  = '';
-		// $html .= 'footer-sticky' === $id ? sprintf( '<div%s>', maipub_build_attributes( $attr ) ) : ''; // Add id to wrapper.
-		// $html .= 'footer-sticky' === $id ? sprintf( '<div id="%s">', $slot ) : sprintf( '<div%s>', maipub_build_attributes( $attr ) );
-		// $html .= '</div>';
-		// $html .= 'footer-sticky' === $id ? '</div>' : '';
-
-
-
-		// $html .= 'footer-sticky' === $id ? sprintf( '<div%s>', maipub_build_attributes( $attr ) ) : ''; // Add id to wrapper.
-		// $html .= 'footer-sticky' === $id ? sprintf( '<div id="%s">', $slot ) : sprintf( '<div%s>', maipub_build_attributes( $attr ) );
-		// $html .= sprintf( '<script>window.googletag = window.googletag || {};googletag.cmd = googletag.cmd || [];if ( window.googletag && googletag.apiReady ) { googletag.cmd.push(function(){ googletag.display("%s"); }); }</script>', $slot );
-		// $html .= '</div>';
-		// $html .= 'footer-sticky' === $id ? '</div>' : '';
 
 		// Allow filtering.
 		$html = apply_filters( 'mai_publisher_ad_unit', $html );
@@ -276,13 +257,13 @@ class Mai_Publisher_Ad_Unit_Block {
 			$styles .= 'background:rgba(0,0,0,0.05);border:2px dashed rgba(0,0,0,0.25);';
 		}
 
-		// Build max-width.
+		// Build width.
 		foreach ( $sizes as $break => $values ) {
 			if ( ! $values ) {
 				continue;
 			}
 
-			$styles .= sprintf( '--mai-ad-unit-max-width-%s:%spx;', $break, $values[0] );
+			$styles .= sprintf( '--mai-ad-unit-width-%s:%spx;', $break, $values[0] );
 		}
 
 		// Build aspect-ratio.
@@ -307,14 +288,16 @@ class Mai_Publisher_Ad_Unit_Block {
 	 * @return string
 	 */
 	function get_slot( $slot ) {
-		static $counts = [];
-		static $reset  = true;
+		static $counts  = [];
 
-		// Mai_Publisher_Display->get_block_ad_ids() runs on wp_enqueue_scripts and increments the slot.
-		// We need to reset the counts after that so they match when actually displayed.
-		if ( ! doing_action( 'wp_enqueue_scripts' ) && $reset ) {
+		// If resetting.
+		if ( maipub_reset_slots() ) {
 			$counts = [];
-			$reset  = false;
+			maipub_reset_slots( false );
+		}
+
+		if ( maipub_contextual_prefix() ) {
+			$slot = maipub_contextual_prefix() . '-' . $slot;
 		}
 
 		if ( isset( $counts[ $slot ] ) ) {
