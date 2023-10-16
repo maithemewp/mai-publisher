@@ -42,13 +42,10 @@ class Mai_Publisher_Ad_Field_Group {
 			return;
 		}
 
-		$suffix    = maipub_get_suffix();
-		$file      = "/assets/js/mai-publisher-admin{$suffix}.js";
-		$file_path = MAI_PUBLISHER_DIR . $file;
-		$file_url  = MAI_PUBLISHER_URL . $file;
-		$version   = MAI_PUBLISHER_VERSION . '.' . date( 'njYHi', filemtime( $file_path ) );
+		$suffix = maipub_get_suffix();
+		$file   = "assets/js/mai-publisher-admin{$suffix}.js";
 
-		wp_enqueue_script( 'mai-publisher-admin', $file_url, [], $version, true );
+		wp_enqueue_script( 'mai-publisher-admin', maipub_get_file_data( $file, 'url' ), [], maipub_get_file_data( $file, 'version' ), [ 'in_footer' => true ] );
 	}
 
 	/**
