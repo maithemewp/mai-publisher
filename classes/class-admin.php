@@ -186,7 +186,6 @@ class Mai_Publisher_Admin {
 			}
 
 			if ( $array ) {
-				// $html .= 'Terms -- ' . implode( ', ', $array ) . '<br>';
 				$html .= sprintf( '%s (%s) -- %s', __( 'Terms', 'mai-publisher' ), $choices['archive'][ $archive ], implode( ', ', $array ) ) . '<br>';
 			}
 		}
@@ -207,8 +206,6 @@ class Mai_Publisher_Admin {
 		$ad_units = maipub_get_config( 'ad_units' );
 		$post     = get_post( $post_id );
 		$slugs    = $this->get_ad_unit_slugs( $post->post_content );
-
-		ray( $slugs );
 
 		if ( ! $slugs ) {
 			return;
@@ -231,6 +228,15 @@ class Mai_Publisher_Admin {
 		echo implode( '<br>', $sizes );
 	}
 
+	/**
+	 * Gets ad unit slugs from post content.
+	 *
+	 * @since TBD
+	 *
+	 * @param array|string $input The post content or parsed blocks.
+	 *
+	 * @return array
+	 */
 	function get_ad_unit_slugs( $input ) {
 		$units  = [];
 		$blocks = is_array( $input ) ? $input : parse_blocks( $input );
