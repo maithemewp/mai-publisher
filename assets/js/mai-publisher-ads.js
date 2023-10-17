@@ -25,7 +25,7 @@ if ( window.googletag && googletag.apiReady ) {
 			slot.defineSizeMapping(
 				googletag.sizeMapping()
 				.addSize( [ 1024, 768 ], ads[id].sizesDesktop )
-				.addSize( [ 640, 480 ], ads[id].sizesTablet )
+				.addSize( [ 728, 480 ], ads[id].sizesTablet )
 				.addSize( [ 0, 0 ], ads[id].sizesMobile )
 				.build()
 			);
