@@ -205,7 +205,7 @@ class Mai_Publisher_Display {
 	 *
 	 * @since 0.7.0
 	 *
-	 * @param string $slug
+	 * @param string $slug The existing slug.
 	 *
 	 * @return string
 	 */
@@ -231,8 +231,7 @@ class Mai_Publisher_Display {
 
 		foreach ( $this->ads as $ad ) {
 			$count  = isset( $ad['content_count'] ) && is_array( $ad['content_count'] ) ? count( $ad['content_count'] ) : 1;
-			$ad_ids = array_merge( $ad_ids, $this->get_block_ad_ids( $ad['content'], $count ) );
-
+			$ad_ids = $ad['content'] ? array_merge( $ad_ids, $this->get_block_ad_ids( $ad['content'], $count ) ) : $ad_ids;
 		}
 
 		foreach ( $this->ads as $ad ) {
