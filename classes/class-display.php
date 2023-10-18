@@ -166,10 +166,11 @@ class Mai_Publisher_Display {
 	function get_gam_ads() {
 		$ads    = [];
 		$counts = [];
-		$ad_ids = $this->domain ? $this->get_ad_ids() : [];
+		$ad_data = $this->domain ? $this->get_gam_ads_data() : [];
 		$config = maipub_get_config( 'ad_units' );
 
-		foreach ( $ad_ids as $slug ) {
+		foreach ( $ad_data as $data ) {
+			$slug    = $data['id'];
 			$trimmed = $this->get_trimmed_slug( $slug );
 
 			if ( ! isset( $config[ $trimmed ] ) ) {
@@ -180,6 +181,7 @@ class Mai_Publisher_Display {
 				$counts[ $slug ]++;
 				$ads[ $slug . '-' . $counts[ $slug ] ] = [
 					'id'           => $slug,
+					'targeting'    => $data['targeting'],
 					'sizes'        => $config[ $trimmed ]['sizes'],
 					'sizesDesktop' => $config[ $trimmed ]['sizes_desktop'],
 					'sizesTablet'  => $config[ $trimmed ]['sizes_tablet'],
@@ -189,6 +191,7 @@ class Mai_Publisher_Display {
 				$counts[ $slug ] = 1;
 				$ads[ $slug ]    = [
 					'id'           => $slug,
+					'targeting'    => $data['targeting'],
 					'sizes'        => $config[ $trimmed ]['sizes'],
 					'sizesDesktop' => $config[ $trimmed ]['sizes_desktop'],
 					'sizesTablet'  => $config[ $trimmed ]['sizes_tablet'],
@@ -220,31 +223,31 @@ class Mai_Publisher_Display {
 	}
 
 	/**
-	 * Get the GAM ad IDs from ads.
+	 * Get the GAM ad data from ads.
 	 *
 	 * @since 0.1.0
 	 *
 	 * @return array
 	 */
-	function get_ad_ids() {
-		$ad_ids = [];
+	function get_gam_ads_data() {
+		$data = [];
 
 		foreach ( $this->ads as $ad ) {
-			$count  = isset( $ad['content_count'] ) && is_array( $ad['content_count'] ) ? count( $ad['content_count'] ) : 1;
-			$ad_ids = $ad['content'] ? array_merge( $ad_ids, $this->get_block_ad_ids( $ad['content'], $count ) ) : $ad_ids;
+			$count = isset( $ad['content_count'] ) && is_array( $ad['content_count'] ) ? count( $ad['content_count'] ) : 1;
+			$data  = $ad['content'] ? array_merge( $data, $this->get_block_ad_ids( $ad['content'], $count ) ) : $data;
 		}
 
 		foreach ( $this->ads as $ad ) {
 			if ( isset( $ad['ad_ids'] ) && $ad['ad_ids'] ) {
-				$ad_ids = array_merge( $ad_ids, $ad['ad_ids'] );
+				$data = array_merge( $data, $ad['ad_ids'] );
 			}
 		}
 
-		return $ad_ids;
+		return $data;
 	}
 
 	/**
-	 * Get the GAM ad IDs from blocks in the ads.
+	 * Get the GAM ad data from blocks in the ads.
 	 *
 	 * @since 0.1.0
 	 *
@@ -258,7 +261,7 @@ class Mai_Publisher_Display {
 		$blocks = is_array( $input ) ? $input : parse_blocks( $input );
 
 		foreach ( $blocks as $block ) {
-			// If Mai Ad block with an ID.
+			// If Mai Ad block with a post ID.
 			if ( 'acf/mai-ad' === $block['blockName'] && isset( $block['attrs']['data']['id'] ) && ! empty( $block['attrs']['data']['id'] ) ) {
 				// Get the post object.
 				$post = get_post( $block['attrs']['data']['id'] );
@@ -268,11 +271,23 @@ class Mai_Publisher_Display {
 					$ad_ids = array_merge( $ad_ids, $this->get_block_ad_ids( $post->post_content, 1 ) );
 				}
 			}
-			// If Mai Ad unit block with an ID.
+			// If Mai Ad unit block with an ad unit ID.
 			elseif ( 'acf/mai-ad-unit' === $block['blockName'] && isset( $block['attrs']['data']['id'] ) && ! empty( $block['attrs']['data']['id'] ) ) {
+				// Start key values.
+				$targeting = [];
+				$type       = isset( $block['attrs']['data']['type'] ) && $block['attrs']['data']['type'] ? $block['attrs']['data']['type'] : '';
+
+				// If ad type.
+				if ( $type ) {
+					$targeting['at'] = $type;
+				}
+
 				// Loop through the $count and add the ad ID to the array.
 				for ( $i = 0; $i < $count; $i++ ) {
-					$ad_ids[] = $block['attrs']['data']['id'];
+					$ad_ids[] = [
+						'id'         => $block['attrs']['data']['id'],
+						'targeting' => $targeting,
+					];
 				}
 			}
 

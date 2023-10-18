@@ -19,7 +19,7 @@ function maipub_get_ads() {
 
 	$ads = [];
 
-	// If singular, check for manuall added ad blocks.
+	// If singular, check for manually added ad blocks.
 	if ( maipub_is_singular() ) {
 		$post = get_post();
 
@@ -72,7 +72,20 @@ function maipub_get_ads() {
 					continue;
 				}
 
-				$ad_ids[] = $slug;
+				// Get key values.
+				$targeting = [];
+				$type      = $tags->get_attribute( 'data-type' );
+
+				// Set ad type.
+				if ( $type ) {
+					$targeting['at'] = $type;
+				}
+
+				// Ad data.
+				$ad_ids[] = [
+					'id'        => $slug,
+					'targeting' => $targeting,
+				];
 			}
 
 			// Add our sidebar ads.

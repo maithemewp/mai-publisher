@@ -53,6 +53,7 @@ class Mai_Publisher_Ad_Unit_Block {
 	 */
 	function render_block( $block, $content = '', $is_preview = false, $post_id = 0 ) {
 		$id         = get_field( 'id' );
+		$type       = get_field( 'type' );
 		$label      = get_field( 'label' );
 		$label_hide = get_field( 'label_hide' );
 		$label      = $label ? $label : maipub_get_option( 'ad_label', false );
@@ -78,7 +79,7 @@ class Mai_Publisher_Ad_Unit_Block {
 			}
 
 			if ( $label ) {
-				$attr['data-label'] = $label;
+				$attr['data-label'] = esc_attr( $label );
 			}
 
 			$text  = $id ? __( 'Ad Placeholder', 'mai-publisher' ) : __( 'No Ad Unit Selected', 'mai-publisher' );
@@ -124,13 +125,18 @@ class Mai_Publisher_Ad_Unit_Block {
 				'class' => 'mai-ad-unit mai-ad-unit-sticky mai-ad-unit-sticky-footer',
 			];
 
+			// Add type.
+			if ( $type ) {
+				$attr_inner['data-type'] = esc_attr( $type );
+			}
+
 			// Add label.
 			if ( $label ) {
-				$attr_inner['data-label'] = $label;
+				$attr_inner['data-label'] = esc_attr( $label );
 			}
 
 			// Add analytics tracking.
-			$attr_inner['data-content-name']  = $slot;
+			$attr_inner['data-content-name']  = esc_attr( $slot );
 			$attr_inner['data-track-content'] = null;
 
 			// Get attributes string.
@@ -162,13 +168,18 @@ class Mai_Publisher_Ad_Unit_Block {
 				$attr['style'] = $styles;
 			}
 
+			// Add type.
+			if ( $type ) {
+				$attr['data-type'] = esc_attr( $type );
+			}
+
 			// Add label.
 			if ( $label ) {
-				$attr['data-label'] = $label;
+				$attr['data-label'] = esc_attr( $label );
 			}
 
 			// Add analytics tracking.
-			$attr['data-content-name']  = $slot;
+			$attr['data-content-name']  = esc_attr( $slot );
 			$attr['data-track-content'] = null;
 
 			// Get attributes string.
@@ -333,6 +344,18 @@ class Mai_Publisher_Ad_Unit_Block {
 						'name'    => 'id',
 						'type'    => 'select',
 						'choices' => [],
+					],
+					[
+						'label'   => __( 'Ad type', 'mai-publisher' ),
+						'key'     => 'maipub_ad_unit_type',
+						'name'    => 'type',
+						'type'    => 'select',
+						'choices' => [
+							''   => __( 'Not set', 'mai-publisher' ),
+							'sp' => __( 'Sponsorship', 'mai-publisher' ),
+							'st' => __( 'Standard', 'mai-publisher' ),
+							'h'  => __( 'House', 'mai-publisher' ),
+						],
 					],
 					[
 						'label'             => __( 'Label override', 'mai-publisher' ),
