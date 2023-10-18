@@ -24,6 +24,8 @@ function maipub_get_views( $atts = [] ) {
 			'min'                => 20,      // Minimum number of views before displaying.
 			'format'             => 'short', // Use short format (2k+) or show full number (2,143). Currently accepts 'short', '', or a falsey value.
 			'style'              => 'display:inline-flex;align-items:center;',
+			'before'             => '',
+			'after'              => '',
 			'icon'               => 'heart',
 			'icon_style'         => 'solid',
 			'icon_size'          => '0.85em',
@@ -44,6 +46,8 @@ function maipub_get_views( $atts = [] ) {
 		'min'                => absint( $atts['min'] ),
 		'format'             => esc_html( $atts['format'] ),
 		'style'              => esc_attr( $atts['style'] ),
+		'before'             => esc_html( $atts['before'] ),
+		'after'              => esc_html( $atts['after'] ),
 		'icon'               => sanitize_key( $atts['icon'] ),
 		'icon_style'         => sanitize_key( $atts['icon_style'] ),
 		'icon_size'          => esc_attr( $atts['icon_size'] ),
@@ -77,7 +81,7 @@ function maipub_get_views( $atts = [] ) {
 	) : '';
 
 	// Build markup.
-	$html = sprintf( '<span class="mai-views"%s>%s<span class="mai-views__count">%s</span></span>', $style, $icon, $views );
+	$html = sprintf( '<span class="mai-views"%s>%s%s<span class="mai-views__count">%s</span>%s</span>', $style, $atts['before'], $icon, $views, $atts['after'] );
 
 	// Allow filtering of markup.
 	$views = apply_filters( 'mai_publisher_entry_views', $html );
