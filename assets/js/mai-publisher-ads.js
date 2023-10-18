@@ -11,12 +11,22 @@ if ( window.googletag && googletag.apiReady ) {
 		const gamBase = maiPubAdsVars['gamBase'];
 
 		// Loop through maiPubAdsVars getting key and values.
-		for ( const id in ads ) {
+		Object.keys( ads ).forEach( slug => {
 			// Define ad slot.
-			const slot = googletag
-				.defineSlot( gamBase + id, ads[id].sizes, 'mai-ad-' + id )
-				.addService( googletag.pubads() )
-				.setTargeting( refreshKey, refreshvalue );
+			const slot = googletag.defineSlot( gamBase + slug, ads[slug].sizes, 'mai-ad-' + slug );
+
+			// Set refresh targeting.
+			slot.setTargeting( refreshKey, refreshvalue )
+
+			// Set slot-level targeting.
+			if ( ads[slug].targeting ) {
+				Object.keys( ads[slug].targeting ).forEach( key => {
+					slot.setTargeting( key, ads[slug].targeting[key] );
+				});
+			}
+
+			// Get it running.
+			slot.addService( googletag.pubads() );
 
 			/**
 			 * Define size mapping.
@@ -24,12 +34,12 @@ if ( window.googletag && googletag.apiReady ) {
 			 */
 			slot.defineSizeMapping(
 				googletag.sizeMapping()
-				.addSize( [ 1024, 768 ], ads[id].sizesDesktop )
-				.addSize( [ 728, 480 ], ads[id].sizesTablet )
-				.addSize( [ 0, 0 ], ads[id].sizesMobile )
+				.addSize( [ 1024, 768 ], ads[slug].sizesDesktop )
+				.addSize( [ 728, 480 ], ads[slug].sizesTablet )
+				.addSize( [ 0, 0 ], ads[slug].sizesMobile )
 				.build()
 			);
-		}
+		});
 
 		// TODO: Configure page-level targeting.
 		// googletag.pubads().setTargeting( 'interests', 'basketball' );
