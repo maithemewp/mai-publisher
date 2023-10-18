@@ -75,13 +75,19 @@ function maipub_get_ads() {
 				// Get key values.
 				$targeting = [];
 				$type      = $tags->get_attribute( 'data-type' );
+				$pos       = $tags->get_attribute( 'data-pos' );
 
 				// Set ad type.
 				if ( $type ) {
-					$targeting['at'] = $type;
+					$targeting['at'] = [ $type ];
 				}
 
-				// Ad data.
+				// Set ad position.
+				if ( $pos ) {
+					$targeting['p'] = [ $pos ];
+				}
+
+				// Add data.
 				$ad_ids[] = [
 					'id'        => $slug,
 					'targeting' => $targeting,

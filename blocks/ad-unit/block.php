@@ -54,6 +54,7 @@ class Mai_Publisher_Ad_Unit_Block {
 	function render_block( $block, $content = '', $is_preview = false, $post_id = 0 ) {
 		$id         = get_field( 'id' );
 		$type       = get_field( 'type' );
+		$pos        = get_field( 'position' );
 		$label      = get_field( 'label' );
 		$label_hide = get_field( 'label_hide' );
 		$label      = $label ? $label : maipub_get_option( 'ad_label', false );
@@ -82,8 +83,9 @@ class Mai_Publisher_Ad_Unit_Block {
 				$attr['data-label'] = esc_attr( $label );
 			}
 
-			$text  = $id ? __( 'Ad Placeholder', 'mai-publisher' ) : __( 'No Ad Unit Selected', 'mai-publisher' );
-			printf( '<div%s><span style="font-size:1.1rem;font-variant:all-small-caps;letter-spacing:1px;">%s</span></div>', maipub_build_attributes( $attr ), $text );
+			// $text  = $id ? __( 'Ad Placeholder', 'mai-publisher' ) : __( 'No Ad Unit Selected', 'mai-publisher' );
+			$text  = $id ? $id : __( 'No Ad Unit Selected', 'mai-publisher' );
+			printf( '<div%s><span style="font-size:1.1rem;">%s</span></div>', maipub_build_attributes( $attr ), $text );
 			return;
 		}
 
@@ -94,7 +96,6 @@ class Mai_Publisher_Ad_Unit_Block {
 
 		// Build slot.
 		$slot = sprintf( 'mai-ad-%s', $slot );
-		// $attr = array_merge( [ 'id' => $slot ], $attr );
 
 		// Build script.
 		$script = sprintf( '<script>window.googletag = window.googletag || {};googletag.cmd = googletag.cmd || [];if ( window.googletag && googletag.apiReady ) { googletag.cmd.push(function(){ googletag.display("%s"); }); }</script>', $slot );
@@ -128,6 +129,11 @@ class Mai_Publisher_Ad_Unit_Block {
 			// Add type.
 			if ( $type ) {
 				$attr_inner['data-type'] = esc_attr( $type );
+			}
+
+			// Add position.
+			if ( $pos ) {
+				$attr_inner['data-pos'] = esc_attr( $pos );
 			}
 
 			// Add label.
@@ -171,6 +177,11 @@ class Mai_Publisher_Ad_Unit_Block {
 			// Add type.
 			if ( $type ) {
 				$attr['data-type'] = esc_attr( $type );
+			}
+
+			// Add position.
+			if ( $pos ) {
+				$attr['data-pos'] = esc_attr( $pos );
 			}
 
 			// Add label.
@@ -355,6 +366,17 @@ class Mai_Publisher_Ad_Unit_Block {
 							'sp' => __( 'Sponsorship', 'mai-publisher' ),
 							'st' => __( 'Standard', 'mai-publisher' ),
 							'h'  => __( 'House', 'mai-publisher' ),
+						],
+					],
+					[
+						'label'   => __( 'Position', 'mai-publisher' ),
+						'key'     => 'maipub_ad_unit_position',
+						'name'    => 'position',
+						'type'    => 'select',
+						'choices' => [
+							''    => __( 'Not set', 'mai-publisher' ),
+							'atf' => __( 'Above the Fold', 'mai-publisher' ),
+							'btf' => __( 'Below the Fold', 'mai-publisher' ),
 						],
 					],
 					[

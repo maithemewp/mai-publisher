@@ -303,11 +303,17 @@ class Mai_Publisher_Display {
 			elseif ( 'acf/mai-ad-unit' === $block['blockName'] && isset( $block['attrs']['data']['id'] ) && ! empty( $block['attrs']['data']['id'] ) ) {
 				// Start key values.
 				$targeting = [];
-				$type       = isset( $block['attrs']['data']['type'] ) && $block['attrs']['data']['type'] ? $block['attrs']['data']['type'] : '';
+				$type      = isset( $block['attrs']['data']['type'] ) && $block['attrs']['data']['type'] ? $block['attrs']['data']['type'] : '';
+				$pos       = isset( $block['attrs']['data']['position'] ) && $block['attrs']['data']['position'] ? $block['attrs']['data']['position'] : '';
 
 				// If ad type.
 				if ( $type ) {
-					$targeting['at'] = $type;
+					$targeting['at'] = [ $type ];
+				}
+
+				// If ad pos.
+				if ( $pos ) {
+					$targeting['p'] = [ $pos ];
 				}
 
 				// Loop through the $count and add the ad ID to the array.
