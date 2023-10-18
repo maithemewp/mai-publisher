@@ -318,6 +318,7 @@ class Mai_Publisher_Display {
 		elseif ( class_exists( 'WP_HTML_Tag_Processor' ) ) {
 			$tags = new WP_HTML_Tag_Processor( $input );
 
+			// Check for Mai Ad unit divs.
 			while ( $tags->next_tag( [ 'tag_name' => 'div', 'class_name' => 'mai-ad-unit' ] ) ) {
 				// Get slug from ID. Converts `mai-ad-medium-rectangle` and `mai-ad-medium-rectangle-2` to `medium-rectangle`.
 				$id    = $tags->get_attribute( 'id' );
