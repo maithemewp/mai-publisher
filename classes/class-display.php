@@ -246,12 +246,6 @@ class Mai_Publisher_Display {
 			$data  = $ad['content'] ? array_merge( $data, $this->get_block_ad_ids( $ad['content'], $count ) ) : $data;
 		}
 
-		foreach ( $this->ads as $ad ) {
-			if ( isset( $ad['ad_ids'] ) && $ad['ad_ids'] ) {
-				$data = array_merge( $data, $ad['ad_ids'] );
-			}
-		}
-
 		return $data;
 	}
 
@@ -265,50 +259,104 @@ class Mai_Publisher_Display {
 	 *
 	 * @return array
 	 */
-	function get_block_ad_ids( $input, $count ) {
+	function get_block_ad_ids( $input, $count = 1 ) {
 		$ad_ids = [];
-		$blocks = is_array( $input ) ? $input : parse_blocks( $input );
+		$blocks = [];
 
-		foreach ( $blocks as $block ) {
-			// If Mai Ad block with a post ID.
-			if ( 'acf/mai-ad' === $block['blockName'] && isset( $block['attrs']['data']['id'] ) && ! empty( $block['attrs']['data']['id'] ) ) {
-				// Get the post object.
-				$post = get_post( $block['attrs']['data']['id'] );
+		if ( is_array( $input ) ) {
+			$blocks = $input;
+		} elseif ( has_blocks( $input ) ) {
+			$blocks = parse_blocks( $input );
+		}
 
-				// If we have a post, get the ad unit IDs from the post content.
-				if ( $post ) {
-					$ad_ids = array_merge( $ad_ids, $this->get_block_ad_ids( $post->post_content, 1 ) );
+		// Parsed array of blocks.
+		if ( $blocks ) {
+			foreach ( $blocks as $block ) {
+				// If Mai Ad block with a post ID.
+				if ( 'acf/mai-ad' === $block['blockName'] && isset( $block['attrs']['data']['id'] ) && ! empty( $block['attrs']['data']['id'] ) ) {
+					// Get the post object.
+					$post = get_post( $block['attrs']['data']['id'] );
+
+					// If we have a post, get the ad unit IDs from the post content.
+					if ( $post ) {
+						$ad_ids = array_merge( $ad_ids, $this->get_block_ad_ids( $post->post_content ) );
+					}
+				}
+				// If Mai Ad unit block with an ad unit ID.
+				elseif ( 'acf/mai-ad-unit' === $block['blockName'] && isset( $block['attrs']['data']['id'] ) && ! empty( $block['attrs']['data']['id'] ) ) {
+					// Start key values.
+					$targeting = [];
+					$type      = isset( $block['attrs']['data']['type'] ) && $block['attrs']['data']['type'] ? $block['attrs']['data']['type'] : '';
+					$pos       = isset( $block['attrs']['data']['position'] ) && $block['attrs']['data']['position'] ? $block['attrs']['data']['position'] : '';
+
+					// If ad type.
+					if ( $type ) {
+						$targeting['at'] = $type;
+					}
+
+					// If ad pos.
+					if ( $pos ) {
+						$targeting['p'] = $pos;
+					}
+
+					// Loop through the $count and add the ad ID to the array.
+					for ( $i = 0; $i < $count; $i++ ) {
+						$ad_ids[] = [
+							'id'         => $block['attrs']['data']['id'],
+							'targeting' => $targeting,
+						];
+					}
+				}
+
+				// If we have inner blocks, recurse.
+				if ( isset( $block['innerBlocks'] ) && $block['innerBlocks'] ) {
+					$ad_ids = array_merge( $ad_ids, $this->get_block_ad_ids( $block['innerBlocks'], $count ) );
 				}
 			}
-			// If Mai Ad unit block with an ad unit ID.
-			elseif ( 'acf/mai-ad-unit' === $block['blockName'] && isset( $block['attrs']['data']['id'] ) && ! empty( $block['attrs']['data']['id'] ) ) {
-				// Start key values.
-				$targeting = [];
-				$type      = isset( $block['attrs']['data']['type'] ) && $block['attrs']['data']['type'] ? $block['attrs']['data']['type'] : '';
-				$pos       = isset( $block['attrs']['data']['position'] ) && $block['attrs']['data']['position'] ? $block['attrs']['data']['position'] : '';
+		}
+		// String of raw HTML.
+		elseif ( class_exists( 'WP_HTML_Tag_Processor' ) ) {
+			$tags = new WP_HTML_Tag_Processor( $input );
 
-				// If ad type.
+			while ( $tags->next_tag( [ 'tag_name' => 'div', 'class_name' => 'mai-ad-unit' ] ) ) {
+				// Get slug from ID. Converts `mai-ad-medium-rectangle` and `mai-ad-medium-rectangle-2` to `medium-rectangle`.
+				$id    = $tags->get_attribute( 'id' );
+				$id    = str_replace( 'mai-ad-', '', $id );
+				$array = explode( '-', $id );
+				$last  = end( $array );
+
+				// Remove last item if numeric.
+				if ( is_numeric( $last ) ) {
+					array_pop( $array );
+				}
+
+				// Back to string.
+				$slug = implode( '-', $array );
+
+				if ( ! $slug ) {
+					continue;
+				}
+
+				// Get key values.
+				$targeting = [];
+				$type      = $tags->get_attribute( 'data-type' );
+				$pos       = $tags->get_attribute( 'data-pos' );
+
+				// Set ad type.
 				if ( $type ) {
 					$targeting['at'] = $type;
 				}
 
-				// If ad pos.
+				// Set ad position.
 				if ( $pos ) {
 					$targeting['p'] = $pos;
 				}
 
-				// Loop through the $count and add the ad ID to the array.
-				for ( $i = 0; $i < $count; $i++ ) {
-					$ad_ids[] = [
-						'id'         => $block['attrs']['data']['id'],
-						'targeting' => $targeting,
-					];
-				}
-			}
-
-			// If we have inner blocks, recurse.
-			if ( isset( $block['innerBlocks'] ) && $block['innerBlocks'] ) {
-				$ad_ids = array_merge( $ad_ids, $this->get_block_ad_ids( $block['innerBlocks'], $count ) );
+				// Add data.
+				$ad_ids[] = [
+					'id'        => $slug,
+					'targeting' => $targeting,
+				];
 			}
 		}
 

@@ -31,7 +31,6 @@ function maipub_get_ads() {
 		}
 	}
 
-
 	// Check Genesis and Mai Theme sidebars.
 	$mai_sidebar     = function_exists( 'mai_has_sidebar' ) && mai_has_sidebar();
 	$genesis_sidebar = function_exists( 'genesis_site_layout' ) && in_array( genesis_site_layout(), [ 'sidebar', 'sidebar-alt' ] );
@@ -51,57 +50,18 @@ function maipub_get_ads() {
 
 		// If sidebar content.
 		if ( $sidebar ) {
-			// Check for ad-units.
-			$ad_ids = [];
+			$has_ad = false;
 			$tags   = new WP_HTML_Tag_Processor( $sidebar );
 
 			while ( $tags->next_tag( [ 'tag_name' => 'div', 'class_name' => 'mai-ad-unit' ] ) ) {
-				// Get slug from ID. Converts `mai-ad-medium-rectangle` and `mai-ad-medium-rectangle-2` to `medium-rectangle`.
-				$id    = $tags->get_attribute( 'id' );
-				$id    = str_replace( 'mai-ad-', '', $id );
-				$array = explode( '-', $id );
-				$last  = end( $array );
-
-				// Remove last item if numeric.
-				if ( is_numeric( $last ) ) {
-					array_pop( $array );
-				}
-
-				// Back to string.
-				$slug = implode( '-', $array );
-
-				if ( ! $slug ) {
-					continue;
-				}
-
-				// Get key values.
-				$targeting = [];
-				$type      = $tags->get_attribute( 'data-type' );
-				$pos       = $tags->get_attribute( 'data-pos' );
-
-				// Set ad type.
-				if ( $type ) {
-					$targeting['at'] = $type;
-				}
-
-				// Set ad position.
-				if ( $pos ) {
-					$targeting['p'] = $pos;
-				}
-
-				// Add data.
-				$ad_ids[] = [
-					'id'        => $slug,
-					'targeting' => $targeting,
-				];
+				$has_ad = true;
+				break;
 			}
 
-			// Add our sidebar ads.
-			if ( $ad_ids ) {
+			if ( $has_ad ) {
 				$ads[] = [
-					'id'      => 'sidebars',
-					'content' => '',
-					'ad_ids'  => $ad_ids,
+					'id'      => 'sidebar',
+					'content' => $sidebar,
 				];
 			}
 		}
