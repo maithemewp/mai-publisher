@@ -232,25 +232,6 @@ class Mai_Publisher_Display {
 	}
 
 	/**
-	 * Get slug with contextual prefix removed.
-	 *
-	 * @since 0.7.0
-	 *
-	 * @param string $slug The existing slug.
-	 *
-	 * @return string
-	 */
-	function get_trimmed_slug( $slug ) {
-		$substring = 'sidebar-';
-
-		if ( str_starts_with( $slug, $substring ) ) {
-			return substr( $slug, strlen( $substring ) );
-		} else {
-			return $slug;
-		}
-	}
-
-	/**
 	 * Get the GAM ad data from ads.
 	 *
 	 * @since 0.1.0
@@ -308,12 +289,12 @@ class Mai_Publisher_Display {
 
 				// If ad type.
 				if ( $type ) {
-					$targeting['at'] = [ $type ];
+					$targeting['at'] = $type;
 				}
 
 				// If ad pos.
 				if ( $pos ) {
-					$targeting['p'] = [ $pos ];
+					$targeting['p'] = $pos;
 				}
 
 				// Loop through the $count and add the ad ID to the array.
@@ -332,6 +313,25 @@ class Mai_Publisher_Display {
 		}
 
 		return $ad_ids;
+	}
+
+	/**
+	 * Get slug with contextual prefix removed.
+	 *
+	 * @since 0.7.0
+	 *
+	 * @param string $slug The existing slug.
+	 *
+	 * @return string
+	 */
+	function get_trimmed_slug( $slug ) {
+		$substring = 'sidebar-';
+
+		if ( str_starts_with( $slug, $substring ) ) {
+			return substr( $slug, strlen( $substring ) );
+		} else {
+			return $slug;
+		}
 	}
 
 	/**
