@@ -653,10 +653,12 @@ class Mai_Publisher_Display {
 	 * @return array
 	 */
 	function add_entries_wrap_atts( $atts, $context, $markup_args ) {
+		// Bail if not an archive.
 		if ( ! isset( $markup_args['params']['args']['context'] ) || 'archive' !== $markup_args['params']['args']['context'] ) {
 			return $atts;
 		}
 
+		// Bail if missing helper function in Mai Engine.
 		if ( ! function_exists( 'mai_get_breakpoint_columns' ) ) {
 			return $atts;
 		}
@@ -664,13 +666,16 @@ class Mai_Publisher_Display {
 		// Static variable since these filters would run for each CCA.
 		static $has_atts = false;
 
+		// Bail if no atts.
 		if ( $has_atts ) {
 			return $atts;
 		}
 
+		// Set style and get columns.
 		$atts['style'] = isset( $atts['style'] ) ? $atts['style'] : '';
 		$columns       = array_reverse( mai_get_breakpoint_columns( $markup_args['params']['args'] ) );
 
+		// Add inline custom properties.
 		foreach ( $columns as $break => $column ) {
 			$atts['style'] .= sprintf( '--maipub-columns-%s:%s;', $break, $column );
 		}
