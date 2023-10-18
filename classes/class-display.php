@@ -22,11 +22,39 @@ class Mai_Publisher_Display {
 	 * @return void
 	 */
 	function hooks() {
+		add_action( 'admin_bar_menu',     [ $this, 'add_admin_bar_item' ], 9999 );
 		add_action( 'wp_enqueue_scripts', [ $this, 'run' ], 0 );
 		add_action( 'wp_head',            [ $this, 'header' ] );
 		add_action( 'wp_footer',          [ $this, 'footer' ], 20 );
 		add_action( 'genesis_sidebar',    [ $this, 'set_sidebar_prefix' ], 0 );
 		add_action( 'genesis_sidebar',    [ $this, 'unset_sidebar_prefix' ], 999 );
+	}
+
+	/**
+	 * Add links to toolbar.
+	 *
+	 * @since TBD
+	 *
+	 * @param WP_Admin_Bar $wp_admin_bar Admin bar object.
+	 *
+	 * @return void
+	 */
+	function add_admin_bar_item( $wp_admin_bar ) {
+		if ( is_admin() || ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		$wp_admin_bar->add_node(
+			[
+				'id'     => 'mai-ads',
+				'parent' => 'site-name',
+				'title'  => __( 'Mai Ads', 'mai-publisher' ),
+				'href'   => admin_url( 'edit.php?post_type=mai_ad' ),
+				'meta'   => [
+					'title' => __( 'Edit Mai Ads', 'mai-publisher' ),
+				],
+			]
+		);
 	}
 
 	/**
