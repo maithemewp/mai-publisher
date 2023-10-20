@@ -149,21 +149,21 @@ function maipub_get_processed_content( $content ) {
  *
  * @uses DOMDocument
  *
- * @param string $content The existing html.
- * @param array  $args    The ad args.
- * @param bool   $counts  Whether to return the valid content_count instead of content.
- *                        This keeps the logic in one place.
+ * @param string $content       The existing html.
+ * @param array  $args          The ad args.
+ * @param bool   $return_counts Whether to return the valid content_count instead of content.
+ *                              This keeps the logic in one place.
  *
- * @return string.
+ * @return string|array
  */
-function maipub_get_content( $content, $args, $counts = false ) {
-	$count = [];
-	$dom   = maipub_get_dom_document( $content );
-	$xpath = new DOMXPath( $dom );
-	$all   = $xpath->query( '/*[not(self::script or self::style or self::link)]' );
+function maipub_get_content( $content, $args, $return_counts = false ) {
+	$counts = [];
+	$dom    = maipub_get_dom_document( $content );
+	$xpath  = new DOMXPath( $dom );
+	$all    = $xpath->query( '/*[not(self::script or self::style or self::link)]' );
 
 	if ( ! $all->length ) {
-		return $content;
+		return $return_counts ? [] : $content;
 	}
 
 	$last     = $all->item( $all->length - 1 );
@@ -182,7 +182,7 @@ function maipub_get_content( $content, $args, $counts = false ) {
 	}
 
 	if ( ! $elements ) {
-		return $counts ? [] : $content;
+		return $return_counts ? [] : $content;
 	}
 
 	$item       = 0;
@@ -202,7 +202,7 @@ function maipub_get_content( $content, $args, $counts = false ) {
 		}
 
 		// If modifying content.
-		if ( ! $counts ) {
+		if ( ! $return_counts ) {
 			/**
 			 * Build the temporary dom.
 			 * Special characters were causing issues with `appendXML()`.
@@ -235,7 +235,7 @@ function maipub_get_content( $content, $args, $counts = false ) {
 			}
 
 			// If modifying content.
-			if ( ! $counts ) {
+			if ( ! $return_counts ) {
 				/**
 				 * Add cca after this element. There is no insertAfter() in PHP ¯\_(ツ)_/¯.
 				 *
@@ -247,26 +247,26 @@ function maipub_get_content( $content, $args, $counts = false ) {
 		// Before headings.
 		else {
 			// If modifying content.
-			if ( ! $counts ) {
+			if ( ! $return_counts ) {
 				$element->parentNode->insertBefore( $node, $element );
 			}
 		}
 
-		// Add to count.
-		$count[] = $item;
+		// Add to counts.
+		$counts[] = $item;
 
 		// Remove from temp counts.
 		unset( $tmp_counts[ $item ] );
 	}
 
 	// If modifying content.
-	if ( ! $counts ) {
+	if ( ! $return_counts ) {
 		// Save new HTML.
 		$content = $dom->saveHTML();
 	}
 
 	// Return what we need.
-	return $counts ? $count : $content;
+	return $return_counts ? $counts : $content;
 }
 
 /**
