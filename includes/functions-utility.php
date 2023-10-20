@@ -506,6 +506,11 @@ function maipub_validate_args_single( $args ) {
 			return [];
 		}
 
+		// Maybe run blocks and shortcodes.
+		if ( has_blocks( $post_content ) ) {
+			$post_content = maipub_get_processed_content( $post_content );
+		}
+
 		// Get valid counts.
 		$count = maipub_get_content( $post_content, $args, true );
 
