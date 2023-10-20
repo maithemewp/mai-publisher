@@ -144,6 +144,9 @@ function maipub_get_processed_content( $content ) {
 
 /**
  * Adds content area to existing content/HTML.
+ * We can't cache this function because it runs early to get counts for JS
+ * then runs again in the_content filter which may have modified content
+ * and needs to run in real time.
  *
  * @since 0.1.0
  *
