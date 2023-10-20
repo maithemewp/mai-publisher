@@ -340,8 +340,8 @@ class Mai_Publisher_Display {
 
 				// Get key values.
 				$targeting = [];
-				$type      = $tags->get_attribute( 'data-type' );
-				$pos       = $tags->get_attribute( 'data-pos' );
+				$type      = $tags->get_attribute( 'data-at' );
+				$pos       = $tags->get_attribute( 'data-ap' );
 
 				// Set ad type.
 				if ( $type ) {
@@ -350,7 +350,7 @@ class Mai_Publisher_Display {
 
 				// Set ad position.
 				if ( $pos ) {
-					$targeting['p'] = $pos;
+					$targeting['ap'] = $pos;
 				}
 
 				// Add data.

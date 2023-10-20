@@ -128,12 +128,12 @@ class Mai_Publisher_Ad_Unit_Block {
 
 			// Add type.
 			if ( $type ) {
-				$attr_inner['data-type'] = esc_attr( $type );
+				$attr_inner['data-at'] = esc_attr( $type );
 			}
 
 			// Add position.
 			if ( $pos ) {
-				$attr_inner['data-pos'] = esc_attr( $pos );
+				$attr_inner['data-ap'] = esc_attr( $pos );
 			}
 
 			// Add label.
@@ -176,12 +176,12 @@ class Mai_Publisher_Ad_Unit_Block {
 
 			// Add type.
 			if ( $type ) {
-				$attr['data-type'] = esc_attr( $type );
+				$attr['data-at'] = esc_attr( $type );
 			}
 
 			// Add position.
 			if ( $pos ) {
-				$attr['data-pos'] = esc_attr( $pos );
+				$attr['data-ap'] = esc_attr( $pos );
 			}
 
 			// Add label.
