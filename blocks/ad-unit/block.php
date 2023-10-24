@@ -103,11 +103,13 @@ class Mai_Publisher_Ad_Unit_Block {
 		// Start HTML.
 		$html = '';
 
-		// Sticky footer adds another wrapper.
-		if ( 'footer-sticky' === $id ) {
+		// Sticky footer (bottoms sticky) adds another wrapper.
+		if ( in_array( $pos, [ 'ts', 'bs' ] ) ) {
+			$location = 'ts' === $pos ? 'header' : 'footer';
+
 			// Start outer attributes.
 			$attr_outer = [
-				'class' => 'mai-ad-unit-container mai-ad-unit-has-sticky mai-ad-unit-has-sticky-footer',
+				'class' => "mai-ad-unit-container mai-ad-unit-has-sticky mai-ad-unit-has-sticky-{$location}",
 			];
 
 			// Add custom classes.
@@ -123,7 +125,7 @@ class Mai_Publisher_Ad_Unit_Block {
 			// Start inner attributes.
 			$attr_inner = [
 				'id'    => $slot,
-				'class' => 'mai-ad-unit mai-ad-unit-sticky mai-ad-unit-sticky-footer',
+				'class' => "mai-ad-unit mai-ad-unit-sticky mai-ad-unit-sticky-{$location}",
 			];
 
 			// Add type.
@@ -374,9 +376,14 @@ class Mai_Publisher_Ad_Unit_Block {
 						'name'    => 'position',
 						'type'    => 'select',
 						'choices' => [
-							''    => __( 'Not set', 'mai-publisher' ),
-							'atf' => __( 'Above the Fold', 'mai-publisher' ),
-							'btf' => __( 'Below the Fold', 'mai-publisher' ),
+							''     => __( 'Not set', 'mai-publisher' ),
+							'atf'  => __( 'Above the Fold', 'mai-publisher' ),
+							'btf'  => __( 'Below the Fold', 'mai-publisher' ),
+							's'    => __( 'Sidebar', 'mai-publisher' ),
+							'satf' => __( 'Sidebar Above the Fold', 'mai-publisher' ),
+							'vs'   => __( 'Sticky Vertical', 'mai-publisher' ),
+							'ts'   => __( 'Sticky Top Horizontal', 'mai-publisher' ),
+							'bs'   => __( 'Sticky Bottom Horizontal', 'mai-publisher' ),
 						],
 					],
 					[
