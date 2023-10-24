@@ -65,7 +65,7 @@
         "meta_input": {
             "maipub_single_location": "content",
             "maipub_single_content_location": "before",
-            "maipub_single_content_count": "3,6,9",
+            "maipub_single_content_count": "3,6,9,12,15,18",
             "maipub_single_types": [
                 "post"
             ],
