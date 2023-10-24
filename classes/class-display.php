@@ -119,6 +119,7 @@ class Mai_Publisher_Display {
 					[
 						'gamBase' => $gam_base,
 						'ads'     => $gam_ads,
+						'targets' => $this->get_targets(),
 					]
 				);
 			}
@@ -381,6 +382,92 @@ class Mai_Publisher_Display {
 		} else {
 			return $slug;
 		}
+	}
+
+	/**
+	 * Get targets.
+	 * These must be exist in our GAM 360.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	function get_targets() {
+		$targets = [];
+		$age     = maipub_get_content_age();
+		$creator = $this->get_content_creator();
+		$group   = $this->get_content_group();
+		$path    = maipub_get_current_page( 'url' );
+		$type    = maipub_get_current_page( 'name' );
+		$iabct   = maipub_get_current_page( 'iabct' );
+
+		// Content age.
+		if ( $age ) {
+			$targets['ca'] = $age[0];
+		}
+
+		// Content creator.
+		if ( $creator ) {
+			$targets['cc'] = $creator;
+		}
+
+		// Content group/category.
+		if ( $group ) {
+			$targets['cg'] = $group;
+		}
+
+		// Content path.
+		if ( $path ) {
+			$targets['cp'] = wp_parse_url( $path, PHP_URL_PATH );
+		}
+
+		// Content type.
+		if ( $type ) {
+			$targets['ct'] = sanitize_title_with_dashes( $type );
+		}
+
+		// IAB Content Taxonomy.
+		if ( $iabct ) {
+			$targets['iabct'] = $iabct;
+		}
+
+		ray( $targets );
+
+		return $targets;
+	}
+
+	/**
+	 * Get content creator.
+	 *
+	 * @since TBD
+	 *
+	 * @return int|false
+	 */
+	function get_content_creator() {
+		if ( ! is_singular() ) {
+			return false;
+		}
+
+		$author_id = get_post_field( 'post_author', get_the_ID() );
+
+		return absint( $author_id );
+	}
+
+	/**
+	 * Get content group/category slug.
+	 *
+	 * @since TBD
+	 *
+	 * @return string|false
+	 */
+	function get_content_group() {
+		if ( ! is_singular() ) {
+			return false;
+		}
+
+		$term = maipub_get_primary_term( 'category', get_the_ID() );
+
+		return $term ? $term->slug : false;
 	}
 
 	/**

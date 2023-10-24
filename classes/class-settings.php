@@ -366,7 +366,7 @@ class Mai_Publisher_Settings {
 		echo '<div style="display:flex;align-items:center;gap:1em;">';
 			echo '<select id="iab-category" name="mai_publisher[category]">';
 				printf( '<option value="">%s</option>', __( 'Select a sitewide category...', 'mai-publisher' ) );
-				foreach ( (array) maipub_get_all_categories() as $id => $label ) {
+				foreach ( (array) maipub_get_all_iab_categories() as $id => $label ) {
 					printf( '<option value="%s"%s>%s</option>', $id, selected( $selected, $id ), $label );
 				}
 			echo '</select>';

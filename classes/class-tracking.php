@@ -100,14 +100,17 @@ class Mai_Publisher_Tracking {
 					// If we're fetching trending or popular counts.
 					if ( ( $trending_days || $views_days ) && $interval ) {
 						// Get page data and current timestamp.
-						$page    = $this->get_current_page();
+						$page    = maipub_get_current_page();
 						$current = current_datetime()->getTimestamp();
+						$updated = false;
 
-						// Get last updated timestamp.
-						if ( is_singular() ) {
-							$updated = get_post_meta( $page['id'], 'mai_views_updated', true );
-						} else {
-							$updated = get_term_meta( $page['id'], 'mai_views_updated', true );
+						// If we have an ID, get the last updated timestamp.
+						if ( $page['id'] ) {
+							if ( is_singular() ) {
+								$updated = get_post_meta( $page['id'], 'mai_views_updated', true );
+							} else {
+								$updated = get_term_meta( $page['id'], 'mai_views_updated', true );
+							}
 						}
 
 						// If last updated timestampe is more than N minutes (converted to seconds) ago.
@@ -260,7 +263,7 @@ class Mai_Publisher_Tracking {
 	/**
 	 * Gets post category.
 	 *
-	 * @todo Add support for CPT and Custom Taxonomies?
+	 * @todo TODO: Add support for CPT and Custom Taxonomies?
 	 *
 	 * @since 0.3.0
 	 *
@@ -353,7 +356,7 @@ class Mai_Publisher_Tracking {
 	 */
 	function set_site_dimension_9() {
 		// Uses readable name as the type. 'Post' instead of 'post'.
-		$type = $this->get_current_page( 'name' );
+		$type = maipub_get_current_page( 'name' );
 
 		if ( ! $type ) {
 			return;
@@ -515,30 +518,15 @@ class Mai_Publisher_Tracking {
 	 * @return void
 	 */
 	function set_global_dimension_7() {
-		$iab = $primary = false;
+		$iab = maipub_get_iab_category();
 
-		if ( is_singular( 'post' ) ) {
-			$primary = maipub_get_primary_term( 'category', get_the_ID() );
-
-		} elseif ( is_category() ) {
-			$object  = get_queried_object();
-			$primary = $object && $object instanceof WP_Term ? $object : 0;
-		}
-
-		if ( $primary ) {
-			$iab = get_term_meta( $primary->term_id, 'maipub_category', true );
-		}
-
+		// Maybe fallback to sitewide category.
 		if ( ! $iab ) {
 			$iab = maipub_get_option( 'category', false );
 		}
 
-		if ( ! $iab ) {
-			return;
-		}
-
 		// Get category label from ID.
-		$categories = maipub_get_all_categories();
+		$categories = maipub_get_all_iab_categories();
 		$iab        = isset( $categories[ $iab ] ) ? $categories[ $iab ] : false;
 
 		if ( ! $iab ) {
@@ -582,98 +570,13 @@ class Mai_Publisher_Tracking {
 	 */
 	function set_global_dimension_9() {
 		// Uses readable name as the type. 'Post' instead of 'post'.
-		$type = $this->get_current_page( 'name' );
+		$type = maipub_get_current_page( 'name' );
 
 		if ( ! $type ) {
 			return;
 		}
 
 		$this->global_dimensions[9] = $type;
-	}
-
-	/**
-	 * Get current page data.
-	 *
-	 * @since 0.3.0
-	 *
-	 * @param string $key The key to return.
-	 *
-	 * @return array|string
-	 */
-	function get_current_page( $key = '' ) {
-		static $data = null;
-
-		if ( ! is_null( $data ) ) {
-			return $key ? $data[ $key ] : $data;
-		}
-
-		$data = [
-			'type' => '',
-			'name' => '',
-			'id'   => '',
-			'url'  => '',
-		];
-
-		// Single post.
-		if ( is_singular() ) {
-			$object = get_post_type_object( get_post_type() );
-
-			if ( $object ) {
-				$data['type'] = 'post';
-				$data['name'] = $object->labels->singular_name; // Singular name.
-				$data['id']   = get_the_ID();
-				$data['url']  = get_permalink();
-			}
-		}
-		// Post type archive.
-		elseif ( is_home() ) {
-			$object = get_post_type_object( 'post' );
-
-			if ( $object ) {
-				$post_id      = absint( get_option( 'page_for_posts' ) );
-				$data['name'] = $object->label; // Plural name.
-				$data['id']   = $post_id;
-				$data['url']  = $post_id ? get_permalink( $post_id ) : get_home_url();
-			}
-		}
-		// Custom post type archive.
-		elseif ( is_post_type_archive() ) {
-			$object = get_post_type_object( get_post_type() );
-
-			if ( $object ) {
-				$data['name'] = $object->label; // Plural name.
-				$data['url']  = get_post_type_archive_link( $object->name );
-			}
-		}
-		// Taxonomy archive.
-		elseif ( is_category() || is_tag() || is_tax() ) {
-			$object = get_queried_object();
-
-			if ( $object  ) {
-				$taxonomy = get_taxonomy( $object->taxonomy );
-
-				if ( $taxonomy ) {
-					$data['type'] = 'term';
-					$data['name'] = $taxonomy->labels->singular_name; // Singular name.
-					$data['id']   = $object->term_id;
-					$data['url']  = get_term_link( $object );
-				}
-			}
-		}
-		// Date archives.
-		elseif ( is_date() || is_year() || is_month() || is_day() || is_time() ) {
-			$data['name'] = 'Date';
-		}
-		// Author archives.
-		elseif ( is_author() ) {
-			$data['name'] = 'Author';
-		}
-		// Search results.
-		elseif ( is_search() ) {
-			$data['name'] = 'Search';
-		}
-
-		return $key ? $data[ $key ] : $data;
 	}
 
 	/**
