@@ -68,6 +68,7 @@
 
 .mai-ad-unit-sticky-header::after,
 .mai-ad-unit-sticky-footer::after {
+	position: absolute;
 	width: 100vw;
 	background: rgba(255, 255, 255, 0.8);
 	box-shadow: 0 0 16px 0px rgba(0, 0, 0, 0.1);
@@ -76,11 +77,11 @@
 }
 
 .mai-ad-unit-sticky-header::after {
-	top: var(--body-top, 0);
+	top: 0;
 	bottom: 0;
 }
 
 .mai-ad-unit-sticky-footer::after {
-	top: -28px;
+	top: -28px; /* adds space for Sponsored label */
 	bottom: 0;
 }

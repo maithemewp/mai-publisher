@@ -371,7 +371,7 @@ class Mai_Publisher_Ad_Unit_Block {
 						],
 					],
 					[
-						'label'   => __( 'Position', 'mai-publisher' ),
+						'label'   => __( 'Ad Position', 'mai-publisher' ),
 						'key'     => 'maipub_ad_unit_position',
 						'name'    => 'position',
 						'type'    => 'select',
