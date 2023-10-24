@@ -241,55 +241,20 @@ class Mai_Publisher_Tracking {
 	}
 
 	/**
-	 * Gets content age.
+	 * Gets readable content age label.
 	 *
 	 * @since 0.3.0
 	 *
 	 * @return array
 	 */
 	function set_site_dimension_6() {
-		$date = get_the_date( 'F j, Y' );
+		$age = maipub_get_content_age();
 
-		if ( ! $date ) {
+		if ( ! $age ) {
 			return;
 		}
 
-		$range  = false;
-		$date   = new DateTime( $date );
-		$today  = new DateTime( 'now' );
-		$days   = $today->diff( $date )->format( '%a' );
-		$ranges = [
-			[ 0, 29 ],
-			[ 30, 89 ],
-			[ 90, 179 ],
-			[ 180, 364 ],
-			[ 367, 729 ],
-		];
-
-		foreach ( $ranges as $index => $values ) {
-			if ( ! filter_var( $days, FILTER_VALIDATE_INT,
-				[
-					'options' => [
-						'min_range' => $values[0],
-						'max_range' => $values[1],
-					],
-				],
-			)) {
-				continue;
-			}
-
-			$range = sprintf( '%s-%s', $values[0], $values[1] );
-		}
-
-		if ( ! $range && $days > 729 ) {
-			$range = '2000+';
-		}
-
-		if ( ! $range ) {
-			return;
-		}
-
-		$this->site_dimensions[6] = $range . ' days';
+		$this->site_dimensions[6] = $age[1];
 	}
 
 	/**
