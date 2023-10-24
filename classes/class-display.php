@@ -423,7 +423,7 @@ class Mai_Publisher_Display {
 
 		// Content type.
 		if ( $type ) {
-			$targets['ct'] = sanitize_title_with_dashes( $type );
+			// $targets['ct'] = sanitize_title_with_dashes( $type );
 		}
 
 		// IAB Content Taxonomy.
