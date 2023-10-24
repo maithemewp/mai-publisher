@@ -44,7 +44,6 @@ if ( window.googletag && googletag.apiReady ) {
 		// Set page-level targeting.
 		if ( maiPubAdsVars.targeting ) {
 			Object.keys( maiPubAdsVars.targeting ).forEach( key => {
-				console.log( key, maiPubAdsVars.targeting[key] );
 				googletag.pubads().setTargeting( key, maiPubAdsVars.targeting[key] );
 			});
 		}
