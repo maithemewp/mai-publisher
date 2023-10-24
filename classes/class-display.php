@@ -117,9 +117,9 @@ class Mai_Publisher_Display {
 				wp_enqueue_script( 'mai-publisher-ads', maipub_get_file_data( $file, 'url' ), [ 'google-gpt' ], maipub_get_file_data( $file, 'version' ), false ); // Asyncing broke ads.
 				wp_localize_script( 'mai-publisher-ads', 'maiPubAdsVars',
 					[
-						'gamBase' => $gam_base,
-						'ads'     => $gam_ads,
-						'targets' => $this->get_targets(),
+						'gamBase'   => $gam_base,
+						'ads'       => $gam_ads,
+						'targeting' => $this->get_targets(),
 					]
 				);
 			}
@@ -430,8 +430,6 @@ class Mai_Publisher_Display {
 		if ( $iabct ) {
 			$targets['iabct'] = $iabct;
 		}
-
-		ray( $targets );
 
 		return $targets;
 	}

@@ -41,8 +41,13 @@ if ( window.googletag && googletag.apiReady ) {
 			);
 		});
 
-		// TODO: Configure page-level targeting.
-		// googletag.pubads().setTargeting( 'interests', 'basketball' );
+		// Set page-level targeting.
+		if ( maiPubAdsVars.targeting ) {
+			Object.keys( maiPubAdsVars.targeting ).forEach( key => {
+				console.log( key, maiPubAdsVars.targeting[key] );
+				googletag.pubads().setTargeting( key, maiPubAdsVars.targeting[key] );
+			});
+		}
 
 		/**
 		 * Lazy loading.
