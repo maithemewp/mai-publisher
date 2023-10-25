@@ -5,7 +5,7 @@ if ( window.googletag && googletag.apiReady ) {
 	const ads           = maiPubAdsVars['ads'];
 	const refreshKey    = 'refresh';
 	const refreshvalue  = 'true';
-	const prebidTimeout = 2000;
+	const refreshTime   = 30; // Time in seconds.
 
 	googletag.cmd.push(() => {
 		const gamBase = maiPubAdsVars['gamBase'];
@@ -77,51 +77,71 @@ if ( window.googletag && googletag.apiReady ) {
 	});
 
 	// Set currently visible ads and timeout ids objects.
+	const loadTimes        = {};
 	const currentlyVisible = {};
 	const timeoutIds       = {};
 
 	/**
-	 * Refreshes ads when they become visible.
+	 * Set 30 refresh when an ad is in view.
 	 */
-	// googletag.pubads().addEventListener( 'slotVisibilityChanged', (event) => {
-	// 	// let   timeoutId = null;
-	// 	const slot      = event.slot;
-	// 	const slotId    = slot.getSlotElementId();
-	// 	const inView    = event.inViewPercentage > 50;
+	googletag.pubads().addEventListener( 'impressionViewable', function( event ) {
+		const slot   = event.slot;
+		const slotId = slot.getSlotElementId();
 
-	// 	// Bail if not refreshing.
-	// 	if ( slot.getTargeting( refreshKey ).indexOf( refreshvalue ) < 0 ) {
-	// 		return;
-	// 	}
+		// Bail if not refreshing.
+		if ( slot.getTargeting( refreshKey ).indexOf( refreshvalue ) < 0 ) {
+			return;
+		}
 
-	// 	// If in view and not currently visible, set to visible.
-	// 	if ( inView && ! currentlyVisible[slotId] ) {
-	// 		currentlyVisible[slotId] = true;
-	// 	}
-	// 	// If not in view and currently visible, set to not visible.
-	// 	else if ( ! inView && currentlyVisible[slotId] ) {
-	// 		currentlyVisible[slotId] = false;
-	// 	}
-	// 	// Not a change we care about.
-	// 	else {
-	// 		return;
-	// 	}
+		// Set first load to current time.
+		loadTimes[slotId] = Date.now();
 
-	// 	// If not currently visible, clear timeout.
-	// 	if ( ! currentlyVisible[slotId] ) {
-	// 		clearTimeout( timeoutIds[slotId] );
-	// 	}
+		// Set timeout to refresh ads for current visible ads.
+		timeoutIds[slotId] = setTimeout(() => {
+			// console.log( slotId + ' is refreshing (impressionViewable).' );
+			googletag.pubads().refresh( [slot] );
+		}, refreshTime * 1000 ); // Time in milliseconds.
+	});
 
-	// 	// Loop through timeoutIds and clear all of them.
-	// 	// Object.keys( timeoutIds ).forEach( id => {
-	// 	// 	clearTimeout( timeoutIds[id] );
-	// 	// });
+	/**
+	 * Refreshes ads when scrolled back into view.
+	 * Only refreshes if it's been 30 seconds since the ad was initially shown.
+	 */
+	googletag.pubads().addEventListener( 'slotVisibilityChanged', (event) => {
+		const slot   = event.slot;
+		const slotId = slot.getSlotElementId();
+		const inView = event.inViewPercentage > 20;
 
-	// 	// Set timeout to refresh ads for current visible ads.
-	// 	timeoutIds[slotId] = setTimeout(() => {
-	// 		googletag.pubads().refresh( [slot] );
-	// 	}, 30 * 1000 ); // 30 seconds.
+		// Bail if not refreshing.
+		if ( slot.getTargeting( refreshKey ).indexOf( refreshvalue ) < 0 ) {
+			return;
+		}
 
-	// 	console.log( timeoutIds );
-	// });
+		// If in view and not currently visible, set to visible.
+		if ( inView && ! currentlyVisible[slotId] ) {
+			currentlyVisible[slotId] = true;
+		}
+		// If not in view and currently visible, set to not visible.
+		else if ( ! inView && currentlyVisible[slotId] ) {
+			currentlyVisible[slotId] = false;
+		}
+		// Not a change we care about.
+		else {
+			return;
+		}
+
+		// If scrolled out of view, clear timeout then bail.
+		if ( ! currentlyVisible[slotId] ) {
+			clearTimeout( timeoutIds[slotId] );
+			return;
+		}
+
+		// Bail if loadTimes is undefined, or it hasn't been 30 seconds (in milliseconds).
+		if ( 'undefined' === typeof loadTimes[slotId] || ( loadTimes[slotId] && Date.now() - loadTimes[slotId] < refreshTime * 1000 ) ) {
+			return;
+		}
+
+		// console.log( slotId + ' is refreshing (slotVisibilityChanged).' );
+		googletag.pubads().refresh( [slot] );
+	});
 }
