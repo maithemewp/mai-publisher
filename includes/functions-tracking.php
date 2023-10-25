@@ -12,7 +12,7 @@ defined( 'ABSPATH' ) || die;
  * @return array
  */
 function maipub_get_content_age() {
-	$age = null;
+	static $age = null;
 
 	if ( ! is_null( $age ) ) {
 		return $age;
@@ -30,9 +30,9 @@ function maipub_get_content_age() {
 		return $age;
 	}
 
-	$date   = new DateTime( $date );
-	$today  = new DateTime( 'now' );
-	$days   = $today->diff( $date )->format( '%a' );
+	$date  = new DateTime( $date );
+	$today = new DateTime( 'now' );
+	$days  = $today->diff( $date )->format( '%a' );
 
 	if ( ! $days ) {
 		return $age;
