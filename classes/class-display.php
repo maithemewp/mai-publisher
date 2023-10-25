@@ -297,7 +297,7 @@ class Mai_Publisher_Display {
 
 					// If ad pos.
 					if ( $pos ) {
-						$targeting['p'] = $pos;
+						$targeting['ap'] = $pos;
 					}
 
 					// Loop through the $count and add the ad ID to the array.
