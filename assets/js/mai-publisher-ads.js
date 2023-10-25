@@ -105,7 +105,7 @@ if ( window.googletag && googletag.apiReady ) {
 
 	/**
 	 * Refreshes ads when scrolled back into view.
-	 * Only refreshes if it's been 30 seconds since the ad was initially shown.
+	 * Only refreshes if it's been n seconds since the ad was initially shown.
 	 */
 	googletag.pubads().addEventListener( 'slotVisibilityChanged', (event) => {
 		const slot   = event.slot;
@@ -136,7 +136,7 @@ if ( window.googletag && googletag.apiReady ) {
 			return;
 		}
 
-		// Bail if loadTimes is undefined, or it hasn't been 30 seconds (in milliseconds).
+		// Bail if loadTimes is undefined, or it hasn't been n seconds (in milliseconds).
 		if ( 'undefined' === typeof loadTimes[slotId] || ( loadTimes[slotId] && Date.now() - loadTimes[slotId] < refreshTime * 1000 ) ) {
 			return;
 		}
