@@ -33,7 +33,7 @@ class Mai_Publisher_Display {
 	/**
 	 * Add links to toolbar.
 	 *
-	 * @since TBD
+	 * @since 0.9.0
 	 *
 	 * @param WP_Admin_Bar $wp_admin_bar Admin bar object.
 	 *
@@ -388,7 +388,7 @@ class Mai_Publisher_Display {
 	 * Get targets.
 	 * These must be exist in our GAM 360.
 	 *
-	 * @since TBD
+	 * @since 0.9.0
 	 *
 	 * @return void
 	 */
@@ -398,7 +398,7 @@ class Mai_Publisher_Display {
 		$creator = $this->get_content_creator();
 		$group   = $this->get_content_group();
 		$path    = maipub_get_current_page( 'url' );
-		$type    = maipub_get_current_page( 'name' );
+		$type    = $this->get_content_type();
 		$iabct   = maipub_get_current_page( 'iabct' );
 
 		// Content age.
@@ -423,7 +423,7 @@ class Mai_Publisher_Display {
 
 		// Content type.
 		if ( $type ) {
-			// $targets['ct'] = sanitize_title_with_dashes( $type );
+			$targets['ct'] = $type;
 		}
 
 		// IAB Content Taxonomy.
@@ -437,7 +437,7 @@ class Mai_Publisher_Display {
 	/**
 	 * Get content creator.
 	 *
-	 * @since TBD
+	 * @since 0.9.0
 	 *
 	 * @return int|false
 	 */
@@ -454,7 +454,7 @@ class Mai_Publisher_Display {
 	/**
 	 * Get content group/category slug.
 	 *
-	 * @since TBD
+	 * @since 0.9.0
 	 *
 	 * @return string|false
 	 */
@@ -466,6 +466,103 @@ class Mai_Publisher_Display {
 		$term = maipub_get_primary_term( 'category', get_the_ID() );
 
 		return $term ? $term->slug : false;
+	}
+
+	/**
+	 * Get content type.
+	 *
+	 * @since 0.9.1
+	 *
+	 * @return string|false
+	 */
+	function get_content_type() {
+		$type = '';
+
+		// Blog page.
+		if ( is_home() ) {
+			$type = 'bp';
+		}
+		// Single page.
+		elseif ( is_singular( 'page' ) ) {
+			$type = 'pa';
+
+			// Home page.
+			if ( is_front_page() ) {
+				$type = 'hp';
+			}
+		}
+		// Single post.
+		elseif ( is_singular( 'post' ) ) {
+			$type    = 'po';
+			$primary = maipub_get_primary_term( 'category', get_the_ID() );
+
+			// Check for category specific content type.
+			if ( $primary ) {
+				// Podcast.
+				if ( str_contains( $primary->slug, 'podcast' ) ) {
+					$type = 'pod';
+				}
+				// Recipe.
+				elseif ( str_contains( $primary->slug, 'recipe' ) ) {
+					$type = 're';
+				}
+
+				// If it's not specific, check ancestors.
+				if ( 'po' === $type ) {
+					$ancestors = get_ancestors( $primary->term_id, 'category', 'taxonomy' );
+
+					if ( $ancestors ) {
+						$contains  = [ $primary->slug ];
+
+						foreach ( $ancestors as $ancestor ) {
+							$term = get_term( $ancestor );
+
+							if ( $term && ! is_wp_error( $term ) ) {
+								$contains[] = $term->slug;
+							}
+						}
+
+						if ( $contains ) {
+							foreach ( $contains as $slug ) {
+								if ( str_contains( $slug, 'podcast' ) ) {
+									$type = 'pod';
+									break;
+								}
+
+								if ( str_contains( $slug, 'recipe' ) ) {
+									$type = 're';
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		// CPT.
+		elseif ( is_singular() ) {
+			$type      = 'cpt';
+			$post_type = get_post_type();
+
+			// Podcast.
+			if ( str_contains( $post_type, 'podcast' ) ) {
+				$type = 'pod';
+			}
+			// Recipe.
+			elseif ( str_contains( $post_type, 'recipe' ) ) {
+				$type = 're';
+			}
+		}
+		// Category.
+		elseif ( is_category() ) {
+			$type = 'ca';
+		}
+		// Tag.
+		elseif ( is_tag() ) {
+			$type = 'ta';
+		}
+
+		return $type;
 	}
 
 	/**

@@ -7,7 +7,7 @@ defined( 'ABSPATH' ) || die;
  * Gets the content age.
  * Index 0 is the min months, index 1 is the readable string label.
  *
- * @since TBD
+ * @since 0.9.0
  *
  * @return array
  */
@@ -184,7 +184,7 @@ function maipub_get_current_page( $key = '' ) {
 /**
  * Gets the IAB category taxonomy ID.
  *
- * @since TBD
+ * @since 0.9.0
  *
  * @return string|false
  */

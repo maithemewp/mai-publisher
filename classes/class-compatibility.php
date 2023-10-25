@@ -14,7 +14,7 @@ class Mai_Publisher_Plugin_Compatibility {
 	/**
 	 * Add hooks.
 	 *
-	 * @since TBD
+	 * @since 0.9.0
 	 *
 	 * @return void
 	 */
@@ -25,7 +25,7 @@ class Mai_Publisher_Plugin_Compatibility {
 	/**
 	 * Check if the post has a custom TOC.
 	 *
-	 * @since TBD
+	 * @since 0.9.0
 	 *
 	 * @return bool
 	 */
