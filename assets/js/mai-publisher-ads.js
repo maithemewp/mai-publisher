@@ -44,7 +44,7 @@ if ( window.googletag && googletag.apiReady ) {
 		// Set page-level targeting.
 		if ( maiPubAdsVars.targeting ) {
 			Object.keys( maiPubAdsVars.targeting ).forEach( key => {
-				googletag.pubads().setTargeting( key, maiPubAdsVars.targeting[key] );
+				googletag.pubads().setTargeting( key, maiPubAdsVars.targeting[key].toString() );
 			});
 		}
 
@@ -76,16 +76,52 @@ if ( window.googletag && googletag.apiReady ) {
 		googletag.enableServices();
 	});
 
-	/**
-	 * Refresh ads only when they are in view and after expiration of refreshSeconds.
-	 */
-	googletag.pubads().addEventListener( 'impressionViewable', function( event ) {
-		const slot = event.slot;
+	// Set currently visible ads and timeout ids objects.
+	const currentlyVisible = {};
+	const timeoutIds       = {};
 
-		if ( slot.getTargeting( refreshKey ).indexOf( refreshvalue ) >= 0 ) {
-			setTimeout( function() {
-				googletag.pubads().refresh( [slot] );
-			}, 30 * 1000 ); // 30 seconds.
-		}
-	});
+	/**
+	 * Refreshes ads when they become visible.
+	 */
+	// googletag.pubads().addEventListener( 'slotVisibilityChanged', (event) => {
+	// 	// let   timeoutId = null;
+	// 	const slot      = event.slot;
+	// 	const slotId    = slot.getSlotElementId();
+	// 	const inView    = event.inViewPercentage > 50;
+
+	// 	// Bail if not refreshing.
+	// 	if ( slot.getTargeting( refreshKey ).indexOf( refreshvalue ) < 0 ) {
+	// 		return;
+	// 	}
+
+	// 	// If in view and not currently visible, set to visible.
+	// 	if ( inView && ! currentlyVisible[slotId] ) {
+	// 		currentlyVisible[slotId] = true;
+	// 	}
+	// 	// If not in view and currently visible, set to not visible.
+	// 	else if ( ! inView && currentlyVisible[slotId] ) {
+	// 		currentlyVisible[slotId] = false;
+	// 	}
+	// 	// Not a change we care about.
+	// 	else {
+	// 		return;
+	// 	}
+
+	// 	// If not currently visible, clear timeout.
+	// 	if ( ! currentlyVisible[slotId] ) {
+	// 		clearTimeout( timeoutIds[slotId] );
+	// 	}
+
+	// 	// Loop through timeoutIds and clear all of them.
+	// 	// Object.keys( timeoutIds ).forEach( id => {
+	// 	// 	clearTimeout( timeoutIds[id] );
+	// 	// });
+
+	// 	// Set timeout to refresh ads for current visible ads.
+	// 	timeoutIds[slotId] = setTimeout(() => {
+	// 		googletag.pubads().refresh( [slot] );
+	// 	}, 30 * 1000 ); // 30 seconds.
+
+	// 	console.log( timeoutIds );
+	// });
 }
