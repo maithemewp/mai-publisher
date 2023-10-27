@@ -99,14 +99,24 @@ class Mai_Publisher_Ad_Unit_Block {
 
 		// Build script.
 		if ( 'demo' === maipub_get_option( 'ad_mode', false ) ) {
-			$last = end( $unit['sizes_desktop'] ); // Last should be the largest.
-			$file = sprintf( 'assets/img/placeholders/%s.png', implode( 'x', $last ) );
+			$mobile  = end( $unit['sizes_mobile'] );  // Last should be the largest.
+			$tablet  = end( $unit['sizes_tablet'] );  // Last should be the largest.
+			$desktop = end( $unit['sizes_desktop'] ); // Last should be the largest.
+			// $file    = sprintf( 'assets/img/placeholders/%s.png', implode( 'x', $last ) );
+			// if ( file_exists( sprintf( '%s%s', MAI_PUBLISHER_DIR, $file ) ) ) {
+			// 	$script = sprintf( '<img src="%s" />', sprintf( '%s%s', MAI_PUBLISHER_URL, $file ) );
+			// } else {
+				// $script = sprintf( '<img src="https://placehold.co/%s" />', implode( 'x', $last ) );
+			// }
 
-			if ( file_exists( sprintf( '%s%s', MAI_PUBLISHER_DIR, $file ) ) ) {
-				$script = sprintf( '<img src="%s" />', sprintf( '%s%s', MAI_PUBLISHER_URL, $file ) );
-			} else {
-				$script = sprintf( '<img src="https://placehold.co/%s" />', implode( 'x', $last ) );
-			}
+			$script  = '';
+			$script .= '<picture>';
+				$script .= sprintf( '<source srcset="https://placehold.co/%s" media="(max-width: 727px)" />', implode( 'x', $mobile ) );
+				$script .= sprintf( '<source srcset="https://placehold.co/%s" media="(min-width: 728px) and (max-width: 1023px)" />', implode( 'x', $tablet ) );
+				$script .= sprintf( '<source srcset="https://placehold.co/%s" media="(min-width: 1024px)" />', implode( 'x', $desktop ) );
+				$script .= sprintf( '<img src="https://placehold.co/%s" />', implode( 'x', $desktop ) );
+			$script .= '</picture>';
+
 		} else {
 			$script = sprintf( '<script>window.googletag = window.googletag || {};googletag.cmd = googletag.cmd || [];if ( window.googletag && googletag.apiReady ) { googletag.cmd.push(function(){ googletag.display("%s"); }); }</script>', $slot );
 		}
