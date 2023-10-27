@@ -135,11 +135,11 @@ class Mai_Publisher_Settings {
 		 ************/
 
 		 add_settings_field(
-			'enabled', // id
-			__( 'Enable tracking', 'mai-publisher' ), // title
-			[ $this, 'enabled_callback' ], // callback
+			'ad_mode', // id
+			__( 'Ad mode', 'mai-publisher' ), // title
+			[ $this, 'ad_mode_callback' ], // callback
 			'mai-publisher-section', // page
-			'mai_publisher_settings' // section
+			'maipub_settings' // section
 		);
 
 		add_settings_field(
@@ -273,6 +273,7 @@ class Mai_Publisher_Settings {
 	 */
 	function maipub_sanitize( $input ) {
 		$allowed = [
+			'ad_mode'                => 'sanitize_text_field',
 			'gam_domain'             => 'maipub_get_url_host',
 			'gam_network_code'       => 'absint',
 			'category'               => 'sanitize_text_field',
@@ -318,6 +319,23 @@ class Mai_Publisher_Settings {
 
 	function maipub_section_scripts() {
 		printf( '<h3 style="margin-top:48px;">%s</h3>', __( 'Scripts', 'mai-publisher' ) );
+	}
+
+	/**
+	 * Setting callback.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return void
+	 */
+	function ad_mode_callback() {
+		$selected = maipub_get_option( 'ad_mode' );
+
+		echo '<select name="mai_publisher[ad_mode]">';
+			printf( '<option value="">%s</option>', __( 'Active', 'mai-publisher' ) );
+			printf( '<option value="disabled"%s>%s</option>', selected( $selected, 'disabled' ), __( 'Disabled', 'mai-publisher' ) );
+			printf( '<option value="demo"%s>%s</option>', selected( $selected, 'demo' ), __( 'Demo', 'mai-publisher' ) );
+		echo '</select>';
 	}
 
 	/**

@@ -22,12 +22,8 @@ class Mai_Publisher_Display {
 	 * @return void
 	 */
 	function hooks() {
-		add_action( 'admin_bar_menu',     [ $this, 'add_admin_bar_item' ], 9999 );
-		add_action( 'wp_enqueue_scripts', [ $this, 'run' ], 0 );
-		add_action( 'wp_head',            [ $this, 'header' ] );
-		add_action( 'wp_footer',          [ $this, 'footer' ], 20 );
-		add_action( 'genesis_sidebar',    [ $this, 'set_sidebar_prefix' ], 0 );
-		add_action( 'genesis_sidebar',    [ $this, 'unset_sidebar_prefix' ], 999 );
+		add_action( 'admin_bar_menu',    [ $this, 'add_admin_bar_item' ], 9999 );
+		add_action( 'template_redirect', [ $this, 'maybe_run' ] );
 	}
 
 	/**
@@ -55,6 +51,25 @@ class Mai_Publisher_Display {
 				],
 			]
 		);
+	}
+
+	/**
+	 * Check if ads are active.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	function maybe_run() {
+		if ( 'disabled' === maipub_get_option( 'ad_mode', false ) ) {
+			return;
+		}
+
+		add_action( 'wp_enqueue_scripts', [ $this, 'run' ], 0 );
+		add_action( 'wp_head',            [ $this, 'header' ] );
+		add_action( 'wp_footer',          [ $this, 'footer' ], 20 );
+		add_action( 'genesis_sidebar',    [ $this, 'set_sidebar_prefix' ], 0 );
+		add_action( 'genesis_sidebar',    [ $this, 'unset_sidebar_prefix' ], 999 );
 	}
 
 	/**

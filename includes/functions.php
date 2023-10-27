@@ -677,7 +677,8 @@ function maipub_get_options() {
 function maipub_get_default_option( $option ) {
 	$options = maipub_get_default_options();
 
-	return isset( $options[ $option ] ) ? $options[ $option ] : null;
+	return $options[ $option ];
+	// return isset( $options[ $option ] ) ? $options[ $option ] : null;
 }
 
 /**
@@ -697,7 +698,9 @@ function maipub_get_default_options() {
 	$options = [
 		'version_first'          => '',
 		'version_db'             => '',
+		'ad_mode'                => '',
 		'gam_domain'             => (string) maipub_get_url_host( home_url() ),
+		'gam_network_code'       => (string) maipub_get_url_host( home_url() ),
 		'category'               => '',
 		'matomo_enabled_global'  => defined( 'MAI_PUBLISHER_MATOMO_ENABLED_GLOBAL' ) ? MAI_PUBLISHER_MATOMO_ENABLED_GLOBAL : 1,
 		'matomo_enabled'         => defined( 'MAI_PUBLISHER_MATOMO_ENABLED' ) ? MAI_PUBLISHER_MATOMO_ENABLED : 0,
