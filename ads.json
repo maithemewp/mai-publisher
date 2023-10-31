@@ -90,8 +90,13 @@
         }
     },
     "inrecipe": {
-        "post_content": "<!-- wp:group {\"tagName\":\"aside\",\"backgroundColor\":\"alt\",\"layout\":{\"type\":\"constrained\"},\"contentWidth\":\"no\",\"verticalSpacingTop\":\"sm\",\"verticalSpacingBottom\":\"sm\",\"verticalSpacingLeft\":\"xs\",\"verticalSpacingRight\":\"xs\",\"marginTop\":\"xl\",\"marginBottom\":\"xl\"} -->\n<aside class=\"wp-block-group has-alt-background-color has-background\"><!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"inrecipe\",\"_id\":\"maipub_ad_unit_id\"},\"mode\":\"preview\"} \/--><\/aside>\n<!-- \/wp:group -->",
-        "meta_input": []
+        "post_content": "<!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"medium-rectangle\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"\",\"_position\":\"maipub_ad_unit_position\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\"} \/-->",
+        "meta_input": {
+            "maipub_single_location": "recipe",
+            "maipub_single_types": [
+                "post"
+            ]
+        }
     },
     "leaderboard": {
         "post_content": "<!-- wp:group {\"tagName\":\"aside\",\"align\":\"full\",\"backgroundColor\":\"alt\",\"layout\":{\"type\":\"constrained\"},\"contentWidth\":\"no\",\"verticalSpacingTop\":\"sm\",\"verticalSpacingBottom\":\"sm\",\"verticalSpacingLeft\":\"xs\",\"verticalSpacingRight\":\"xs\",\"marginTop\":\"no\",\"marginBottom\":\"no\"} -->\n<aside class=\"wp-block-group alignfull has-alt-background-color has-background\"><!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"leaderboard\",\"_id\":\"maipub_ad_unit_id\"},\"mode\":\"preview\"} \/--><\/aside>\n<!-- \/wp:group -->",
