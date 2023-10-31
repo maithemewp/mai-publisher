@@ -99,5 +99,5 @@
 .wprm-recipe-instruction-group .mai-ad-unit {
 	position: sticky;
 	top: var(--scroll-margin-top, 0);
-	margin: 24px 0;
+	margin: 24px 0 0;
 }
