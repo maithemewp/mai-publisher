@@ -59,7 +59,7 @@ class Mai_Publisher_Plugin_Compatibility {
 	/**
 	 * Adds a hook to the recipe instructions.
 	 *
-	 * @since TBD
+	 * @since 0.11.0
 	 *
 	 * @param string      $output          The recipe markup.
 	 * @param WPRM_Recipe $recipe          The recipe object.

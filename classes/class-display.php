@@ -56,7 +56,7 @@ class Mai_Publisher_Display {
 	/**
 	 * Check if ads are active.
 	 *
-	 * @since TBD
+	 * @since 0.11.0
 	 *
 	 * @return void
 	 */
