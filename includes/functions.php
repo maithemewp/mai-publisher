@@ -532,6 +532,14 @@ function maipub_get_locations() {
 		];
 	}
 
+	// WP Recipe Maker.
+	if ( class_exists( 'WP_Recipe_Maker' ) ) {
+		$locations['recipe'] = [
+			'hook'     => 'maipub_before_recipe_instructions',
+			'priority' => 10,
+		];
+	}
+
 	$locations = apply_filters( 'mai_publisher_locations', $locations );
 
 	if ( $locations ) {
@@ -597,6 +605,10 @@ function maipub_get_location_choices( $type = '' ) {
 			'before_footer'        => __( 'Before footer', 'mai-publisher' ),
 		],
 	];
+
+	if ( class_exists( 'WP_Recipe_Maker' ) ) {
+		$cache['single']['recipe'] = __( 'In recipe', 'mai-publisher' );
+	}
 
 	if ( $type ) {
 		return $cache[ $type ];

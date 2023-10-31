@@ -85,3 +85,19 @@
 	top: -28px; /* adds space for Sponsored label */
 	bottom: 0;
 }
+
+.wprm-recipe {
+	overflow: visible !important;
+}
+
+.wprm-recipe-instruction-group {
+	display: flex;
+	gap: 24px;
+	align-items: start;
+}
+
+.wprm-recipe-instruction-group .mai-ad-unit {
+	position: sticky;
+	top: var(--scroll-margin-top, 0);
+	margin: 24px 0;
+}
