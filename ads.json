@@ -90,7 +90,7 @@
         }
     },
     "inrecipe": {
-        "post_content": "<!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"medium-rectangle\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"\",\"_position\":\"maipub_ad_unit_position\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\"} \/-->",
+        "post_content": "<!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"inrecipe\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"\",\"_position\":\"maipub_ad_unit_position\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\"} \/-->",
         "meta_input": {
             "maipub_single_location": "recipe",
             "maipub_single_types": [
