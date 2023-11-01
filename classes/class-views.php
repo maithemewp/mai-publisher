@@ -221,13 +221,13 @@ class Mai_Publisher_Views {
 
 		// Bail if no API data.
 		if ( ! ( $site_url && $site_id && $token ) ) {
-			wp_send_json_error();
+			wp_send_json_error( __( 'Missing Matomo API data.', 'mai-publisher' ) );
 			exit();
 		}
 
 		// Bail if nothing to fetch.
 		if ( ! ( ( $trending_days || $views_days ) && $interval ) ) {
-			wp_send_json_error();
+			wp_send_json_error( __( 'Missing views or trending days or interval.', 'mai-publisher' ) );
 			exit();
 		}
 
@@ -239,17 +239,22 @@ class Mai_Publisher_Views {
 
 		// Bail if we don't have the post data we need.
 		if ( ! ( $type && $id && $url && $current ) ) {
-			wp_send_json_error();
+			wp_send_json_error( __( 'Missing type, id, url, or current.', 'mai-publisher' ) );
 			exit();
 		}
 
 		// Start API data.
 		$return   = [];
 		$api_url  = trailingslashit( $site_url ) . 'index.php';
-		$fetch    = [
-			'views'    => $views_days,
-			'trending' => $trending_days,
-		];
+		$fetch    = [];
+
+		if ( $views_days ) {
+			$fetch['views'] = $views_days;
+		}
+
+		if ( $trending_days ) {
+			$fetch['trending'] = $trending_days;
+		}
 
 		// Try each API hit.
 		foreach ( $fetch as $key => $days ) {
@@ -276,13 +281,16 @@ class Mai_Publisher_Views {
 
 			// Check for a successful request.
 			if ( is_wp_error( $response ) ) {
-				wp_send_json_error();
+				wp_send_json_error( $response->get_error_message(), $response->get_error_code() );
 				exit();
 			}
 
+			// Get the response code.
+			$code = wp_remote_retrieve_response_code( $response );
+
 			// Bail if not a successful response.
-			if ( 200 !== wp_remote_retrieve_response_code( $response ) ) {
-				wp_send_json_error();
+			if ( 200 !== $code ) {
+				wp_send_json_error( wp_remote_retrieve_response_message( $response ), $code );
 				exit();
 			}
 
@@ -294,7 +302,7 @@ class Mai_Publisher_Views {
 
 			// Bail if visits are not returned.
 			if ( is_null( $visits ) ) {
-				wp_send_json_error();
+				wp_send_json_error( __( 'No visits returned.', 'mai-publisher' ) );
 				exit();
 			}
 

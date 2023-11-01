@@ -73,8 +73,7 @@
 					.then(function( data ) {
 					})
 					.catch(function( error ) {
-						console.log( 'Mai Publisher Views' );
-						console.log( error.name, error.message );
+						console.log( error.name + ', ', error.message );
 					});
 				}
 
