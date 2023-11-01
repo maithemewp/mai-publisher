@@ -46,8 +46,8 @@ class Mai_Publisher_Views {
 		add_filter( 'mai_term_grid_query_args', [ $this, 'edit_query' ], 30, 2 );
 
 		// Update.
-		add_action( 'wp_ajax_maipub_views',        [ $this, 'update_trending' ] );
-		add_action( 'wp_ajax_nopriv_maipub_views', [ $this, 'update_trending' ] );
+		add_action( 'wp_ajax_maipub_views',        [ $this, 'update_views' ] );
+		add_action( 'wp_ajax_nopriv_maipub_views', [ $this, 'update_views' ] );
 	}
 
 	/**
@@ -69,6 +69,14 @@ class Mai_Publisher_Views {
 		register_meta( 'post', 'mai_views', [
 			'type'              => 'integer',
 			'description'       => __( 'The total number of views', 'mai-publisher' ),
+			'sanitize_callback' => 'absint',
+			'single'            => true,
+			'show_in_rest'      => true,
+		]);
+
+		register_meta( 'post', 'mai_views_updated', [
+			'type'              => 'integer',
+			'description'       => __( 'The last updated timestamp', 'mai-publisher' ),
 			'sanitize_callback' => 'absint',
 			'single'            => true,
 			'show_in_rest'      => true,
@@ -196,7 +204,7 @@ class Mai_Publisher_Views {
 	 *
 	 * @return void
 	 */
-	function update_trending() {
+	function update_views() {
 		// Bail if failed nonce check.
 		if ( false === check_ajax_referer( 'maipub_views_nonce', 'nonce' ) ) {
 			wp_send_json_error();
