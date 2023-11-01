@@ -248,10 +248,12 @@ class Mai_Publisher_Views {
 		$api_url  = trailingslashit( $site_url ) . 'index.php';
 		$fetch    = [];
 
+		// Add trending first incase views times out.
 		if ( $trending_days ) {
 			$fetch['trending'] = $trending_days;
 		}
 
+		// Add views.
 		if ( $views_days ) {
 			$fetch['views'] = $views_days;
 		}
