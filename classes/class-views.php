@@ -215,9 +215,9 @@ class Mai_Publisher_Views {
 		$site_url      = maipub_get_option( 'matomo_url' );
 		$site_id       = maipub_get_option( 'matomo_site_id' );
 		$token         = maipub_get_option( 'matomo_token' );
-		$views_days    = maipub_get_option( 'views_days' );
-		$trending_days = maipub_get_option( 'trending_days' );
-		$interval      = maipub_get_option( 'views_interval' );
+		$views_days    = maipub_get_option( 'views_days', false );
+		$trending_days = maipub_get_option( 'trending_days', false );
+		$interval      = maipub_get_option( 'views_interval', false );
 
 		// Bail if no API data.
 		if ( ! ( $site_url && $site_id && $token ) ) {
@@ -248,12 +248,12 @@ class Mai_Publisher_Views {
 		$api_url  = trailingslashit( $site_url ) . 'index.php';
 		$fetch    = [];
 
-		if ( $views_days ) {
-			$fetch['views'] = $views_days;
-		}
-
 		if ( $trending_days ) {
 			$fetch['trending'] = $trending_days;
+		}
+
+		if ( $views_days ) {
+			$fetch['views'] = $views_days;
 		}
 
 		// Try each API hit.
