@@ -69,7 +69,7 @@ class Mai_Publisher_Views {
 	 * @return array
 	 */
 	function add_trending_choice( $field ) {
-		$field['choices'][ 'trending' ] = __( 'Trending', 'mai-publisher' ) . ' (Mai Analytics)';
+		$field['choices'][ 'trending' ] = __( 'Trending', 'mai-publisher' ) . ' (Mai Publisher)';
 
 		return $field;
 	}

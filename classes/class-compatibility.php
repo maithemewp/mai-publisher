@@ -19,8 +19,28 @@ class Mai_Publisher_Plugin_Compatibility {
 	 * @return void
 	 */
 	function hooks() {
+		add_filter( 'ep_prepare_meta_whitelist_key',    [ $this, 'elasticpress_meta_keys' ], 10, 3 );
 		add_filter( 'mai_table_of_contents_has_custom', [ $this, 'has_custom' ], 10, 2 );
 		add_filter( 'wprm_recipe_shortcode_output',     [ $this, 'do_recipe_hook' ], 10, 4 );
+	}
+
+	/**
+	 * Allow meta keys to be indexed by ElasticPress.
+	 *
+	 * @since TBD
+	 *
+	 * @param bool    $allow Whether to allow the meta key.
+	 * @param string  $key   The meta key name.
+	 * @param WP_Post $post  The post object.
+	 *
+	 * @return bool
+	 */
+	function elasticpress_meta_keys( $allow, $key, $post ) {
+		if ( in_array( $key, [ 'mai_trending', 'mai_views' ] ) ) {
+			$allow = true;
+		}
+
+		return $allow;
 	}
 
 	/**
