@@ -91,9 +91,14 @@
 }
 
 .wprm-recipe-instruction-group {
-	display: flex;
-	gap: 24px;
+	display: grid;
+	gap: 0;
 	align-items: start;
+	grid-template-columns: auto auto;
+}
+
+.wprm-recipe-instruction-group > *:not(.mai-ad-unit) {
+	grid-column-start: 1;
 }
 
 .wprm-recipe-instruction-group .mai-ad-unit {
