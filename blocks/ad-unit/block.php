@@ -308,7 +308,7 @@ class Mai_Publisher_Ad_Unit_Block {
 				continue;
 			}
 
-			$styles .= sprintf( '--mai-ad-unit-width-%s:%spx;', $break, $values[0] );
+			$styles .= sprintf( '--mai-ad-unit-max-width-%s:%spx;', $break, $values[0] );
 		}
 
 		// Build aspect-ratio.
