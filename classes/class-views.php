@@ -207,7 +207,7 @@ class Mai_Publisher_Views {
 	function update_views() {
 		// Bail if failed nonce check.
 		if ( false === check_ajax_referer( 'maipub_views_nonce', 'nonce' ) ) {
-			wp_send_json_error();
+			wp_send_json_error( __( 'Invalid nonce.', 'mai-publisher' ) );
 			exit();
 		}
 
