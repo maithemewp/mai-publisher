@@ -491,7 +491,7 @@ class Mai_Publisher_Display {
 	 * @return string|false
 	 */
 	function get_content_type() {
-		$type = '';
+		$type = 'ot';
 
 		// Blog page.
 		if ( is_home() ) {
@@ -575,6 +575,18 @@ class Mai_Publisher_Display {
 		// Tag.
 		elseif ( is_tag() ) {
 			$type = 'ta';
+		}
+		// Author.
+		elseif ( is_author() ) {
+			$type = 'au';
+		}
+		// Search.
+		elseif ( is_search() ) {
+			$type = 'se';
+		}
+		// 404.
+		elseif ( is_404() ) {
+			$type = 'fo';
 		}
 
 		return $type;
