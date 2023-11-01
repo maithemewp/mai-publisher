@@ -91,7 +91,7 @@
 }
 
 .wprm-recipe-instruction-group .mai-ad-unit {
-	margin-bottom: 24px;
+	margin: 24px auto;
 }
 
 @media only screen and (min-width: 728px) {
