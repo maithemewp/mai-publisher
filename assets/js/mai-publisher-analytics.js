@@ -37,8 +37,6 @@
 			try {
 				const matomoTracker = Matomo.getTracker( analytics[ tracker ].url + 'matomo.php', analytics[ tracker ].id );
 
-				// TODO: Unset dimensions. Somehow wrong ones are still getting through to global analytics.
-
 				// Loop through and push items.
 				for ( const key in analytics[ tracker ].toPush ) {
 
@@ -52,6 +50,34 @@
 						matomoTracker[func]();
 					}
 				}
+
+				// If we have an ajax url and body, pdate the views.
+				if ( analytics[ tracker ].ajaxUrl && analytics[ tracker ].body ) {
+					// Send ajax request.
+					fetch( analytics[ tracker ].ajaxUrl, {
+						method: "POST",
+						credentials: 'same-origin',
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded',
+							'Cache-Control': 'no-cache',
+						},
+						body: new URLSearchParams( analytics[ tracker ].body ),
+					})
+					.then(function( response ) {
+						if ( ! response.ok ) {
+							throw new Error( response.statusText );
+						}
+
+						return response.json();
+					})
+					.then(function( data ) {
+					})
+					.catch(function( error ) {
+						console.log( 'Mai Publisher Views' );
+						console.log( error.name, error.message );
+					});
+				}
+
 			} catch( err ) {
 				console.log( err );
 			}

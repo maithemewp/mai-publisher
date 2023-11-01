@@ -88,8 +88,6 @@ class Mai_Publisher_Tracking {
 				$analytics['toPush'][] = [ 'trackVisibleContentImpressions' ];
 				// $analytics['toPush'][] = [ 'trackAllContentImpressions' ];
 
-				// Add site analytics.
-				$vars['analytics'][] = $analytics;
 
 				// If singular or a term archive (all we care about now).
 				if ( is_singular() || is_category() || is_tag() || is_tax() ) {
@@ -115,8 +113,8 @@ class Mai_Publisher_Tracking {
 
 						// If last updated timestampe is more than N minutes (converted to seconds) ago.
 						if ( ! $updated || $updated < ( $current - ( $interval * 60 ) ) ) {
-							$vars['ajaxUrl'] = admin_url( 'admin-ajax.php' );
-							$vars['body']    = [
+							$analytics['ajaxUrl'] = admin_url( 'admin-ajax.php' );
+							$analytics['body']    = [
 								'action'  => 'maipub_views',
 								'nonce'   => wp_create_nonce( 'maipub_views_nonce' ),
 								'type'    => $page['type'],
@@ -127,6 +125,9 @@ class Mai_Publisher_Tracking {
 						}
 					}
 				}
+
+				// Add site analytics.
+				$vars['analytics'][] = $analytics;
 			}
 		}
 
