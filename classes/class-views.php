@@ -21,6 +21,9 @@ class Mai_Publisher_Views {
 	 * @return void
 	 */
 	function hooks() {
+		// Register meta.
+		add_action( 'init', [ $this, 'register_meta' ] );
+
 		// Shortcode.
 		add_shortcode( 'mai_views', [ $this, 'add_shortcode' ] );
 
@@ -45,6 +48,31 @@ class Mai_Publisher_Views {
 		// Update.
 		add_action( 'wp_ajax_maipub_views',        [ $this, 'update_trending' ] );
 		add_action( 'wp_ajax_nopriv_maipub_views', [ $this, 'update_trending' ] );
+	}
+
+	/**
+	 * Registers the post meta keys.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	function register_meta() {
+		register_meta( 'post', 'mai_trending', [
+			'type'              => 'integer',
+			'description'       => __( 'The number of views in the last n days.', 'mai-publisher' ),
+			'sanitize_callback' => 'absint',
+			'single'            => true,
+			'show_in_rest'      => true,
+		]);
+
+		register_meta( 'post', 'mai_views', [
+			'type'              => 'integer',
+			'description'       => __( 'The total number of views', 'mai-publisher' ),
+			'sanitize_callback' => 'absint',
+			'single'            => true,
+			'show_in_rest'      => true,
+		]);
 	}
 
 	/**
