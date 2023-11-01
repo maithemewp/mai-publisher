@@ -31,12 +31,11 @@ function maipub_get_ads() {
 		}
 	}
 
-	// Check Genesis and Mai Theme sidebars.
-	$mai_sidebar     = function_exists( 'mai_has_sidebar' ) && mai_has_sidebar();
-	$genesis_sidebar = function_exists( 'genesis_site_layout' ) && in_array( genesis_site_layout(), [ 'sidebar', 'sidebar-alt' ] );
+	// Check for sidebar.
+	$has_sidebar = maipub_has_sidebar();
 
 	// If we have a sidebar, and the WP_HTML_Tag_Processor class exists.
-	if ( ( $mai_sidebar || $genesis_sidebar ) && class_exists( 'WP_HTML_Tag_Processor' ) ) {
+	if ( $has_sidebar && class_exists( 'WP_HTML_Tag_Processor' ) ) {
 		// Set prefix to sidebar.
 		maipub_contextual_prefix( 'sidebar' );
 

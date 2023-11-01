@@ -221,6 +221,16 @@ class Mai_Publisher_Display {
 				continue;
 			}
 
+			// If sidebar.
+			if ( maipub_has_sidebar() ) {
+				// Remove desktop sizes larger than 800px.
+				foreach ( $config[ $trimmed ]['sizes_desktop'] as $index => $size ) {
+					if ( $size[0] > 800 ) {
+						unset( $config[ $trimmed ]['sizes_desktop'][ $index ] );
+					}
+				}
+			}
+
 			if ( isset( $counts[ $slug ] ) ) {
 				$counts[ $slug ]++;
 				$ads[ $slug . '-' . $counts[ $slug ] ] = [

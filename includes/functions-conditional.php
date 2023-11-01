@@ -59,6 +59,27 @@ function maipub_is_product_singular() {
 }
 
 /**
+ * Checks if current page has a sidebar.
+ *
+ * @since TBD
+ *
+ * @return bool
+ */
+function maipub_has_sidebar() {
+	static $cache = null;
+
+	if ( ! is_null( $cache ) ) {
+		return $cache;
+	}
+
+	$mai_sidebar     = function_exists( 'mai_has_sidebar' ) && mai_has_sidebar();
+	$genesis_sidebar = function_exists( 'genesis_site_layout' ) && in_array( genesis_site_layout(), [ 'sidebar', 'sidebar-alt' ] );
+	$cache           = $mai_sidebar || $genesis_sidebar;
+
+	return $cache;
+}
+
+/**
  * Check if a string contains at least one specified string.
  *
  * @since 0.1.0
