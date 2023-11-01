@@ -576,9 +576,17 @@ class Mai_Publisher_Display {
 		elseif ( is_tag() ) {
 			$type = 'ta';
 		}
+		// Custom taxonomy.
+		elseif ( is_tax() ) {
+			$type = 'te';
+		}
 		// Author.
 		elseif ( is_author() ) {
 			$type = 'au';
+		}
+		// Date.
+		elseif ( is_date() ) {
+			$type = 'da';
 		}
 		// Search.
 		elseif ( is_search() ) {
