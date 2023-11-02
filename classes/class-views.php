@@ -215,9 +215,9 @@ class Mai_Publisher_Views {
 		$site_url      = maipub_get_option( 'matomo_url' );
 		$site_id       = maipub_get_option( 'matomo_site_id' );
 		$token         = maipub_get_option( 'matomo_token' );
-		$views_years   = maipub_get_option( 'views_years', false );
-		$trending_days = maipub_get_option( 'trending_days', false );
-		$interval      = maipub_get_option( 'views_interval', false );
+		$trending_days = maipub_get_option( 'trending_days' );
+		$views_years   = maipub_get_option( 'views_years' );
+		$interval      = maipub_get_option( 'views_interval' );
 
 		// Bail if no API data.
 		if ( ! ( $site_url && $site_id && $token ) ) {
@@ -244,13 +244,14 @@ class Mai_Publisher_Views {
 		}
 
 		// Start API data.
-		$return  = [];
 		$api_url = trailingslashit( $site_url ) . 'index.php';
+		$return  = [];
 		$fetch   = [];
 
 		// Add trending first incase views times out.
 		if ( $trending_days ) {
-			$fetch['trending'] = [
+			$fetch[] = [
+				'key'    => 'trending',
 				'period' => 'day',
 				'date'   => 'last' . $trending_days,
 			];
@@ -258,15 +259,24 @@ class Mai_Publisher_Views {
 
 		// Add views.
 		if ( $views_years ) {
-			$fetch['views'] = [
+			$fetch[] = [
+				'key'    => 'views',
 				'period' => 'year',
 				'date'   => 'last' . $views_years,
 			];
 		}
 
+		// Start API args.
+		$url_count = 0;
+		$api_args  = [
+			'module' => 'API',
+			'method' => 'API.getBulkRequest',
+			'format' => 'json',
+		];
+
 		// Try each API hit.
-		foreach ( $fetch as $key => $values ) {
-			$api_args = [
+		foreach ( $fetch as $values ) {
+			$string = add_query_arg( [
 				'module'      => 'API',
 				'method'      => 'Actions.getPageUrl',
 				'idSite'      => $site_id,
@@ -277,51 +287,57 @@ class Mai_Publisher_Views {
 				'period'      => $values['period'],
 				'date'        => $values['date'],
 				'format'      => 'json',
-			];
+			], '' );
 
-			// Allow filtering of args.
-			$api_args = apply_filters( 'mai_publisher_views_api_args', $api_args, $key );
+			// Add args.
+			$api_args[ sprintf( 'urls[%s]', $url_count ) ] = urlencode( '&' . ltrim( $string, '?' ) );
 
-			// Get API url.
-			$api_url = add_query_arg( $api_args, $api_url );
+			// Increment count.
+			$url_count++;
+		}
 
-			// Send a GET request to the Matomo API.
-			$response = wp_remote_get( $api_url );
+		// Get API url.
+		$api_url = add_query_arg( $api_args, $api_url );
 
-			// Check for a successful request.
-			if ( is_wp_error( $response ) ) {
-				wp_send_json_error( $response->get_error_message(), $response->get_error_code() );
-				exit();
-			}
+		// Send a GET request to the Matomo API.
+		$response = wp_remote_get( $api_url );
 
-			// Get the response code.
-			$code = wp_remote_retrieve_response_code( $response );
+		// Check for a successful request.
+		if ( is_wp_error( $response ) ) {
+			wp_send_json_error( $response->get_error_message(), $response->get_error_code() );
+			exit();
+		}
 
-			// Bail if not a successful response.
-			if ( 200 !== $code ) {
-				wp_send_json_error( wp_remote_retrieve_response_message( $response ), $code );
-				exit();
-			}
+		// Get the response code.
+		$code = wp_remote_retrieve_response_code( $response );
 
-			// Get the data.
-			$body   = wp_remote_retrieve_body( $response );
-			$data   = json_decode( $body, true );
+		// Bail if not a successful response.
+		if ( 200 !== $code ) {
+			wp_send_json_error( wp_remote_retrieve_response_message( $response ), $code );
+			exit();
+		}
+
+		// Get the data.
+		$body = wp_remote_retrieve_body( $response );
+		$data = json_decode( $body, true );
+
+		// Bail if no data.
+		if ( ! $data ) {
+			wp_send_json_error( __( 'No data returned.', 'mai-publisher' ) );
+			exit();
+		}
+
+		// Loop through each item in the bulk request.
+		foreach ( $data as $index => $row ) {
+			$key    = $fetch[ $index ]['key'];
 			$visits = 0;
-			$update = null;
 
-			foreach ( $data as $array ) {
-				if ( ! $array || ! isset( $array[0]['nb_visits'] ) ) {
+			foreach ( $row as $values ) {
+				if ( ! $values || ! isset( $values[0]['nb_visits'] ) ) {
 					continue;
 				}
 
-				$visits += absint( $array[0]['nb_visits'] );
-				$update  = true;
-			}
-
-			// Bail if visits are not returned.
-			if ( is_null( $update ) ) {
-				wp_send_json_error( __( 'No visits returned.', 'mai-publisher' ) );
-				exit();
+				$visits += absint( $values[0]['nb_visits'] );
 			}
 
 			// Update meta. `mai_trending` or `mai_views`.
@@ -334,6 +350,7 @@ class Mai_Publisher_Views {
 				break;
 			}
 
+			// Add to return.
 			$return[ $key ] = $visits;
 		}
 

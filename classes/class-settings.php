@@ -526,7 +526,7 @@ class Mai_Publisher_Settings {
 		printf(
 			'<input class="small-text" type="number" name="mai_publisher[views_years]" id="views_years" value="%s"> %s',
 			maipub_get_option( 'views_years' ),
-			__( 'days', 'mai-publisher' ),
+			__( 'years', 'mai-publisher' ),
 		);
 
 		printf( '<p class="description">%s %s %s</p>',
