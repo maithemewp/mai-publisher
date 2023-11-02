@@ -265,8 +265,8 @@ class Mai_Publisher_Admin {
 	 * @return string
 	 */
 	function format_sizes( $array ) {
-		$result = array_map( function( $inner_array ) {
-			return '[' . implode(', ', $inner_array) . ']';
+		$result = array_map( function( $inner ) {
+			return '[' . implode(', ', (array) $inner) . ']';
 		}, $array );
 
 		return implode( ', ', $result );

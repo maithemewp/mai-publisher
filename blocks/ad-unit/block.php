@@ -102,13 +102,9 @@ class Mai_Publisher_Ad_Unit_Block {
 			$mobile  = end( $unit['sizes_mobile'] );  // Last should be the largest.
 			$tablet  = end( $unit['sizes_tablet'] );  // Last should be the largest.
 			$desktop = end( $unit['sizes_desktop'] ); // Last should be the largest.
-			// $file    = sprintf( 'assets/img/placeholders/%s.png', implode( 'x', $last ) );
-			// if ( file_exists( sprintf( '%s%s', MAI_PUBLISHER_DIR, $file ) ) ) {
-			// 	$script = sprintf( '<img src="%s" />', sprintf( '%s%s', MAI_PUBLISHER_URL, $file ) );
-			// } else {
-				// $script = sprintf( '<img src="https://placehold.co/%s" />', implode( 'x', $last ) );
-			// }
-
+			$mobile  = 'fluid' === $mobile ? [ 300, 157 ] : $mobile;
+			$tablet  = 'fluid' === $tablet ? [ 300, 157 ] : $tablet;
+			$desktop = 'fluid' === $desktop ? [ 300, 157 ] : $desktop;
 			$script  = '';
 			$script .= '<picture>';
 				$script .= sprintf( '<source srcset="https://placehold.co/%s" media="(max-width: 727px)" />', implode( 'x', $mobile ) );

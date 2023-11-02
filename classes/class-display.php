@@ -229,12 +229,20 @@ class Mai_Publisher_Display {
 				if ( $incontent && maipub_has_sidebar() ) {
 					// Remove all sizes larger than 800px.
 					foreach ( $config[ $trimmed ]['sizes'] as $index => $size ) {
+						if ( ! is_array( $size ) ) {
+							continue;
+						}
+
 						if ( $size[0] > 800 ) {
 							unset( $config[ $trimmed ]['sizes'][ $index ] );
 						}
 					}
 					// Remove desktop sizes larger than 800px.
 					foreach ( $config[ $trimmed ]['sizes_desktop'] as $index => $size ) {
+						if ( ! is_array( $size ) ) {
+							continue;
+						}
+
 						if ( $size[0] > 800 ) {
 							unset( $config[ $trimmed ]['sizes_desktop'][ $index ] );
 						}
