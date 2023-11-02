@@ -713,7 +713,7 @@ function maipub_get_default_options() {
 		'version_db'             => '',
 		'ad_mode'                => '',
 		'gam_domain'             => (string) maipub_get_url_host( home_url() ),
-		'gam_network_code'       => (string) maipub_get_url_host( home_url() ),
+		'gam_network_code'       => '',
 		'category'               => '',
 		'matomo_enabled_global'  => defined( 'MAI_PUBLISHER_MATOMO_ENABLED_GLOBAL' ) ? MAI_PUBLISHER_MATOMO_ENABLED_GLOBAL : 1,
 		'matomo_enabled'         => defined( 'MAI_PUBLISHER_MATOMO_ENABLED' ) ? MAI_PUBLISHER_MATOMO_ENABLED : 0,
