@@ -213,50 +213,55 @@ class Mai_Publisher_Display {
 		$ad_data = $this->domain ? $this->get_gam_ads_data() : [];
 		$config = maipub_get_config( 'ad_units' );
 
-		foreach ( $ad_data as $data ) {
-			$slug    = $data['id'];
-			$trimmed = $this->get_trimmed_slug( $slug );
+		foreach ( $ad_data as $locations ) {
+			foreach ( $locations as $data ) {
+				$slug    = $data['id'];
+				$trimmed = $this->get_trimmed_slug( $slug );
 
-			if ( ! isset( $config[ $trimmed ] ) ) {
-				continue;
-			}
+				if ( ! isset( $config[ $trimmed ] ) ) {
+					continue;
+				}
 
-			// If sidebar.
-			if ( maipub_has_sidebar() ) {
-				// Remove all sizes larger than 800px.
-				foreach ( $config[ $trimmed ]['sizes'] as $index => $size ) {
-					if ( $size[0] > 800 ) {
-						unset( $config[ $trimmed ]['sizes'][ $index ] );
+				// Check if the location is one that is affected by a sidebar.
+				$incontent = in_array( $data['location'], [ 'genesis_loop', 'after_loop', 'before_entry', 'after_entry', 'before_entry_content', 'after_entry_content', 'content', 'entries', 'editor', 'recipe', ] );
+
+				// If in content and there is a sidebar.
+				if ( $incontent && maipub_has_sidebar() ) {
+					// Remove all sizes larger than 800px.
+					foreach ( $config[ $trimmed ]['sizes'] as $index => $size ) {
+						if ( $size[0] > 800 ) {
+							unset( $config[ $trimmed ]['sizes'][ $index ] );
+						}
+					}
+					// Remove desktop sizes larger than 800px.
+					foreach ( $config[ $trimmed ]['sizes_desktop'] as $index => $size ) {
+						if ( $size[0] > 800 ) {
+							unset( $config[ $trimmed ]['sizes_desktop'][ $index ] );
+						}
 					}
 				}
-				// Remove desktop sizes larger than 800px.
-				foreach ( $config[ $trimmed ]['sizes_desktop'] as $index => $size ) {
-					if ( $size[0] > 800 ) {
-						unset( $config[ $trimmed ]['sizes_desktop'][ $index ] );
-					}
-				}
-			}
 
-			if ( isset( $counts[ $slug ] ) ) {
-				$counts[ $slug ]++;
-				$ads[ $slug . '-' . $counts[ $slug ] ] = [
-					'id'           => $slug,
-					'targeting'    => $data['targeting'],
-					'sizes'        => $config[ $trimmed ]['sizes'],
-					'sizesDesktop' => $config[ $trimmed ]['sizes_desktop'],
-					'sizesTablet'  => $config[ $trimmed ]['sizes_tablet'],
-					'sizesMobile'  => $config[ $trimmed ]['sizes_mobile'],
-				];
-			} else {
-				$counts[ $slug ] = 1;
-				$ads[ $slug ]    = [
-					'id'           => $slug,
-					'targeting'    => $data['targeting'],
-					'sizes'        => $config[ $trimmed ]['sizes'],
-					'sizesDesktop' => $config[ $trimmed ]['sizes_desktop'],
-					'sizesTablet'  => $config[ $trimmed ]['sizes_tablet'],
-					'sizesMobile'  => $config[ $trimmed ]['sizes_mobile'],
-				];
+				if ( isset( $counts[ $slug ] ) ) {
+					$counts[ $slug ]++;
+					$ads[ $slug . '-' . $counts[ $slug ] ] = [
+						'id'           => $slug,
+						'targeting'    => $data['targeting'],
+						'sizes'        => $config[ $trimmed ]['sizes'],
+						'sizesDesktop' => $config[ $trimmed ]['sizes_desktop'],
+						'sizesTablet'  => $config[ $trimmed ]['sizes_tablet'],
+						'sizesMobile'  => $config[ $trimmed ]['sizes_mobile'],
+					];
+				} else {
+					$counts[ $slug ] = 1;
+					$ads[ $slug ]    = [
+						'id'           => $slug,
+						'targeting'    => $data['targeting'],
+						'sizes'        => $config[ $trimmed ]['sizes'],
+						'sizesDesktop' => $config[ $trimmed ]['sizes_desktop'],
+						'sizesTablet'  => $config[ $trimmed ]['sizes_tablet'],
+						'sizesMobile'  => $config[ $trimmed ]['sizes_mobile'],
+					];
+				}
 			}
 		}
 
@@ -274,8 +279,26 @@ class Mai_Publisher_Display {
 		$data = [];
 
 		foreach ( $this->ads as $ad ) {
+			if ( ! ( isset( $ad['content'] ) && $ad['content'] ) ) {
+				continue;
+			}
+
+			// Get block ad IDs.
 			$count = isset( $ad['content_count'] ) && is_array( $ad['content_count'] ) ? count( $ad['content_count'] ) : 1;
-			$data  = $ad['content'] ? array_merge( $data, $this->get_block_ad_ids( $ad['content'], $count ) ) : $data;
+			$array = $this->get_block_ad_ids( $ad['content'], $count );
+
+			// Add location to each ad.
+			foreach ( $array as $index => $item ) {
+				$array[ $index ]['location'] = $ad['location'];
+			}
+
+			// Bail if no data.
+			if ( ! $array ) {
+				continue;
+			}
+
+			// Add to data.
+			$data[] = $array;
 		}
 
 		return $data;

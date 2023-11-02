@@ -25,8 +25,9 @@ function maipub_get_ads() {
 
 		if ( has_block( 'acf/mai-ad', $post ) || has_block( 'acf/mai-ad-unit', $post ) ) {
 			$ads[] = [
-				'id'      => $post->ID,
-				'content' => $post->post_content,
+				'id'       => $post->ID,
+				'location' => 'editor',
+				'content'  => $post->post_content,
 			];
 		}
 	}
@@ -59,8 +60,9 @@ function maipub_get_ads() {
 
 			if ( $has_ad ) {
 				$ads[] = [
-					'id'      => 'sidebar',
-					'content' => $sidebar,
+					'id'       => 'sidebar',
+					'location' => 'sidebar',
+					'content'  => $sidebar,
 				];
 			}
 		}
