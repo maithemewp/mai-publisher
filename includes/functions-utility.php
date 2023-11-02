@@ -522,6 +522,11 @@ function maipub_validate_args_single( $args ) {
 		}
 	}
 
+	// Check for recipe.
+	if ( 'recipe' && ! maipub_has_recipe( $post_id ) ) {
+		return [];
+	}
+
 	return $args;
 }
 
