@@ -215,7 +215,7 @@ class Mai_Publisher_Views {
 		$site_url      = maipub_get_option( 'matomo_url' );
 		$site_id       = maipub_get_option( 'matomo_site_id' );
 		$token         = maipub_get_option( 'matomo_token' );
-		$views_days    = maipub_get_option( 'views_days', false );
+		$views_years   = maipub_get_option( 'views_years', false );
 		$trending_days = maipub_get_option( 'trending_days', false );
 		$interval      = maipub_get_option( 'views_interval', false );
 
@@ -226,16 +226,16 @@ class Mai_Publisher_Views {
 		}
 
 		// Bail if nothing to fetch.
-		if ( ! ( ( $trending_days || $views_days ) && $interval ) ) {
+		if ( ! ( ( $trending_days || $views_years ) && $interval ) ) {
 			wp_send_json_error( __( 'Missing views or trending days or interval.', 'mai-publisher' ) );
 			exit();
 		}
 
 		// Get post data.
-		$type     = isset( $_POST['type'] ) ? sanitize_key( $_POST['type'] ) : '';
-		$id       = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : '';
-		$url      = isset( $_POST['url'] ) ? esc_url( $_POST['url'] ) : '';
-		$current  = isset( $_POST['current'] ) ? absint( $_POST['current'] ) : '';
+		$type    = isset( $_POST['type'] ) ? sanitize_key( $_POST['type'] ) : '';
+		$id      = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : '';
+		$url     = isset( $_POST['url'] ) ? esc_url( $_POST['url'] ) : '';
+		$current = isset( $_POST['current'] ) ? absint( $_POST['current'] ) : '';
 
 		// Bail if we don't have the post data we need.
 		if ( ! ( $type && $id && $url && $current ) ) {
@@ -244,32 +244,39 @@ class Mai_Publisher_Views {
 		}
 
 		// Start API data.
-		$return   = [];
-		$api_url  = trailingslashit( $site_url ) . 'index.php';
-		$fetch    = [];
+		$return  = [];
+		$api_url = trailingslashit( $site_url ) . 'index.php';
+		$fetch   = [];
 
 		// Add trending first incase views times out.
 		if ( $trending_days ) {
-			$fetch['trending'] = $trending_days;
+			$fetch['trending'] = [
+				'period' => 'day',
+				'date'   => 'last' . $trending_days,
+			];
 		}
 
 		// Add views.
-		if ( $views_days ) {
-			$fetch['views'] = $views_days;
+		if ( $views_years ) {
+			$fetch['views'] = [
+				'period' => 'year',
+				'date'   => 'last' . $views_years,
+			];
 		}
 
 		// Try each API hit.
-		foreach ( $fetch as $key => $days ) {
+		foreach ( $fetch as $key => $values ) {
 			$api_args = [
-				'module'     => 'API',
-				'method'     => 'Actions.getPageUrl',
-				'idSite'     => $site_id,
-				'token_auth' => $token,
-				'pageUrl'    => $url,
-				'period'     => 'range',
-				'date'       => 'last' . $days,
-				'format'     => 'json',
-				// 'columns'    => 'nb_visits', // Not working.
+				'module'      => 'API',
+				'method'      => 'Actions.getPageUrl',
+				'idSite'      => $site_id,
+				'token_auth'  => $token,
+				'pageUrl'     => $url,
+				'hideColumns' => 'label',
+				'showColumns' => 'nb_visits',
+				'period'      => $values['period'],
+				'date'        => $values['date'],
+				'format'      => 'json',
 			];
 
 			// Allow filtering of args.
@@ -299,11 +306,20 @@ class Mai_Publisher_Views {
 			// Get the data.
 			$body   = wp_remote_retrieve_body( $response );
 			$data   = json_decode( $body, true );
-			$data   = reset( $data ); // Get first. It was returning an array of 1 result.
-			$visits = isset( $data['nb_visits'] ) ? absint( $data['nb_visits'] ) : null;
+			$visits = 0;
+			$update = null;
+
+			foreach ( $data as $array ) {
+				if ( ! $array || ! isset( $array[0]['nb_visits'] ) ) {
+					continue;
+				}
+
+				$visits += absint( $array[0]['nb_visits'] );
+				$update  = true;
+			}
 
 			// Bail if visits are not returned.
-			if ( is_null( $visits ) ) {
+			if ( is_null( $update ) ) {
 				wp_send_json_error( __( 'No visits returned.', 'mai-publisher' ) );
 				exit();
 			}

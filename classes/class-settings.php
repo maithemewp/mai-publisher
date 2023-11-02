@@ -223,9 +223,9 @@ class Mai_Publisher_Settings {
 		);
 
 		add_settings_field(
-			'views_days', // id
-			__( 'Total Views Days', 'mai-publisher' ), // title
-			[ $this, 'views_days_callback' ], // callback
+			'views_years', // id
+			__( 'Total Views Years', 'mai-publisher' ), // title
+			[ $this, 'views_years_callback' ], // callback
 			'mai-publisher-section', // page
 			'maipub_settings_matomo' // section
 		);
@@ -284,7 +284,7 @@ class Mai_Publisher_Settings {
 			'matomo_site_id'         => 'absint',
 			'matomo_token'           => 'sanitize_text_field',
 			'trending_days'          => 'absint',
-			'views_days'             => 'absint',
+			'views_years'             => 'absint',
 			'views_interval'         => 'absint',
 			'ad_label'               => 'sanitize_text_field',
 			'header'                 => 'trim',
@@ -518,19 +518,19 @@ class Mai_Publisher_Settings {
 	/**
 	 * Setting callback.
 	 *
-	 * @since 0.4.0
+	 * @since TBD
 	 *
 	 * @return void
 	 */
-	function views_days_callback() {
+	function views_years_callback() {
 		printf(
-			'<input class="small-text" type="number" name="mai_publisher[views_days]" id="views_days" value="%s"> %s',
-			maipub_get_option( 'views_days' ),
+			'<input class="small-text" type="number" name="mai_publisher[views_years]" id="views_years" value="%s"> %s',
+			maipub_get_option( 'views_years' ),
 			__( 'days', 'mai-publisher' ),
 		);
 
 		printf( '<p class="description">%s %s %s</p>',
-			__( 'Retrieve total post views going back this many days.', 'mai-publisher' ),
+			__( 'Retrieve total post views going back this many years.', 'mai-publisher' ),
 			__( 'Use 0 to disable fetching total views.', 'mai-publisher' ),
 			__( 'Values are stored in the <code>mai_views</code> meta key.', 'mai-publisher' )
 		);

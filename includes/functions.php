@@ -720,7 +720,7 @@ function maipub_get_default_options() {
 		'matomo_site_id'         => defined( 'MAI_PUBLISHER_MATOMO_SITE_ID' ) ? MAI_PUBLISHER_MATOMO_SITE_ID : '',
 		'matomo_token'           => defined( 'MAI_PUBLISHER_MATOMO_TOKEN' ) ? MAI_PUBLISHER_MATOMO_TOKEN : '',
 		'trending_days'          => 30,
-		'views_days'             => 365,
+		'views_years'            => 10,
 		'views_interval'         => 60,
 		'ad_label'               => __( 'Sponsored', 'mai-publisher' ),
 		'header'                 => '',

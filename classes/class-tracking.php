@@ -92,11 +92,11 @@ class Mai_Publisher_Tracking {
 				// If singular or a term archive (all we care about now).
 				if ( is_singular() || is_category() || is_tag() || is_tax() ) {
 					$trending_days = (int) maipub_get_option( 'trending_days', false );
-					$views_days    = (int) maipub_get_option( 'views_days', false );
+					$views_years   = (int) maipub_get_option( 'views_years', false );
 					$interval      = (int) maipub_get_option( 'views_interval', false );
 
 					// If we're fetching trending or popular counts.
-					if ( ( $trending_days || $views_days ) && $interval ) {
+					if ( ( $trending_days || $views_years ) && $interval ) {
 						// Get page data and current timestamp.
 						$page    = maipub_get_current_page();
 						$current = current_datetime()->getTimestamp();
