@@ -61,7 +61,7 @@ function maipub_is_product_singular() {
 /**
  * Checks if current page has a sidebar.
  *
- * @since TBD
+ * @since 0.12.0
  *
  * @return bool
  */

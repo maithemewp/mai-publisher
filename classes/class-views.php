@@ -53,7 +53,7 @@ class Mai_Publisher_Views {
 	/**
 	 * Registers the post meta keys.
 	 *
-	 * @since TBD
+	 * @since 0.12.0
 	 *
 	 * @return void
 	 */

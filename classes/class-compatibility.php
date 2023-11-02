@@ -27,7 +27,7 @@ class Mai_Publisher_Plugin_Compatibility {
 	/**
 	 * Allow meta keys to be indexed by ElasticPress.
 	 *
-	 * @since TBD
+	 * @since 0.12.0
 	 *
 	 * @param bool    $allow Whether to allow the meta key.
 	 * @param string  $key   The meta key name.
