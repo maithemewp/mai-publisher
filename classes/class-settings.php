@@ -284,7 +284,7 @@ class Mai_Publisher_Settings {
 			'matomo_site_id'         => 'absint',
 			'matomo_token'           => 'sanitize_text_field',
 			'trending_days'          => 'absint',
-			'views_years'             => 'absint',
+			'views_years'            => 'absint',
 			'views_interval'         => 'absint',
 			'ad_label'               => 'sanitize_text_field',
 			'header'                 => 'trim',
