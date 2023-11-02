@@ -60,6 +60,7 @@ class Mai_Publisher_Tracking {
 		$vars       = [];
 		$this->user = wp_get_current_user();
 
+		// Handle site tracking vars.
 		if ( maipub_get_option( 'matomo_enabled', false ) ) {
 			$site_url = maipub_get_option( 'matomo_url', false );
 			$site_id  = maipub_get_option( 'matomo_site_id', false );
@@ -131,6 +132,7 @@ class Mai_Publisher_Tracking {
 			}
 		}
 
+		// Handle global tracking vars.
 		if ( maipub_get_option( 'matomo_enabled_global', false ) ) {
 			$vars['analytics'] = isset( $vars['analytics'] ) ? $vars['analytics'] : [];
 			$dimensions        = $this->get_global_dimensions();
