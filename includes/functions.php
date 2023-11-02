@@ -652,7 +652,7 @@ function maipub_get_config( $sub_config = '' ) {
 function maipub_get_option( $option, $fallback = true ) {
 	$options = maipub_get_options();
 
-	if ( isset( $options[ $option ] ) && $options[ $option ] ) {
+	if ( isset( $options[ $option ] ) && ! is_null( $options[ $option ] ) ) {
 		return $options[ $option ];
 	}
 
