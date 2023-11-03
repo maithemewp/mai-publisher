@@ -391,6 +391,9 @@ class Mai_Publisher_Ad_Unit_Block {
 							'sp' => __( 'Sponsorship', 'mai-publisher' ),
 							'st' => __( 'Standard', 'mai-publisher' ),
 							'h'  => __( 'House', 'mai-publisher' ),
+							'n'  => __( 'Native', 'mai-publisher' ),
+							'ng' => __( 'Native Grid', 'mai-publisher' ),
+							'nc' => __( 'Native Comments', 'mai-publisher' ),
 						],
 					],
 					[
