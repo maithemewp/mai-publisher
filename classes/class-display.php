@@ -36,7 +36,10 @@ class Mai_Publisher_Display {
 	 * @return void
 	 */
 	function add_admin_bar_item( $wp_admin_bar ) {
-		if ( is_admin() || ! current_user_can( 'manage_options' ) ) {
+		// if ( is_admin() || ! current_user_can( 'manage_options' ) ) {
+		// 	return;
+		// }
+		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
 
