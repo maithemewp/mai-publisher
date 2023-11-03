@@ -388,6 +388,7 @@ function maipub_validate_args_single( $args ) {
 		'content'             => '',
 		'content_location'    => 'after',
 		'content_count'       => 6,
+		'comment_count'       => 5,
 		'types'               => [],
 		'keywords'            => '',
 		'taxonomies'          => [],
@@ -397,6 +398,8 @@ function maipub_validate_args_single( $args ) {
 		'exclude'             => [],
 	] );
 
+	// ray( $args['location'], $args['comment_count'] );
+
 	// Sanitize.
 	$args = [
 		'id'                  => absint( $args['id'] ),
@@ -405,6 +408,7 @@ function maipub_validate_args_single( $args ) {
 		'content'             => trim( $args['content'] ),
 		'content_location'    => esc_html( $args['content_location'] ),
 		'content_count'       => $args['content_count'] ? array_map( 'absint', explode( ',', (string) $args['content_count'] ) ) : [],
+		'comment_count'       => absint( $args['comment_count'] ),
 		'types'               => $args['types'] ? array_map( 'esc_html', (array) $args['types'] ) : [],
 		'keywords'            => maipub_sanitize_keywords( $args['keywords'] ),
 		'taxonomies'          => maipub_sanitize_taxonomies( $args['taxonomies'] ),
@@ -414,10 +418,15 @@ function maipub_validate_args_single( $args ) {
 		'exclude'             => $args['exclude'] ? array_map( 'absint', (array) $args['exclude'] ) : [],
 	];
 
+	// ray( $args['location'], $args['comment_count'] );
+
 	// Set variables.
 	$post_id      = get_the_ID();
 	$post_type    = get_post_type();
 	$post_content = null;
+
+	// ray( $args['location'] );
+
 
 	// Bail if excluding this entry.
 	if ( $args['exclude'] && in_array( $post_id, $args['exclude'] ) ) {
@@ -525,6 +534,17 @@ function maipub_validate_args_single( $args ) {
 	// Check for recipe.
 	if ( 'recipe' === $args['location'] && ! maipub_has_recipe( $post_id ) ) {
 		return [];
+	}
+
+	// Check for comment count.
+	if ( 'comments' === $args['location'] && $args['comment_count'] ) {
+		$comments = get_comments_number( $post_id );
+
+		// ray( $comments );
+
+		if ( ! $comments ) {
+			return [];
+		}
 	}
 
 	return $args;

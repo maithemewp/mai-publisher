@@ -390,6 +390,7 @@ function maipub_get_ads_data() {
 						'content'             => $content,
 						'content_location'    => get_field( 'maipub_single_content_location' ),
 						'content_count'       => get_field( 'maipub_single_content_count' ),
+						'comment_count'       => get_field( 'maipub_single_comment_count' ),
 						'types'               => get_field( 'maipub_single_types' ),
 						'keywords'            => get_field( 'maipub_single_keywords' ),
 						'taxonomies'          => get_field( 'maipub_single_taxonomies' ),
@@ -500,6 +501,10 @@ function maipub_get_locations() {
 			'hook'     => 'wp_footer',
 			'priority' => 20,
 		],
+		'comments' => [
+			'hook'     => 'genesis_after_entry',
+			'priority' => 10,
+		],
 	];
 
 	if ( maipub_is_product_archive() || maipub_is_product_singular() ) {
@@ -595,6 +600,7 @@ function maipub_get_location_choices( $type = '' ) {
 			'content'              => __( 'In content', 'mai-publisher' ),
 			'after_entry_content'  => __( 'After entry content', 'mai-publisher' ),
 			'after_entry'          => __( 'After entry', 'mai-publisher' ),
+			'comments'             => __( 'In comments', 'mai-publisher' ),
 			'before_footer'        => __( 'Before footer', 'mai-publisher' ),
 		],
 		'archive' => [
