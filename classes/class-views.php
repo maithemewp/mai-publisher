@@ -274,7 +274,7 @@ class Mai_Publisher_Views {
 			'format' => 'json',
 		];
 
-		// Try each API hit.
+		// Bundle each API hit for bulk request.
 		foreach ( $fetch as $values ) {
 			$string = add_query_arg( [
 				'module'      => 'API',
