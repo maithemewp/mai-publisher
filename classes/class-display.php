@@ -836,11 +836,34 @@ class Mai_Publisher_Display {
 						return $close;
 					}
 
-					$ads = '';
+					$ads   = '';
+					$class = '';
+
+					// Build classes.
+					switch ( $args['content_item'] ) {
+						case 'rows':
+							$class .= 'maipub-row entry entry-archive is-column';
+							break;
+						case 'entries':
+							$class .= 'maipub-entry entry entry-archive is-column';
+							break;
+					}
 
 					// Show an ad for each set row.
 					foreach ( $args['content_count'] as $count ) {
-						$ads .= sprintf( '<div class="maipub-ad" style="order:calc(var(--maipub-columns) * %s);">%s</div>', $count, maipub_get_processed_ad_content( $args['content'] ) );
+						$style = 'rows' === $args['content_item'] ? "order:calc(var(--maipub-row) * {$count});" : "order:{$count};";
+						$ad    = maipub_get_processed_ad_content( $args['content'] );
+						$tags  = new WP_HTML_Tag_Processor( $ad );
+
+						while ( $tags->next_tag() ) {
+							$class = trim( $class . ' ' . (string) $tags->get_attribute( 'class' ) );
+							$style = trim( $style . ' ' . (string) $tags->get_attribute( 'style' ) );
+							$tags->set_attribute( 'class', $class );
+							$tags->set_attribute( 'style', $style );
+							break;
+						}
+
+						$ads .= $tags->get_updated_html();
 					}
 
 					return $ads . $close;
@@ -880,27 +903,27 @@ class Mai_Publisher_Display {
 
 		?>
 		<style>
-			.maipub-ad {
+			.maipub-row {
 				flex:1 1 100%;
 			}
 			@media only screen and (max-width: 599px) {
 				.entries-wrap {
-					--maipub-columns: var(--maipub-columns-xs);
+					--maipub-row: var(--maipub-row-xs);
 				}
 			}
 			@media only screen and (min-width: 600px) and (max-width: 799px) {
 				.entries-wrap {
-					--maipub-columns: var(--maipub-columns-sm);
+					--maipub-row: var(--maipub-row-sm);
 				}
 			}
 			@media only screen and (min-width: 800px) and (max-width: 999px) {
 				.entries-wrap {
-					--maipub-columns: var(--maipub-columns-md);
+					--maipub-row: var(--maipub-row-md);
 				}
 			}
 			@media only screen and (min-width: 1000px) {
 				.entries-wrap {
-					--maipub-columns: var(--maipub-columns-lg);
+					--maipub-row: var(--maipub-row-lg);
 				}
 			}
 		</style>
@@ -945,7 +968,7 @@ class Mai_Publisher_Display {
 
 		// Add inline custom properties.
 		foreach ( $columns as $break => $column ) {
-			$atts['style'] .= sprintf( '--maipub-columns-%s:%s;', $break, $column );
+			$atts['style'] .= sprintf( '--maipub-row-%s:%s;', $break, $column );
 		}
 
 		$has_atts = true;

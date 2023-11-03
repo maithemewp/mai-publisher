@@ -550,7 +550,8 @@ function maipub_validate_args_archive( $args ) {
 		'slug'          => '',
 		'location'      => '',
 		'content'       => '',
-		'content_count' => 3,
+		'content_count' => '',
+		'content_item'  => 'rows',
 		'types'         => [],
 		'taxonomies'    => [],
 		'terms'         => [],
@@ -565,6 +566,7 @@ function maipub_validate_args_archive( $args ) {
 		'location'      => esc_html( $args['location'] ),
 		'content'       => trim( $args['content'] ),
 		'content_count' => $args['content_count'] ? array_map( 'absint', explode( ',', (string) $args['content_count'] ) ) : [],
+		'content_item'  => $args['content_item'] ? sanitize_key( $args['content_item'] ) : 'rows',
 		'types'         => $args['types'] ? array_map( 'esc_html', (array) $args['types'] ) : [],
 		'taxonomies'    => $args['taxonomies'] ? array_map( 'esc_html', (array) $args['taxonomies'] ) : [],
 		'terms'         => $args['terms'] ? array_map( 'absint', (array) $args['terms'] ) : [],
@@ -626,29 +628,48 @@ function maipub_validate_args_archive( $args ) {
 	// If in entries.
 	if ( 'entries' === $args['location'] ) {
 		// Mai Theme v2 logic for rows/columns.
-		if ( function_exists( 'mai_get_template_args' ) ) {
+		if ( class_exists( 'Mai_Engine' ) ) {
+			$compare  = null;
 			$settings = mai_get_template_args();
- 			$columns  = mai_get_breakpoint_columns( $args );
 
 			// Bail if no posts per page.
 			if ( ! ( isset( $settings['posts_per_page'] ) && $settings['posts_per_page'] ) ) {
 				return [];
 			}
 
-			// Bail if no columns.
-			if ( ! ( isset( $columns['lg'] ) && $columns['lg'] ) ) {
+			// Set posts per page.
+			$ppp = (int) $settings['posts_per_page'];
+
+			// If counting rows.
+			if ( 'rows' === $args['content_item'] ) {
+				$columns = mai_get_breakpoint_columns( $args );
+
+				// Bail if no columns.
+				if ( ! ( isset( $columns['lg'] ) && $columns['lg'] ) ) {
+					return [];
+				}
+
+				// Get desktop rows and round up.
+				$rows    = $ppp / (int) $columns['lg'];
+				$compare = absint( ceil( $rows ) );
+
+			}
+			// If counting entries.
+			elseif ( 'entries' === $args['content_item'] ) {
+				$compare = $ppp;
+			}
+
+			// Bail if not comparing.
+			if ( is_null( $compare ) ) {
 				return [];
 			}
 
-			// Get desktop rows and round up.
-			$rows = $settings['posts_per_page'] / $columns['lg'];
-			$rows = absint( ceil( $rows ) );
-
 			// Remove counts that are greater than the posts per page.
 			foreach ( $args['content_count'] as $index => $count ) {
-				if ( $count >= $rows ) {
+				if ( (int) $count >= $compare ) {
 					// Remove this one and any after it, and break.
 					$args['content_count'] = array_slice( $args['content_count'], 0, $index );
+					break;
 				}
 			}
 

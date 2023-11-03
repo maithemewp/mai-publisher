@@ -409,6 +409,7 @@ function maipub_get_ads_data() {
 						'location'      => $archive_location,
 						'content'       => $content,
 						'content_count' => get_field( 'maipub_archive_content_count' ),
+						'content_item'  => get_field( 'maipub_archive_content_item' ),
 						'types'         => get_field( 'maipub_archive_types' ),
 						'taxonomies'    => get_field( 'maipub_archive_taxonomies' ),
 						'terms'         => get_field( 'maipub_archive_terms' ),

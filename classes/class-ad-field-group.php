@@ -307,14 +307,14 @@ class Mai_Publisher_Ad_Field_Group {
 				'choices'      => maipub_get_location_choices( 'archive' ),
 			],
 			[
-				'label'             => __( 'Row count', 'mai-publisher' ),
-				'instructions'      => __( 'Count this many rows of entries before displaying content. Use comma-separated values to repeat this add after a different number of elements.', 'mai-publisher' ),
+				'label'             => __( 'Count', 'mai-publisher' ),
+				'instructions'      => __( 'Count this many entries or rows of entries before displaying content. Use comma-separated values to repeat this add after a different number of items.', 'mai-publisher' ),
 				'key'               => 'maipub_archive_content_count',
 				'name'              => 'maipub_archive_content_count',
 				'type'              => 'text',
-				'append'            => __( 'rows', 'mai-publisher' ),
 				'required'          => 1,
-				'default_value'     => 3,
+				'default_value'     => '3, 6',
+				'wrapper'           => [ 'width' => '75' ],
 				'conditional_logic' => [
 					[
 						[
@@ -324,6 +324,19 @@ class Mai_Publisher_Ad_Field_Group {
 						],
 					],
 				],
+			],
+			[
+				'label'         => __( 'Count Items', 'mai-publisher' ),
+				'instructions'  => __( 'Whether to count rows or entries.', 'mai-publisher' ),
+				'key'           => 'maipub_archive_content_item',
+				'name'          => 'maipub_archive_content_item',
+				'type'          => 'select',
+				'default_value' => 'rows',
+				'choices'       => [
+					'rows'    => __( 'Rows', 'mai-publisher' ),
+					'entries' => __( 'Entries', 'mai-publisher' ),
+				],
+				'wrapper'      => [ 'width' => '25' ],
 			],
 			[
 				'label'        => __( 'Post type archives', 'mai-publisher' ),
