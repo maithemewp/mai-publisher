@@ -102,9 +102,10 @@ class Mai_Publisher_Ad_Unit_Block {
 			$mobile  = end( $unit['sizes_mobile'] );  // Last should be the largest.
 			$tablet  = end( $unit['sizes_tablet'] );  // Last should be the largest.
 			$desktop = end( $unit['sizes_desktop'] ); // Last should be the largest.
-			$mobile  = ! is_array( $mobile ) ? [ 300, 157 ] : $mobile;
-			$tablet  = ! is_array( $tablet ) ? [ 300, 157 ] : $tablet;
-			$desktop = ! is_array( $desktop ) ? [ 300, 157 ] : $desktop;
+			$mobile  = ! is_array( $mobile ) ? [ 300, 350 ] : $mobile;
+			$tablet  = ! is_array( $tablet ) ? [ 300, 350 ] : $tablet;
+			$desktop = ! is_array( $desktop ) ? [ 300, 350 ] : $desktop;
+
 			$script  = '';
 			$script .= '<picture>';
 				$script .= sprintf( '<source srcset="https://placehold.co/%s" media="(max-width: 727px)" />', implode( 'x', $mobile ) );
@@ -257,6 +258,11 @@ class Mai_Publisher_Ad_Unit_Block {
 
 			// Check for largest width and height.
 			foreach ( $item as $subitem ) {
+				// Bail if not array, mostly for fluid.
+				if ( ! is_array( $subitem ) ) {
+					continue;
+				}
+
 				$width  = $subitem[0];
 				$height = $subitem[1];
 
