@@ -86,6 +86,252 @@ function maipub_get_content_age() {
 }
 
 /**
+ * Get content creator.
+ *
+ * @since TBD
+ *
+ * @return int|false
+ */
+function maipub_get_content_creator() {
+	if ( ! is_singular() ) {
+		return false;
+	}
+
+	$author_id = get_post_field( 'post_author', get_the_ID() );
+
+	return absint( $author_id );
+}
+
+/**
+ * Get content group/category slug.
+ *
+ * @since TBD
+ *
+ * @return string|false
+ */
+function maipub_get_content_group() {
+	if ( ! is_singular() ) {
+		return false;
+	}
+
+	$term = maipub_get_primary_term( 'category', get_the_ID() );
+
+	return $term ? $term->slug : false;
+}
+
+/**
+ * Get content type.
+ *
+ * @since TBD
+ *
+ * @return string|false
+ */
+function maipub_get_content_type() {
+	$type = 'ot';
+
+	// Blog page.
+	if ( is_home() ) {
+		$type = 'bp';
+	}
+	// Single page.
+	elseif ( is_singular( 'page' ) ) {
+		$type = 'pa';
+
+		// Home page.
+		if ( is_front_page() ) {
+			$type = 'hp';
+		}
+	}
+	// Single post.
+	elseif ( is_singular( 'post' ) ) {
+		$type    = 'po';
+		$primary = maipub_get_primary_term( 'category', get_the_ID() );
+
+		// Check for category specific content type.
+		if ( $primary ) {
+			// Podcast.
+			if ( str_contains( $primary->slug, 'podcast' ) ) {
+				$type = 'pod';
+			}
+			// Recipe.
+			elseif ( str_contains( $primary->slug, 'recipe' ) ) {
+				$type = 're';
+			}
+
+			// If it's not specific, check ancestors.
+			if ( 'po' === $type ) {
+				$ancestors = get_ancestors( $primary->term_id, 'category', 'taxonomy' );
+
+				if ( $ancestors ) {
+					$contains  = [ $primary->slug ];
+
+					foreach ( $ancestors as $ancestor ) {
+						$term = get_term( $ancestor );
+
+						if ( $term && ! is_wp_error( $term ) ) {
+							$contains[] = $term->slug;
+						}
+					}
+
+					if ( $contains ) {
+						foreach ( $contains as $slug ) {
+							if ( str_contains( $slug, 'podcast' ) ) {
+								$type = 'pod';
+								break;
+							}
+
+							if ( str_contains( $slug, 'recipe' ) ) {
+								$type = 're';
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	// CPT.
+	elseif ( is_singular() ) {
+		$type      = 'cpt';
+		$post_type = get_post_type();
+
+		// Podcast.
+		if ( str_contains( $post_type, 'podcast' ) ) {
+			$type = 'pod';
+		}
+		// Recipe.
+		elseif ( str_contains( $post_type, 'recipe' ) ) {
+			$type = 're';
+		}
+	}
+	// Category.
+	elseif ( is_category() ) {
+		$type = 'ca';
+	}
+	// Tag.
+	elseif ( is_tag() ) {
+		$type = 'ta';
+	}
+	// Custom taxonomy.
+	elseif ( is_tax() ) {
+		$type = 'te';
+	}
+	// Author.
+	elseif ( is_author() ) {
+		$type = 'au';
+	}
+	// Date.
+	elseif ( is_date() ) {
+		$type = 'da';
+	}
+	// Search.
+	elseif ( is_search() ) {
+		$type = 'se';
+	}
+	// 404.
+	elseif ( is_404() ) {
+		$type = 'fo';
+	}
+
+	return $type;
+}
+
+/**
+ * TODO: Use this?
+ * Gets localized args for OpenRTB.
+ *
+ * OpenRTB 2.6 spec / Content Taxonomy.
+ * @link https://iabtechlab.com/wp-content/uploads/2022/04/OpenRTB-2-6_FINAL.pdf
+ *
+ * @since TBD
+ *
+ * @return array
+ */
+function maipub_get_ortb2_vars() {
+	/**
+	 * 3.2.13 Object: Site
+	 */
+	$site = [
+		'name'          => get_bloginfo( 'name' ),
+		'domain'        => (string) maipub_get_url_host( home_url() ),
+		'page'          => is_singular() ? get_permalink() : home_url( add_query_arg( [] ) ),
+		// 'kwarray'       => [ 'sports', 'news', 'rumors', 'gossip' ],
+		'mobile'        => 1,
+		'privacypolicy' => 1,
+		// 'content'       => [],
+	];
+
+	$cattax      = 7; // IAB Tech Lab Content Taxonomy 3.0.
+	$cat         = maipub_get_option( 'category' ); // Sitewide category.
+	$section_cat = ''; // Category.
+	$page_cat    = ''; // Child category.
+	$term_id     = 0;
+
+	if ( is_singular( 'post' ) ) {
+		$post_id = get_the_ID();
+		$primary = maipub_get_primary_term( 'category', $post_id );
+		$term_id = $primary ? $primary->term_id : 0;
+
+		/**
+		 * 3.2.16 Object: Content
+		 */
+		$site['content'] = [
+			'id'       => $post_id,
+			'title'    => get_the_title(),
+			'url'      => get_permalink(),
+			'context'  => 5,                                        // Text (i.e., primarily textual document such as a web page, eBook, or news article.
+			// 'kwarray'  => [ 'philadelphia 76ers', 'doc rivers' ],   // Array of keywords about the content.
+			// 'language' => '',                                       // Content language using ISO-639-1-alpha-2. Only one of language or langb should be present.
+			// 'langb'    => '',                                       // Content language using IETF BCP 47. Only one of language or langb should be present.
+			/**
+			 * 3.2.21 Object: Data
+			 */
+			// 'data' => [],
+		];
+
+	} elseif ( is_category() ) {
+		$object    = get_queried_object();
+		$term_id   = $object && $object instanceof WP_Term ? $object->term_id : 0;
+	}
+
+	if ( $term_id ) {
+		$hierarchy = $this->get_term_hierarchy( $term_id );
+
+		if ( $hierarchy ) {
+			$page_cat    = array_pop( $hierarchy );
+			$section_cat = array_pop( $hierarchy );
+			$section_cat = $section_cat ?: $page_cat;
+
+			// Check for IATB category.
+			$page_cat    = $page_cat ? get_term_meta( $term_id, 'maipub_category', true ) : 0;
+			$section_cat = $section_cat ? get_term_meta( $term_id, 'maipub_category', true ) : 0;
+		}
+	}
+
+	if ( $cat || $section_cat || $page_cat ) {
+		$site['cattax']            = $cattax;
+		$site['content']['cattax'] = $cattax;
+
+		if ( $cat ) {
+			$site['cat']            = [ $cat ];
+			$site['content']['cat'] = [ $cat ];
+		}
+
+		if ( $section_cat ) {
+			$site['sectioncat']            = [ $section_cat ];
+			$site['content']['sectioncat'] = [ $section_cat ];
+		}
+
+		if ( $page_cat ) {
+			$site['pagecat']            = [ $page_cat ];
+			$site['content']['pagecat'] = [ $page_cat ];
+		}
+	}
+
+	return $site;
+}
+
+/**
  * Get current page data.
  *
  * @since 0.3.0

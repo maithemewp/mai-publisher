@@ -138,12 +138,12 @@ final class Mai_Publisher_Plugin {
 		$generate         = new Mai_Publisher_Generate_Ads;
 		$ad_block         = new Mai_Publisher_Ad_Block;
 		$ad_unit_block    = new Mai_Publisher_Ad_Unit_Block;
-		// $display          = new Mai_Publisher_Display;
+		$display          = new Mai_Publisher_Display;
+		$output           = new Mai_Publisher_Output;
 		$views            = new Mai_Publisher_Views;
 		$tracking         = new Mai_Publisher_Tracking;
 		$tracking_content = new Mai_Publisher_Tracking_Content;
 
-		$output = new Mai_Publisher_Output;
 
 		if ( ! class_exists( 'Mai_Analytics_Plugin' ) ) {
 			$tracker_block = new Mai_Publisher_Analytics_Tracker_Block;

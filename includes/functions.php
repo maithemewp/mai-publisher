@@ -320,7 +320,6 @@ function maipub_get_dom_document( $html ) {
 
 /**
  * Returns an array of ads.
- * Slugs must exist in the config.
  *
  * @since 0.1.0
  *
@@ -423,6 +422,7 @@ function maipub_get_ads_data() {
 	}
 	wp_reset_postdata();
 
+	// TODO: Put this in conditions function.
 	// Now that we have data, maybe check visibility for incontent ads.
 	if ( $visibility && in_array( 'incontent', $visibility ) ) {
 		foreach ( $ads['single'] as $index => $values ) {
@@ -535,12 +535,12 @@ function maipub_get_locations() {
 	}
 
 	// WP Recipe Maker.
-	if ( class_exists( 'WP_Recipe_Maker' ) ) {
-		$locations['recipe'] = [
-			'hook'     => 'maipub_before_recipe_instructions',
-			'priority' => 10,
-		];
-	}
+	// if ( class_exists( 'WP_Recipe_Maker' ) ) {
+	// 	$locations['recipe'] = [
+	// 		'hook'     => 'maipub_before_recipe_instructions',
+	// 		'priority' => 10,
+	// 	];
+	// }
 
 	$locations = apply_filters( 'mai_publisher_locations', $locations );
 
@@ -593,6 +593,7 @@ function maipub_get_location_choices( $type = '' ) {
 			'before_entry'         => __( 'Before entry', 'mai-publisher' ),
 			'before_entry_content' => __( 'Before entry content', 'mai-publisher' ),
 			'content'              => __( 'In content', 'mai-publisher' ),
+			'comments'             => __( 'In comments', 'mai-publisher' ),
 			'after_entry_content'  => __( 'After entry content', 'mai-publisher' ),
 			'after_entry'          => __( 'After entry', 'mai-publisher' ),
 			'before_footer'        => __( 'Before footer', 'mai-publisher' ),

@@ -337,16 +337,6 @@ class Mai_Publisher_Ad_Unit_Block {
 	function get_slot( $slot ) {
 		static $counts  = [];
 
-		// If resetting.
-		if ( maipub_reset_slots() ) {
-			$counts = [];
-			maipub_reset_slots( false );
-		}
-
-		if ( maipub_contextual_prefix() ) {
-			$slot = maipub_contextual_prefix() . '-' . $slot;
-		}
-
 		if ( isset( $counts[ $slot ] ) ) {
 			$counts[ $slot ]++;
 			$slot = $slot . '-' . $counts[ $slot ];
