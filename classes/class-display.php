@@ -88,9 +88,10 @@ class Mai_Publisher_Display {
 			return;
 		}
 
-		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$suffix = maipub_get_suffix();
+		$file   = "assets/css/mai-publisher{$suffix}.css";
 
-		wp_enqueue_style( 'mai-publisher', MAI_PUBLISHER_URL . "assets/css/mai-publisher{$suffix}.css", [], MAI_PUBLISHER_VERSION );
+		wp_enqueue_style( 'mai-publisher', maipub_get_file_data( $file, 'url' ), [], maipub_get_file_data( $file, 'version' ) );
 	}
 
 	/**
