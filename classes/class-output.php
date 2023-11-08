@@ -234,7 +234,7 @@ class Mai_Publisher_Output {
 		// Get the content node.
 		$xpath    = new DOMXPath( $this->dom );
 		$content  = $xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " entry-content-single ")]' )->item(0);
-		$children = $content->childNodes;
+		$children = $content ? $content->childNodes : [];
 		$tags     = [];
 
 		// Bail if no content node or child nodes.
@@ -316,17 +316,8 @@ class Mai_Publisher_Output {
 					continue;
 				}
 
-				/**
-				 * Build the temporary dom.
-				 * Special characters were causing issues with `appendXML()`.
-				 *
-				 * This needs to happen inside the loop, otherwise the slot IDs are not correctly incremented.
-				 *
-				 * @link https://stackoverflow.com/questions/4645738/domdocument-appendxml-with-special-characters
-				 * @link https://www.py4u.net/discuss/974358
-				 */
-				$tmp  = maipub_get_dom_document( $ad['content'] );
-				$node = $this->dom->importNode( $tmp->documentElement, true );
+				// Build the temporary dom.
+				$node = maipub_get_tmp_dom_document_node( $ad['content'] );
 
 				// If valid node.
 				if ( $node ) {
@@ -366,6 +357,70 @@ class Mai_Publisher_Output {
 			return;
 		}
 
+		// Mai Theme v2 logic for rows/columns inline styles.
+		if ( class_exists( 'Mai_Engine' ) ) {
+			// Set has rows.
+			$has_rows = false;
+
+			// Check if we have an ad with rows.
+			foreach ( $this->grouped['entries'] as $ad ) {
+				if ( 'rows' === $ad['content_item'] ) {
+					$has_rows = true;
+					break;
+				}
+			}
+
+			// Set rows.
+			if ( $has_rows ) {
+				$style   = $wrap->getAttribute( 'style' );
+				$styles  = array_filter( explode( ';' , $style ) );
+				$columns = [];
+
+				foreach ( $styles as $style ) {
+					if ( ! str_starts_with( $style, '--columns-' ) ) {
+						continue;
+					}
+
+					$column = explode( ':', $style );
+
+					if ( 2 !== count( $column ) ) {
+						continue;
+					}
+
+					$break  = str_replace( '--columns-', '', $column[0] );
+					$column = explode( '/', $column[1] );
+
+					if ( 2 !== count( $column ) ) {
+						continue;
+					}
+
+					$columns[ $break ] = $column[1];
+				}
+
+				if ( $columns ) {
+					// Get existing styles as an array.
+					$style  = $wrap->getAttribute( 'style' );
+					$styles = array_filter( explode( ';' , $style ) );
+					$styles = array_map( 'trim', $styles );
+
+					// Add row breakpoint styles.
+					foreach ( $columns as $break => $column ) {
+						$styles[] = sprintf( '--maipub-row-%s:%s;', $break, $column );
+					}
+
+					// Set new styles.
+					$wrap->setAttribute( 'style', implode( ';', $styles ) . ';' );
+
+					// Insert styles before wrap.
+					$suffix = maipub_get_suffix();
+					$file   = "assets/css/mai-engine{$suffix}.css";
+					$link   = sprintf( '<link href="%s" rel="stylesheet">', maipub_get_file_data( $file, 'url' ) );
+					$node   = maipub_get_tmp_dom_document_node( $this->dom, $link );
+					$this->insert_node( $node, $wrap, 'before' );
+				}
+			}
+		} // End Mai_Engine logic.
+
 		// Loop through entries ads.
 		foreach ( $this->grouped['entries'] as $ad ) {
 			// Skip if no content.
@@ -373,9 +428,26 @@ class Mai_Publisher_Output {
 				continue;
 			}
 
-			// Mai Theme v2 logic for rows/columns.
+			// Setup vars.
+			$class = [];
+			$style = [];
+
+			// Build atts.
+			switch ( $ad['content_item'] ) {
+				case 'rows':
+					$class[] = 'maipub-row';
+					break;
+				case 'entries':
+					$class[] = 'maipub-entry';
+					break;
+			}
+
+			// Sort counts lowest to highest.
+			asort( $ad['content_count'] );
+
+			// Mai Theme v2 logic for inserting rows/columns.
 			if ( class_exists( 'Mai_Engine' ) ) {
-				$compare  = null;
+				$compare = null;
 
 				// If counting rows.
 				if ( 'rows' === $ad['content_item'] ) {
@@ -391,6 +463,9 @@ class Mai_Publisher_Output {
 				}
 				// If counting entries.
 				elseif ( 'entries' === $ad['content_item'] ) {
+					$class[] = 'entry';
+					$class[] = 'entry-archive';
+					$class[] = 'is-column';
 					$compare = $entries;
 				}
 
@@ -406,147 +481,48 @@ class Mai_Publisher_Output {
 					}
 				}
 
-				// TODO: Handle rows order for Mai Engine.
+				// Loop through each ad count.
+				foreach ( $ad['content_count'] as $count ) {
+					$item_class   = $class;
+					$item_style   = $style;
+					$item_style[] = 'rows' === $ad['content_item'] ? "order:calc(var(--maipub-row) * {$count})" : "order:{$count}";
+					$tags         = new WP_HTML_Tag_Processor( $ad['content'] );
 
+					// Loop through tags.
+					while ( $tags->next_tag() ) {
+						$item_class = trim( implode( ' ', $item_class ) . ' ' . $tags->get_attribute( 'class' ) );
+						$item_style = trim( implode( ';', $item_style ) . '; ' . $tags->get_attribute( 'style' ) );
+						$tags->set_attribute( 'class', $item_class );
+						$tags->set_attribute( 'style', $item_style );
 
-				// // Set has rows.
-				// $has_rows = false;
+						// Break after first.
+						break;
+					}
 
-				// // Check if we have an ad with rows.
-				// foreach ( $this->grouped['entries'] as $ad ) {
-				// 	if ( 'rows' === $ad['content_item'] ) {
-				// 		$has_rows = true;
-				// 		break;
-				// 	}
-				// }
+					// Build the temporary dom node.
+					$node = maipub_get_tmp_dom_document_node( $this->dom, $tags->get_updated_html() );
 
-				// // Set rows.
-				// if ( $has_rows ) {
-				// 	$styles  = (string) $wrap->getAttribute( 'style' );
-				// 	$styles  = array_filter( explode( ';' , $styles ) );
-				// 	$columns = [];
-
-				// 	foreach ( $styles as $style ) {
-				// 		if ( ! str_starts_with( $style, '--columns-' ) ) {
-				// 			continue;
-				// 		}
-
-				// 		$column = explode( ':', $style );
-
-				// 		if ( 2 !== count( $column ) ) {
-				// 			continue;
-				// 		}
-
-				// 		$break  = str_replace( '--columns-', '', $column[0] );
-				// 		$column = explode( '/', $column[1] );
-
-				// 		if ( 2 !== count( $column ) ) {
-				// 			continue;
-				// 		}
-
-				// 		$columns[ $break ] = $column[1];
-				// 	}
-
-				// 	if ( $columns ) {
-				// 		// Get existing styles as an array.
-				// 		$style  = (string) $wrap->getAttribute( 'style' );
-				// 		$styles = explode( ';', $style );
-				// 		$styles = array_map( 'trim', $styles );
-
-				// 		foreach ( $columns as $break => $column ) {
-				// 			$styles[] = sprintf( '--maipub-row-%s:%s;', $break, $column );
-				// 		}
-
-				// 		// Set new styles.
-				// 		$wrap->setAttribute( 'style', implode( ';', $styles ) . ';' );
-				// 	}
-				// }
-			}
-
-			// Setup vars.
-			$class = '';
-			$style = '';
-
-			// Build atts.
-			switch ( $ad['content_item'] ) {
-				case 'rows':
-					$class .= 'maipub-row';
-					break;
-				case 'entries':
-					$class .= 'maipub-entry entry entry-archive is-column';
-					break;
-			}
-
-			// Sort counts lowest to highest.
-			asort( $ad['content_count'] );
-
-			// Add attributes.
-			foreach ( $ad['content_count'] as $count ) {
-				$style .= 'rows' === $ad['content_item'] ? "order:calc(var(--maipub-row) * {$count});" : "order:{$count};";
-				$tags   = new WP_HTML_Tag_Processor( $ad['content'] );
-
-				// Loop through tags.
-				while ( $tags->next_tag() ) {
-					$class = trim( $class . ' ' . (string) $tags->get_attribute( 'class' ) );
-					$style = trim( $style . ' ' . (string) $tags->get_attribute( 'style' ) );
-					$tags->set_attribute( 'class', $class );
-					$tags->set_attribute( 'style', $style );
-					// Break after first.
-					break;
-				}
-
-				// Get updated HTML.
-				$html = $tags->get_updated_html();
-
-				// Skip if no HTML.
-				if ( ! $html ) {
-					continue;
-				}
-
-				/**
-				 * Build the temporary dom.
-				 * Special characters were causing issues with `appendXML()`.
-				 *
-				 * This needs to happen inside the loop, otherwise the slot IDs are not correctly incremented.
-				 *
-				 * @link https://stackoverflow.com/questions/4645738/domdocument-appendxml-with-special-characters
-				 * @link https://www.py4u.net/discuss/974358
-				 */
-				$tmp  = maipub_get_dom_document( $html );
-				$node = $this->dom->importNode( $tmp->documentElement, true );
-
-				// If valid node.
-				if ( $node ) {
-					// Insert the node into the dom.
-					$this->insert_node( $node, $wrap, 'append' );
+					// If valid node.
+					if ( $node ) {
+						// Insert the node into the dom.
+						$this->insert_node( $node, $wrap, 'append' );
+					}
 				}
 			}
-		}
+			// Not Mai_Engine.
+			else {
+				// Loop through each ad count.
+				foreach ( $ad['content_count'] as $count ) {
+					$node = maipub_get_tmp_dom_document_node( $this->dom, $ad['content'] );
 
-		// Bail if no HTML.
-		// if ( ! $html ) {
-		// 	return;
-		// }
-
-		// ray( $html );
-
-		// /**
-		//  * Build the temporary dom.
-		//  * Special characters were causing issues with `appendXML()`.
-		//  *
-		//  * This needs to happen inside the loop, otherwise the slot IDs are not correctly incremented.
-		//  *
-		//  * @link https://stackoverflow.com/questions/4645738/domdocument-appendxml-with-special-characters
-		//  * @link https://www.py4u.net/discuss/974358
-		//  */
-		// $tmp  = maipub_get_dom_document( $html );
-		// $node = $this->dom->importNode( $tmp->documentElement, true );
-
-		// // If valid node.
-		// if ( $node ) {
-		// 	// Insert the node into the dom.
-		// 	$this->insert_node( $node, $wrap, 'append' );
-		// }
+					// If valid node.
+					if ( $node ) {
+						// Insert the node into the dom.
+						$this->insert_node( $node, $wrap, 'append' );
+					}
+				}
+			}
+		} // End ad loop.
 	}
 
 	function handle_recipes() {
@@ -615,7 +591,8 @@ class Mai_Publisher_Output {
 		$libxml_previous_state = libxml_use_internal_errors( true );
 
 		// Encode.
-		$html = mb_convert_encoding( $html, 'HTML-ENTITIES', 'UTF-8' );
+		// $html = mb_convert_encoding( $html, 'HTML-ENTITIES', 'UTF-8' );
+		$html = htmlspecialchars_decode( mb_encode_numericentity( htmlentities( $html, ENT_QUOTES, 'UTF-8' ), [0x80, 0x10FFFF, 0, ~0], 'UTF-8' ) );
 
 		// Load the content in the document HTML.
 		$dom->loadHTML( $html );

@@ -292,7 +292,8 @@ function maipub_get_dom_document( $html ) {
 	$libxml_previous_state = libxml_use_internal_errors( true );
 
 	// Encode.
-	$html = mb_convert_encoding( $html, 'HTML-ENTITIES', 'UTF-8' );
+	// $html = mb_convert_encoding( $html, 'HTML-ENTITIES', 'UTF-8' );
+	$html = htmlspecialchars_decode( mb_encode_numericentity( htmlentities( $html, ENT_QUOTES, 'UTF-8' ), [0x80, 0x10FFFF, 0, ~0], 'UTF-8' ) );
 
 	// Load the content in the document HTML.
 	$dom->loadHTML( "<div>$html</div>" );
@@ -316,6 +317,23 @@ function maipub_get_dom_document( $html ) {
 	libxml_use_internal_errors( $libxml_previous_state );
 
 	return $dom;
+}
+
+/**
+ * Build the temporary dom.
+ * Special characters were causing issues with `appendXML()`.
+ *
+ * @since TBD
+ *
+ * @link https://stackoverflow.com/questions/4645738/domdocument-appendxml-with-special-characters
+ * @link https://www.py4u.net/discuss/974358
+ *
+ * @return DOMNode|false
+ */
+function maipub_get_tmp_dom_document_node( $dom, $content ) {
+	$tmp = $content ? maipub_get_dom_document( $content ) : false;
+
+	return $tmp ? $dom->importNode( $tmp->documentElement, true ) : $tmp;
 }
 
 /**
