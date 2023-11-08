@@ -37,7 +37,7 @@ class Mai_Publisher_Settings_Categories {
 	 */
 	function add_menu_item() {
 		add_submenu_page(
-			null, // No parent page, so no menu item.
+			'', // No parent page, so no menu item.
 			__( 'IAB Tech Lab Taxonomy Mapping', 'mai-publisher' ), // page_title
 			'', // No menu title.
 			'manage_options', // capability

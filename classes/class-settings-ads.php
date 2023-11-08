@@ -36,7 +36,7 @@ class Mai_Publisher_Settings_Ad_Units_Config {
 	 */
 	function add_menu_item() {
 		add_submenu_page(
-			null, // No parent page, so no menu item.
+			'', // No parent page, so no menu item.
 			__( 'Ad Units Config', 'mai-publisher' ), // page_title
 			'', // No menu title.
 			'manage_options', // capability
