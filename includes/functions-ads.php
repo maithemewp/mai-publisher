@@ -469,121 +469,120 @@ function maipub_validate_ad_conditions_archive( $args ) {
 	return $args;
 }
 
+// /**
+//  * Get content area hook locations.
+//  *
+//  * @since TBD
+//  *
+//  * @return array
+//  */
+// function maipub_get_ad_locations() {
+// 	static $locations = null;
 
-/**
- * Get content area hook locations.
- *
- * @since TBD
- *
- * @return array
- */
-function maipub_get_ad_locations() {
-	static $locations = null;
+// 	if ( ! is_null( $locations ) ) {
+// 		return $locations;
+// 	}
 
-	if ( ! is_null( $locations ) ) {
-		return $locations;
-	}
+// 	$locations = [
+// 		'before_header' => [
+// 			'query'  => '.site-header',
+// 			'insert' => 'prepend',
+// 		],
+// 		'after_header' => [
+// 			'query'  => '.site-header',
+// 			'insert' => 'append',
+// 		],
+// 		'before_loop' => [
+// 			'query'  => '.content',
+// 			'insert' => 'prependchild',
+// 		],
+// 		'after_loop' => [
+// 			'query'  => '.content',
+// 			'insert' => 'appendchild',
+// 		],
+// 		'before_entry' => [
+// 			'query'  => '.content',
+// 			'insert' => 'prependchild',
+// 		],
+// 		'after_entry' => [
+// 			'query'  => '.content',
+// 			'insert' => 'appendchild',
+// 		],
+// 		'before_entry_content' => [
+// 			'query'  => '.entry-content',
+// 			'insert' => 'prepend',
+// 		],
+// 		'after_entry_content'  => [
+// 			'query'  => '.entry-content',
+// 			'insert' => 'append',
+// 		],
+// 		'content' => [
+// 			'query'  => '.entry-content',
+// 			'insert' => '', // Exception, handled in dom.
+// 		],
+// 		'entries' => [
+// 			'query'  => '.entries-wrap > .entry',
+// 			'insert' => 'innerbefore', // Exception, handled in dom.
+// 		],
+// 		'recipe' => [
+// 			'query'  => '.wprm-recipe-ingredients',
+// 			'insert' => 'before', // Exception, handled in dom.
+// 		],
+// 		'before_footer' => [
+// 			'query'  => '.site-footer',
+// 			'insert' => 'before',
+// 		],
+// 		'after_footer' => [
+// 			'query'  => '.site-footer',
+// 			'insert' => 'before',
+// 		],
+// 	];
 
-	$locations = [
-		'before_header' => [
-			'query'  => '.site-header',
-			'insert' => 'prepend',
-		],
-		'after_header' => [
-			'query'  => '.site-header',
-			'insert' => 'append',
-		],
-		'before_loop' => [
-			'query'  => '.content',
-			'insert' => 'prependchild',
-		],
-		'after_loop' => [
-			'query'  => '.content',
-			'insert' => 'appendchild',
-		],
-		'before_entry' => [
-			'query'  => '.content',
-			'insert' => 'prependchild',
-		],
-		'after_entry' => [
-			'query'  => '.content',
-			'insert' => 'appendchild',
-		],
-		'before_entry_content' => [
-			'query'  => '.entry-content',
-			'insert' => 'prepend',
-		],
-		'after_entry_content'  => [
-			'query'  => '.entry-content',
-			'insert' => 'append',
-		],
-		'content' => [
-			'query'  => '.entry-content',
-			'insert' => '', // Exception, handled in dom.
-		],
-		'entries' => [
-			'query'  => '.entries-wrap > .entry',
-			'insert' => 'innerbefore', // Exception, handled in dom.
-		],
-		'recipe' => [
-			'query'  => '.wprm-recipe-ingredients',
-			'insert' => 'before', // Exception, handled in dom.
-		],
-		'before_footer' => [
-			'query'  => '.site-footer',
-			'insert' => 'before',
-		],
-		'after_footer' => [
-			'query'  => '.site-footer',
-			'insert' => 'before',
-		],
-	];
+// 	// TODO: Add WooCommerce query/insert.
+// 	if ( maipub_is_product_archive() || maipub_is_product_singular() ) {
+// 		$locations['before_loop'] = [
+// 			'query'  => '',
+// 			'insert' => '',
+// 		];
 
-	// TODO: Add WooCommerce query/insert.
-	if ( maipub_is_product_archive() || maipub_is_product_singular() ) {
-		$locations['before_loop'] = [
-			'query'  => '',
-			'insert' => '',
-		];
+// 		$locations['before_entry'] = [
+// 			'query'  => '',
+// 			'insert' => '',
+// 		];
 
-		$locations['before_entry'] = [
-			'query'  => '',
-			'insert' => '',
-		];
+// 		$locations['before_entry_content'] = [
+// 			'query'  => '',
+// 			'insert' => '',
+// 		];
 
-		$locations['before_entry_content'] = [
-			'query'  => '',
-			'insert' => '',
-		];
+// 		$locations['after_entry_content'] = [
+// 			'query'  => '',
+// 			'insert' => '',
+// 		];
 
-		$locations['after_entry_content'] = [
-			'query'  => '',
-			'insert' => '',
-		];
+// 		$locations['after_entry'] = [
+// 			'query'  => '',
+// 			'insert' => '',
+// 		];
 
-		$locations['after_entry'] = [
-			'query'  => '',
-			'insert' => '',
-		];
+// 		$locations['after_loop'] = [
+// 			'query'  => '',
+// 			'insert' => '',
+// 		];
+// 	}
 
-		$locations['after_loop'] = [
-			'query'  => '',
-			'insert' => '',
-		];
-	}
+// 	$locations = apply_filters( 'mai_publisher_ad_locations', $locations );
 
-	$locations = apply_filters( 'mai_publisher_ad_locations', $locations );
+// 	if ( $locations ) {
+// 		foreach ( $locations as $name => $location ) {
+// 			$locations[ $name ] = wp_parse_args( (array) $location,
+// 				[
+// 					'query'  => '',
+// 					'insert' => '',
+// 				]
+// 			);
+// 		}
+// 	}
 
-	if ( $locations ) {
-		foreach ( $locations as $name => $location ) {
-			$locations[ $name ] = wp_parse_args( (array) $location,
-				[
-					'query'  => '',
-					'insert' => '',
-				]
-			);
-		}
-	}
-
-	return $locations;
-}
+// 	return $locations;
+// }
