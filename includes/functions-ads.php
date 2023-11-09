@@ -68,20 +68,11 @@ function maipub_get_page_ads_data() {
 		'archive' => [],
 	];
 
-	// Start post ID.
-	$post_id = false;
-
 	// Get post ID.
-	if ( maipub_is_singular() ) {
-		$post_id = get_the_ID();
-	} elseif ( is_home() && ! is_front_page() ) {
-		$post_id = get_option( 'page_for_posts' );
-	} elseif ( maipub_is_shop_archive() ) {
-		$post_id = get_option( 'woocommerce_shop_page_id' );
-	}
+	$page_id = maipub_get_current_page_id();
 
 	// Check visibility.
-	$visibility = $post_id ? get_post_meta( $post_id, 'maipub_visibility', true ) : false;
+	$visibility = $page_id ? get_post_meta( $page_id, 'maipub_visibility', true ) : false;
 
 	// Bail if hidding all ads.
 	if ( $visibility && in_array( 'all', $visibility ) ) {

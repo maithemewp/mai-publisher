@@ -428,6 +428,34 @@ function maipub_get_current_page( $key = '' ) {
 }
 
 /**
+ * Gets current page id.
+ *
+ * @since TBD
+ *
+ * @return int
+ */
+function maipub_get_current_page_id() {
+	static $post_id = null;
+
+	if ( ! is_null( $post_id ) ) {
+		return $post_id;
+	}
+
+	$post_id = 0;
+
+	// Get post ID.
+	if ( maipub_is_singular() ) {
+		$post_id = get_the_ID();
+	} elseif ( is_home() && ! is_front_page() ) {
+		$post_id = get_option( 'page_for_posts' );
+	} elseif ( maipub_is_shop_archive() ) {
+		$post_id = get_option( 'woocommerce_shop_page_id' );
+	}
+
+	return $post_id;
+}
+
+/**
  * Gets the IAB category taxonomy ID.
  *
  * @since 0.9.0

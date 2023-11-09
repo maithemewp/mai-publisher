@@ -780,6 +780,8 @@ class Mai_Publisher_Output {
 		$path    = maipub_get_current_page( 'url' );
 		$type    = maipub_get_content_type();
 		$iabct   = maipub_get_current_page( 'iabct' );
+		$page_id = maipub_get_current_page_id();
+		$custom  = $page_id ? get_post_meta( $page_id, 'maipub_keyvalue_pairs', true ) : '';
 
 		// Content age.
 		if ( $age ) {
@@ -809,6 +811,25 @@ class Mai_Publisher_Output {
 		// IAB Content Taxonomy.
 		if ( $iabct ) {
 			$targets['iabct'] = $iabct;
+		}
+
+		// Custom key value pairs.
+		if ( $custom ) {
+			$pairs = explode( ',', $custom );
+			$pairs = array_map( 'trim', $pairs );
+			$pairs = array_filter( $pairs );
+
+			foreach ( $pairs as $pair ) {
+				$pair = explode( '=', $pair );
+				$pair = array_map( 'trim', $pair );
+				$pair = array_filter( $pair );
+
+				if ( 2 !== count( $pair ) ) {
+					continue;
+				}
+
+				$targets[ $pair[0] ] = $pair[1];
+			}
 		}
 
 		return $targets;

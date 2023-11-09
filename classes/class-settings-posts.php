@@ -3,7 +3,7 @@
 // Prevent direct file access.
 defined( 'ABSPATH' ) || die;
 
-class Mai_Publisher_Ad_Visibility {
+class Mai_Publisher_Settings_Posts {
 
 	/**
 	 * Construct the class.
@@ -25,6 +25,13 @@ class Mai_Publisher_Ad_Visibility {
 		add_filter( 'acf/location/rule_match/maipub_public_taxonomies', [ $this, 'taxonomy_rule_match' ], 10, 4 );
 	}
 
+	/**
+	 * Registers the ACF field group.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return void
+	 */
 	function register_field_group() {
 		if ( ! function_exists( 'acf_add_local_field_group' ) ) {
 			return;
@@ -32,10 +39,11 @@ class Mai_Publisher_Ad_Visibility {
 
 		acf_add_local_field_group(
 			[
-				'key'    => 'maipub_ad_disable_field_group',
-				'title'  => __( 'Mai Ad Visibility', 'mai-publisher' ),
+				'key'    => 'maipub_posts_field_group',
+				'title'  => __( 'Mai Publisher', 'mai-publisher' ),
 				'fields' => [
 					[
+						'label' => __( 'Ad Visibility', 'mai-publisher' ),
 						'instructions' => __( 'Hide ads on this post/page. Does not hide manually added Mai Ad blocks.', 'mai-publisher' ),
 						'key'          => 'maipub_visibility',
 						'name'         => 'maipub_visibility',
@@ -44,6 +52,13 @@ class Mai_Publisher_Ad_Visibility {
 							'all'       => __( 'Hide all ads', 'mai-publisher' ),
 							'incontent' => __( 'Hide in-content ads', 'mai-publisher' ),
 						],
+					],
+					[
+						'label'        => __( 'Key/Value Pairs', 'mai-publisher' ),
+						'instructions' => __( 'Comma-separated key value pairs. Example: a=b, d=f', 'mai-publisher' ),
+						'key'          => 'maipub_keyvalue_pairs',
+						'name'         => 'maipub_keyvalue_pairs',
+						'type'         => 'text',
 					],
 				],
 				'location' => [

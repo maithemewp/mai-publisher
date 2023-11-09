@@ -132,7 +132,7 @@ final class Mai_Publisher_Plugin {
 		// Instantiate classes.
 		$field_group      = new Mai_Publisher_Ad_Field_Group;
 		$fields           = new Mai_Publisher_Ad_Fields;
-		$visibility       = new Mai_Publisher_Ad_Visibility;
+		$post_settings    = new Mai_Publisher_Settings_Posts;
 		$compabitility    = new Mai_Publisher_Plugin_Compatibility;
 		$categories       = new Mai_Publisher_Categories_Field_Group;
 		$generate         = new Mai_Publisher_Generate_Ads;
@@ -143,7 +143,6 @@ final class Mai_Publisher_Plugin {
 		$views            = new Mai_Publisher_Views;
 		$tracking         = new Mai_Publisher_Tracking;
 		$tracking_content = new Mai_Publisher_Tracking_Content;
-
 
 		if ( ! class_exists( 'Mai_Analytics_Plugin' ) ) {
 			$tracker_block = new Mai_Publisher_Analytics_Tracker_Block;
