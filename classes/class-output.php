@@ -481,8 +481,37 @@ class Mai_Publisher_Output {
 		} // End ad loop.
 	}
 
+	/**
+	 * Handle recipe ads.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
 	function handle_recipes() {
+		$xpath = new DOMXPath( $this->dom );
+		$lists = $xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " wprm-recipe-ingredients-container ") or contains(concat(" ", normalize-space(@class), " "), " wprm-recipe-instructions-container ")]' );
 
+		// Bail if no lists.
+		if ( ! $lists ) {
+			return;
+		}
+
+		// Loop through recipe ads.
+		foreach ( $this->grouped['recipe'] as $ad ) {
+			// Skip if no content.
+			if ( ! $ad['content'] ) {
+				continue;
+			}
+
+			// Loop through containers.
+			foreach ( $lists as $list ) {
+				$class = $list->getAttribute( 'class' );
+				$class = trim( $class . ' mai-ad-container' );
+				$list->setAttribute( 'class', $class );
+				$this->insert_node( $ad['content'], $list, 'append' );
+			}
+		}
 	}
 
 	/**
@@ -554,6 +583,7 @@ class Mai_Publisher_Output {
 			$item  = 0;
 			$count = $ad['comment_count'];
 
+			// Loop through comments.
 			foreach ( $comments as $comment ) {
 				$item ++;
 
