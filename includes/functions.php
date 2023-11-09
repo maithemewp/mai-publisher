@@ -498,15 +498,11 @@ function maipub_get_locations() {
 			'hook'     => '', // No hooks, handled in class-output.
 			'priority' => null,
 		],
+		'comments' => [
+			'hook'     => '', // No hooks, handled in class-output.
+			'priority' => null,
+		],
 		'entries' => [
-			'hook'     => '', // No hooks, handled in class-output.
-			'priority' => null,
-		],
-		'before_sidebar_content' => [
-			'hook'     => '', // No hooks, handled in class-output.
-			'priority' => null,
-		],
-		'after_sidebar_content' => [
 			'hook'     => '', // No hooks, handled in class-output.
 			'priority' => null,
 		],
@@ -521,6 +517,14 @@ function maipub_get_locations() {
 		'after_loop' => [
 			'hook'     => 'genesis_loop',
 			'priority' => 15,
+		],
+		'before_sidebar_content' => [
+			'hook'     => '', // No hooks, handled in class-output.
+			'priority' => null,
+		],
+		'after_sidebar_content' => [
+			'hook'     => '', // No hooks, handled in class-output.
+			'priority' => null,
 		],
 		'before_footer' => [
 			'hook'     => 'genesis_after_content_sidebar_wrap',
@@ -605,6 +609,8 @@ function maipub_get_location_choices( $type = '' ) {
 			''                       => __( 'None (inactive)', 'mai-publisher' ),
 			'before_header'          => __( 'Before header', 'mai-publisher' ),
 			'after_header'           => __( 'After header', 'mai-publisher' ),
+			'before_sidebar_content' => __( 'Before sidebar content', 'mai-publisher' ),
+			'after_sidebar_content'  => __( 'After sidebar content', 'mai-publisher' ),
 			'before_footer'          => __( 'Before footer', 'mai-publisher' ),
 			'after_footer'           => __( 'After footer', 'mai-publisher' ),
 		],
@@ -615,11 +621,12 @@ function maipub_get_location_choices( $type = '' ) {
 			'before_entry'           => __( 'Before entry', 'mai-publisher' ),
 			'before_entry_content'   => __( 'Before entry content', 'mai-publisher' ),
 			'content'                => __( 'In content', 'mai-publisher' ),
-			'before_sidebar_content' => __( 'Before sidebar content', 'mai-publisher' ),
-			'after_sidebar_content'  => __( 'After sidebar content', 'mai-publisher' ),
 			'comments'               => __( 'In comments', 'mai-publisher' ),
+			'recipe'                 => __( 'In recipe', 'mai-publisher' ),
 			'after_entry_content'    => __( 'After entry content', 'mai-publisher' ),
 			'after_entry'            => __( 'After entry', 'mai-publisher' ),
+			'before_sidebar_content' => __( 'Before sidebar content', 'mai-publisher' ),
+			'after_sidebar_content'  => __( 'After sidebar content', 'mai-publisher' ),
 			'before_footer'          => __( 'Before footer', 'mai-publisher' ),
 		],
 		'archive' => [
@@ -628,16 +635,12 @@ function maipub_get_location_choices( $type = '' ) {
 			'after_header'           => __( 'After header', 'mai-publisher' ),
 			'before_loop'            => __( 'Before entries', 'mai-publisher' ),
 			'entries'                => __( 'In entries', 'mai-publisher' ),
+			'after_loop'             => __( 'After entries', 'mai-publisher' ),
 			'before_sidebar_content' => __( 'Before sidebar content', 'mai-publisher' ),
 			'after_sidebar_content'  => __( 'After sidebar content', 'mai-publisher' ),
-			'after_loop'             => __( 'After entries', 'mai-publisher' ),
 			'before_footer'          => __( 'Before footer', 'mai-publisher' ),
 		],
 	];
-
-	if ( class_exists( 'WP_Recipe_Maker' ) ) {
-		$cache['single']['recipe'] = __( 'In recipe', 'mai-publisher' );
-	}
 
 	if ( $type ) {
 		return $cache[ $type ];

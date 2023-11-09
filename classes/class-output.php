@@ -154,7 +154,6 @@ class Mai_Publisher_Output {
 			if ( ! $this->mode ) {
 				// Build script, import into dom and append to ad unit.
 				$script = sprintf( '<script>window.googletag = window.googletag || {};googletag.cmd = googletag.cmd || [];if ( window.googletag && googletag.apiReady ) { googletag.cmd.push(function(){ googletag.display("%s"); }); }</script>', $slot );
-				$script = maipub_import_node( $this->dom, $script );
 				$this->insert_node( $script, $ad_unit, 'append' );
 
 				// Add to gam array.
@@ -194,7 +193,6 @@ class Mai_Publisher_Output {
 	 * @return void
 	 */
 	function handle_content() {
-		// Get the content node.
 		$xpath    = new DOMXPath( $this->dom );
 		$content  = $xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " entry-content-single ")]' )->item(0);
 		$children = $content ? $content->childNodes : [];
@@ -210,6 +208,11 @@ class Mai_Publisher_Output {
 
 		// Loop through in-content ads.
 		foreach ( $this->grouped['content'] as $ad ) {
+			// Skip if no content.
+			if ( ! $ad['content'] ) {
+				continue;
+			}
+
 			// Skip if no location.
 			if ( ! isset( $ad['content_location'] ) || ! $ad['content_location'] ) {
 				continue;
@@ -279,28 +282,22 @@ class Mai_Publisher_Output {
 					continue;
 				}
 
-				// Build the temporary dom.
-				$node = maipub_import_node( $this->dom, $ad['content'] );
-
-				// If valid node.
-				if ( $node ) {
-					// Before headings.
-					if ( 'before' === $ad['content_location'] ) {
-						$this->insert_node( $node, $element, 'before' );
+				// Before headings.
+				if ( 'before' === $ad['content_location'] ) {
+					$this->insert_node( $ad['content'], $element, 'before' );
+				}
+				// After elements.
+				else {
+					/**
+					 * Bail if this is the last element.
+					 * This avoids duplicates since this location would technically be "after entry content" at this point.
+					 */
+					if ( $element === $last || null === $element->nextSibling ) {
+						break;
 					}
-					// After elements.
-					else {
-						/**
-						 * Bail if this is the last element.
-						 * This avoids duplicates since this location would technically be "after entry content" at this point.
-						 */
-						if ( $element === $last || null === $element->nextSibling ) {
-							break;
-						}
 
-						// Insert the node into the dom.
-						$this->insert_node( $node, $element->nextSibling, 'after' );
-					}
+					// Insert the node into the dom.
+					$this->insert_node( $node, $element->nextSibling, 'after' );
 				}
 
 				// Remove from temp counts.
@@ -317,7 +314,6 @@ class Mai_Publisher_Output {
 	 * @return void
 	 */
 	function handle_entries() {
-		// Get the content node.
 		$xpath   = new DOMXPath( $this->dom );
 		$wrap    = $xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " entries-archive ")]/div[contains(concat(" ", normalize-space(@class), " "), " entries-wrap ")]' )->item(0);
 		$entries = $wrap ? count( $wrap->childNodes ) : 0;
@@ -346,6 +342,7 @@ class Mai_Publisher_Output {
 				$styles  = array_filter( explode( ';' , $style ) );
 				$columns = [];
 
+				// Build columns array from inlines styles.
 				foreach ( $styles as $style ) {
 					if ( ! str_starts_with( $style, '--columns-' ) ) {
 						continue;
@@ -367,6 +364,7 @@ class Mai_Publisher_Output {
 					$columns[ $break ] = $column[1];
 				}
 
+				// If columns.
 				if ( $columns ) {
 					// Get existing styles as an array.
 					$style  = $wrap->getAttribute( 'style' );
@@ -385,8 +383,7 @@ class Mai_Publisher_Output {
 					$suffix = maipub_get_suffix();
 					$file   = "assets/css/mai-engine{$suffix}.css";
 					$link   = sprintf( '<link href="%s" rel="stylesheet">', maipub_get_file_data( $file, 'url' ) );
-					$node   = maipub_import_node( $this->dom, $link );
-					$this->insert_node( $node, $wrap, 'before' );
+					$this->insert_node( $link, $wrap, 'before' );
 				}
 			}
 		} // End Mai_Engine logic.
@@ -469,27 +466,16 @@ class Mai_Publisher_Output {
 						break;
 					}
 
-					// Build the temporary dom node.
-					$node = maipub_import_node( $this->dom, $tags->get_updated_html() );
-
-					// If valid node.
-					if ( $node ) {
-						// Insert the node into the dom.
-						$this->insert_node( $node, $wrap, 'append' );
-					}
+					// Insert the html into the dom.
+					$this->insert_node( $tags->get_updated_html(), $wrap, 'append' );
 				}
 			}
 			// Not Mai_Engine.
 			else {
 				// Loop through each ad count.
 				foreach ( $ad['content_count'] as $count ) {
-					$node = maipub_import_node( $this->dom, $ad['content'] );
-
-					// If valid node.
-					if ( $node ) {
-						// Insert the node into the dom.
-						$this->insert_node( $node, $wrap, 'append' );
-					}
+					// Insert the html into the dom.
+					$this->insert_node( $ad['content'], $wrap, 'append' );
 				}
 			}
 		} // End ad loop.
@@ -499,11 +485,47 @@ class Mai_Publisher_Output {
 
 	}
 
+	/**
+	 * Handle sidebar ads.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
 	function handle_sidebar() {
-		// Get the content node.
-		// $xpath   = new DOMXPath( $this->dom );
-		// $wrap    = $xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " entries-archive ")]/div[contains(concat(" ", normalize-space(@class), " "), " entries-wrap ")]' )->item(0);
-		// $entries = $wrap ? count( $wrap->childNodes ) : 0;
+		$xpath   = new DOMXPath( $this->dom );
+		$sidebar = $xpath->query( '//*[contains(concat(" ", normalize-space(@class), " "), " sidebar ")]' )->item(0);
+
+		// Bail if no sidebar.
+		if ( ! $sidebar ) {
+			return;
+		}
+
+		// Sidebar ads.
+		$sidebar_ads = [];
+
+		// Add before sidebar content.
+		if ( isset( $this->grouped['before_sidebar_content'] ) ) {
+			$sidebar_ads['prepend'] = $this->grouped['before_sidebar_content'];
+		}
+
+		// Add after sidebar content.
+		if ( isset( $this->grouped['after_sidebar_content'] ) ) {
+			$sidebar_ads['append'] = $this->grouped['after_sidebar_content'];
+		}
+
+		// Loop through sidebar ads.
+		foreach ( $sidebar_ads as $action => $ads ) {
+			foreach ( $ads as $ad ) {
+				// Skip if no content.
+				if ( ! $ad['content'] ) {
+					continue;
+				}
+
+				// Insert the ad.
+				$this->insert_node( $ad['content'], $sidebar, $action );
+			}
+		}
 	}
 
 	/**
@@ -514,51 +536,37 @@ class Mai_Publisher_Output {
 	 * @return void
 	 */
 	function handle_comments() {
-		// $xpath   = new DOMXPath( $this->dom );
-		// $nodes   = $xpath->query( '//*[contains(concat(" ", normalize-space(@class), " "), " site-header ")]' );
-		// $element = $nodes->item( 0 );
+		$xpath    = new DOMXPath( $this->dom );
+		$comments = $xpath->query( '//ol[contains(concat(" ", normalize-space(@class), " "), " comment-list ")]/li[contains(concat(" ", normalize-space(@class), " "), " comment ")]' );
 
-		// if ( ! $element ) {
-		// 	return;
-		// }
+		if ( ! $comments->length ) {
+			return;
+		}
 
-		// foreach ( $this->ads['after_header'] as $ad ) {
-		// 	/**
-		// 	 * Build the temporary dom.
-		// 	 * Special characters were causing issues with `appendXML()`.
-		// 	 *
-		// 	 * This needs to happen inside the loop, otherwise the slot IDs are not correctly incremented.
-		// 	 *
-		// 	 * @link https://stackoverflow.com/questions/4645738/domdocument-appendxml-with-special-characters
-		// 	 * @link https://www.py4u.net/discuss/974358
-		// 	 */
-		// 	$tmp  = maipub_get_dom_document( $ad['content'] );
-		// 	// $tmp  = maipub_get_dom_document( maipub_get_processed_ad_content( $ad['content'] ) );
-		// 	// $node = $this->dom->importNode( $tmp->documentElement, true );
-		// 	$node = $this->dom->importNode( $tmp->documentElement, true );
+		// Loop through comments ads.
+		foreach ( $this->grouped['comments'] as $ad ) {
+			// Skip if no content.
+			if ( ! $ad['content'] ) {
+				continue;
+			}
 
-		// 	// Skip if no node.
-		// 	if ( ! $node ) {
-		// 		continue;
-		// 	}
+			// Set item and counter.
+			$item  = 0;
+			$count = $ad['comment_count'];
 
-		// 	// ray( $this->locations );
+			foreach ( $comments as $comment ) {
+				$item ++;
 
-		// 	// Insert the node into the dom.
-		// 	$this->insert_node( $element, $node, $this->locations['after_header']['insert'] );
-		// }
+				// Skip if it does equal count or isn't divisble by count.
+				if ( $item !== $count && 0 !== ( $item % $count ) ) {
+					continue;
+				}
+
+				// Insert the ad into the dom.
+				$this->insert_node( $ad['content'], $comment, 'after' );
+			}
+		}
 	}
-
-	// function get_id( $id ) {
-	// 	if ( isset( $this->slots[ $id ] ) ) {
-	// 		$this->slots[ $id ]++;
-	// 		return $id . '-' . $this->slots[ $id ];
-	// 	}
-
-	// 	$this->slots[ $id ] = 1;
-
-	// 	return $id;
-	// }
 
 	/**
 	 * Increments the slot ID, if needed.
@@ -621,20 +629,29 @@ class Mai_Publisher_Output {
 	 *
 	 * @since TBD
 	 *
-	 * @param DOMNode $insert The node to insert.
-	 * @param DOMNode $target The target element.
-	 * @param string  $action The insertion location.
+	 * @param DOMNode|DOMElement|string $insert The node to insert.
+	 * @param DOMNode                   $target The target element.
+	 * @param string                    $action The insertion location.
 	 *
 	 * @return void
 	 */
 	function insert_node( $insert, $target, $action ) {
+		// If string, convert to node.
+		if ( is_string( $insert ) ) {
+			$insert = maipub_import_node( $this->dom, $insert );
+		}
+
+		// Bail if nothing to insert.
+		if ( ! $insert ) {
+			return;
+		}
+
 		switch ( $action ) {
 			case 'before':
 				// Insert before this element.
 				$target->parentNode->insertBefore( $insert, $target );
 				break;
 			case 'after':
-			default:
 				/**
 				 * Insert after this element. There is no insertAfter() in PHP ¯\_(ツ)_/¯.
 				 * @link https://gist.github.com/deathlyfrantic/cd8d7ef8ba91544cdf06
@@ -734,11 +751,3 @@ class Mai_Publisher_Output {
 		return $targets;
 	}
 }
-
-// add_action( 'genesis_before_loop', function() {
-// 	echo '<h2>Here</h2>';
-// }, 5 );
-
-// add_action( 'genesis_after_header', function() {
-// 	echo '<h2>Here</h2>';
-// }, 15 );

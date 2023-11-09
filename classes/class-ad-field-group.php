@@ -155,7 +155,7 @@ class Mai_Publisher_Ad_Field_Group {
 			],
 			[
 				'label'             => __( 'Element count', 'mai-publisher' ),
-				'instructions'      => __( 'Count this many elements before displaying content. Use comma-separated values to repeat this add after a different number of elements.', 'mai-publisher' ),
+				'instructions'      => __( 'Count this many elements before displaying content. Use comma-separated values to repeat this ad after a different number of elements.', 'mai-publisher' ),
 				'key'               => 'maipub_single_content_count',
 				'name'              => 'maipub_single_content_count',
 				'type'              => 'text',
@@ -168,6 +168,27 @@ class Mai_Publisher_Ad_Field_Group {
 							'field'    => 'maipub_single_location',
 							'operator' => '==',
 							'value'    => 'content',
+						],
+					],
+				],
+			],
+			[
+				'label'             => __( 'Comment count', 'mai-publisher' ),
+				'instructions'      => __( 'Count this many elements between repeated ads in comments.', 'mai-publisher' ),
+				'key'               => 'maipub_single_comment_count',
+				'name'              => 'maipub_single_comment_count',
+				'type'              => 'number',
+				'append'            => __( 'comments', 'mai-publisher' ),
+				'required'          => 1,
+				'default_value'     => 4,
+				'min'               => 1,
+				'step'              => 1,
+				'conditional_logic' => [
+					[
+						[
+							'field'    => 'maipub_single_location',
+							'operator' => '==',
+							'value'    => 'comments',
 						],
 					],
 				],
