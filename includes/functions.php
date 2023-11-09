@@ -4,99 +4,6 @@
 defined( 'ABSPATH' ) || die;
 
 /**
- * Gets ads to be displayed on the current page.
- *
- * @since 0.1.0
- *
- * @return void
- */
-function maipub_get_ads() {
-	static $ads = null;
-
-	if ( ! is_null( $ads ) ) {
-		return $ads;
-	}
-
-	$ads = [];
-
-	// If singular, check for manually added ad blocks.
-	if ( maipub_is_singular() ) {
-		$post = get_post();
-
-		if ( has_block( 'acf/mai-ad', $post ) || has_block( 'acf/mai-ad-unit', $post ) ) {
-			$ads[] = [
-				'id'       => $post->ID,
-				'location' => 'editor',
-				'content'  => $post->post_content,
-			];
-		}
-	}
-
-	// Check for sidebar.
-	$has_sidebar = maipub_has_sidebar();
-
-	// If we have a sidebar, and the WP_HTML_Tag_Processor class exists.
-	if ( $has_sidebar && class_exists( 'WP_HTML_Tag_Processor' ) ) {
-		// Set prefix to sidebar.
-		maipub_contextual_prefix( 'sidebar' );
-
-		// Get sidebar html.
-		ob_start();
-		do_action( 'genesis_sidebar' );
-		$sidebar = ob_get_clean();
-
-		// Remove prefix.
-		maipub_contextual_prefix( '' );
-
-		// If sidebar content.
-		if ( $sidebar ) {
-			$has_ad = false;
-			$tags   = new WP_HTML_Tag_Processor( $sidebar );
-
-			while ( $tags->next_tag( [ 'tag_name' => 'div', 'class_name' => 'mai-ad-unit' ] ) ) {
-				$has_ad = true;
-				break;
-			}
-
-			if ( $has_ad ) {
-				$ads[] = [
-					'id'       => 'sidebar',
-					'location' => 'sidebar',
-					'content'  => $sidebar,
-				];
-			}
-		}
-	}
-
-	// Get ad data from location settings.
-	$data = maipub_get_ads_data();
-
-	// Bail if no actual values.
-	if ( ! array_filter( array_values( $data ) ) ) {
-		return $ads;
-	}
-
-	// Loop through each type.
-	foreach ( $data as $type => $items ) {
-		// Loop through each item.
-		foreach ( $items as $args ) {
-			// Validate.
-			$args = maipub_validate_args( $args, $type );
-
-			// Bail if not valid args.
-			if ( ! $args ) {
-				continue;
-			}
-
-			// Add to ads.
-			$ads[] = $args;
-		}
-	}
-
-	return $ads;
-}
-
-/**
  * Gets processed content.
  *
  * @since 0.1.0
@@ -141,136 +48,6 @@ function maipub_get_processed_content( $content ) {
 	$content = convert_smilies( $content );                // WP runs priority 20.
 
 	return $content;
-}
-
-/**
- * Adds content area to existing content/HTML.
- * We can't cache this function because it runs early to get counts for JS
- * then runs again in the_content filter which may have modified content
- * and needs to run in real time.
- *
- * @since 0.1.0
- *
- * @uses DOMDocument
- *
- * @param string $content       The existing html.
- * @param array  $args          The ad args.
- * @param bool   $return_counts Whether to return the valid content_count instead of content.
- *                              This keeps the logic in one place.
- *
- * @return string|array
- */
-function maipub_get_content( $content, $args, $return_counts = false ) {
-	$counts = [];
-	$dom    = maipub_get_dom_document( $content );
-	$xpath  = new DOMXPath( $dom );
-	$all    = $xpath->query( '/*[not(self::script or self::style or self::link)]' );
-
-	if ( ! $all->length ) {
-		return $return_counts ? [] : $content;
-	}
-
-	$last     = $all->item( $all->length - 1 );
-	$tags     = 'before' !== $args['content_location'] ? [ 'div', 'p', 'ol', 'ul', 'blockquote', 'figure', 'iframe' ] : [ 'h2', 'h3' ];
-	$tags     = apply_filters( 'mai_publisher_content_elements', $tags, $args );
-	$tags     = array_filter( $tags );
-	$tags     = array_unique( $tags );
-	$elements = [];
-
-	foreach ( $all as $node ) {
-		if ( ! $node->childNodes->length || ! in_array( $node->nodeName, $tags ) ) {
-			continue;
-		}
-
-		$elements[] = $node;
-	}
-
-	if ( ! $elements ) {
-		return $return_counts ? [] : $content;
-	}
-
-	$item       = 0;
-	$tmp_counts = array_flip( $args['content_count'] );
-
-	foreach ( $elements as $index => $element ) {
-		$item++;
-
-		// Bail if there are no more counts to check.
-		if ( ! $tmp_counts ) {
-			break;
-		}
-
-		// Bail if not an element we need.
-		if ( ! isset( $tmp_counts[ $item ] ) ) {
-			continue;
-		}
-
-		// If modifying content.
-		if ( ! $return_counts ) {
-			/**
-			 * Build the temporary dom.
-			 * Special characters were causing issues with `appendXML()`.
-			 *
-			 * This needs to happen inside the loop, otherwise the slot IDs are not correctly incremented.
-			 *
-			 * @link https://stackoverflow.com/questions/4645738/domdocument-appendxml-with-special-characters
-			 * @link https://www.py4u.net/discuss/974358
-			 */
-			$tmp  = maipub_get_dom_document( maipub_get_processed_ad_content( $args['content'] ) );
-			$node = $dom->importNode( $tmp->documentElement, true );
-
-			// Skip if no node.
-			if ( ! $node ) {
-				continue;
-			}
-		}
-
-		// After elements.
-		if ( 'before' !== $args['content_location'] ) {
-
-			// TODO: 2 Mai Ad blocks manually in content aren't generating the right mai-ad-unit slug.
-
-			/**
-			 * Bail if this is the last element.
-			 * This avoids duplicates since this location would technically be "after entry content" at this point.
-			 */
-			if ( $element->getLineNo() === $last->getLineNo() || null === $element->nextSibling ) {
-				break;
-			}
-
-			// If modifying content.
-			if ( ! $return_counts ) {
-				/**
-				 * Add cca after this element. There is no insertAfter() in PHP ¯\_(ツ)_/¯.
-				 *
-				 * @link https://gist.github.com/deathlyfrantic/cd8d7ef8ba91544cdf06
-				 */
-				$element->parentNode->insertBefore( $node, $element->nextSibling );
-			}
-		}
-		// Before headings.
-		else {
-			// If modifying content.
-			if ( ! $return_counts ) {
-				$element->parentNode->insertBefore( $node, $element );
-			}
-		}
-
-		// Add to counts.
-		$counts[] = $item;
-
-		// Remove from temp counts.
-		unset( $tmp_counts[ $item ] );
-	}
-
-	// If modifying content.
-	if ( ! $return_counts ) {
-		// Save new HTML.
-		$content = $dom->saveHTML();
-	}
-
-	// Return what we need.
-	return $return_counts ? $counts : $content;
 }
 
 /**
@@ -334,125 +111,6 @@ function maipub_import_node( $dom, $content ) {
 	$tmp = $content ? maipub_get_dom_document( $content ) : false;
 
 	return $tmp ? $dom->importNode( $tmp->documentElement, true ) : $tmp;
-}
-
-/**
- * Returns an array of ads.
- *
- * @since 0.1.0
- *
- * @return array
- */
-function maipub_get_ads_data() {
-	static $ads = null;
-
-	if ( ! is_null( $ads ) ) {
-		return $ads;
-	}
-
-	// Set default ad array.
-	$ads = [
-		'global'  => [],
-		'single'  => [],
-		'archive' => [],
-	];
-
-	// Check visibility.
-	$visibility = maipub_is_singular() ? get_post_meta( get_the_ID(), 'maipub_visibility', true ) : false;
-
-	// Bail if hidding all ads.
-	if ( $visibility && in_array( 'all', $visibility ) ) {
-		return $ads;
-	}
-
-	$query = new WP_Query(
-		[
-			'post_type'              => 'mai_ad',
-			'posts_per_page'         => 500,
-			'no_found_rows'          => true,
-			'update_post_meta_cache' => false,
-			'update_post_term_cache' => false,
-			'suppress_filters'       => false, // https://github.com/10up/Engineering-Best-Practices/issues/116
-			'orderby'                => 'menu_order',
-			'order'                  => 'ASC',
-		]
-	);
-
-	if ( $query->have_posts() ) {
-		while ( $query->have_posts() ) : $query->the_post();
-			$post_id          = get_the_ID();
-			$slug             = get_post()->post_name;
-			$content          = get_post()->post_content;
-			$global_location  = get_field( 'maipub_global_location' );
-			$single_location  = get_field( 'maipub_single_location' );
-			$archive_location = get_field( 'maipub_archive_location' );
-
-			if ( $global_location ) {
-				$ads['global'][] = maipub_filter_associative_array(
-					[
-						'id'       => $post_id,
-						'slug'     => $slug,
-						'location' => $global_location,
-						'content'  => $content,
-					]
-				);
-			}
-
-			if ( $single_location ) {
-				$ads['single'][] = maipub_filter_associative_array(
-					[
-						'id'                  => $post_id,
-						'slug'                => $slug,
-						'location'            => $single_location,
-						'content'             => $content,
-						'content_location'    => get_field( 'maipub_single_content_location' ),
-						'content_count'       => get_field( 'maipub_single_content_count' ),
-						'types'               => get_field( 'maipub_single_types' ),
-						'keywords'            => get_field( 'maipub_single_keywords' ),
-						'taxonomies'          => get_field( 'maipub_single_taxonomies' ),
-						'taxonomies_relation' => get_field( 'maipub_single_taxonomies_relation' ),
-						'authors'             => get_field( 'maipub_single_authors' ),
-						'include'             => get_field( 'maipub_single_entries' ),
-						'exclude'             => get_field( 'maipub_single_exclude_entries' ),
-					]
-				);
-			}
-
-			if ( $archive_location ) {
-				$ads['archive'][] = maipub_filter_associative_array(
-					[
-						'id'            => $post_id,
-						'slug'          => $slug,
-						'location'      => $archive_location,
-						'content'       => $content,
-						'content_count' => get_field( 'maipub_archive_content_count' ),
-						'content_item'  => get_field( 'maipub_archive_content_item' ),
-						'types'         => get_field( 'maipub_archive_types' ),
-						'taxonomies'    => get_field( 'maipub_archive_taxonomies' ),
-						'terms'         => get_field( 'maipub_archive_terms' ),
-						'exclude'       => get_field( 'maipub_archive_exclude_terms' ),
-						'includes'      => get_field( 'maipub_archive_includes' ),
-					]
-				);
-			}
-
-		endwhile;
-	}
-	wp_reset_postdata();
-
-	// TODO: Put this in conditions function.
-	// Now that we have data, maybe check visibility for incontent ads.
-	if ( $visibility && in_array( 'incontent', $visibility ) ) {
-		foreach ( $ads['single'] as $index => $values ) {
-			if ( 'content' !== $values['location'] ) {
-				continue;
-			}
-
-			unset( $ads['single'][ $index ] );
-		}
-	}
-
-	return $ads;
 }
 
 /**
@@ -722,7 +380,6 @@ function maipub_get_default_option( $option ) {
 	$options = maipub_get_default_options();
 
 	return $options[ $option ];
-	// return isset( $options[ $option ] ) ? $options[ $option ] : null;
 }
 
 /**
@@ -761,39 +418,6 @@ function maipub_get_default_options() {
 	];
 
 	return $options;
-}
-
-/**
- * Returns the GAM domain.
- *
- * @since 0.1.0
- *
- * @param bool $fallback Whether to fallback to home_url() if no domain.
- *
- * @return string
- */
-function maipub_get_gam_domain( $fallback = true ) {
-	$domain = (string) maipub_get_option( 'gam_domain', $fallback );
-	$domain = esc_url( $domain );
-	$domain = maipub_get_url_host( $domain );
-
-	return $domain;
-}
-
-/**
- * Sanitizes domain to be used in GAM.
- *
- * @since 0.1.0
- *
- * @param string $domain The domain.
- *
- * @return string
- */
-function maipub_get_url_host( string $domain ) {
-	$domain = $domain ? (string) wp_parse_url( esc_url( (string) $domain ), PHP_URL_HOST ) : '';
-	$domain = str_replace( 'www.', '', $domain );
-
-	return $domain;
 }
 
 /**
@@ -868,4 +492,37 @@ function maipub_get_file_data( $file, $key = '' ) {
 	}
 
 	return $cache[ $file ];
+}
+
+/**
+ * Returns the GAM domain.
+ *
+ * @since 0.1.0
+ *
+ * @param bool $fallback Whether to fallback to home_url() if no domain.
+ *
+ * @return string
+ */
+function maipub_get_gam_domain( $fallback = true ) {
+	$domain = (string) maipub_get_option( 'gam_domain', $fallback );
+	$domain = esc_url( $domain );
+	$domain = maipub_get_url_host( $domain );
+
+	return $domain;
+}
+
+/**
+ * Sanitizes domain to be used in GAM.
+ *
+ * @since 0.1.0
+ *
+ * @param string $domain The domain.
+ *
+ * @return string
+ */
+function maipub_get_url_host( string $domain ) {
+	$domain = $domain ? (string) wp_parse_url( esc_url( (string) $domain ), PHP_URL_HOST ) : '';
+	$domain = str_replace( 'www.', '', $domain );
+
+	return $domain;
 }

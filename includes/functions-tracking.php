@@ -478,7 +478,6 @@ function maipub_get_all_iab_categories() {
 	return $cache;
 }
 
-
 /**
  * Gets the primary term of a post, by taxonomy.
  * If Yoast Primary Term is used, return it,

@@ -63,7 +63,6 @@ class Mai_Publisher_Ad_Unit_Block {
 		$unit       = $id ? $ad_units[ $id ] : [];
 		$sizes      = $id ? $this->get_sizes( $unit ) : [];
 		$styles     = $id ? $this->get_styles( $sizes, $is_preview ) : '';
-		// $slot       = $id ? $this->get_slot( $id ) : '';
 
 		// If previewing in editor, show placeholder.
 		if ( $is_preview ) {
@@ -94,8 +93,9 @@ class Mai_Publisher_Ad_Unit_Block {
 			return;
 		}
 
-		// Build slot.
-		// $slot = sprintf( 'mai-ad-%s', $slot );
+		// Start HTML.
+		$html  = '';
+		$inner = '';
 
 		// Build script.
 		if ( 'demo' === maipub_get_option( 'ad_mode', false ) ) {
@@ -106,22 +106,14 @@ class Mai_Publisher_Ad_Unit_Block {
 			$tablet  = ! is_array( $tablet ) ? [ 300, 350 ] : $tablet;
 			$desktop = ! is_array( $desktop ) ? [ 300, 350 ] : $desktop;
 
-			$script  = '';
-			$script .= '<picture>';
-				$script .= sprintf( '<source srcset="https://placehold.co/%s" media="(max-width: 727px)" />', implode( 'x', $mobile ) );
-				$script .= sprintf( '<source srcset="https://placehold.co/%s" media="(min-width: 728px) and (max-width: 1023px)" />', implode( 'x', $tablet ) );
-				$script .= sprintf( '<source srcset="https://placehold.co/%s" media="(min-width: 1024px)" />', implode( 'x', $desktop ) );
-				$script .= sprintf( '<img src="https://placehold.co/%s" />', implode( 'x', $desktop ) );
-			$script .= '</picture>';
-
-		} else {
-			// $script = sprintf( '<script>window.googletag = window.googletag || {};googletag.cmd = googletag.cmd || [];if ( window.googletag && googletag.apiReady ) { googletag.cmd.push(function(){ googletag.display("%s"); }); }</script>', $slot );
-			// $script = '<div class="mai-ad-slot"></div>';
-			$script = '';
+			// Build inner HTML.
+			$inner .= '<picture>';
+				$inner .= sprintf( '<source srcset="https://placehold.co/%s" media="(max-width: 727px)" />', implode( 'x', $mobile ) );
+				$inner .= sprintf( '<source srcset="https://placehold.co/%s" media="(min-width: 728px) and (max-width: 1023px)" />', implode( 'x', $tablet ) );
+				$inner .= sprintf( '<source srcset="https://placehold.co/%s" media="(min-width: 1024px)" />', implode( 'x', $desktop ) );
+				$inner .= sprintf( '<img src="https://placehold.co/%s" />', implode( 'x', $desktop ) );
+			$inner .= '</picture>';
 		}
-
-		// Start HTML.
-		$html = '';
 
 		// Sticky footer (bottoms sticky) adds another wrapper.
 		if ( in_array( $pos, [ 'ts', 'bs' ] ) ) {
@@ -175,7 +167,7 @@ class Mai_Publisher_Ad_Unit_Block {
 			// Build HTML with extra wrap.
 			$html .= sprintf( '<div %s>', $attributes );
 				$html .= sprintf( '<div%s>', maipub_build_attributes( $attr_inner ) );
-					$html .= $script;
+					$html .= $inner;
 				$html .= '</div>';
 			$html .= '</div>';
 		}
@@ -223,7 +215,7 @@ class Mai_Publisher_Ad_Unit_Block {
 
 			// Build HTML.
 			$html .= sprintf( '<div %s>', $attributes );
-				$html .= $script;
+				$html .= $inner;
 			$html .= '</div>';
 		}
 

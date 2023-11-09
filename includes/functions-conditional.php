@@ -59,66 +59,6 @@ function maipub_is_product_singular() {
 }
 
 /**
- * Checks if current page has a sidebar.
- *
- * @since 0.12.0
- *
- * @return bool
- */
-function maipub_has_sidebar() {
-	static $cache = null;
-
-	if ( ! is_null( $cache ) ) {
-		return $cache;
-	}
-
-	$mai_sidebar     = function_exists( 'mai_has_sidebar' ) && mai_has_sidebar();
-	$genesis_sidebar = function_exists( 'genesis_site_layout' ) && in_array( genesis_site_layout(), [ 'sidebar', 'sidebar-alt' ] );
-	$cache           = $mai_sidebar || $genesis_sidebar;
-
-	return $cache;
-}
-
-/**
- * Checks if a post has a recipe in it.
- *
- * @since 0.12.1
- *
- * @param int $post_id The post ID.
- *
- * @return bool
- */
-function maipub_has_recipe( $post_id = 0 ) {
-	static $cache = null;
-
-	// Check for cache.
-	if ( ! is_null( $cache ) && isset( $cache[ $post_id ] ) ) {
-		return $cache[ $post_id ];
-	}
-
-	// Set array.
-	if ( ! is_array( $cache ) ) {
-		$cache = [];
-	}
-
-	// Maybe get post ID.
-	if ( ! $post_id ) {
-		$post_id = get_the_ID();
-	}
-
-	// Bail if no recipe plugin.
-	if ( ! class_exists( 'WP_Recipe_Maker' ) ) {
-		$cache[ $post_id ] = false;
-		return $cache[ $post_id ];
-	}
-
-	// Get recipes.
-	$cache[ $post_id ] = (bool) WPRM_Recipe_Manager::get_recipe_ids_from_post( $post_id );
-
-	return $cache[ $post_id ];
-}
-
-/**
  * Check if a string contains at least one specified string.
  *
  * @since 0.1.0
