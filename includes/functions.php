@@ -330,7 +330,7 @@ function maipub_get_dom_document( $html ) {
  *
  * @return DOMNode|false
  */
-function maipub_get_tmp_dom_document_node( $dom, $content ) {
+function maipub_import_node( $dom, $content ) {
 	$tmp = $content ? maipub_get_dom_document( $content ) : false;
 
 	return $tmp ? $dom->importNode( $tmp->documentElement, true ) : $tmp;

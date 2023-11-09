@@ -63,7 +63,7 @@ class Mai_Publisher_Ad_Unit_Block {
 		$unit       = $id ? $ad_units[ $id ] : [];
 		$sizes      = $id ? $this->get_sizes( $unit ) : [];
 		$styles     = $id ? $this->get_styles( $sizes, $is_preview ) : '';
-		$slot       = $id ? $this->get_slot( $id ) : '';
+		// $slot       = $id ? $this->get_slot( $id ) : '';
 
 		// If previewing in editor, show placeholder.
 		if ( $is_preview ) {
@@ -95,7 +95,7 @@ class Mai_Publisher_Ad_Unit_Block {
 		}
 
 		// Build slot.
-		$slot = sprintf( 'mai-ad-%s', $slot );
+		// $slot = sprintf( 'mai-ad-%s', $slot );
 
 		// Build script.
 		if ( 'demo' === maipub_get_option( 'ad_mode', false ) ) {
@@ -115,7 +115,9 @@ class Mai_Publisher_Ad_Unit_Block {
 			$script .= '</picture>';
 
 		} else {
-			$script = sprintf( '<script>window.googletag = window.googletag || {};googletag.cmd = googletag.cmd || [];if ( window.googletag && googletag.apiReady ) { googletag.cmd.push(function(){ googletag.display("%s"); }); }</script>', $slot );
+			// $script = sprintf( '<script>window.googletag = window.googletag || {};googletag.cmd = googletag.cmd || [];if ( window.googletag && googletag.apiReady ) { googletag.cmd.push(function(){ googletag.display("%s"); }); }</script>', $slot );
+			// $script = '<div class="mai-ad-slot"></div>';
+			$script = '';
 		}
 
 		// Start HTML.
@@ -142,8 +144,9 @@ class Mai_Publisher_Ad_Unit_Block {
 
 			// Start inner attributes.
 			$attr_inner = [
-				'id'    => $slot,
-				'class' => "mai-ad-unit mai-ad-unit-sticky mai-ad-unit-sticky-{$location}",
+				// 'id'        => $slot,
+				'class'     => "mai-ad-unit mai-ad-unit-sticky mai-ad-unit-sticky-{$location}",
+				'data-unit' => $id,
 			];
 
 			// Add type.
@@ -162,7 +165,7 @@ class Mai_Publisher_Ad_Unit_Block {
 			}
 
 			// Add analytics tracking.
-			$attr_inner['data-content-name']  = esc_attr( $slot );
+			// $attr_inner['data-content-name']  = esc_attr( $slot );
 			$attr_inner['data-track-content'] = null;
 
 			// Get attributes string.
@@ -180,8 +183,9 @@ class Mai_Publisher_Ad_Unit_Block {
 		else {
 			// Start attributes.
 			$attr = [
-				'id'    => $slot,
-				'class' => 'mai-ad-unit',
+				// 'id'        => $slot,
+				'class'     => 'mai-ad-unit',
+				'data-unit' => $id,
 			];
 
 			// Add custom classes.
@@ -210,7 +214,7 @@ class Mai_Publisher_Ad_Unit_Block {
 			}
 
 			// Add analytics tracking.
-			$attr['data-content-name']  = esc_attr( $slot );
+			// $attr['data-content-name']  = esc_attr( $slot ); // TODO: Find data-track-content in DOM and update name with incremented slot.
 			$attr['data-track-content'] = null;
 
 			// Get attributes string.

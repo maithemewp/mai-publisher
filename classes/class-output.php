@@ -10,6 +10,7 @@ class Mai_Publisher_Output {
 	protected $dom;
 	protected $slots;
 	protected $gam;
+	protected $mode;
 
 	/**
 	 * Constructs the class.
@@ -35,8 +36,8 @@ class Mai_Publisher_Output {
 		// add_action( 'template_redirect', [ $this, 'start' ], 99998 );
 		// add_action( 'after_setup_theme', [ $this, 'start' ], 99998 );
 		// add_action( 'shutdown',  [ $this, 'end' ], 10 );
-		add_action( 'template_redirect',  [ $this, 'start' ], 99998 );
-		add_action( 'shutdown',           [ $this, 'end' ], 99998 );
+		add_action( 'template_redirect', [ $this, 'start' ], 99998 );
+		add_action( 'shutdown',          [ $this, 'end' ], 99998 );
 	}
 
 	/**
@@ -51,9 +52,10 @@ class Mai_Publisher_Output {
 		$this->ads       = maipub_get_page_ads();
 		$this->grouped   = $this->get_grouped_ads( $this->ads );
 		$this->slots     = [];
+		$this->mode      = maipub_get_option( 'ad_mode', false );
 
-		// Bail if no ads.
-		if ( ! $this->ads ) {
+		// Bail if no ads or ads are disabled.
+		if ( ! $this->ads || 'disabled' === $this->mode ) {
 			return;
 		}
 
@@ -102,15 +104,6 @@ class Mai_Publisher_Output {
 			return $buffer;
 		}
 
-		// Check if we have a sidebar.
-		// $has_sidebar = false;
-		// $tags        = new WP_HTML_Tag_Processor( $buffer );
-
-		// while ( $tags->next_tag( [ 'class_name' => 'sidebar' ] ) ) {
-		// 	$has_sidebar = true;
-		// 	break;
-		// }
-
 		// Setup dom.
 		$this->dom = $this->dom_document( $buffer );
 
@@ -129,10 +122,11 @@ class Mai_Publisher_Output {
 			$this->handle_recipes();
 		}
 
-		// Sidebar.
+		// Sidebars.
 		$sidebar_before = isset( $this->grouped['before_sidebar_content'] ) && $this->grouped['before_sidebar_content'];
 		$sidebar_after  = isset( $this->grouped['after_sidebar_content'] ) && $this->grouped['after_sidebar_content'];
 
+		// Sidebar.
 		if ( $sidebar_before || $sidebar_after ) {
 			$this->handle_sidebar();
 		}
@@ -142,149 +136,52 @@ class Mai_Publisher_Output {
 			$this->handle_comments();
 		}
 
-		// Save HTML.
-		$buffer = $this->dom->saveHTML();
+		// Set vars and get all ad units.
+		$config   = maipub_get_config( 'ad_units' );
+		$xpath    = new DOMXPath( $this->dom );
+		$ad_units = $xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " mai-ad-unit ")]' );
 
-		// Get ad units from config.
-		$config = maipub_get_config( 'ad_units' );
+		// Loop through ad units.
+		foreach ( $ad_units as $ad_unit ) {
+			// Build slot from ad unit.
+			$unit = $ad_unit->getAttribute( 'data-unit' );
+			$slot = $this->get_slot( $unit );
 
-		// Get all ad units.
-		$tags = new WP_HTML_Tag_Processor( $buffer );
+			// Set slot as id.
+			$ad_unit->setAttribute( 'id', $slot );
 
-		// Make sure ads are incremented.
-		while ( $tags->next_tag( [ 'tag_name' => 'div', 'class_name' => 'mai-ad-unit' ] ) ) {
-			$id    = $tags->get_attribute( 'id' );
-			$id    = $id ?: $ad['slug'];
-			$slot  = $this->get_id( $id );
-			$unit  = str_replace( 'mai-ad-', '', $slot );
-			$array = explode( '-', $unit );
-			$last  = end( $array );
+			// If ads are active.
+			if ( ! $this->mode ) {
+				// Build script, import into dom and append to ad unit.
+				$script = sprintf( '<script>window.googletag = window.googletag || {};googletag.cmd = googletag.cmd || [];if ( window.googletag && googletag.apiReady ) { googletag.cmd.push(function(){ googletag.display("%s"); }); }</script>', $slot );
+				$script = maipub_import_node( $this->dom, $script );
+				$this->insert_node( $script, $ad_unit, 'append' );
 
-			// Remove last item if numeric.
-			if ( is_numeric( $last ) ) {
-				array_pop( $array );
-			}
+				// Add to gam array.
+				$this->gam[ $slot ] = [
+					'sizes'        => $config[ $unit ]['sizes'],
+					'sizesDesktop' => $config[ $unit ]['sizes_desktop'],
+					'sizesTablet'  => $config[ $unit ]['sizes_tablet'],
+					'sizesMobile'  => $config[ $unit ]['sizes_mobile'],
+					'targets'      => [],
+				];
 
-			// Back to string.
-			$unit = implode( '-', $array );
+				// Get and add targets.
+				$at = $ad_unit->getAttribute( 'data-at' );
+				$ap = $ad_unit->getAttribute( 'data-ap' );
 
-			// Skip if no ad unit.
-			if ( ! $unit ) {
-				continue;
-			}
+				if ( $at ) {
+					$this->gam[ $slot ]['targets']['at'] = $at;
+				}
 
-			// Set incremented id.
-			$tags->set_attribute( 'id', $slot );
-
-			// Add to gam array.
-			$this->gam[ $slot ] = [
-				'sizes'        => $config[ $unit ]['sizes'],
-				'sizesDesktop' => $config[ $unit ]['sizes_desktop'],
-				'sizesTablet'  => $config[ $unit ]['sizes_tablet'],
-				'sizesMobile'  => $config[ $unit ]['sizes_mobile'],
-				'targets'      => [],
-			];
-
-			// Get and add targets.
-			$at = $tags->get_attribute( 'data-at' );
-			$ap = $tags->get_attribute( 'data-ap' );
-
-			if ( $at ) {
-				$this->gam[ $slot ]['targets']['at'] = $at;
-			}
-
-			if ( $ap ) {
-				$this->gam[ $slot ]['targets']['ap'] = $ap;
+				if ( $ap ) {
+					$this->gam[ $slot ]['targets']['ap'] = $ap;
+				}
 			}
 		}
 
-
-		// // Get all ads for gam.
-		// $xpath    = new DOMXPath( $this->dom );
-		// $ad_units = $xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " mai-ad-unit ")]' );
-
-		// // Loop through ad units.
-		// foreach ( $ad_units as $ad_unit ) {
-		// 	$slot  = $ad_unit->getAttribute( 'id' );
-		// 	$unit  = str_replace( 'mai-ad-', '', $slot );
-		// 	$array = explode( '-', $unit );
-		// 	$last  = end( $array );
-
-		// 	// Remove last item if numeric.
-		// 	if ( is_numeric( $last ) ) {
-		// 		array_pop( $array );
-		// 	}
-
-		// 	// Back to string.
-		// 	$unit = implode( '-', $array );
-
-		// 	// Skip if no ad unit.
-		// 	if ( ! $unit ) {
-		// 		continue;
-		// 	}
-
-		// 	// If we have a sidebar.
-		// 	// if ( $has_sidebar ) {
-		// 	// 	$in_content = false;
-		// 	// 	$current    = $ad_unit;
-
-		// 	// 	// Check if this ad is inside the content class.
-		// 	// 	while ( $current = $current->parentNode ) {
-		// 	// 		if ( $current instanceof DOMElement && 'main' === $current->tagName ) {
-		// 	// 			$in_content = true;
-		// 	// 			break;
-		// 	// 		}
-		// 	// 	}
-
-		// 	// 	// If in content.
-		// 	// 	if ( $in_content ) {
-		// 	// 		// Remove all sizes larger than 800px.
-		// 	// 		foreach ( $config[ $slot ]['sizes'] as $index => $size ) {
-		// 	// 			if ( ! is_array( $size ) ) {
-		// 	// 				continue;
-		// 	// 			}
-
-		// 	// 			if ( $size[0] > 800 ) {
-		// 	// 				unset( $config[ $slot ]['sizes'][ $index ] );
-		// 	// 			}
-		// 	// 		}
-		// 	// 		// Remove desktop sizes larger than 800px.
-		// 	// 		foreach ( $config[ $slot ]['sizes_desktop'] as $index => $size ) {
-		// 	// 			if ( ! is_array( $size ) ) {
-		// 	// 				continue;
-		// 	// 			}
-
-		// 	// 			if ( $size[0] > 800 ) {
-		// 	// 				unset( $config[ $slot ]['sizes_desktop'][ $index ] );
-		// 	// 			}
-		// 	// 		}
-		// 	// 	}
-		// 	// }
-
-		// 	// Add to gam array.
-		// 	$this->gam[ $slot ] = [
-		// 		'sizes'        => $config[ $unit ]['sizes'],
-		// 		'sizesDesktop' => $config[ $unit ]['sizes_desktop'],
-		// 		'sizesTablet'  => $config[ $unit ]['sizes_tablet'],
-		// 		'sizesMobile'  => $config[ $unit ]['sizes_mobile'],
-		// 		'targets'      => [],
-		// 	];
-
-		// 	// Get and add targets.
-		// 	$at = $ad_unit->getAttribute( 'data-at' );
-		// 	$ap = $ad_unit->getAttribute( 'data-ap' );
-
-		// 	if ( $at ) {
-		// 		$this->gam[ $slot ]['targets']['at'] = $at;
-		// 	}
-
-		// 	if ( $ap ) {
-		// 		$this->gam[ $slot ]['targets']['ap'] = $ap;
-		// 	}
-		// }
-
-		// // Save HTML.
-		// $buffer = $this->dom->saveHTML();
+		// Save HTML.
+		$buffer = $this->dom->saveHTML();
 
 		return $buffer;
 	}
@@ -383,7 +280,7 @@ class Mai_Publisher_Output {
 				}
 
 				// Build the temporary dom.
-				$node = maipub_get_tmp_dom_document_node( $this->dom, $ad['content'] );
+				$node = maipub_import_node( $this->dom, $ad['content'] );
 
 				// If valid node.
 				if ( $node ) {
@@ -488,7 +385,7 @@ class Mai_Publisher_Output {
 					$suffix = maipub_get_suffix();
 					$file   = "assets/css/mai-engine{$suffix}.css";
 					$link   = sprintf( '<link href="%s" rel="stylesheet">', maipub_get_file_data( $file, 'url' ) );
-					$node   = maipub_get_tmp_dom_document_node( $this->dom, $link );
+					$node   = maipub_import_node( $this->dom, $link );
 					$this->insert_node( $node, $wrap, 'before' );
 				}
 			}
@@ -573,7 +470,7 @@ class Mai_Publisher_Output {
 					}
 
 					// Build the temporary dom node.
-					$node = maipub_get_tmp_dom_document_node( $this->dom, $tags->get_updated_html() );
+					$node = maipub_import_node( $this->dom, $tags->get_updated_html() );
 
 					// If valid node.
 					if ( $node ) {
@@ -586,7 +483,7 @@ class Mai_Publisher_Output {
 			else {
 				// Loop through each ad count.
 				foreach ( $ad['content_count'] as $count ) {
-					$node = maipub_get_tmp_dom_document_node( $this->dom, $ad['content'] );
+					$node = maipub_import_node( $this->dom, $ad['content'] );
 
 					// If valid node.
 					if ( $node ) {
@@ -652,15 +549,37 @@ class Mai_Publisher_Output {
 		// }
 	}
 
-	function get_id( $id ) {
-		if ( isset( $this->slots[ $id ] ) ) {
-			$this->slots[ $id ]++;
-			return $id . '-' . $this->slots[ $id ];
+	// function get_id( $id ) {
+	// 	if ( isset( $this->slots[ $id ] ) ) {
+	// 		$this->slots[ $id ]++;
+	// 		return $id . '-' . $this->slots[ $id ];
+	// 	}
+
+	// 	$this->slots[ $id ] = 1;
+
+	// 	return $id;
+	// }
+
+	/**
+	 * Increments the slot ID, if needed.
+	 *
+	 * @since TBD
+	 *
+	 * @param string $slot
+	 *
+	 * @return string
+	 */
+	function get_slot( $slot ) {
+		static $counts  = [];
+
+		if ( isset( $counts[ $slot ] ) ) {
+			$counts[ $slot ]++;
+			$slot = $slot . '-' . $counts[ $slot ];
+		} else {
+			$counts[ $slot ] = 1;
 		}
 
-		$this->slots[ $id ] = 1;
-
-		return $id;
+		return $slot;
 	}
 
 	/**
