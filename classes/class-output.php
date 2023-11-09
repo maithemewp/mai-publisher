@@ -8,9 +8,10 @@ class Mai_Publisher_Output {
 	protected $ads;
 	protected $grouped;
 	protected $dom;
-	protected $slots;
+	protected $xpath;
 	protected $gam;
 	protected $mode;
+	protected $suffix;
 
 	/**
 	 * Constructs the class.
@@ -31,11 +32,6 @@ class Mai_Publisher_Output {
 	 * @return void
 	 */
 	function hooks() {
-		// add_action( 'get_header', [ $this, 'start' ], 99998 );
-		// add_action( 'wp_footer',  [ $this, 'end' ], 99998 );
-		// add_action( 'template_redirect', [ $this, 'start' ], 99998 );
-		// add_action( 'after_setup_theme', [ $this, 'start' ], 99998 );
-		// add_action( 'shutdown',  [ $this, 'end' ], 10 );
 		add_action( 'template_redirect', [ $this, 'start' ], 99998 );
 		add_action( 'shutdown',          [ $this, 'end' ], 99998 );
 	}
@@ -51,8 +47,9 @@ class Mai_Publisher_Output {
 		$this->locations = maipub_get_locations();
 		$this->ads       = maipub_get_page_ads();
 		$this->grouped   = $this->get_grouped_ads( $this->ads );
-		$this->slots     = [];
+		$this->gam       = [];
 		$this->mode      = maipub_get_option( 'ad_mode', false );
+		$this->suffix    = maipub_get_suffix();
 
 		// Bail if no ads or ads are disabled.
 		if ( ! $this->ads || 'disabled' === $this->mode ) {
@@ -104,8 +101,9 @@ class Mai_Publisher_Output {
 			return $buffer;
 		}
 
-		// Setup dom.
-		$this->dom = $this->dom_document( $buffer );
+		// Setup dom and xpath.
+		$this->dom   = $this->dom_document( $buffer );
+		$this->xpath = new DOMXPath( $this->dom );
 
 		// In content.
 		if ( isset( $this->grouped['content'] ) && $this->grouped['content'] ) {
@@ -138,8 +136,7 @@ class Mai_Publisher_Output {
 
 		// Set vars and get all ad units.
 		$config   = maipub_get_config( 'ad_units' );
-		$xpath    = new DOMXPath( $this->dom );
-		$ad_units = $xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " mai-ad-unit ")]' );
+		$ad_units = $this->xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " mai-ad-unit ")]' );
 
 		// Loop through ad units.
 		foreach ( $ad_units as $ad_unit ) {
@@ -158,6 +155,7 @@ class Mai_Publisher_Output {
 
 				// Add to gam array.
 				$this->gam[ $slot ] = [
+					'id'           => $unit,
 					'sizes'        => $config[ $unit ]['sizes'],
 					'sizesDesktop' => $config[ $unit ]['sizes_desktop'],
 					'sizesTablet'  => $config[ $unit ]['sizes_tablet'],
@@ -179,6 +177,47 @@ class Mai_Publisher_Output {
 			}
 		}
 
+		// Get gam domain.
+		$domain       = maipub_get_gam_domain();
+		$network_code = (string) maipub_get_option( 'gam_network_code' );
+
+		// If we have gam domain and ads are active.
+		if ( $domain && $this->gam ) {
+			$gam_base = '';
+
+			// Maybe disable MCM and use Network Code as base.
+			if ( defined( 'MAI_PUBLISHER_DISABLE_MCM' ) && MAI_PUBLISHER_DISABLE_MCM && $network_code ) {
+				$gam_base = "/$network_code";
+			} else {
+				$gam_base = '/23001026477';
+
+				if ( $network_code ) {
+					$gam_base .= ",$network_code";
+				}
+			}
+
+			$gam_base .= "/$domain/";
+			$localize  = [
+				'gamBase'   => $gam_base,
+				'ads'       => $this->gam,
+				'targeting' => $this->get_targets(),
+			];
+
+			// Build scripts.
+			$element = $this->xpath->query( '//head/link' )->item(0);
+			$file    = "assets/js/mai-publisher-ads{$this->suffix}.js";
+			$scripts = [
+				'<script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>', // Google Ad Manager GPT.
+				sprintf( '<script>/* <![CDATA[ */%svar maiPubAdsVars = %s;%s/* ]]> */</script>', PHP_EOL, wp_json_encode( $localize ), PHP_EOL ),
+				sprintf( '<script src="%s?ver=%s"></script>', maipub_get_file_data( $file, 'url' ), maipub_get_file_data( $file, 'version' ) ), // Initial testing showed async broke ads.
+			];
+
+			// Insert scripts.
+			foreach ( $scripts as $script ) {
+				$this->insert_node( $script, $element, 'before' );
+			}
+		}
+
 		// Save HTML.
 		$buffer = $this->dom->saveHTML();
 
@@ -193,8 +232,7 @@ class Mai_Publisher_Output {
 	 * @return void
 	 */
 	function handle_content() {
-		$xpath    = new DOMXPath( $this->dom );
-		$content  = $xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " entry-content-single ")]' )->item(0);
+		$content  = $this->xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " entry-content-single ")]' )->item(0);
 		$children = $content ? $content->childNodes : [];
 		$tags     = [];
 
@@ -314,8 +352,7 @@ class Mai_Publisher_Output {
 	 * @return void
 	 */
 	function handle_entries() {
-		$xpath   = new DOMXPath( $this->dom );
-		$wrap    = $xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " entries-archive ")]/div[contains(concat(" ", normalize-space(@class), " "), " entries-wrap ")]' )->item(0);
+		$wrap    = $this->xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " entries-archive ")]/div[contains(concat(" ", normalize-space(@class), " "), " entries-wrap ")]' )->item(0);
 		$entries = $wrap ? count( $wrap->childNodes ) : 0;
 
 		// Bail if no wrap and no entries.
@@ -380,8 +417,7 @@ class Mai_Publisher_Output {
 					$wrap->setAttribute( 'style', implode( ';', $styles ) . ';' );
 
 					// Insert styles before wrap.
-					$suffix = maipub_get_suffix();
-					$file   = "assets/css/mai-engine{$suffix}.css";
+					$file   = "assets/css/mai-engine{$this->suffix}.css";
 					$link   = sprintf( '<link href="%s" rel="stylesheet">', maipub_get_file_data( $file, 'url' ) );
 					$this->insert_node( $link, $wrap, 'before' );
 				}
@@ -489,8 +525,7 @@ class Mai_Publisher_Output {
 	 * @return void
 	 */
 	function handle_recipes() {
-		$xpath = new DOMXPath( $this->dom );
-		$lists = $xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " wprm-recipe-ingredients-container ") or contains(concat(" ", normalize-space(@class), " "), " wprm-recipe-instructions-container ")]' );
+		$lists = $this->xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " wprm-recipe-ingredients-container ") or contains(concat(" ", normalize-space(@class), " "), " wprm-recipe-instructions-container ")]' );
 
 		// Bail if no lists.
 		if ( ! $lists ) {
@@ -522,8 +557,7 @@ class Mai_Publisher_Output {
 	 * @return void
 	 */
 	function handle_sidebar() {
-		$xpath   = new DOMXPath( $this->dom );
-		$sidebar = $xpath->query( '//*[contains(concat(" ", normalize-space(@class), " "), " sidebar ")]' )->item(0);
+		$sidebar = $this->xpath->query( '//*[contains(concat(" ", normalize-space(@class), " "), " sidebar ")]' )->item(0);
 
 		// Bail if no sidebar.
 		if ( ! $sidebar ) {
@@ -565,8 +599,7 @@ class Mai_Publisher_Output {
 	 * @return void
 	 */
 	function handle_comments() {
-		$xpath    = new DOMXPath( $this->dom );
-		$comments = $xpath->query( '//ol[contains(concat(" ", normalize-space(@class), " "), " comment-list ")]/li[contains(concat(" ", normalize-space(@class), " "), " comment ")]' );
+		$comments = $this->xpath->query( '//ol[contains(concat(" ", normalize-space(@class), " "), " comment-list ")]/li[contains(concat(" ", normalize-space(@class), " "), " comment ")]' );
 
 		if ( ! $comments->length ) {
 			return;
