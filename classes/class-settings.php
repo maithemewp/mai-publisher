@@ -167,6 +167,31 @@ class Mai_Publisher_Settings {
 		);
 
 		add_settings_field(
+			'gam_hashed_domain', // id
+			__( 'GAM Hashed Domain', 'mai-publisher' ), // title
+			[ $this, 'gam_hashed_domain_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings' // section
+		);
+
+		add_settings_field(
+			'gam_sellers_id', // id
+			__( 'GAM Sellers ID', 'mai-publisher' ), // title
+			[ $this, 'gam_sellers_id_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings' // section
+		);
+
+
+		add_settings_field(
+			'gam_targets', // id
+			__( 'Key/Value Pairs', 'mai-publisher' ), // title
+			[ $this, 'gam_targets_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings' // section
+		);
+
+		add_settings_field(
 			'category', // id
 			__( 'Sitewide Category', 'mai-publisher' ), // title
 			[ $this, 'category_callback' ], // callback
@@ -276,6 +301,7 @@ class Mai_Publisher_Settings {
 			'ad_mode'                => 'sanitize_text_field',
 			'gam_domain'             => 'maipub_get_url_host',
 			'gam_network_code'       => 'absint',
+			'gam_targets'            => 'sanitize_text_field',
 			'category'               => 'sanitize_text_field',
 			'matomo_enabled_global'  => 'rest_sanitize_boolean',
 			'matomo_enabled'         => 'rest_sanitize_boolean',
@@ -369,6 +395,46 @@ class Mai_Publisher_Settings {
 	 */
 	function gam_network_code_callback() {
 		printf( '<input class="regular-text" type="text" name="mai_publisher[gam_network_code]" id="gam_network_code" value="%s">', maipub_get_option( 'gam_network_code', false ) );
+	}
+
+	/**
+	 * Setting callback.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	function gam_hashed_domain_callback() {
+		$domain = maipub_get_gam_domain();
+		$hashed = $domain ? maipub_encode( $domain, 14 ) : ''; // Character limit needs to match in get_targets() in class-output.php.
+
+		printf( '<input class="regular-text" type="text" name="mai_publisher[gam_hashed_domain]" id="gam_hashed_domain" value="%s" readonly>', $hashed );
+	}
+
+	/**
+	 * Setting callback.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	function gam_sellers_id_callback() {
+		$network_code  = maipub_get_option( 'gam_network_code', false );
+		$sellers_id    = $network_code ? maipub_encode( $network_code ) : '';
+
+		printf( '<input class="regular-text" type="text" name="mai_publisher[gam_sellers_id]" id="gam_sellers_id" value="%s" readonly>', $sellers_id );
+	}
+
+	/**
+	 * Setting callback.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	function gam_targets_callback() {
+		printf( '<input class="regular-text" type="text" name="mai_publisher[gam_targets]" id="gam_targets" value="%s">', maipub_get_option( 'gam_targets', false ) );
+		printf( '<p class="description">%s</p>', __( 'Comma-separated key value pairs. Example: a=b, d=f', 'mai-publisher' ) );
 	}
 
 	/**

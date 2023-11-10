@@ -55,6 +55,7 @@ class Mai_Publisher_Ad_Unit_Block {
 		$id         = get_field( 'id' );
 		$type       = get_field( 'type' );
 		$pos        = get_field( 'position' );
+		$targets    = get_field( 'targets' );
 		$label      = get_field( 'label' );
 		$label_hide = get_field( 'label_hide' );
 		$label      = $label ? $label : maipub_get_option( 'ad_label', false );
@@ -156,6 +157,11 @@ class Mai_Publisher_Ad_Unit_Block {
 				$attr_inner['data-label'] = esc_attr( $label );
 			}
 
+			// Custom key value pairs.
+			if ( $targets ) {
+				$attr_inner['data-targets'] = esc_attr( $targets );
+			}
+
 			// Add analytics tracking.
 			// $attr_inner['data-content-name']  = esc_attr( $slot );
 			$attr_inner['data-track-content'] = null;
@@ -203,6 +209,11 @@ class Mai_Publisher_Ad_Unit_Block {
 			// Add label.
 			if ( $label ) {
 				$attr['data-label'] = esc_attr( $label );
+			}
+
+			// Custom key value pairs.
+			if ( $targets ) {
+				$attr['data-targets'] = esc_attr( $targets );
 			}
 
 			// Add analytics tracking.
@@ -397,6 +408,13 @@ class Mai_Publisher_Ad_Unit_Block {
 							'ts'   => __( 'Sticky Top Horizontal', 'mai-publisher' ),
 							'bs'   => __( 'Sticky Bottom Horizontal', 'mai-publisher' ),
 						],
+					],
+					[
+						'label'        => __( 'Key/Value Pairs', 'mai-publisher' ),
+						'instructions' => __( 'Comma-separated key value pairs. Example: a=b, d=f', 'mai-publisher' ),
+						'key'          => 'maipub_ad_unit_targets',
+						'name'         => 'targets',
+						'type'         => 'text',
 					],
 					[
 						'label'             => __( 'Label override', 'mai-publisher' ),

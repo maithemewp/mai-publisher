@@ -56,8 +56,8 @@ class Mai_Publisher_Settings_Posts {
 					[
 						'label'        => __( 'Key/Value Pairs', 'mai-publisher' ),
 						'instructions' => __( 'Comma-separated key value pairs. Example: a=b, d=f', 'mai-publisher' ),
-						'key'          => 'maipub_keyvalue_pairs',
-						'name'         => 'maipub_keyvalue_pairs',
+						'key'          => 'maipub_targets',
+						'name'         => 'maipub_targets',
 						'type'         => 'text',
 					],
 				],

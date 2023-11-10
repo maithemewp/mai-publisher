@@ -481,3 +481,47 @@ function maipub_validate_ad_conditions_archive( $args ) {
 
 	return $args;
 }
+
+/**
+ * Gets an array of valid key=value pairs from a string.
+ * This is typically from a text field.
+ *
+ * @param string $string
+ *
+ * @return array
+ */
+function maipub_get_valid_targets( $string ) {
+	$pairs = [];
+	$array = maipub_string_to_array( ',', $string );
+
+	// Loop through key value pairs.
+	foreach ( $array as $pair ) {
+		$pair = maipub_string_to_array( '=', $pair );
+
+		// Skip if not a valid pair.
+		if ( 2 !== count( $pair ) ) {
+			continue;
+		}
+
+		$pairs[ $pair[0] ] = $pair[1];
+	}
+
+	return $pairs;
+}
+
+/**
+ * Converts a string to an array.
+ *
+ * @since TBD
+ *
+ * @param string $split  The string to split on via explode().
+ * @param string $string The string of pairs to validate.
+ *
+ * @return array
+ */
+function maipub_string_to_array( $split, $pairs ) {
+	$array = explode( $split, $pairs );
+	$array = array_map( 'trim', $array );
+
+	return array_filter( $array );
+}
