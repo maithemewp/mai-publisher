@@ -322,7 +322,11 @@ class Mai_Publisher_Settings {
 
 		// Sanitize.
 		foreach ( $input as $key => $value ) {
-			$input[ $key ] = $allowed[ $key ]( $value );
+			if ( is_null( $value ) || '' === $value ) {
+				$input[ $key ] = '';
+			} else {
+				$input[ $key ] = $allowed[ $key ]( $value );
+			}
 		}
 
 		return $input;
