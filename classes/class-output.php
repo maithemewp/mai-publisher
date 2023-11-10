@@ -213,7 +213,7 @@ class Mai_Publisher_Output {
 			];
 
 			// Build scripts.
-			$element = $this->xpath->query( '//head/link' )->item(0);
+			$element = $this->xpath->query( '//head' )->item(0);
 			$file    = "assets/js/mai-publisher-ads{$this->suffix}.js";
 			$scripts = [
 				'<script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>', // Google Ad Manager GPT.
@@ -223,7 +223,7 @@ class Mai_Publisher_Output {
 
 			// Insert scripts.
 			foreach ( $scripts as $script ) {
-				$this->insert_node( $script, $element, 'before' );
+				$this->insert_node( $script, $element, 'append' );
 			}
 		}
 
