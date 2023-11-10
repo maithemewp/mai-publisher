@@ -149,12 +149,12 @@ class Mai_Publisher_Output {
 			$slot = $this->get_slot( $unit );
 
 			// Set slot as id.
-			$ad_unit->setAttribute( 'id', $slot );
+			$ad_unit->setAttribute( 'id', 'mai-ad-' . $slot );
 
 			// If ads are active.
 			if ( ! $this->mode ) {
 				// Build script, import into dom and append to ad unit.
-				$script = sprintf( '<script>window.googletag = window.googletag || {};googletag.cmd = googletag.cmd || [];if ( window.googletag && googletag.apiReady ) { googletag.cmd.push(function(){ googletag.display("%s"); }); }</script>', $slot );
+				$script = sprintf( '<script>window.googletag = window.googletag || {};googletag.cmd = googletag.cmd || [];if ( window.googletag && googletag.apiReady ) { googletag.cmd.push(function(){ googletag.display("mai-ad-%s"); }); }</script>', $slot );
 				$this->insert_node( $script, $ad_unit, 'append' );
 
 				// Add to gam array.
@@ -213,17 +213,17 @@ class Mai_Publisher_Output {
 			];
 
 			// Build scripts.
-			$element = $this->xpath->query( '//head' )->item(0);
+			$element = $this->xpath->query( '//head/link' )->item(0);
 			$file    = "assets/js/mai-publisher-ads{$this->suffix}.js";
 			$scripts = [
-				'<script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>', // Google Ad Manager GPT.
+				'<script src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>', // Google Ad Manager GPT.
 				sprintf( '<script>/* <![CDATA[ */%svar maiPubAdsVars = %s;%s/* ]]> */</script>', PHP_EOL, wp_json_encode( $localize ), PHP_EOL ),
 				sprintf( '<script src="%s?ver=%s"></script>', maipub_get_file_data( $file, 'url' ), maipub_get_file_data( $file, 'version' ) ), // Initial testing showed async broke ads.
 			];
 
 			// Insert scripts.
 			foreach ( $scripts as $script ) {
-				$this->insert_node( $script, $element, 'append' );
+				$this->insert_node( $script, $element, 'before' );
 			}
 		}
 
