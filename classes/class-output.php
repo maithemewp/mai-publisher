@@ -167,6 +167,10 @@ class Mai_Publisher_Output {
 					'targets'      => [],
 				];
 
+				// Add analytics tracking.
+				$ad_unit->setAttribute( 'data-content-name', esc_attr( $slot ) );
+				$ad_unit->setAttribute( 'data-track-content', '' );
+
 				// Get and add targets.
 				$at      = $ad_unit->getAttribute( 'data-at' );
 				$ap      = $ad_unit->getAttribute( 'data-ap' );

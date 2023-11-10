@@ -155,6 +155,10 @@ function maipub_add_attributes( $content, $name ) {
 	if ( $tracked->length ) {
 		foreach ( $tracked as $node ) {
 			// Skip if not an element we can add attributes to.
+			if ( ! $node instanceof DOMElement ) {
+				continue;
+			}
+
 			if ( 'DOMElement' !== get_class( $node ) ) {
 				continue;
 			}
@@ -170,7 +174,7 @@ function maipub_add_attributes( $content, $name ) {
 		$first = $children->item(0);
 
 		// Make sure it's an element we can add attributes to.
-		if ( 'DOMElement' === get_class( $first ) ) {
+		if ( $first instanceof DOMElement ) {
 			$first->setAttribute( 'data-content-name', esc_attr( $name ) );
 			$first->setAttribute( 'data-track-content', '' );
 		}
@@ -178,7 +182,7 @@ function maipub_add_attributes( $content, $name ) {
 	} else {
 		foreach ( $children as $node ) {
 			// Skip if not an element we can add attributes to.
-			if ( 'DOMElement' !== get_class( $node ) ) {
+			if ( ! $node instanceof DOMElement ) {
 				continue;
 			}
 

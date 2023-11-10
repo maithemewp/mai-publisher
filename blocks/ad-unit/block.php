@@ -162,10 +162,6 @@ class Mai_Publisher_Ad_Unit_Block {
 				$attr_inner['data-targets'] = esc_attr( $targets );
 			}
 
-			// Add analytics tracking.
-			// $attr_inner['data-content-name']  = esc_attr( $slot );
-			$attr_inner['data-track-content'] = null;
-
 			// Get attributes string.
 			$attributes = get_block_wrapper_attributes( $attr_outer );
 			$attributes = str_replace( ' wp-block-acf-mai-ad-unit', '', $attributes );
@@ -215,10 +211,6 @@ class Mai_Publisher_Ad_Unit_Block {
 			if ( $targets ) {
 				$attr['data-targets'] = esc_attr( $targets );
 			}
-
-			// Add analytics tracking.
-			// $attr['data-content-name']  = esc_attr( $slot ); // TODO: Find data-track-content in DOM and update name with incremented slot.
-			$attr['data-track-content'] = null;
 
 			// Get attributes string.
 			$attributes = get_block_wrapper_attributes( $attr );
