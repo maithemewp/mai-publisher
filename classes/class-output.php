@@ -4,6 +4,8 @@
 defined( 'ABSPATH' ) || die;
 
 class Mai_Publisher_Output {
+	protected $domain;
+	protected $network_code;
 	protected $locations;
 	protected $ads;
 	protected $grouped;
@@ -44,12 +46,14 @@ class Mai_Publisher_Output {
 	 * @return void
 	 */
 	function start() {
-		$this->locations = maipub_get_locations();
-		$this->ads       = maipub_get_page_ads();
-		$this->grouped   = $this->get_grouped_ads( $this->ads );
-		$this->gam       = [];
-		$this->mode      = maipub_get_option( 'ad_mode', false );
-		$this->suffix    = maipub_get_suffix();
+		$this->domain       = maipub_get_gam_domain();
+		$this->network_code = (string) maipub_get_option( 'gam_network_code' );
+		$this->locations    = maipub_get_locations();
+		$this->ads          = maipub_get_page_ads();
+		$this->grouped      = $this->get_grouped_ads( $this->ads );
+		$this->gam          = [];
+		$this->mode         = maipub_get_option( 'ad_mode', false );
+		$this->suffix       = maipub_get_suffix();
 
 		// Bail if no ads or ads are disabled.
 		if ( ! $this->ads || 'disabled' === $this->mode ) {
@@ -164,8 +168,9 @@ class Mai_Publisher_Output {
 				];
 
 				// Get and add targets.
-				$at = $ad_unit->getAttribute( 'data-at' );
-				$ap = $ad_unit->getAttribute( 'data-ap' );
+				$at      = $ad_unit->getAttribute( 'data-at' );
+				$ap      = $ad_unit->getAttribute( 'data-ap' );
+				$targets = $ad_unit->getAttribute( 'data-targets' );
 
 				if ( $at ) {
 					$this->gam[ $slot ]['targets']['at'] = $at;
@@ -174,29 +179,29 @@ class Mai_Publisher_Output {
 				if ( $ap ) {
 					$this->gam[ $slot ]['targets']['ap'] = $ap;
 				}
+
+				if ( $targets ) {
+					$this->gam[ $slot ]['targets'] = array_merge( $this->gam[ $slot ]['targets'], maipub_get_valid_targets( $targets ) );
+				}
 			}
 		}
 
-		// Get gam domain.
-		$domain       = maipub_get_gam_domain();
-		$network_code = (string) maipub_get_option( 'gam_network_code' );
-
 		// If we have gam domain and ads are active.
-		if ( $domain && $this->gam ) {
+		if ( $this->domain && $this->gam ) {
 			$gam_base = '';
 
 			// Maybe disable MCM and use Network Code as base.
-			if ( defined( 'MAI_PUBLISHER_DISABLE_MCM' ) && MAI_PUBLISHER_DISABLE_MCM && $network_code ) {
-				$gam_base = "/$network_code";
+			if ( defined( 'MAI_PUBLISHER_DISABLE_MCM' ) && MAI_PUBLISHER_DISABLE_MCM && $this->network_code ) {
+				$gam_base = "/$this->network_code";
 			} else {
 				$gam_base = '/23001026477';
 
-				if ( $network_code ) {
-					$gam_base .= ",$network_code";
+				if ( $this->network_code ) {
+					$gam_base .= ",$this->network_code";
 				}
 			}
 
-			$gam_base .= "/$domain/";
+			$gam_base .= "/$this->domain/";
 			$localize  = [
 				'gamBase'   => $gam_base,
 				'ads'       => $this->gam,
@@ -781,7 +786,18 @@ class Mai_Publisher_Output {
 		$type    = maipub_get_content_type();
 		$iabct   = maipub_get_current_page( 'iabct' );
 		$page_id = maipub_get_current_page_id();
-		$custom  = $page_id ? get_post_meta( $page_id, 'maipub_keyvalue_pairs', true ) : '';
+		$global  = maipub_get_option( 'gam_targets' );
+		$custom  = $page_id ? get_post_meta( $page_id, 'maipub_targets', true ) : '';
+
+		// Hashed domain.
+		if ( $this->domain ) {
+			$targets['gd'] = maipub_encode( $this->domain, 14 ); // Character limit needs to match in gam_hashed_domain_callback() in class-settings.php.
+		}
+
+		// Sellers ID.
+		if ( $this->network_code ) {
+			$targets['gs'] = maipub_encode( $this->network_code );
+		}
 
 		// Content age.
 		if ( $age ) {
@@ -813,23 +829,14 @@ class Mai_Publisher_Output {
 			$targets['iabct'] = $iabct;
 		}
 
+		// Global key value pairs.
+		if ( $global ) {
+			$targets = array_merge( $targets, maipub_get_valid_targets( $global ) );
+		}
+
 		// Custom key value pairs.
 		if ( $custom ) {
-			$pairs = explode( ',', $custom );
-			$pairs = array_map( 'trim', $pairs );
-			$pairs = array_filter( $pairs );
-
-			foreach ( $pairs as $pair ) {
-				$pair = explode( '=', $pair );
-				$pair = array_map( 'trim', $pair );
-				$pair = array_filter( $pair );
-
-				if ( 2 !== count( $pair ) ) {
-					continue;
-				}
-
-				$targets[ $pair[0] ] = $pair[1];
-			}
+			$targets = array_merge( $targets, maipub_get_valid_targets( $custom ) );
 		}
 
 		return $targets;

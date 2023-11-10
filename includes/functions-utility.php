@@ -218,6 +218,56 @@ function maipub_add_attributes( $content, $name ) {
 }
 
 /**
+ * Encodes a string and removes special characters.
+ * This is for encoding GAM Network Code to Sellers ID.
+ * This needs to match what is in Mai Sellers JSON plugin.
+ *
+ * @access private
+ *
+ * @since TBD
+ *
+ * @param string    $input
+ * @param int|false $limit Character limit.
+ *
+ * @return string
+ */
+function maipub_encode( $input, $limit = false ) {
+	$base64 = base64_encode( $input );
+
+	// Replace characters not in the custom alphabet with '='.
+	$base64 = strtr( $base64, '+/', '-_' );
+
+	// Remove any trailing '=' characters.
+	$base64 = rtrim( $base64, '=' );
+
+	// If trimming characters.
+	if ( $limit ) {
+		$base64 = substr( $base64, 0, $limit );
+	}
+
+	return $base64;
+}
+
+/**
+ * Decodes a string and removes special characters.
+ *
+ * @since TBD
+ *
+ * @param string $input
+ *
+ * @return string
+ */
+function maipub_decode( $input ) {
+	// Add back any trailing '=' characters.
+	$input = str_pad( $input, (int) ( ceil( strlen( $input ) / 4 ) * 4 ), '=', STR_PAD_RIGHT );
+
+	// Replace characters in the custom alphabet.
+	$input = strtr( $input, '-_', '+/' );
+
+	return base64_decode( $input );
+}
+
+/**
  * Removes any array elements where the value is an empty string.
  *
  * @since 0.1.0
