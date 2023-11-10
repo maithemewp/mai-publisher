@@ -16,7 +16,7 @@ if ( window.googletag && googletag.apiReady ) {
 			const slot = googletag.defineSlot( gamBase + slug, ads[slug].sizes, 'mai-ad-' + slug );
 
 			// Set refresh targeting.
-			slot.setTargeting( refreshKey, refreshvalue )
+			slot.setTargeting( refreshKey, refreshvalue );
 
 			// Set slot-level targeting.
 			if ( ads[slug].targeting ) {

@@ -216,9 +216,9 @@ class Mai_Publisher_Output {
 			$element = $this->xpath->query( '//head/link' )->item(0);
 			$file    = "assets/js/mai-publisher-ads{$this->suffix}.js";
 			$scripts = [
-				'<script src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>', // Google Ad Manager GPT.
-				sprintf( '<script>/* <![CDATA[ */%svar maiPubAdsVars = %s;%s/* ]]> */</script>', PHP_EOL, wp_json_encode( $localize ), PHP_EOL ),
-				sprintf( '<script src="%s?ver=%s"></script>', maipub_get_file_data( $file, 'url' ), maipub_get_file_data( $file, 'version' ) ), // Initial testing showed async broke ads.
+				sprintf( '<script type="text/javascript" src="https://securepubads.g.doubleclick.net/tag/js/gpt.js?ver=%s"></script>', maipub_get_file_data( $file, 'version' ) ),// Google Ad Manager GPT.
+				sprintf( '<script type="text/javascript">/* <![CDATA[ */%svar maiPubAdsVars = %s;%s/* ]]> */</script>', PHP_EOL, wp_json_encode( $localize ), PHP_EOL ),
+				sprintf( '<script type="text/javascript" src="%s?ver=%s"></script>', maipub_get_file_data( $file, 'url' ), maipub_get_file_data( $file, 'version' ) ), // Initial testing showed async broke ads.
 			];
 
 			// Insert scripts.
