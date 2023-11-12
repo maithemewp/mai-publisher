@@ -343,7 +343,7 @@ function maipub_get_config( $sub_config = '' ) {
 function maipub_get_option( $option, $fallback = true ) {
 	$options = maipub_get_options();
 
-	if ( isset( $options[ $option ] ) && ! is_null( $options[ $option ] ) ) {
+	if ( isset( $options[ $option ] ) && $options[ $option ] ) {
 		return $options[ $option ];
 	}
 
@@ -505,11 +505,7 @@ function maipub_get_file_data( $file, $key = '' ) {
  * @return string
  */
 function maipub_get_gam_domain( $fallback = true ) {
-	$domain = (string) maipub_get_option( 'gam_domain', $fallback );
-	$domain = esc_url( $domain );
-	$domain = maipub_get_url_host( $domain );
-
-	return $domain;
+	return (string) maipub_get_option( 'gam_domain', $fallback );
 }
 
 /**
