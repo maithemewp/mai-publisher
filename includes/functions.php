@@ -496,19 +496,6 @@ function maipub_get_file_data( $file, $key = '' ) {
 }
 
 /**
- * Returns the GAM domain.
- *
- * @since 0.1.0
- *
- * @param bool $fallback Whether to fallback to home_url() if no domain.
- *
- * @return string
- */
-function maipub_get_gam_domain( $fallback = true ) {
-	return (string) maipub_get_option( 'gam_domain', $fallback );
-}
-
-/**
  * Sanitizes domain to be used in GAM.
  *
  * @since 0.1.0

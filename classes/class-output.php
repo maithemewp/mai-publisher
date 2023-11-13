@@ -46,7 +46,7 @@ class Mai_Publisher_Output {
 	 * @return void
 	 */
 	function start() {
-		$this->domain       = maipub_get_gam_domain();
+		$this->domain       = (string) maipub_get_option( 'gam_domain' );
 		$this->network_code = (string) maipub_get_option( 'gam_network_code' );
 		$this->locations    = maipub_get_locations();
 		$this->ads          = maipub_get_page_ads();
