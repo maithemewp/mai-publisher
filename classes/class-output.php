@@ -498,21 +498,16 @@ class Mai_Publisher_Output {
 					$item_class   = $class;
 					$item_style   = $style;
 					$item_style[] = 'rows' === $ad['content_item'] ? "order:calc(var(--maipub-row) * {$count})" : "order:{$count}";
-					$tags         = new WP_HTML_Tag_Processor( $ad['content'] );
+					$item_atts    = [
+						'class' => trim( implode( ' ', $item_class ) ),
+						'style' => trim( implode( ';', $item_style ) ),
+					];
 
-					// Loop through tags.
-					while ( $tags->next_tag() ) {
-						$item_class = trim( implode( ' ', $item_class ) . ' ' . $tags->get_attribute( 'class' ) );
-						$item_style = trim( implode( ';', $item_style ) . '; ' . $tags->get_attribute( 'style' ) );
-						$tags->set_attribute( 'class', $item_class );
-						$tags->set_attribute( 'style', $item_style );
-
-						// Break after first.
-						break;
-					}
+					// Build ad with wrapper.
+					$html = sprintf( '<div%s>%s</div>', maipub_build_attributes( $item_atts ), $ad['content'] );
 
 					// Insert the html into the dom.
-					$this->insert_node( $tags->get_updated_html(), $wrap, 'append' );
+					$this->insert_node( $html, $wrap, 'append' );
 				}
 			}
 			// Not Mai_Engine.
