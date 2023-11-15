@@ -53,7 +53,7 @@
 
 .mai-ad-unit-has-sticky-header,
 .mai-ad-unit-has-sticky-footer {
-	padding-bottom: calc(var(--mai-ad-unit-aspect-ratio) * 1%) !important;
+	padding-bottom: calc(1 / (var(--mai-ad-unit-aspect-ratio)) * 100% + 24px) !important;
 }
 
 .mai-ad-unit-sticky-header {
