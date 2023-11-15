@@ -80,34 +80,6 @@
 	bottom: 0;
 }
 
-.maipub-row {
-	flex: 1 1 100%;
-}
-
-@media only screen and (max-width: 599px) {
-	.entries-wrap {
-		--maipub-row: var(--maipub-row-xs);
-	}
-}
-
-@media only screen and (min-width: 600px) and (max-width: 799px) {
-	.entries-wrap {
-		--maipub-row: var(--maipub-row-sm);
-	}
-}
-
-@media only screen and (min-width: 800px) and (max-width: 999px) {
-	.entries-wrap {
-		--maipub-row: var(--maipub-row-md);
-	}
-}
-
-@media only screen and (min-width: 1000px) {
-	.entries-wrap {
-		--maipub-row: var(--maipub-row-lg);
-	}
-}
-
 .wprm-recipe {
 	overflow: visible !important;
 }
