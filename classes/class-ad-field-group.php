@@ -357,7 +357,16 @@ class Mai_Publisher_Ad_Field_Group {
 					'rows'    => __( 'Rows', 'mai-publisher' ),
 					'entries' => __( 'Entries', 'mai-publisher' ),
 				],
-				'wrapper'      => [ 'width' => '25' ],
+				'wrapper'           => [ 'width' => '25' ],
+				'conditional_logic' => [
+					[
+						[
+							'field'    => 'maipub_archive_location',
+							'operator' => '==',
+							'value'    => 'entries',
+						],
+					],
+				],
 			],
 			[
 				'label'        => __( 'Post type archives', 'mai-publisher' ),
