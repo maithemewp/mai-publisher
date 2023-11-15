@@ -61,8 +61,8 @@ class Mai_Publisher_Ad_Unit_Block {
 		$label      = $label ? $label : maipub_get_option( 'ad_label', false );
 		$label      = $label_hide ? '' : $label;
 		$ad_units   = maipub_get_config( 'ad_units' );
-		$unit       = $id ? $ad_units[ $id ] : [];
-		$sizes      = $id ? $this->get_sizes( $unit ) : [];
+		$unit       = $id && isset( $ad_units[ $id ] ) ? $ad_units[ $id ] : [];
+		$sizes      = $id && $unit ? $this->get_sizes( $unit ) : [];
 		$styles     = $id ? $this->get_styles( $sizes, $is_preview ) : '';
 
 		// If previewing in editor, show placeholder.
@@ -83,13 +83,12 @@ class Mai_Publisher_Ad_Unit_Block {
 				$attr['data-label'] = esc_attr( $label );
 			}
 
-			// $text  = $id ? __( 'Ad Placeholder', 'mai-publisher' ) : __( 'No Ad Unit Selected', 'mai-publisher' );
-			$text  = $id ? $id : __( 'No Ad Unit Selected', 'mai-publisher' );
+			$text  = $id && isset( $ad_units[ $id ] ) ? $id : __( 'No Ad Unit Selected', 'mai-publisher' );
 			printf( '<div%s><span style="font-size:1.1rem;">%s</span></div>', maipub_build_attributes( $attr ), $text );
 			return;
 		}
 
-		// Bail if no ID.
+		// Bail if not a valid ad unit.
 		if ( ! ( $id && isset( $ad_units[ $id ] ) ) ) {
 			return;
 		}
