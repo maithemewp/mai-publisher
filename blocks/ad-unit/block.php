@@ -61,30 +61,10 @@ class Mai_Publisher_Ad_Unit_Block {
 		$label      = $label ? $label : maipub_get_option( 'ad_label', false );
 		$label      = $label_hide ? '' : $label;
 		$ad_units   = maipub_get_config( 'ad_units' );
-		$unit       = $id && isset( $ad_units[ $id ] ) ? $ad_units[ $id ] : [];
-		$sizes      = $id && $unit ? $this->get_sizes( $unit ) : [];
-		$styles     = $id ? $this->get_styles( $sizes, $is_preview ) : '';
 
-		// If previewing in editor, show placeholder.
-		if ( $is_preview ) {
-			$attr = [
-				'class' => 'mai-ad-unit',
-			];
-
-			if ( isset( $block['className'] ) && $block['className'] ) {
-				$attr['class'] .= ' ' . esc_attr( $block['className'] );
-			}
-
-			if ( $styles ) {
-				$attr['style'] = $styles;
-			}
-
-			if ( $label ) {
-				$attr['data-label'] = esc_attr( $label );
-			}
-
-			$text  = $id && isset( $ad_units[ $id ] ) ? $id : __( 'No Ad Unit Selected', 'mai-publisher' );
-			printf( '<div%s><span style="font-size:1.1rem;">%s</span></div>', maipub_build_attributes( $attr ), $text );
+		// If previewing in editor and no ad selected, show placeholder.
+		if ( $is_preview && ! ( $id && isset( $ad_units[ $id ] ) ) ) {
+			printf( '<div style="text-align:center;background:rgba(0,0,0,0.05);border:2px dashed rgba(0,0,0,0.25);"><span style="font-size:1.1rem;">%s</span></div>',  __( 'No Ad Unit Selected', 'mai-publisher' ) );
 			return;
 		}
 
@@ -93,12 +73,17 @@ class Mai_Publisher_Ad_Unit_Block {
 			return;
 		}
 
+		// Set vars.
+		$unit   = $ad_units[ $id ];
+		$sizes  = $this->get_sizes( $unit );
+		$styles = $this->get_styles( $sizes );
+
 		// Start HTML.
 		$html  = '';
 		$inner = '';
 
 		// Build script.
-		if ( 'demo' === maipub_get_option( 'ad_mode', false ) ) {
+		if ( $is_preview || 'demo' === maipub_get_option( 'ad_mode', false ) ) {
 			$mobile  = end( $unit['sizes_mobile'] );  // Last should be the largest.
 			$tablet  = end( $unit['sizes_tablet'] );  // Last should be the largest.
 			$desktop = end( $unit['sizes_desktop'] ); // Last should be the largest.
@@ -286,17 +271,12 @@ class Mai_Publisher_Ad_Unit_Block {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param array $sizes      The ad unit responsive sizes.
-	 * @param bool  $is_preview Whether the block is being previewed in the editor.
+	 * @param array $sizes The ad unit responsive sizes.
 	 *
 	 * @return string
 	 */
-	function get_styles( $sizes, $is_preview ) {
+	function get_styles( $sizes ) {
 		$styles = '';
-
-		if ( $is_preview ) {
-			$styles .= 'background:rgba(0,0,0,0.05);border:2px dashed rgba(0,0,0,0.25);';
-		}
 
 		// Build width.
 		foreach ( $sizes as $break => $values ) {
