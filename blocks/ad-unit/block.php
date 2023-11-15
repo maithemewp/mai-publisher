@@ -251,8 +251,8 @@ class Mai_Publisher_Ad_Unit_Block {
 				continue;
 			}
 
-			$largest_width  = 0;
-			$largest_height = 0;
+			$largest_width = 0;
+			$height        = 0;
 
 			// Check for largest width and height.
 			foreach ( $item as $subitem ) {
@@ -261,15 +261,11 @@ class Mai_Publisher_Ad_Unit_Block {
 					continue;
 				}
 
-				$width  = $subitem[0];
-				$height = $subitem[1];
+				$width = $subitem[0];
 
 				if ( $width > $largest_width ) {
 					$largest_width = $width;
-				}
-
-				if ( $height > $largest_height ) {
-					$largest_height = $height;
+					$height        = $subitem[1];
 				}
 			}
 
@@ -279,7 +275,7 @@ class Mai_Publisher_Ad_Unit_Block {
 			}
 
 			// Set sizes.
-			$sizes[ $key ] = array( $largest_width, $largest_height );
+			$sizes[ $key ] = array( $largest_width, $height );
 		}
 
 		return $sizes;
