@@ -344,7 +344,7 @@ class Mai_Publisher_Output {
 					}
 
 					// Insert the node into the dom.
-					$this->insert_node( $node, $element->nextSibling, 'after' );
+					$this->insert_node( $ad['content'], $element, 'after' );
 				}
 
 				// Remove from temp counts.
