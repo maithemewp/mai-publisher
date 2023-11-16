@@ -69,7 +69,7 @@ function maipub_get_dom_document( $html ) {
 	$libxml_previous_state = libxml_use_internal_errors( true );
 
 	// Load the content in the document HTML.
-	$dom->loadHTML( "<div>$html</div>", LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD );
+	$dom->loadHTML( "<div>$html</div>" );
 
 	// Handle wraps.
 	$container = $dom->getElementsByTagName('div')->item(0);
@@ -106,7 +106,7 @@ function maipub_get_dom_document( $html ) {
 function maipub_import_node( $dom, $content ) {
 	$tmp = $content ? maipub_get_dom_document( $content ) : false;
 
-	return $tmp ? $dom->importNode( $tmp->documentElement, true ) : $tmp;
+	return $tmp ? $dom->importNode( $tmp->documentElement, true ) : false;
 }
 
 /**
