@@ -91,6 +91,12 @@ class Mai_Publisher_Ad_Unit_Block {
 			$tablet  = ! is_array( $tablet ) ? [ 300, 350 ] : $tablet;
 			$desktop = ! is_array( $desktop ) ? [ 300, 350 ] : $desktop;
 
+			if ( 'sidebar' === $id ) {
+				$mobile  = [ 300, 250 ];
+				$tablet  = [ 300, 250 ];
+				$desktop = [ 300, 250 ];
+			}
+
 			// Build inner HTML.
 			$inner .= '<picture>';
 				$inner .= sprintf( '<source srcset="https://placehold.co/%s" media="(max-width: 727px)" />', implode( 'x', $mobile ) );
