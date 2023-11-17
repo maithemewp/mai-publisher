@@ -161,10 +161,13 @@ class Mai_Publisher_Generate_Ads {
 		$redirect = admin_url( 'edit.php?post_type=mai_ad' );
 		$post_id  = isset( $_GET['id'] ) ? absint( $_GET['id'] ) : null;
 
-		if ( $post_id ) {
+		// If we have a post ID and this post ID is not disabled from reimporting.
+		if ( $post_id && ! (bool) get_post_meta( $post_id, 'maipub_disable_reimport_content', true ) ) {
 			$ads    = $this->import_content( $post_id );
 			$action = __( 'updated', 'mai-publisher' );
-		} else {
+		}
+		// Create all ad.
+		else {
 			$ads    = $this->create_ads();
 			$action = __( 'created', 'mai-publisher' );
 		}
