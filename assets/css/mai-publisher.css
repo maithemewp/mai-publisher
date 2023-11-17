@@ -21,7 +21,7 @@
 }
 
 @media only screen and (max-width: 727px) {
-	.mai-ad-unit-container,
+	.mai-ad-unit-has-sticky,
 	.mai-ad-unit {
 		--mai-ad-unit-max-width: var(--mai-ad-unit-max-width-sm, unset);
 		--mai-ad-unit-aspect-ratio: var(--mai-ad-unit-aspect-ratio-sm, unset);
@@ -29,7 +29,7 @@
 }
 
 @media only screen and (min-width: 728px) and (max-width: 1023px) {
-	.mai-ad-unit-container,
+	.mai-ad-unit-has-sticky,
 	.mai-ad-unit {
 		--mai-ad-unit-max-width: var(--mai-ad-unit-max-width-md, unset);
 		--mai-ad-unit-aspect-ratio: var(--mai-ad-unit-aspect-ratio-md, unset);
@@ -37,7 +37,7 @@
 }
 
 @media only screen and (min-width: 1024px) {
-	.mai-ad-unit-container,
+	.mai-ad-unit-has-sticky,
 	.mai-ad-unit {
 		--mai-ad-unit-max-width: var(--mai-ad-unit-max-width-lg, unset);
 		--mai-ad-unit-aspect-ratio: var(--mai-ad-unit-aspect-ratio-lg, unset);

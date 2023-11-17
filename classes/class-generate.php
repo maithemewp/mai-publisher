@@ -172,8 +172,10 @@ class Mai_Publisher_Generate_Ads {
 			$action = __( 'created', 'mai-publisher' );
 		}
 
+		// Get ads count.
 		$count = count( $ads );
 
+		// Set message text.
 		switch ( $count ) {
 			case 0:
 				$message = __( 'Sorry, no ads are available.', 'mai-publisher' );

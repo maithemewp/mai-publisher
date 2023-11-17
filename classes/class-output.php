@@ -589,6 +589,31 @@ class Mai_Publisher_Output {
 					continue;
 				}
 
+				// Check if sticky in Mai Engine.
+				if ( class_exists( 'Mai_Engine' ) ) {
+					$sticky = false;
+					$tags   = new WP_HTML_Tag_Processor( $ad['content'] );
+
+					while ( $tags->next_tag( [ 'tag_name' => 'div', 'class_name' => 'mai-ad-unit' ] ) ) {
+						$ap = $tags->get_attribute( 'data-ap' );
+
+						if ( ! $ap ) {
+							continue;
+						}
+
+						if ( 'vs' !== $ap ) {
+							continue;
+						}
+
+						$sticky = true;
+						break;
+					}
+
+					if ( $sticky ) {
+						$ad['content'] = sprintf( '<div class="mai-ad-container is-sticky">%s</div>', $ad['content'] );
+					}
+				}
+
 				// Insert the ad.
 				$this->insert_node( $ad['content'], $sidebar, $action );
 			}

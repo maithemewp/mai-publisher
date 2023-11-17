@@ -64,6 +64,7 @@ class Mai_Publisher_Ad_Unit_Block {
 
 		// If previewing in editor and no ad selected, show placeholder.
 		if ( $is_preview && ! ( $id && isset( $ad_units[ $id ] ) ) ) {
+			// This styling should match Mai Ad block.
 			printf( '<div style="text-align:center;background:rgba(0,0,0,0.05);border:2px dashed rgba(0,0,0,0.25);"><span style="font-size:1.1rem;">%s</span></div>',  __( 'No Ad Unit Selected', 'mai-publisher' ) );
 			return;
 		}
@@ -112,7 +113,7 @@ class Mai_Publisher_Ad_Unit_Block {
 
 			// Start outer attributes.
 			$attr_outer = [
-				'class' => "mai-ad-unit-container mai-ad-unit-has-sticky mai-ad-unit-has-sticky-{$location}",
+				'class' => "mai-ad-unit-has-sticky mai-ad-unit-has-sticky-{$location}",
 			];
 
 			// Add custom classes.

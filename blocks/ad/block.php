@@ -53,15 +53,16 @@ class Mai_Publisher_Ad_Block {
 	 * @return void
 	 */
 	function render_block( $block, $content = '', $is_preview = false, $post_id = 0 ) {
-		$id = get_field( 'id' );
+		$id   = get_field( 'id' );
+		$post = $id ? get_post( $id ) : false;
 
-		if ( ! $id ) {
-			return;
-		}
-
-		$post = get_post( $id );
-
-		if ( ! $post ) {
+		// If not the data we need.
+		if ( ! ( $id && $post ) ) {
+			// If in editor.
+			if ( $is_preview ) {
+				// This styling should match Mai Ad Unit block.
+				printf( '<div style="text-align:center;background:rgba(0,0,0,0.05);border:2px dashed rgba(0,0,0,0.25);"><span style="font-size:1.1rem;">%s</span></div>',  __( 'No Ad Selected', 'mai-publisher' ) );
+			}
 			return;
 		}
 
