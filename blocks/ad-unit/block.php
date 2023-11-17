@@ -108,7 +108,7 @@ class Mai_Publisher_Ad_Unit_Block {
 		}
 
 		// Sticky footer (bottoms sticky) adds another wrapper.
-		if ( in_array( $pos, [ 'ts', 'bs' ] ) ) {
+		if ( ! $is_preview && in_array( $pos, [ 'ts', 'bs' ] ) ) {
 			$location = 'ts' === $pos ? 'header' : 'footer';
 
 			// Start outer attributes.
