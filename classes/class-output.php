@@ -701,7 +701,7 @@ class Mai_Publisher_Output {
 	function insert_node( $insert, $target, $action ) {
 		// If string, convert to node.
 		if ( is_string( $insert ) ) {
-			$insert = maipub_import_node( $this->dom, $insert );
+			$insert = $this->import_node( $insert );
 		}
 
 		// Bail if nothing to insert.
@@ -730,6 +730,31 @@ class Mai_Publisher_Output {
 				$target->appendChild( $insert );
 				break;
 		}
+	}
+
+	/**
+	 * Build the temporary dom.
+	 * Special characters were causing issues with `appendXML()`.
+	 *
+	 * @since TBD
+	 *
+	 * @link https://stackoverflow.com/questions/4645738/domdocument-appendxml-with-special-characters
+	 * @link https://www.py4u.net/discuss/974358
+	 *
+	 * @return DOMNode[]
+	 */
+	function import_node( $content ) {
+		if ( ! $content ) {
+			return false;
+		}
+
+		/**
+		 * Using `maipub_get_dom_document()` breaks when there are multiple top level elements.
+		 * I think it's because of `$this->dom` is the full dom with doctype and html element.
+		 */
+		$tmp = $this->dom_document( $content );
+
+		return $this->dom->importNode( $tmp->documentElement, true );
 	}
 
 	/**

@@ -21,7 +21,7 @@ class Mai_Publisher_Ad_Field_Group {
 	 */
 	function hooks() {
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_script' ] );
-		add_action( 'acf/init',              [ $this, 'register_field_group' ] );
+		add_action( 'acf/init',              [ $this, 'register_field_groups' ] );
 	}
 
 	/**
@@ -49,13 +49,13 @@ class Mai_Publisher_Ad_Field_Group {
 	}
 
 	/**
-	 * Register field group.
+	 * Register field groups.
 	 *
 	 * @since 0.1.0
 	 *
 	 * @return void
 	 */
-	function register_field_group() {
+	function register_field_groups() {
 		if ( ! function_exists( 'acf_add_local_field_group' ) ) {
 			return;
 		}
@@ -65,6 +65,31 @@ class Mai_Publisher_Ad_Field_Group {
 				'key'      => 'maipub_ad_field_group',
 				'title'    => __( 'Locations Settings', 'mai-publisher' ),
 				'fields'   => $this->get_fields(),
+				'location' => [
+					[
+						[
+							'param'    => 'post_type',
+							'operator' => '==',
+							'value'    => 'mai_ad',
+						],
+					],
+				],
+			]
+		);
+
+		acf_add_local_field_group(
+			[
+				'key'      => 'maipub_ad_sidebar_field_group',
+				'title'    => __( 'Ad Settings', 'mai-publisher' ),
+				'fields'   => [
+					array(
+						'key'     => 'maipub_disable_reimport_content',
+						'name'    => 'maipub_disable_reimport_content',
+						'type'    => 'true_false',
+						'message' => __( 'Disable reimporting ad content', 'mai-publisher' ),
+					),
+				],
+				'position' => 'side',
 				'location' => [
 					[
 						[

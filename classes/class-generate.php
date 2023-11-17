@@ -118,9 +118,19 @@ class Mai_Publisher_Generate_Ads {
 			return $actions;
 		}
 
-		$generate_url              = add_query_arg( [ 'action' => 'maipub_generate_ads_action', 'id' => $post->ID ], admin_url( 'admin-post.php' ) );
-		$generate_url              = wp_nonce_url( $generate_url, 'maipub_generate_ads_action', 'maipub_generate_ads_nonce' );
-		$actions['import_content'] = sprintf( '<a href="%s">%s</a>', $generate_url, __( 'Reimport Content', 'mai-publisher' ) );
+		// Check if disabling reimport.
+		$disable = get_post_meta( $post->ID, 'maipub_disable_reimport_content', true );
+
+		// If disabled.
+		if ( $disable ) {
+			$actions['import_content'] = __( 'Reimport Disabled', 'mai-publisher' );
+		}
+		// Add reimport link.
+		else {
+			$generate_url              = add_query_arg( [ 'action' => 'maipub_generate_ads_action', 'id' => $post->ID ], admin_url( 'admin-post.php' ) );
+			$generate_url              = wp_nonce_url( $generate_url, 'maipub_generate_ads_action', 'maipub_generate_ads_nonce' );
+			$actions['import_content'] = sprintf( '<a href="%s">%s</a>', $generate_url, __( 'Reimport Content', 'mai-publisher' ) );
+		}
 
 		return $actions;
 	}

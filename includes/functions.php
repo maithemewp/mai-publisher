@@ -93,23 +93,6 @@ function maipub_get_dom_document( $html ) {
 }
 
 /**
- * Build the temporary dom.
- * Special characters were causing issues with `appendXML()`.
- *
- * @since TBD
- *
- * @link https://stackoverflow.com/questions/4645738/domdocument-appendxml-with-special-characters
- * @link https://www.py4u.net/discuss/974358
- *
- * @return DOMNode|false
- */
-function maipub_import_node( $dom, $content ) {
-	$tmp = $content ? maipub_get_dom_document( $content ) : false;
-
-	return $tmp ? $dom->importNode( $tmp->documentElement, true ) : false;
-}
-
-/**
  * Get content area hook locations.
  *
  * @since 0.1.0
