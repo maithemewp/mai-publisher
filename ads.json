@@ -108,6 +108,21 @@
             ]
         }
     },
+    "infeed-full-width": {
+        "post_content": "<!-- wp:group {\"align\":\"full\",\"backgroundColor\":\"alt\",\"layout\":{\"type\":\"constrained\"},\"hideFromFeed\":true,\"verticalSpacingTop\":\"xs\",\"verticalSpacingBottom\":\"xs\"} -->\n<div class=\"wp-block-group alignfull has-alt-background-color has-background\"><!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"leaderboard\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"\",\"_position\":\"maipub_ad_unit_position\",\"targets\":\"\",\"_targets\":\"maipub_ad_unit_targets\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\"} \/--><\/div>\n<!-- \/wp:group -->",
+        "meta_input": {
+            "maipub_archive_location": "entries",
+            "maipub_archive_types": [
+                "post"
+            ],
+            "maipub_archive_taxonomies": [
+                "category",
+                "post_tag"
+            ],
+            "maipub_archive_content_count": "3, 6, 9, 12, 15, 18, 21, 24",
+            "maipub_archive_content_item": "rows"
+        }
+    },
     "inrecipe": {
         "post_content": "<!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"inrecipe\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"\",\"_position\":\"maipub_ad_unit_position\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\"} \/-->",
         "meta_input": {
