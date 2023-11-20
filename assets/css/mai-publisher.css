@@ -20,6 +20,7 @@
 	content: attr(data-label);
 }
 
+/* This div gets destroyed when the gam ad unit renders, but for now at least it will set the aspect-ratio on page load */
 .mai-ad-unit-inner {
 	aspect-ratio: var(--mai-ad-unit-aspect-ratio);
 }
