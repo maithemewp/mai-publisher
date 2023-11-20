@@ -160,7 +160,9 @@ class Mai_Publisher_Ad_Unit_Block {
 			// Build HTML with extra wrap.
 			$html .= sprintf( '<div %s>', $attributes );
 				$html .= sprintf( '<div%s>', maipub_build_attributes( $attr_inner ) );
-					$html .= $inner;
+					$html .= '<div class="mai-ad-unit-inner">';
+						$html .= $inner;
+					$html .= '</div>';
 				$html .= '</div>';
 			$html .= '</div>';
 		}
@@ -209,7 +211,9 @@ class Mai_Publisher_Ad_Unit_Block {
 
 			// Build HTML.
 			$html .= sprintf( '<div %s>', $attributes );
-				$html .= $inner;
+				$html .= '<div class="mai-ad-unit-inner">';
+					$html .= $inner;
+				$html .= '</div>';
 			$html .= '</div>';
 		}
 
