@@ -4,7 +4,7 @@
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-	max-width: var(--mai-ad-unit-max-width);
+	min-width: var(--mai-ad-unit-max-width); /* max-width breaks aspect ratio in Safari */
 	margin: auto;
 	aspect-ratio: var(--mai-ad-unit-aspect-ratio);
 }
