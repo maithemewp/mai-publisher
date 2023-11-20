@@ -113,3 +113,9 @@
 		margin-top: 0;
 	}
 }
+
+/* Mai Engine specific but easier to add here */
+.entry-wrap > .cnx-main-container {
+	margin-block: var(--spacing-md, 24px);
+	z-index: 9;
+}
