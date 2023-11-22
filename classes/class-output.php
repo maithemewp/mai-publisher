@@ -463,7 +463,8 @@ class Mai_Publisher_Output {
 
 				// If counting rows.
 				if ( 'rows' === $ad['content_item'] ) {
-					$columns = mai_get_breakpoint_columns( $ad );
+					$args    = mai_get_template_args();
+					$columns = mai_get_breakpoint_columns( $args );
 
 					// If columns.
 					if ( isset( $columns['lg'] ) && $columns['lg'] ) {
