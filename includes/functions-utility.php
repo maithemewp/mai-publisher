@@ -123,7 +123,7 @@ function maipub_build_attributes( $attr, $escape = 'esc_attr' ) {
  *
  * If you set the same attribute or the same class on multiple elements within one block,
  * the first element found will always win. Nested content blocks are currently not supported in Matomo.
- * This would happen if a Mai Ad block was used inside of a Mai CCA (i think, this is from Mai Analytics),
+ * This would happen if a Mai Ad block was used inside of a Mai CCA (i think, this comment is from Mai Analytics),
  * the CCA would take precedence and the Ad links will have the content piece.
  *
  * @since 0.7.0

@@ -62,7 +62,7 @@ class Mai_Publisher_Analytics_Tracker_Block {
 			return;
 		}
 
-		echo maipub_add_attributes( $content, (string) get_field( 'name' ) );
+		echo maipub_add_attributes( $content, sanitize_text_field( (string) get_field( 'name' ) ) );
 	}
 
 	/**
@@ -103,7 +103,7 @@ class Mai_Publisher_Analytics_Tracker_Block {
 	}
 
 	/**
-	 * Enqueue JS.
+	 * Enqueue JS for block transforms.
 	 *
 	 * @since 0.7.0
 	 *
