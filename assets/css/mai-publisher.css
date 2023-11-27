@@ -1,9 +1,5 @@
 .mai-ad-unit {
 	position: relative;
-	/* display: flex; */
-	/* flex-direction: column; */
-	/* justify-content: center; */
-	/* align-items: center; */
 	max-width: var(--mai-ad-unit-max-width);
 	margin: auto;
 	aspect-ratio: var(--mai-ad-unit-aspect-ratio);
@@ -68,17 +64,14 @@
 .mai-ad-unit-sticky-header::after,
 .mai-ad-unit-sticky-footer::after {
 	position: absolute;
-	width: 100vw;
+	top: 0;
+	bottom: 0;
+	left: -50vw;
+	right: -50vw;
 	background: rgba(255, 255, 255, 0.8);
 	box-shadow: 0 0 16px 0px rgba(0, 0, 0, 0.1);
 	z-index: -1;
 	content: "";
-}
-
-.mai-ad-unit-sticky-header::after,
-.mai-ad-unit-sticky-footer::after {
-	top: 0;
-	bottom: 0;
 }
 
 .wprm-recipe {
