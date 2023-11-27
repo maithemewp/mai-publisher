@@ -1,11 +1,12 @@
 .mai-ad-unit {
 	position: relative;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
+	/* display: flex; */
+	/* flex-direction: column; */
+	/* justify-content: center; */
+	/* align-items: center; */
 	max-width: var(--mai-ad-unit-max-width);
 	margin: auto;
+	aspect-ratio: var(--mai-ad-unit-aspect-ratio);
 }
 
 .mai-ad-unit[data-label]::before {
@@ -18,12 +19,6 @@
 	font-variant: all-small-caps;
 	letter-spacing: 1px;
 	content: attr(data-label);
-}
-
-/* This div gets destroyed when the gam ad unit renders, but for now at least it will set the aspect-ratio on page load */
-.mai-ad-unit-inner {
-	max-width: 100%; /* aspect-ratio was breaking out of container */
-	aspect-ratio: var(--mai-ad-unit-aspect-ratio);
 }
 
 @media only screen and (max-width: 727px) {
