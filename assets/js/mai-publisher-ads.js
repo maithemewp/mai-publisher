@@ -1,6 +1,15 @@
 window.googletag = window.googletag || {};
 googletag.cmd    = googletag.cmd || [];
 
+/**
+ * Amazon UAD.
+ * Debug via `apstag.debug('enableConsole')`
+ */
+!function(a9,a,p,s,t,A,g){if(a[a9])return;function q(c,r){a[a9]._Q.push([c,r])}a[a9]={init:function(){q("i",arguments)},fetchBids:function(){q("f",arguments)},setDisplayBids:function(){},targetingKeys:function(){return[]},_Q:[]};A=p.createElement(s);A.async=!0;A.src=t;g=p.getElementsByTagName(s)[0];g.parentNode.insertBefore(A,g)}("apstag",window,document,"script","//c.amazon-adsystem.com/aax2/apstag.js");
+
+/**
+ * When googletag and the API are ready, set up ads.
+ */
 if ( window.googletag && googletag.apiReady ) {
 	const ads           = maiPubAdsVars['ads'];
 	const refreshKey    = 'refresh';
@@ -8,12 +17,28 @@ if ( window.googletag && googletag.apiReady ) {
 	const refreshTime   = 30; // Time in seconds.
 
 	googletag.cmd.push(() => {
-		const gamBase = maiPubAdsVars['gamBase'];
+		const gamBase  = maiPubAdsVars['gamBase'];
+		const uadSlots = [];
+
+		// Initialize apstag and have apstag set bids on the googletag slots when they are returned to the page.
+		apstag.init({
+			pubID: '79166f25-5776-4c3e-9537-abad9a584b43', // BB.
+			adServer: 'googletag',
+			// bidTimeout: prebidTimeout,
+			// us_privacy: '-1', // https://ams.amazon.com/webpublisher/uam/docs/web-integration-documentation/integration-guide/uam-ccpa.html?source=menu
+		});
 
 		// Loop through maiPubAdsVars getting key and values.
 		Object.keys( ads ).forEach( slug => {
 			// Define ad slot.
 			const slot = googletag.defineSlot( gamBase + slug, ads[slug].sizes, 'mai-ad-' + slug );
+
+			// Add slot to array for UAD.
+			uadSlots.push({
+				slotID: 'mai-ad-' + slug,
+				slotName: gamBase + slug,
+				sizes: ads[slug].sizes,
+			});
 
 			// Set refresh targeting.
 			slot.setTargeting( refreshKey, refreshvalue );
@@ -71,9 +96,21 @@ if ( window.googletag && googletag.apiReady ) {
 		googletag.pubads().setCentering( true );
 
 		// Enable SRA and services.
-		// googletag.pubads().disableInitialLoad(); // Disable initial load for header bidding.
+		googletag.pubads().disableInitialLoad(); // Disable initial load for header bidding.
 		googletag.pubads().enableSingleRequest();
 		googletag.enableServices();
+
+		// Fetch bids from Amazon UAM using apstag.
+		apstag.fetchBids({
+			slots: uadSlots,
+			timeout: 1000,
+		}, function( bids ) {
+			// Set apstag bids, then trigger the first request to GAM.
+			googletag.cmd.push(function() {
+				apstag.setDisplayBids();
+				googletag.pubads().refresh();
+			});
+		});
 	});
 
 	// Set currently visible ads and timeout ids objects.
