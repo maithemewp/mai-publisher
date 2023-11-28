@@ -216,9 +216,9 @@ class Mai_Publisher_Output {
 			$element = $this->xpath->query( '//head/link' )->item(0);
 			$file    = "assets/js/mai-publisher-ads{$this->suffix}.js";
 			$scripts = [
-				sprintf( '<script type="text/javascript" src="https://securepubads.g.doubleclick.net/tag/js/gpt.js?ver=%s"></script>', maipub_get_file_data( $file, 'version' ) ),// Google Ad Manager GPT.
-				sprintf( '<script type="text/javascript">/* <![CDATA[ */%svar maiPubAdsVars = %s;%s/* ]]> */</script>', PHP_EOL, wp_json_encode( $localize ), PHP_EOL ),
-				sprintf( '<script type="text/javascript" src="%s?ver=%s"></script>', maipub_get_file_data( $file, 'url' ), maipub_get_file_data( $file, 'version' ) ), // Initial testing showed async broke ads.
+				sprintf( '<script src="https://securepubads.g.doubleclick.net/tag/js/gpt.js?ver=%s"></script>', maipub_get_file_data( $file, 'version' ) ), // Google Ad Manager GPT.
+				sprintf( '<script>/* <![CDATA[ */%svar maiPubAdsVars = %s;%s/* ]]> */</script>', PHP_EOL, wp_json_encode( $localize ), PHP_EOL ),
+				sprintf( '<script src="%s?ver=%s"></script>', maipub_get_file_data( $file, 'url' ), maipub_get_file_data( $file, 'version' ) ), // Initial testing showed async broke ads.
 			];
 
 			// Insert scripts.
@@ -782,7 +782,19 @@ class Mai_Publisher_Output {
 		 * Using `maipub_get_dom_document()` breaks when there are multiple top level elements.
 		 * I think it's because of `$this->dom` is the full dom with doctype and html element.
 		 */
-		$tmp = $this->dom_document( $content );
+		$tmp = $this->dom_document( "<div>$content</div>" );
+
+		// Handle wraps.
+		$container = $tmp->getElementsByTagName('div')->item(0);
+		$container = $container->parentNode->removeChild( $container );
+
+		while ( $tmp->firstChild ) {
+			$tmp->removeChild( $tmp->firstChild );
+		}
+
+		while ( $container->firstChild ) {
+			$tmp->appendChild( $container->firstChild );
+		}
 
 		return $this->dom->importNode( $tmp->documentElement, true );
 	}
