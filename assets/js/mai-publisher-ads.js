@@ -20,25 +20,10 @@ if ( window.googletag && googletag.apiReady ) {
 		const gamBase  = maiPubAdsVars['gamBase'];
 		const uadSlots = [];
 
-		// Initialize apstag and have apstag set bids on the googletag slots when they are returned to the page.
-		apstag.init({
-			pubID: '79166f25-5776-4c3e-9537-abad9a584b43', // BB.
-			adServer: 'googletag',
-			// bidTimeout: prebidTimeout,
-			// us_privacy: '-1', // https://ams.amazon.com/webpublisher/uam/docs/web-integration-documentation/integration-guide/uam-ccpa.html?source=menu
-		});
-
 		// Loop through maiPubAdsVars getting key and values.
 		Object.keys( ads ).forEach( slug => {
 			// Define ad slot.
 			const slot = googletag.defineSlot( gamBase + slug, ads[slug].sizes, 'mai-ad-' + slug );
-
-			// Add slot to array for UAD.
-			uadSlots.push({
-				slotID: 'mai-ad-' + slug,
-				slotName: gamBase + slug,
-				sizes: ads[slug].sizes,
-			});
 
 			// Set refresh targeting.
 			slot.setTargeting( refreshKey, refreshvalue );
@@ -100,20 +85,45 @@ if ( window.googletag && googletag.apiReady ) {
 		googletag.pubads().enableSingleRequest();
 		googletag.enableServices();
 
-		// Fetch bids from Amazon UAM using apstag.
-		apstag.fetchBids({
-			slots: uadSlots,
-			timeout: 2e3,
-			params: {
-				adRefresh: '1',
-			}
-		}, function( bids ) {
-			// Set apstag bids, then trigger the first request to GAM.
-			googletag.cmd.push(function() {
-				apstag.setDisplayBids();
-				googletag.pubads().refresh();
+		// Handle Amazon UAM bids.
+		if ( maiPubAdsVars.amazonUAM ) {
+			// Initialize apstag and have apstag set bids on the googletag slots when they are returned to the page.
+			apstag.init({
+				pubID: '79166f25-5776-4c3e-9537-abad9a584b43', // BB.
+				adServer: 'googletag',
+				// bidTimeout: prebidTimeout,
+				// us_privacy: '-1', // https://ams.amazon.com/webpublisher/uam/docs/web-integration-documentation/integration-guide/uam-ccpa.html?source=menu
 			});
-		});
+
+			// Loop through maiPubAdsVars getting key and values.
+			Object.keys( ads ).forEach( slug => {
+				// Add slot to array for UAD.
+				uadSlots.push({
+					slotID: 'mai-ad-' + slug,
+					slotName: gamBase + slug,
+					sizes: ads[slug].sizes,
+				});
+			});
+
+			// Fetch bids from Amazon UAM using apstag.
+			apstag.fetchBids({
+				slots: uadSlots,
+				timeout: 2e3,
+				params: {
+					adRefresh: '1',
+				}
+			}, function( bids ) {
+				// Set apstag bids, then trigger the first request to GAM.
+				googletag.cmd.push(function() {
+					apstag.setDisplayBids();
+					googletag.pubads().refresh();
+				});
+			});
+		}
+		// Standard GAM.
+		else {
+			googletag.pubads().refresh();
+		}
 	});
 
 	// Set currently visible ads and timeout ids objects.
@@ -139,7 +149,9 @@ if ( window.googletag && googletag.apiReady ) {
 		// Set timeout to refresh ads for current visible ads.
 		timeoutIds[slotId] = setTimeout(() => {
 			// console.log( slotId + ' is refreshing (impressionViewable).' );
-			apstag.setDisplayBids();
+			if ( maiPubAdsVars.amazonUAM ) {
+				apstag.setDisplayBids();
+			}
 			googletag.pubads().refresh( [slot] );
 		}, refreshTime * 1000 ); // Time in milliseconds.
 	});
@@ -183,7 +195,9 @@ if ( window.googletag && googletag.apiReady ) {
 		}
 
 		// console.log( slotId + ' is refreshing (slotVisibilityChanged).' );
-		apstag.setDisplayBids();
+		if ( maiPubAdsVars.amazonUAM ) {
+			apstag.setDisplayBids();
+		}
 		googletag.pubads().refresh( [slot] );
 	});
 }

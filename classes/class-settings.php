@@ -134,7 +134,11 @@ class Mai_Publisher_Settings {
 		 * Fields   *
 		 ************/
 
-		 add_settings_field(
+		/**
+		 * Ads
+		 */
+
+		add_settings_field(
 			'ad_mode', // id
 			__( 'Ad mode', 'mai-publisher' ), // title
 			[ $this, 'ad_mode_callback' ], // callback
@@ -198,6 +202,18 @@ class Mai_Publisher_Settings {
 			'mai-publisher-section', // page
 			'maipub_settings' // section
 		);
+
+		add_settings_field(
+			'amazon_uam_enabled', // id
+			__( 'Amazon UAM', 'mai-publisher' ), // title
+			[ $this, 'amazon_uam_enabled_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings' // section
+		);
+
+		/**
+		 * Analytics
+		 */
 
 		add_settings_field(
 			'matomo_enabled_global', // id
@@ -272,6 +288,10 @@ class Mai_Publisher_Settings {
 			'maipub_settings_matomo' // section
 		);
 
+		/**
+		 * Scripts
+		 */
+
 		add_settings_field(
 			'header_scripts', // id
 			__( 'Header Scripts', 'mai-publisher' ), // title
@@ -303,6 +323,7 @@ class Mai_Publisher_Settings {
 			'gam_network_code'       => 'absint',
 			'gam_targets'            => 'sanitize_text_field',
 			'category'               => 'sanitize_text_field',
+			'amazon_uam_enabled'     => 'rest_sanitize_boolean',
 			'matomo_enabled_global'  => 'rest_sanitize_boolean',
 			'matomo_enabled'         => 'rest_sanitize_boolean',
 			'matomo_enabled_backend' => 'rest_sanitize_boolean',
@@ -460,6 +481,23 @@ class Mai_Publisher_Settings {
 			echo '</select>';
 			printf( '<p><a target="_blank" href="%s">%s</a></p>', admin_url( 'edit.php?post_type=mai_ad&page=categories' ), __( 'View full category list', 'mai-publisher' ) );
 		echo '</div>';
+	}
+
+	/**
+	 * Setting callback.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	function amazon_uam_enabled_callback() {
+		$value = maipub_get_option( 'amazon_uam_enabled', false );
+
+		printf(
+			'<input type="checkbox" name="mai_publisher[amazon_uam_enabled]" id="amazon_uam_enabled" value="amazon_uam_enabled"%s> <label for="amazon_uam_enabled">%s</label>',
+			$value ? ' checked' : '',
+			__( 'Enable Amazon UAM bids for ads', 'mai-publisher' )
+		);
 	}
 
 	/**

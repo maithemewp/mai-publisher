@@ -387,6 +387,7 @@ function maipub_get_default_options() {
 		'gam_network_code'       => '',
 		'gam_targets'            => '',
 		'category'               => '',
+		'amazon_uam_enabled'     => 0,
 		'matomo_enabled_global'  => defined( 'MAI_PUBLISHER_MATOMO_ENABLED_GLOBAL' ) ? MAI_PUBLISHER_MATOMO_ENABLED_GLOBAL : 1,
 		'matomo_enabled'         => defined( 'MAI_PUBLISHER_MATOMO_ENABLED' ) ? MAI_PUBLISHER_MATOMO_ENABLED : 0,
 		'matomo_enabled_backend' => defined( 'MAI_PUBLISHER_MATOMO_ENABLED_BACKEND' ) ? MAI_PUBLISHER_MATOMO_ENABLED_BACKEND : 0,

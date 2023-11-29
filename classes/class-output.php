@@ -210,6 +210,7 @@ class Mai_Publisher_Output {
 				'gamBase'   => $gam_base,
 				'ads'       => $this->gam,
 				'targeting' => $this->get_targets(),
+				'amazonUAM' => maipub_get_option( 'amazon_uam_enabled' ),
 			];
 
 			// Build scripts.
