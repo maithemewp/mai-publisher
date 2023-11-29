@@ -116,8 +116,8 @@ class Mai_Publisher_Connatix_Block {
 						'type'    => 'select',
 						'choices' => [
 							''           => __( 'None', 'mai-publisher' ),
-							'tdih'       => __( 'This Day In History', 'mai-publisher' ),
 							'cool-stuff' => __( 'Cool Stuff', 'mai-publisher' ),
+							'tdih'       => __( 'This Day In History', 'mai-publisher' ),
 						],
 					],
 				],
