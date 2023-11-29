@@ -103,7 +103,7 @@ if ( window.googletag && googletag.apiReady ) {
 		// Fetch bids from Amazon UAM using apstag.
 		apstag.fetchBids({
 			slots: uadSlots,
-			timeout: 1000,
+			timeout: 2e3,
 		}, function( bids ) {
 			// Set apstag bids, then trigger the first request to GAM.
 			googletag.cmd.push(function() {
