@@ -307,28 +307,6 @@ class Mai_Publisher_Ad_Unit_Block {
 	}
 
 	/**
-	 * Increments the slot ID, if needed.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @param string $slot
-	 *
-	 * @return string
-	 */
-	function get_slot( $slot ) {
-		static $counts  = [];
-
-		if ( isset( $counts[ $slot ] ) ) {
-			$counts[ $slot ]++;
-			$slot = $slot . '-' . $counts[ $slot ];
-		} else {
-			$counts[ $slot ] = 1;
-		}
-
-		return $slot;
-	}
-
-	/**
 	 * Registers field group.
 	 *
 	 * @since 0.1.0
