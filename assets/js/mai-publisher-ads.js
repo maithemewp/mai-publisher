@@ -104,13 +104,17 @@ if ( window.googletag && googletag.apiReady ) {
 		apstag.fetchBids({
 			slots: uadSlots,
 			timeout: 1000,
-		}, function( bids ) {
-			// Set apstag bids, then trigger the first request to GAM.
-			googletag.cmd.push(function() {
-				apstag.setDisplayBids();
-				// googletag.pubads().refresh();
-			});
 		});
+		// apstag.fetchBids({
+		// 	slots: uadSlots,
+		// 	timeout: 1000,
+		// }, function( bids ) {
+		// 	// Set apstag bids, then trigger the first request to GAM.
+		// 	googletag.cmd.push(function() {
+		// 		apstag.setDisplayBids();
+		// 		// googletag.pubads().refresh();
+		// 	});
+		// });
 	});
 
 	// Set currently visible ads and timeout ids objects.
