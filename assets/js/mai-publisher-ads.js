@@ -2,12 +2,6 @@ window.googletag = window.googletag || {};
 googletag.cmd    = googletag.cmd || [];
 
 /**
- * Amazon UAD.
- * Debug via `apstag.debug('enableConsole')`
- */
-!function(a9,a,p,s,t,A,g){if(a[a9])return;function q(c,r){a[a9]._Q.push([c,r])}a[a9]={init:function(){q("i",arguments)},fetchBids:function(){q("f",arguments)},setDisplayBids:function(){},targetingKeys:function(){return[]},_Q:[]};A=p.createElement(s);A.async=!0;A.src=t;g=p.getElementsByTagName(s)[0];g.parentNode.insertBefore(A,g)}("apstag",window,document,"script","//c.amazon-adsystem.com/aax2/apstag.js");
-
-/**
  * When googletag and the API are ready, set up ads.
  */
 if ( window.googletag && googletag.apiReady ) {
@@ -87,6 +81,12 @@ if ( window.googletag && googletag.apiReady ) {
 
 		// Handle Amazon UAM bids.
 		if ( maiPubAdsVars.amazonUAM ) {
+			/**
+			 * Amazon UAD.
+			 * Debug via `apstag.debug('enableConsole')`
+			 */
+			!function(a9,a,p,s,t,A,g){if(a[a9])return;function q(c,r){a[a9]._Q.push([c,r])}a[a9]={init:function(){q("i",arguments)},fetchBids:function(){q("f",arguments)},setDisplayBids:function(){},targetingKeys:function(){return[]},_Q:[]};A=p.createElement(s);A.async=!0;A.src=t;g=p.getElementsByTagName(s)[0];g.parentNode.insertBefore(A,g)}("apstag",window,document,"script","//c.amazon-adsystem.com/aax2/apstag.js");
+
 			// Initialize apstag and have apstag set bids on the googletag slots when they are returned to the page.
 			apstag.init({
 				pubID: '79166f25-5776-4c3e-9537-abad9a584b43', // BB.
