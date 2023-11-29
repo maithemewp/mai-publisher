@@ -190,6 +190,9 @@ class Mai_Publisher_Output {
 			}
 		}
 
+		// Start scripts array.
+		$scripts = [];
+
 		// If we have gam domain and ads are active.
 		if ( $this->domain && $this->gam ) {
 			$gam_base = '';
@@ -214,13 +217,23 @@ class Mai_Publisher_Output {
 			];
 
 			// Build scripts.
+			$file      = "assets/js/mai-publisher-ads{$this->suffix}.js";
+			$scripts[] = sprintf( '<script src="https://securepubads.g.doubleclick.net/tag/js/gpt.js?ver=%s"></script>', maipub_get_file_data( $file, 'version' ) );  // Google Ad Manager GPT.
+			$scripts[] = sprintf( '<script>/* <![CDATA[ */%svar maiPubAdsVars = %s;%s/* ]]> */</script>', PHP_EOL, wp_json_encode( $localize ), PHP_EOL );
+			$scripts[] = sprintf( '<script src="%s?ver=%s"></script>', maipub_get_file_data( $file, 'url' ), maipub_get_file_data( $file, 'version' ) ); // Initial testing showed async broke ads.
+		}
+
+		// Check connatix.
+		$connatix = $this->xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " mai-ad-unit ")]' );
+
+		// If we have connatix ads.
+		if ( $connatix->length ) {
+			$scripts[] = "<script>!function(n){if(!window.cnx){window.cnx={},window.cnx.cmd=[];var t=n.createElement('iframe');t.src='javascript:false'; t.display='none',t.onload=function(){var n=t.contentWindow.document,c=n.createElement('script');c.src='//cd.connatix.com/connatix.player.js?cid=db8b4096-c769-48da-a4c5-9fbc9ec753f0',c.setAttribute('async','1'),c.setAttribute('type','text/javascript'),n.body.appendChild(c)},n.head.appendChild(t)}}(document);</script>";
+		}
+
+		// Handle scripts.
+		if ( $scripts ) {
 			$element = $this->xpath->query( '//head/link' )->item(0);
-			$file    = "assets/js/mai-publisher-ads{$this->suffix}.js";
-			$scripts = [
-				sprintf( '<script src="https://securepubads.g.doubleclick.net/tag/js/gpt.js?ver=%s"></script>', maipub_get_file_data( $file, 'version' ) ), // Google Ad Manager GPT.
-				sprintf( '<script>/* <![CDATA[ */%svar maiPubAdsVars = %s;%s/* ]]> */</script>', PHP_EOL, wp_json_encode( $localize ), PHP_EOL ),
-				sprintf( '<script src="%s?ver=%s"></script>', maipub_get_file_data( $file, 'url' ), maipub_get_file_data( $file, 'version' ) ), // Initial testing showed async broke ads.
-			];
 
 			// Insert scripts.
 			foreach ( $scripts as $script ) {
