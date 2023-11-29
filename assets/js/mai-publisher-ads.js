@@ -108,7 +108,7 @@ if ( window.googletag && googletag.apiReady ) {
 			// Set apstag bids, then trigger the first request to GAM.
 			googletag.cmd.push(function() {
 				apstag.setDisplayBids();
-				googletag.pubads().refresh();
+				// googletag.pubads().refresh();
 			});
 		});
 	});
@@ -136,6 +136,7 @@ if ( window.googletag && googletag.apiReady ) {
 		// Set timeout to refresh ads for current visible ads.
 		timeoutIds[slotId] = setTimeout(() => {
 			// console.log( slotId + ' is refreshing (impressionViewable).' );
+			apstag.setDisplayBids();
 			googletag.pubads().refresh( [slot] );
 		}, refreshTime * 1000 ); // Time in milliseconds.
 	});
@@ -179,6 +180,7 @@ if ( window.googletag && googletag.apiReady ) {
 		}
 
 		// console.log( slotId + ' is refreshing (slotVisibilityChanged).' );
+		apstag.setDisplayBids();
 		googletag.pubads().refresh( [slot] );
 	});
 }
