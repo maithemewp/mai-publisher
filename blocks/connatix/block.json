@@ -1,0 +1,16 @@
+{
+	"name": "acf/mai-connatix",
+	"title": "Mai Connatix Video",
+	"description": "Displays a video from Connatix.",
+	"category": "widgets",
+	"keywords": [ "ad", "video", "connatix" ],
+	"icon": "media-code",
+	"textdomain": "mai-publisher",
+	"acf": {
+		"mode": "preview"
+	},
+	"supports": {
+		"anchor": false,
+		"align": false
+	}
+}
