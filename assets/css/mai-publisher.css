@@ -1,8 +1,16 @@
 .mai-ad-unit {
 	position: relative;
 	max-width: var(--mai-ad-unit-max-width);
-	margin: auto;
+	margin-inline: auto;
 	aspect-ratio: var(--mai-ad-unit-aspect-ratio);
+}
+
+.mai-ad-unit:not(:first-child) {
+	margin-block-start: var(--spacing-md, 24px);
+}
+
+.mai-ad-unit:not(:last-child) {
+	margin-block-end: var(--spacing-md, 24px);
 }
 
 .mai-ad-unit[data-label]::before {
@@ -101,6 +109,19 @@
 		top: var(--scroll-margin-top, 2em);
 		margin-top: 0;
 	}
+}
+
+.mai-connatix {
+	margin-inline: auto;
+	aspect-ratio: var(--mai-connatix-aspect-ratio, 16/9);
+}
+
+.mai-connatix:not(:first-child) {
+	margin-block-start: var(--spacing-md, 24px);
+}
+
+.mai-connatix:not(:last-child) {
+	margin-block-end: var(--spacing-md, 24px);
 }
 
 /* Mai Engine specific but easier to add here */
