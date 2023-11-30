@@ -127,7 +127,7 @@ final class Mai_Publisher_Plugin {
 		// Blocks.
 		include MAI_PUBLISHER_DIR . 'blocks/ad/block.php';
 		include MAI_PUBLISHER_DIR . 'blocks/ad-unit/block.php';
-		include MAI_PUBLISHER_DIR . 'blocks/connatix/block.php';
+		include MAI_PUBLISHER_DIR . 'blocks/ad-video/block.php';
 		include MAI_PUBLISHER_DIR . 'blocks/analytics-tracker/block.php';
 
 		// Instantiate classes.
@@ -139,7 +139,7 @@ final class Mai_Publisher_Plugin {
 		$generate         = new Mai_Publisher_Generate_Ads;
 		$ad_block         = new Mai_Publisher_Ad_Block;
 		$ad_unit_block    = new Mai_Publisher_Ad_Unit_Block;
-		$connatix_block   = new Mai_Publisher_Connatix_Block;
+		$ad_video_block   = new Mai_Publisher_Ad_Video_Block;
 		$display          = new Mai_Publisher_Display;
 		$output           = new Mai_Publisher_Output;
 		$views            = new Mai_Publisher_Views;

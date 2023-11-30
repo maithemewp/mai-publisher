@@ -3,7 +3,7 @@
 // Prevent direct file access.
 defined( 'ABSPATH' ) || die;
 
-class Mai_Publisher_Connatix_Block {
+class Mai_Publisher_Ad_Video_Block {
 	/**
 	 * Construct the class.
 	 */
@@ -55,7 +55,7 @@ class Mai_Publisher_Connatix_Block {
 
 		// If previewing in editor and no video selected, show placeholder.
 		if ( $is_preview || 'demo' === maipub_get_option( 'ad_mode', false ) ) {
-			$text = $id ? __( 'Mai Connatix Placeholder', 'mai-publisher' ) : __( 'No Ad Unit Selected', 'mai-publisher' );
+			$text = $id ? __( 'Mai Video Ad Placeholder', 'mai-publisher' ) : __( 'No Video Selected', 'mai-publisher' );
 			printf( '<div style="display:grid;place-content:center;aspect-ratio:16/9;margin-block:24px;text-align:center;background:rgba(0,0,0,0.05);border:2px dashed rgba(0,0,0,0.25);"><span style="font-size:1.1rem;">%s</span></div>', $text );
 			return;
 		}
@@ -66,18 +66,20 @@ class Mai_Publisher_Connatix_Block {
 		}
 
 		// Set the attributes.
-		$attr = [
-			'class' => 'mai-connatix',
-		];
+		$attr = [];
 
 		// Get the video script.
 		switch ( $id ) {
-			case 'cool-stuff':
+			// Cool Stuff.
+			case 'd98b3dc2-bc10-43cf-b1b9-bd2c68c9615b':
+				$attr['class'] = 'mai-connatix';
 				$attr['style'] = '--mai-connatix-aspect-ratio:8/3;';
 				$html          = '<script id="af853f8b9afa4c828dc709c0715055b2">(new Image()).src = "https://capi.connatix.com/tr/si?token=d98b3dc2-bc10-43cf-b1b9-bd2c68c9615b&cid=db8b4096-c769-48da-a4c5-9fbc9ec753f0"; cnx.cmd.push(function() { cnx({ playerId: "d98b3dc2-bc10-43cf-b1b9-bd2c68c9615b" }).render("af853f8b9afa4c828dc709c0715055b2"); });</script>';
 			break;
-			case 'tdih':
-				$html = '<script id="b242539108714840b61d0122f61a84b0">(new Image()).src = "https://capi.connatix.com/tr/si?token=6f704650-514c-4dc1-8481-8a75bbfb2eea&cid=db8b4096-c769-48da-a4c5-9fbc9ec753f0"; cnx.cmd.push(function() { cnx({ playerId: "6f704650-514c-4dc1-8481-8a75bbfb2eea" }).render("b242539108714840b61d0122f61a84b0"); });</script>';
+			// This Day In History.
+			case '6f704650-514c-4dc1-8481-8a75bbfb2eea':
+				$attr['class'] = 'mai-connatix';
+				$html          = '<script id="b242539108714840b61d0122f61a84b0">(new Image()).src = "https://capi.connatix.com/tr/si?token=6f704650-514c-4dc1-8481-8a75bbfb2eea&cid=db8b4096-c769-48da-a4c5-9fbc9ec753f0"; cnx.cmd.push(function() { cnx({ playerId: "6f704650-514c-4dc1-8481-8a75bbfb2eea" }).render("b242539108714840b61d0122f61a84b0"); });</script>';
 			break;
 			default:
 				$html = '';
@@ -115,9 +117,9 @@ class Mai_Publisher_Connatix_Block {
 						'name'    => 'id',
 						'type'    => 'select',
 						'choices' => [
-							''           => __( 'None', 'mai-publisher' ),
-							'cool-stuff' => __( 'Cool Stuff', 'mai-publisher' ),
-							'tdih'       => __( 'This Day In History', 'mai-publisher' ),
+							''                                     => __( 'None', 'mai-publisher' ),
+							'd98b3dc2-bc10-43cf-b1b9-bd2c68c9615b' => __( 'Cool Stuff', 'mai-publisher' ),
+							'6f704650-514c-4dc1-8481-8a75bbfb2eea' => __( 'This Day In History', 'mai-publisher' ),
 						],
 					],
 				],
@@ -126,7 +128,7 @@ class Mai_Publisher_Connatix_Block {
 						[
 							'param'    => 'block',
 							'operator' => '==',
-							'value'    => 'acf/mai-connatix',
+							'value'    => 'acf/mai-ad-video',
 						],
 					],
 				],
