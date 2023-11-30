@@ -224,7 +224,7 @@ class Mai_Publisher_Output {
 		}
 
 		// Check connatix.
-		$connatix = $this->xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " mai-ad-unit ")]' );
+		$connatix = $this->xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " mai-connatix ")]' );
 
 		// If we have connatix ads.
 		if ( $connatix->length ) {
