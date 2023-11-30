@@ -19,8 +19,7 @@
         }
     },
     "cool-stuff": {
-        "post_content": "<!-- wp:acf\/mai-connatix {\"name\":\"acf\/mai-connatix\",\"data\":{\"id\":\"cool-stuff\",\"_id\":\"maipub_connatix_id\"},\"mode\":\"preview\"} \/-->",
-        "meta_input": {
+        "post_content": "<!-- wp:acf\/mai-ad-video {\"name\":\"acf\/mai-ad-video\",\"data\":{\"id\":\"d98b3dc2-bc10-43cf-b1b9-bd2c68c9615b\",\"_id\":\"maipub_connatix_id\"},\"mode\":\"preview\"} \/-->",        "meta_input": {
             "maipub_single_location": "content",
             "maipub_single_content_location": "after",
             "maipub_single_content_count": "3",
@@ -198,7 +197,7 @@
         "meta_input": []
     },
     "tdih": {
-        "post_content": "<!-- wp:acf\/mai-connatix {\"name\":\"acf\/mai-connatix\",\"data\":{\"id\":\"tdih\",\"_id\":\"maipub_connatix_id\"},\"mode\":\"preview\"} \/-->",
+        "post_content": "<!-- wp:acf\/mai-ad-video {\"name\":\"acf\/mai-ad-video\",\"data\":{\"id\":\"6f704650-514c-4dc1-8481-8a75bbfb2eea\",\"_id\":\"maipub_connatix_id\"},\"mode\":\"preview\"} \/-->",
         "meta_input": {
             "maipub_single_location": "content",
             "maipub_single_content_location": "after",
