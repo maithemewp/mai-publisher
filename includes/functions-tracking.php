@@ -88,7 +88,7 @@ function maipub_get_content_age() {
 /**
  * Get content creator.
  *
- * @since TBD
+ * @since 0.13.0
  *
  * @return int|false
  */
@@ -105,7 +105,7 @@ function maipub_get_content_creator() {
 /**
  * Get content group/category slug.
  *
- * @since TBD
+ * @since 0.13.0
  *
  * @return string|false
  */
@@ -122,7 +122,7 @@ function maipub_get_content_group() {
 /**
  * Get content type.
  *
- * @since TBD
+ * @since 0.13.0
  *
  * @return string|false
  */
@@ -243,7 +243,7 @@ function maipub_get_content_type() {
  * OpenRTB 2.6 spec / Content Taxonomy.
  * @link https://iabtechlab.com/wp-content/uploads/2022/04/OpenRTB-2-6_FINAL.pdf
  *
- * @since TBD
+ * @since 0.13.0
  *
  * @return array
  */
@@ -430,7 +430,7 @@ function maipub_get_current_page( $key = '' ) {
 /**
  * Gets current page id.
  *
- * @since TBD
+ * @since 0.13.0
  *
  * @return int
  */

@@ -14,7 +14,7 @@ class Mai_Publisher_Ad_Video_Block {
 	/**
 	 * Add hooks.
 	 *
-	 * @since TBD
+	 * @since 0.15.0
 	 *
 	 * @return void
 	 */
@@ -26,7 +26,7 @@ class Mai_Publisher_Ad_Video_Block {
 	/**
 	 * Registers block.
 	 *
-	 * @since TBD
+	 * @since 0.15.0
 	 *
 	 * @return void
 	 */
@@ -41,7 +41,7 @@ class Mai_Publisher_Ad_Video_Block {
 	/**
 	 * Callback function to render the block.
 	 *
-	 * @since TBD
+	 * @since 0.15.0
 	 *
 	 * @param array  $block      The block settings and attributes.
 	 * @param string $content    The block inner HTML (empty).
@@ -97,7 +97,7 @@ class Mai_Publisher_Ad_Video_Block {
 	/**
 	 * Registers field group.
 	 *
-	 * @since TBD
+	 * @since 0.15.0
 	 *
 	 * @return void
 	 */
@@ -139,7 +139,7 @@ class Mai_Publisher_Ad_Video_Block {
 	/**
 	 * Loads ad unit choices.
 	 *
-	 * @since TBD
+	 * @since 0.15.0
 	 *
 	 * @param array $field The field data.
 	 *

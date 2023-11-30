@@ -228,7 +228,7 @@ function maipub_add_attributes( $content, $name ) {
  *
  * @access private
  *
- * @since TBD
+ * @since 0.13.0
  *
  * @param string    $input
  * @param int|false $limit Character limit.
@@ -255,7 +255,7 @@ function maipub_encode( $input, $limit = false ) {
 /**
  * Decodes a string and removes special characters.
  *
- * @since TBD
+ * @since 0.13.0
  *
  * @param string $input
  *

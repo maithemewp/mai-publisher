@@ -78,7 +78,7 @@ class Mai_Publisher_Display {
 	/**
 	 * Enqueue style.
 	 *
-	 * @since TBD
+	 * @since 0.11.0
 	 *
 	 * @return void
 	 */

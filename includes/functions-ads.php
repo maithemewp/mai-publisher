@@ -6,7 +6,7 @@ defined( 'ABSPATH' ) || die;
 /**
  * Returns array of ads for the currently viewed page.
  *
- * @since TBD
+ * @since 0.13.0
  *
  * @return array
  */
@@ -50,7 +50,7 @@ function maipub_get_page_ads() {
 /**
  * Returns an array of ads.
  *
- * @since TBD
+ * @since 0.13.0
  *
  * @return array
  */
@@ -172,7 +172,7 @@ function maipub_get_page_ads_data() {
 /**
  * Gets valid args.
  *
- * @since TBD
+ * @since 0.13.0
  *
  * @param array  $args The ad args.
  * @param string $type The ad type. Either 'global', 'single', or 'archive'.
@@ -216,7 +216,7 @@ function maipub_validate_ad_conditions( $args, $type ) {
 /**
  * Validate global content args.
  *
- * @since TBD
+ * @since 0.13.0
  *
  * @param array $args The ad args.
  *
@@ -246,7 +246,7 @@ function maipub_validate_ad_conditions_global( $args ) {
  * Validates single content args.
  * In content, recipe, etc. are checked directly in the dom.
  *
- * @since TBD
+ * @since 0.13.0
  *
  * @param array $args The ad args.
  *
@@ -384,7 +384,7 @@ function maipub_validate_ad_conditions_single( $args ) {
  * Validates content archive args.
  * In entries, etc. are checked directly in the dom.
  *
- * @since TBD
+ * @since 0.13.0
  *
  * @param array $args The ad args.
  *
@@ -512,7 +512,7 @@ function maipub_get_valid_targets( $string ) {
 /**
  * Converts a string to an array.
  *
- * @since TBD
+ * @since 0.13.0
  *
  * @param string $split  The string to split on via explode().
  * @param string $string The string of pairs to validate.

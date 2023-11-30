@@ -18,7 +18,7 @@ class Mai_Publisher_Output {
 	/**
 	 * Constructs the class.
 	 *
-	 * @since TBD
+	 * @since 0.13.0
 	 *
 	 * @return void
 	 */
@@ -29,7 +29,7 @@ class Mai_Publisher_Output {
 	/**
 	 * Runs hooks.
 	 *
-	 * @since TBD
+	 * @since 0.13.0
 	 *
 	 * @return void
 	 */
@@ -41,7 +41,7 @@ class Mai_Publisher_Output {
 	/**
 	 * Starts output buffering.
 	 *
-	 * @since TBD
+	 * @since 0.13.0
 	 *
 	 * @return void
 	 */
@@ -66,7 +66,7 @@ class Mai_Publisher_Output {
 	/**
 	 * Ends output buffering.
 	 *
-	 * @since TBD
+	 * @since 0.13.0
 	 *
 	 * @return void
 	 */
@@ -88,7 +88,7 @@ class Mai_Publisher_Output {
 	/**
 	 * Buffer callback.
 	 *
-	 * @since TBD
+	 * @since 0.13.0
 	 *
 	 * @param string $buffer The full dom markup.
 	 *
@@ -250,7 +250,7 @@ class Mai_Publisher_Output {
 	/**
 	 * Inserts ads into entry content.
 	 *
-	 * @since TBD
+	 * @since 0.13.0
 	 *
 	 * @return void
 	 */
@@ -370,7 +370,7 @@ class Mai_Publisher_Output {
 	/**
 	 * Handle in-entries ads.
 	 *
-	 * @since TBD
+	 * @since 0.13.0
 	 *
 	 * @return void
 	 */
@@ -539,7 +539,7 @@ class Mai_Publisher_Output {
 	/**
 	 * Handle recipe ads.
 	 *
-	 * @since TBD
+	 * @since 0.13.0
 	 *
 	 * @return void
 	 */
@@ -571,7 +571,7 @@ class Mai_Publisher_Output {
 	/**
 	 * Handle sidebar ads.
 	 *
-	 * @since TBD
+	 * @since 0.13.0
 	 *
 	 * @return void
 	 */
@@ -638,7 +638,7 @@ class Mai_Publisher_Output {
 	/**
 	 * Handle after header ad.
 	 *
-	 * @since TBD
+	 * @since 0.13.0
 	 *
 	 * @return void
 	 */
@@ -678,7 +678,7 @@ class Mai_Publisher_Output {
 	/**
 	 * Increments the slot ID, if needed.
 	 *
-	 * @since TBD
+	 * @since 0.13.0
 	 *
 	 * @param string $slot
 	 *
@@ -700,7 +700,7 @@ class Mai_Publisher_Output {
 	/**
 	 * Gets the full DOMDocument object, including DOCTYPE and <html>.
 	 *
-	 * @since TBD
+	 * @since 0.13.0
 	 *
 	 * @link https://stackoverflow.com/questions/29493678/loadhtml-libxml-html-noimplied-on-an-html-fragment-generates-incorrect-tags
 	 *
@@ -734,7 +734,7 @@ class Mai_Publisher_Output {
 	/**
 	 * Insert node based on an action value.
 	 *
-	 * @since TBD
+	 * @since 0.13.0
 	 *
 	 * @param DOMNode|DOMElement|string $insert The node to insert.
 	 * @param DOMNode                   $target The target element.
@@ -780,7 +780,7 @@ class Mai_Publisher_Output {
 	 * Build the temporary dom.
 	 * Special characters were causing issues with `appendXML()`.
 	 *
-	 * @since TBD
+	 * @since 0.13.0
 	 *
 	 * @link https://stackoverflow.com/questions/4645738/domdocument-appendxml-with-special-characters
 	 * @link https://www.py4u.net/discuss/974358
@@ -816,7 +816,7 @@ class Mai_Publisher_Output {
 	/**
 	 * Loop through ads and group by location.
 	 *
-	 * @since TBD
+	 * @since 0.13.0
 	 *
 	 * @param array $page_ads The existing ads array.
 	 *
@@ -849,7 +849,7 @@ class Mai_Publisher_Output {
 	 * Get targets.
 	 * These must be exist in our GAM 360.
 	 *
-	 * @since TBD
+	 * @since 0.13.0
 	 *
 	 * @return void
 	 */
