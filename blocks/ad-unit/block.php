@@ -55,6 +55,7 @@ class Mai_Publisher_Ad_Unit_Block {
 		$id         = get_field( 'id' );
 		$type       = get_field( 'type' );
 		$pos        = get_field( 'position' );
+		$split_test = get_field( 'split_test' );
 		$targets    = get_field( 'targets' );
 		$label      = get_field( 'label' );
 		$label_hide = get_field( 'label_hide' );
@@ -153,6 +154,11 @@ class Mai_Publisher_Ad_Unit_Block {
 				$attr_inner['data-targets'] = esc_attr( $targets );
 			}
 
+			// Split testing.
+			if ( $split_test ) {
+				$attr_inner['data-st'] = esc_attr( $split_test );
+			}
+
 			// Get attributes string.
 			$attributes = get_block_wrapper_attributes( $attr_outer );
 			$attributes = str_replace( ' wp-block-acf-mai-ad-unit', '', $attributes );
@@ -201,6 +207,11 @@ class Mai_Publisher_Ad_Unit_Block {
 			// Custom key value pairs.
 			if ( $targets ) {
 				$attr['data-targets'] = esc_attr( $targets );
+			}
+
+			// Split testing.
+			if ( $split_test ) {
+				$attr['data-st'] = esc_attr( $split_test );
 			}
 
 			// Get attributes string.
@@ -359,6 +370,16 @@ class Mai_Publisher_Ad_Unit_Block {
 							'vs'   => __( 'Sticky Vertical', 'mai-publisher' ),
 							'ts'   => __( 'Sticky Top Horizontal', 'mai-publisher' ),
 							'bs'   => __( 'Sticky Bottom Horizontal', 'mai-publisher' ),
+						],
+					],
+					[
+						'label'   => __( 'Split Testing', 'mai-publisher' ),
+						'key'     => 'maipub_ad_unit_split_test',
+						'name'    => 'split_test',
+						'type'    => 'select',
+						'choices' => [
+							''     => __( 'Not set', 'mai-publisher' ),
+							'rand' => __( 'Random (0-99)', 'mai-publisher' ),
 						],
 					],
 					[

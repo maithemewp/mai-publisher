@@ -29,6 +29,12 @@ if ( window.googletag && googletag.apiReady ) {
 				});
 			}
 
+			// Set split testing.
+			if ( ads[slug].splitTest && 'rand' === ads[slug].splitTest ) {
+				// Set 'st' to a value between 0-99.
+				slot.setTargeting( 'st', Math.floor(Math.random() * 100) );
+			}
+
 			// Get it running.
 			slot.addService( googletag.pubads() );
 

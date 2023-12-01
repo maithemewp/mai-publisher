@@ -187,6 +187,13 @@ class Mai_Publisher_Output {
 				if ( $targets ) {
 					$this->gam[ $slot ]['targets'] = array_merge( $this->gam[ $slot ]['targets'], maipub_get_valid_targets( $targets ) );
 				}
+
+				// Add split testing.
+				$split_test = $ad_unit->getAttribute( 'data-st' );
+
+				if ( $split_test ) {
+					$this->gam[ $slot ]['splitTest'] = $split_test;
+				}
 			}
 		}
 
