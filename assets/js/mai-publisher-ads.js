@@ -75,6 +75,7 @@ if ( window.googletag && googletag.apiReady ) {
 		 * Set SafeFrame -- This setting will only take effect for subsequent ad requests made for the respective slots.
 		 * To enable cross domain rendering for all creatives, execute setForceSafeFrame before loading any ad slots.
 		 */
+		// dws122: comment out for now as per Amazom
 		googletag.pubads().setForceSafeFrame( true );
 
 		// Make ads centered.
