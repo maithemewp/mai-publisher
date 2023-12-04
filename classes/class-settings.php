@@ -491,10 +491,11 @@ class Mai_Publisher_Settings {
 	 * @return void
 	 */
 	function amazon_uam_enabled_callback() {
-		$value = maipub_get_option( 'amazon_uam_enabled', false );
+		$value = (bool) maipub_get_option( 'amazon_uam_enabled', false );
 
 		printf(
-			'<input type="checkbox" name="mai_publisher[amazon_uam_enabled]" id="amazon_uam_enabled" value="amazon_uam_enabled"%s> <label for="amazon_uam_enabled">%s</label>',
+			'<input type="checkbox" name="mai_publisher[amazon_uam_enabled]" id="amazon_uam_enabled" value="%s"%s> <label for="amazon_uam_enabled">%s</label>',
+			$value,
 			$value ? ' checked' : '',
 			__( 'Enable Amazon UAM bids for ads', 'mai-publisher' )
 		);
@@ -509,10 +510,11 @@ class Mai_Publisher_Settings {
 	 */
 	function matomo_enabled_global_callback() {
 		$constant = defined( 'MAI_PUBLISHER_MATOMO_ENABLED_GLOBAL' );
-		$value    = $constant ? rest_sanitize_boolean( MAI_PUBLISHER_MATOMO_ENABLED_GLOBAL ) : maipub_get_option( 'matomo_enabled_global', false );
+		$value    = $constant ? rest_sanitize_boolean( MAI_PUBLISHER_MATOMO_ENABLED_GLOBAL ) : (bool) maipub_get_option( 'matomo_enabled_global', false );
 
 		printf(
-			'<input type="checkbox" name="mai_publisher[matomo_enabled_global]" id="matomo_enabled_global" value="matomo_enabled_global"%s%s> <label for="matomo_enabled_global">%s%s</label>',
+			'<input type="checkbox" name="mai_publisher[matomo_enabled_global]" id="matomo_enabled_global" value="%s"%s%s> <label for="matomo_enabled_global">%s%s</label>',
+			$value,
 			$value ? ' checked' : '',
 			$constant ? ' disabled' : '',
 			__( 'Enable global tracking for the Mai Publisher Network.', 'mai-publisher' ),
@@ -532,10 +534,11 @@ class Mai_Publisher_Settings {
 	 */
 	function matomo_enabled_callback() {
 		$constant = defined( 'MAI_PUBLISHER_MATOMO_ENABLED' );
-		$value    = $constant ? rest_sanitize_boolean( MAI_PUBLISHER_MATOMO_ENABLED ) : maipub_get_option( 'matomo_enabled', false );
+		$value    = $constant ? rest_sanitize_boolean( MAI_PUBLISHER_MATOMO_ENABLED ) : (bool) maipub_get_option( 'matomo_enabled', false );
 
 		printf(
-			'<input type="checkbox" name="mai_publisher[matomo_enabled]" id="matomo_enabled" value="matomo_enabled"%s%s> <label for="matomo_enabled">%s%s</label><br><br>',
+			'<input type="checkbox" name="mai_publisher[matomo_enabled]" id="matomo_enabled" value="%s"%s%s> <label for="matomo_enabled">%s%s</label><br><br>',
+			$value,
 			$value ? ' checked' : '',
 			$constant ? ' disabled' : '',
 			__( 'Enable tracking for this website.', 'mai-publisher' ),
