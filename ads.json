@@ -18,16 +18,6 @@
             "maipub_single_content_count": "3"
         }
     },
-    "cool-stuff": {
-        "post_content": "<!-- wp:acf\/mai-ad-video {\"name\":\"acf\/mai-ad-video\",\"data\":{\"id\":\"d98b3dc2-bc10-43cf-b1b9-bd2c68c9615b\",\"_id\":\"maipub_connatix_id\"},\"mode\":\"preview\"} \/-->",        "meta_input": {
-            "maipub_single_location": "content",
-            "maipub_single_content_location": "after",
-            "maipub_single_content_count": "3",
-            "maipub_single_types": [
-                "post"
-            ]
-        }
-    },
     "footer": {
         "post_content": "<!-- wp:group {\"tagName\":\"aside\",\"align\":\"full\",\"backgroundColor\":\"alt\",\"contentWidth\":\"no\",\"verticalSpacingTop\":\"sm\",\"verticalSpacingBottom\":\"sm\",\"verticalSpacingLeft\":\"xs\",\"verticalSpacingRight\":\"xs\",\"marginTop\":\"xl\"} -->\n<aside class=\"wp-block-group alignfull has-alt-background-color has-background\"><!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"footer\",\"_id\":\"maipub_ad_unit_id\"},\"mode\":\"preview\"} \/--><\/aside>\n<!-- \/wp:group -->",
         "meta_input": {
@@ -196,8 +186,18 @@
         "post_content": "<!-- wp:group {\"tagName\":\"aside\",\"backgroundColor\":\"alt\",\"layout\":{\"type\":\"constrained\"},\"contentWidth\":\"no\",\"verticalSpacingTop\":\"sm\",\"verticalSpacingBottom\":\"sm\",\"verticalSpacingLeft\":\"xs\",\"verticalSpacingRight\":\"xs\"} -->\n<aside class=\"wp-block-group has-alt-background-color has-background\"><!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"skyscraper\",\"_id\":\"maipub_ad_unit_id\"},\"mode\":\"preview\"} \/--><\/aside>\n<!-- \/wp:group -->",
         "meta_input": []
     },
-    "tdih": {
-        "post_content": "<!-- wp:acf\/mai-ad-video {\"name\":\"acf\/mai-ad-video\",\"data\":{\"id\":\"6f704650-514c-4dc1-8481-8a75bbfb2eea\",\"_id\":\"maipub_connatix_id\"},\"mode\":\"preview\"} \/-->",
+    "video-cool-stuff": {
+        "post_content": "<!-- wp:acf\/mai-ad-video {\"name\":\"acf\/mai-ad-video\",\"data\":{\"id\":\"d98b3dc2-bc10-43cf-b1b9-bd2c68c9615b\",\"_id\":\"maipub_ad_video_id\"},\"mode\":\"preview\"} \/-->",        "meta_input": {
+            "maipub_single_location": "content",
+            "maipub_single_content_location": "after",
+            "maipub_single_content_count": "3",
+            "maipub_single_types": [
+                "post"
+            ]
+        }
+    },
+    "video-tdih": {
+        "post_content": "<!-- wp:acf\/mai-ad-video {\"name\":\"acf\/mai-ad-video\",\"data\":{\"id\":\"6f704650-514c-4dc1-8481-8a75bbfb2eea\",\"_id\":\"maipub_ad_video_id\"},\"mode\":\"preview\"} \/-->",
         "meta_input": {
             "maipub_single_location": "content",
             "maipub_single_content_location": "after",
