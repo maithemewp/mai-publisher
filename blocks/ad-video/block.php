@@ -108,12 +108,12 @@ class Mai_Publisher_Ad_Video_Block {
 
 		acf_add_local_field_group(
 			[
-				'key'      => 'maipub_connatix_block_field_group',
+				'key'      => 'maipub_ad_video_block_field_group',
 				'title'    => __( 'Locations Settings', 'mai-publisher' ),
 				'fields'   =>[
 					[
-						'label'   => __( 'Ad unit', 'mai-publisher' ),
-						'key'     => 'maipub_connatix_id',
+						'label'   => __( 'Video ID', 'mai-publisher' ),
+						'key'     => 'maipub_ad_video_id',
 						'name'    => 'id',
 						'type'    => 'select',
 						'choices' => [
