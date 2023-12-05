@@ -230,8 +230,8 @@ class Mai_Publisher_Output {
 			$scripts[] = sprintf( '<script src="%s?ver=%s"></script>', maipub_get_file_data( $file, 'url' ), maipub_get_file_data( $file, 'version' ) ); // Initial testing showed async broke ads.
 		}
 
-		// Check connatix.
-		$connatix = $this->xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " mai-connatix ")]' );
+		// Check connatix. This checks the context of the script to see if it contains the connatix domain.
+		$connatix = $this->xpath->query( "//script[contains(., 'https://capi.connatix.com')]" );
 
 		// If we have connatix ads.
 		if ( $connatix->length ) {
