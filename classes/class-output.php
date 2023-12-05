@@ -230,14 +230,6 @@ class Mai_Publisher_Output {
 			$scripts[] = sprintf( '<script src="%s?ver=%s"></script>', maipub_get_file_data( $file, 'url' ), maipub_get_file_data( $file, 'version' ) ); // Initial testing showed async broke ads.
 		}
 
-		// Check connatix. This checks the context of the script to see if it contains the connatix domain.
-		$connatix = $this->xpath->query( "//script[contains(., 'https://capi.connatix.com')]" );
-
-		// If we have connatix ads.
-		if ( $connatix->length ) {
-			$scripts[] = "<script>!function(n){if(!window.cnx){window.cnx={},window.cnx.cmd=[];var t=n.createElement('iframe');t.src='javascript:false'; t.display='none',t.onload=function(){var n=t.contentWindow.document,c=n.createElement('script');c.src='//cd.connatix.com/connatix.player.js?cid=db8b4096-c769-48da-a4c5-9fbc9ec753f0',c.setAttribute('async','1'),c.setAttribute('type','text/javascript'),n.body.appendChild(c)},n.head.appendChild(t)}}(document);</script>";
-		}
-
 		// Handle scripts.
 		if ( $scripts ) {
 			$element = $this->xpath->query( '//head/link' )->item(0);
@@ -246,6 +238,18 @@ class Mai_Publisher_Output {
 			foreach ( $scripts as $script ) {
 				$this->insert_node( $script, $element, 'before' );
 			}
+		}
+
+		// Check connatix. This checks the context of the script to see if it contains the connatix domain.
+		$connatix = $this->xpath->query( "//script[contains(., 'https://capi.connatix.com')]" );
+
+		// If we have connatix ads.
+		if ( $connatix->length ) {
+			$script = "<script>!function(n){if(!window.cnx){window.cnx={},window.cnx.cmd=[];var t=n.createElement('iframe');t.src='javascript:false'; t.display='none',t.onload=function(){var n=t.contentWindow.document,c=n.createElement('script');c.src='//cd.connatix.com/connatix.player.js?cid=db8b4096-c769-48da-a4c5-9fbc9ec753f0',c.setAttribute('async','1'),c.setAttribute('type','text/javascript'),n.body.appendChild(c)},n.head.appendChild(t)}}(document);</script>";
+			$head   = $this->dom->getElementsByTagName( 'head' )->item(0);
+
+			// Append to head.
+			$this->insert_node( $script, $head, 'append' );
 		}
 
 		// Save HTML.
