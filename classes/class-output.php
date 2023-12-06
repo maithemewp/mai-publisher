@@ -241,7 +241,7 @@ class Mai_Publisher_Output {
 		}
 
 		// Check connatix. This checks the context of the script to see if it contains the connatix domain.
-		$connatix = $this->xpath->query( "//script[contains(., 'https://capi.connatix.com')]" );
+		$connatix = $this->xpath->query( "//script[contains(text(), 'https://capi.connatix.com')]" );
 
 		// If we have connatix ads.
 		if ( $connatix->length ) {
