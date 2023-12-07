@@ -85,7 +85,6 @@ class Mai_Publisher_Views {
 
 	/**
 	 * Adds shortcode to display views.
-	 * Bail if shouldn't run. This makes sure views do not display if Jetpack/Stats are not running.
 	 *
 	 * @since 0.1.0
 	 *
