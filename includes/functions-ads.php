@@ -44,6 +44,9 @@ function maipub_get_page_ads() {
 		}
 	}
 
+	// Allow filtering.
+	$ads = apply_filters( 'mai_publisher_page_ads', $ads );
+
 	return $ads;
 }
 
