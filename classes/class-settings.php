@@ -494,8 +494,7 @@ class Mai_Publisher_Settings {
 		$value = (bool) maipub_get_option( 'amazon_uam_enabled', false );
 
 		printf(
-			'<input type="checkbox" name="mai_publisher[amazon_uam_enabled]" id="amazon_uam_enabled" value="%s"%s> <label for="amazon_uam_enabled">%s</label>',
-			$value,
+			'<input type="checkbox" name="mai_publisher[amazon_uam_enabled]" id="amazon_uam_enabled" %s> <label for="amazon_uam_enabled">%s</label>',
 			$value ? ' checked' : '',
 			__( 'Enable Amazon UAM bids for ads', 'mai-publisher' )
 		);
@@ -513,8 +512,7 @@ class Mai_Publisher_Settings {
 		$value    = $constant ? rest_sanitize_boolean( MAI_PUBLISHER_MATOMO_ENABLED_GLOBAL ) : (bool) maipub_get_option( 'matomo_enabled_global', false );
 
 		printf(
-			'<input type="checkbox" name="mai_publisher[matomo_enabled_global]" id="matomo_enabled_global" value="%s"%s%s> <label for="matomo_enabled_global">%s%s</label>',
-			$value,
+			'<input type="checkbox" name="mai_publisher[matomo_enabled_global]" id="matomo_enabled_global" %s%s> <label for="matomo_enabled_global">%s%s</label>',
 			$value ? ' checked' : '',
 			$constant ? ' disabled' : '',
 			__( 'Enable global tracking for the Mai Publisher Network.', 'mai-publisher' ),
@@ -537,8 +535,7 @@ class Mai_Publisher_Settings {
 		$value    = $constant ? rest_sanitize_boolean( MAI_PUBLISHER_MATOMO_ENABLED ) : (bool) maipub_get_option( 'matomo_enabled', false );
 
 		printf(
-			'<input type="checkbox" name="mai_publisher[matomo_enabled]" id="matomo_enabled" value="%s"%s%s> <label for="matomo_enabled">%s%s</label><br><br>',
-			$value,
+			'<input type="checkbox" name="mai_publisher[matomo_enabled]" id="matomo_enabled" %s%s> <label for="matomo_enabled">%s%s</label><br><br>',
 			$value ? ' checked' : '',
 			$constant ? ' disabled' : '',
 			__( 'Enable tracking for this website.', 'mai-publisher' ),
