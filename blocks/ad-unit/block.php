@@ -108,121 +108,77 @@ class Mai_Publisher_Ad_Unit_Block {
 			$inner .= '</picture>';
 		}
 
-		// Sticky footer (bottoms sticky) adds another wrapper.
-		if ( ! $is_preview && in_array( $pos, [ 'ts', 'bs' ] ) ) {
-			$location = 'ts' === $pos ? 'header' : 'footer';
+		// Start container attributes.
+		$outer_attr = [
+			'class' => 'mai-ad-unit-container',
+		];
 
-			// Start outer attributes.
-			$attr_outer = [
-				'class' => "mai-ad-unit-has-sticky mai-ad-unit-has-sticky-{$location}",
-			];
+		// Start ad attributes.
+		$inner_attr = [
+			'class'     => 'mai-ad-unit',
+			'data-unit' => $id,
+		];
 
-			// Add custom classes.
-			if ( isset( $block['className'] ) && $block['className'] ) {
-				$attr_outer['class'] .= ' ' . esc_attr( $block['className'] );
-			}
+		// Check if sticky.
+		$is_sticky = in_array( $pos, [ 'ts', 'bs' ] );
 
-			// Add styles.
-			if ( $styles ) {
-				$attr_outer['style'] = $styles;
-			}
-
-			// Start inner attributes.
-			$attr_inner = [
-				// 'id'        => $slot,
-				'class'     => "mai-ad-unit mai-ad-unit-sticky mai-ad-unit-sticky-{$location}",
-				'data-unit' => $id,
-			];
-
-			// Add type.
-			if ( $type ) {
-				$attr_inner['data-at'] = esc_attr( $type );
-			}
-
-			// Add position.
-			if ( $pos ) {
-				$attr_inner['data-ap'] = esc_attr( $pos );
-			}
-
-			// Add label.
-			if ( $label ) {
-				$attr_inner['data-label'] = esc_attr( $label );
-			}
-
-			// Custom key value pairs.
-			if ( $targets ) {
-				$attr_inner['data-targets'] = esc_attr( $targets );
-			}
-
-			// Split testing.
-			if ( $split_test ) {
-				$attr_inner['data-st'] = esc_attr( $split_test );
-			}
-
-			// Get attributes string.
-			$attributes = get_block_wrapper_attributes( $attr_outer );
-			$attributes = str_replace( ' wp-block-acf-mai-ad-unit', '', $attributes );
-
-			// Build HTML with extra wrap.
-			$html .= sprintf( '<div %s>', $attributes );
-				$html .= sprintf( '<div%s>', maipub_build_attributes( $attr_inner ) );
-					$html .= $inner;
-				$html .= '</div>';
-			$html .= '</div>';
+		// Handle sticky.
+		if ( ! $is_preview && $is_sticky ) {
+			$location             = 'ts' === $pos ? 'header' : 'footer';
+			$outer_attr['class']  = "mai-ad-unit-has-sticky mai-ad-unit-has-sticky-{$location}"; // Removes mai-ad-unit-container.
+			$inner_attr['class'] .= " mai-ad-unit-sticky mai-ad-unit-sticky-{$location}";
 		}
-		// Not sticky footer.
-		else {
-			// Start attributes.
-			$attr = [
-				// 'id'        => $slot,
-				'class'     => 'mai-ad-unit',
-				'data-unit' => $id,
-			];
 
-			// Add custom classes.
-			if ( isset( $block['className'] ) && $block['className'] ) {
-				$attr['class'] .= ' ' . esc_attr( $block['className'] );
-			}
+		// Add custom classes.
+		if ( isset( $block['className'] ) && $block['className'] ) {
+			$outer_attr['class'] .= ' ' . esc_attr( $block['className'] );
+		}
 
-			// Add styles.
-			if ( $styles ) {
-				$attr['style'] = $styles;
-			}
+		// Add styles.
+		if ( $styles ) {
+			$outer_attr['style'] = $styles;
+		}
 
-			// Add type.
-			if ( $type ) {
-				$attr['data-at'] = esc_attr( $type );
-			}
+		// Add type.
+		if ( $type ) {
+			$inner_attr['data-at'] = esc_attr( $type );
+		}
 
-			// Add position.
-			if ( $pos ) {
-				$attr['data-ap'] = esc_attr( $pos );
-			}
+		// Add position.
+		if ( $pos ) {
+			$inner_attr['data-ap'] = esc_attr( $pos );
+		}
 
-			// Add label.
-			if ( $label ) {
-				$attr['data-label'] = esc_attr( $label );
-			}
+		// Add label.
+		if ( $label ) {
+			$inner_attr['data-label'] = esc_attr( $label );
+		}
 
-			// Custom key value pairs.
-			if ( $targets ) {
-				$attr['data-targets'] = esc_attr( $targets );
-			}
+		// Custom key value pairs.
+		if ( $targets ) {
+			$inner_attr['data-targets'] = esc_attr( $targets );
+		}
 
-			// Split testing.
-			if ( $split_test ) {
-				$attr['data-st'] = esc_attr( $split_test );
-			}
+		// Split testing.
+		if ( $split_test ) {
+			$inner_attr['data-st'] = esc_attr( $split_test );
+		}
 
-			// Get attributes string.
-			$attributes = get_block_wrapper_attributes( $attr );
-			$attributes = str_replace( ' wp-block-acf-mai-ad-unit', '', $attributes );
+		// Get attributes string.
+		if ( $is_sticky ) {
+			$outer_attr = str_replace( ' wp-block-acf-mai-ad-unit', '', get_block_wrapper_attributes( $outer_attr ) );
+			$inner_attr = maipub_build_attributes( $inner_attr );
+		} else {
+			$outer_attr = maipub_build_attributes( $outer_attr );
+			$inner_attr = str_replace( ' wp-block-acf-mai-ad-unit', '', get_block_wrapper_attributes( $inner_attr ) );
+		}
 
-			// Build HTML.
-			$html .= sprintf( '<div %s>', $attributes );
+		// Build HTML.
+		$html .= sprintf( '<div %s>', $outer_attr );
+			$html .= sprintf( '<div %s>', $inner_attr );
 				$html .= $inner;
 			$html .= '</div>';
-		}
+		$html .= '</div>';
 
 		// Allow filtering.
 		$html = apply_filters( 'mai_publisher_ad_unit', $html );
