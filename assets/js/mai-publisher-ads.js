@@ -17,7 +17,7 @@ if ( window.googletag && googletag.apiReady ) {
 		// Loop through maiPubAdsVars getting key and values.
 		Object.keys( ads ).forEach( slug => {
 			// Define ad slot.
-			const slot = googletag.defineSlot( gamBase + slug, ads[slug].sizes, 'mai-ad-' + slug );
+			const slot = googletag.defineSlot( gamBase + ads[slug], ads[slug].sizes, 'mai-ad-' + slug );
 
 			// Set refresh targeting.
 			slot.setTargeting( refreshKey, refreshvalue );
@@ -107,7 +107,7 @@ if ( window.googletag && googletag.apiReady ) {
 				// Add slot to array for UAD.
 				uadSlots.push({
 					slotID: 'mai-ad-' + slug,
-					slotName: gamBase + slug,
+					slotName: gamBase + ads[slug],
 					sizes: ads[slug].sizes,
 				});
 			});
