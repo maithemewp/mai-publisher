@@ -14,10 +14,11 @@ if ( window.googletag && googletag.apiReady ) {
 		const gamBase  = maiPubAdsVars['gamBase'];
 		const uadSlots = [];
 
-		// Loop through maiPubAdsVars getting key and values.
+		// Loop through maiPubAdsVars getting key and values. The `slug` key is the incremented id like "incontent-2", etc.
 		Object.keys( ads ).forEach( slug => {
 			// Define ad slot.
-			const slot = googletag.defineSlot( gamBase + ads[slug], ads[slug].sizes, 'mai-ad-' + slug );
+			// googletag.defineSlot( "/1234567/sports", [728, 90], "div-1" );
+			const slot = googletag.defineSlot( gamBase + ads[slug]['id'], ads[slug].sizes, 'mai-ad-' + slug );
 
 			// Set refresh targeting.
 			slot.setTargeting( refreshKey, refreshvalue );
@@ -107,7 +108,7 @@ if ( window.googletag && googletag.apiReady ) {
 				// Add slot to array for UAD.
 				uadSlots.push({
 					slotID: 'mai-ad-' + slug,
-					slotName: gamBase + ads[slug],
+					slotName: gamBase + ads[slug]['id'],
 					sizes: ads[slug].sizes,
 				});
 			});
