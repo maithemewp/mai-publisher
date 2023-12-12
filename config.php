@@ -12,8 +12,8 @@ return [
 		'billboard' => [
 			'sizes'         => [ [970, 250] ],
 			'sizes_desktop' => [ [970, 250] ],
-			'sizes_tablet'  => [ [0, 0] ],
-			'sizes_mobile'  => [ [0, 0] ],
+			'sizes_tablet'  => [], // Invalid arguments: SizeMappingBuilder.addSize([728, 480], [[0, 0]]). All zero-area slot sizes were removed.
+			'sizes_mobile'  => [], // Invalid arguments: SizeMappingBuilder.addSize([728, 480], [[0, 0]]). All zero-area slot sizes were removed.
 		],
 		'button' => [
 			'sizes'         => [ [120, 60], [120, 90], [125, 125] ],
