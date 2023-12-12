@@ -112,7 +112,7 @@
 
 	.wprm-recipe-ingredients-container.mai-ad-container .mai-ad-unit,
 	.wprm-recipe-instructions-container.mai-ad-container .mai-ad-unit {
-		margin-block: 24px;
+		margin-block: 36px 24px;
 	}
 }
 
