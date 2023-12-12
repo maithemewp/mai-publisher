@@ -196,7 +196,6 @@ class Mai_Publisher_Ad_Unit_Block {
 
 		// Get attributes string.
 		if ( $is_sticky ) {
-			ray( $block );
 			$wrap_attr = str_replace( ' wp-block-acf-mai-ad-unit', '', get_block_wrapper_attributes( $wrap_attr ) );
 			$ad_attr   = maipub_build_attributes( $ad_attr );
 		} else {
