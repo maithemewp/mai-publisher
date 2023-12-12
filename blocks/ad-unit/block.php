@@ -109,76 +109,114 @@ class Mai_Publisher_Ad_Unit_Block {
 		}
 
 		// Start container attributes.
-		$outer_attr = [
-			'class' => 'mai-ad-unit-container',
-		];
+		// $outer_attr = [
+		// 	'class' => 'mai-ad-unit-container',
+		// ];
 
-		// Start ad attributes.
-		$inner_attr = [
+		// // Start ad attributes.
+		// $inner_attr = [
+		// 	'class'     => 'mai-ad-unit',
+		// 	'data-unit' => $id,
+		// ];
+
+		$wrap_open   = '';
+		$wrap_closed = '';
+		$wrap_attr   = [];
+		$ad_attr     = [
 			'class'     => 'mai-ad-unit',
 			'data-unit' => $id,
 		];
 
 		// Check if sticky.
-		$is_sticky = in_array( $pos, [ 'ts', 'bs' ] );
+		$is_sticky = ! $is_preview && in_array( $pos, [ 'ts', 'bs' ] );
 
 		// Handle sticky.
-		if ( ! $is_preview && $is_sticky ) {
+		if ( $is_sticky ) {
 			$location             = 'ts' === $pos ? 'header' : 'footer';
-			$outer_attr['class']  = "mai-ad-unit-has-sticky mai-ad-unit-has-sticky-{$location}"; // Removes mai-ad-unit-container.
-			$inner_attr['class'] .= " mai-ad-unit-sticky mai-ad-unit-sticky-{$location}";
+			// $outer_attr['class']  = "mai-ad-unit-has-sticky mai-ad-unit-has-sticky-{$location}"; // Removes mai-ad-unit-container.
+			// $inner_attr['class'] .= " mai-ad-unit-sticky mai-ad-unit-sticky-{$location}";
+
+			$wrap_attr['class']  = "mai-ad-unit-has-sticky mai-ad-unit-has-sticky-{$location}";
+			$ad_attr['class']   .= ' mai-ad-unit-sticky mai-ad-unit-sticky-' . $location;
 		}
 
 		// Add custom classes.
 		if ( isset( $block['className'] ) && $block['className'] ) {
-			$outer_attr['class'] .= ' ' . esc_attr( $block['className'] );
+			// $outer_attr['class'] .= ' ' . esc_attr( $block['className'] );
+			$ad_attr['class'] .= ' ' . esc_attr( $block['className'] );
 		}
 
 		// Add styles.
 		if ( $styles ) {
-			$outer_attr['style'] = $styles;
+			if ( $is_sticky ) {
+				$wrap_attr['style'] = $styles;
+			} else {
+				$ad_attr['style'] = $styles;
+			}
 		}
 
 		// Add type.
 		if ( $type ) {
-			$inner_attr['data-at'] = esc_attr( $type );
+			// $inner_attr['data-at'] = esc_attr( $type );
+			$ad_attr['data-at'] = esc_attr( $type );
 		}
 
 		// Add position.
 		if ( $pos ) {
-			$inner_attr['data-ap'] = esc_attr( $pos );
+			// $inner_attr['data-ap'] = esc_attr( $pos );
+			$ad_attr['data-ap'] = esc_attr( $pos );
 		}
 
 		// Add label.
 		if ( $label ) {
-			$inner_attr['data-label'] = esc_attr( $label );
+			// $inner_attr['data-label'] = esc_attr( $label );
+			$ad_attr['data-label'] = esc_attr( $label );
 		}
 
 		// Custom key value pairs.
 		if ( $targets ) {
-			$inner_attr['data-targets'] = esc_attr( $targets );
+			// $inner_attr['data-targets'] = esc_attr( $targets );
+			$ad_attr['data-targets'] = esc_attr( $targets );
 		}
 
 		// Split testing.
 		if ( $split_test ) {
-			$inner_attr['data-st'] = esc_attr( $split_test );
+			// $inner_attr['data-st'] = esc_attr( $split_test );
+			$ad_attr['data-st'] = esc_attr( $split_test );
 		}
 
 		// Get attributes string.
+		// if ( $is_sticky ) {
+		// 	$outer_attr = str_replace( ' wp-block-acf-mai-ad-unit', '', get_block_wrapper_attributes( $outer_attr ) );
+		// 	$inner_attr = maipub_build_attributes( $inner_attr );
+		// } else {
+		// 	$outer_attr = maipub_build_attributes( $outer_attr );
+		// 	$inner_attr = str_replace( ' wp-block-acf-mai-ad-unit', '', get_block_wrapper_attributes( $inner_attr ) );
+		// }
+
+		// Get attributes string.
 		if ( $is_sticky ) {
-			$outer_attr = str_replace( ' wp-block-acf-mai-ad-unit', '', get_block_wrapper_attributes( $outer_attr ) );
-			$inner_attr = maipub_build_attributes( $inner_attr );
+			ray( $block );
+			$wrap_attr = str_replace( ' wp-block-acf-mai-ad-unit', '', get_block_wrapper_attributes( $wrap_attr ) );
+			$ad_attr   = maipub_build_attributes( $ad_attr );
 		} else {
-			$outer_attr = maipub_build_attributes( $outer_attr );
-			$inner_attr = str_replace( ' wp-block-acf-mai-ad-unit', '', get_block_wrapper_attributes( $inner_attr ) );
+			$wrap_attr = maipub_build_attributes( $wrap_attr );
+			$ad_attr   = str_replace( ' wp-block-acf-mai-ad-unit', '', get_block_wrapper_attributes( $ad_attr ) );
 		}
 
 		// Build HTML.
-		$html .= sprintf( '<div %s>', $outer_attr );
-			$html .= sprintf( '<div %s>', $inner_attr );
+		// $html .= sprintf( '<div %s>', $outer_attr );
+		// 	$html .= sprintf( '<div %s>', $inner_attr );
+		// 		$html .= $inner;
+		// 	$html .= '</div>';
+		// $html .= '</div>';
+
+		// Build HTML.
+		$html .= $wrap_attr ? sprintf( '<div %s>', $wrap_attr ) : '';
+			$html .= sprintf( '<div %s>', $ad_attr );
 				$html .= $inner;
 			$html .= '</div>';
-		$html .= '</div>';
+		$html .= $wrap_attr ? $wrap_closed : '';
 
 		// Allow filtering.
 		$html = apply_filters( 'mai_publisher_ad_unit', $html );
