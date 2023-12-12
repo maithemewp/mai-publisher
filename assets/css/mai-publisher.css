@@ -1,4 +1,5 @@
 .mai-ad-unit {
+	--mai-ad-scroll-margin-top: calc(var(--scroll-margin-top, 2em) + 16px);
 	position: relative;
 	width: min(100%, var(--mai-ad-unit-max-width));
 	aspect-ratio: var(--mai-ad-unit-aspect-ratio);
@@ -98,11 +99,8 @@
 	content: "";
 }
 
-.wprm-recipe-ingredients-container.mai-ad-container .mai-ad-unit,
-.wprm-recipe-instructions-container.mai-ad-container .mai-ad-unit,
 .mai-ad-container.is-sticky,
 .mai-ad-unit.is-sticky {
-	--mai-ad-scroll-margin-top: calc(var(--scroll-margin-top, 2em) + 16px);
 	top: var(--mai-ad-scroll-margin-top);
 }
 
@@ -130,7 +128,7 @@
 		grid-column: 2;
 		grid-row: 1 / 99;
 		position: sticky;
-		top: calc(var(--scroll-margin-top, 2em) + 16px);
+		top: var(--mai-ad-scroll-margin-top);
 		margin-top: 0;
 	}
 }
