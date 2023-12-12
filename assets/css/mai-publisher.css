@@ -108,6 +108,14 @@
 	overflow: visible !important;
 }
 
+@media only screen and (max-width: 727px) {
+
+	.wprm-recipe-ingredients-container.mai-ad-container .mai-ad-unit,
+	.wprm-recipe-instructions-container.mai-ad-container .mai-ad-unit {
+		margin-block: 24px;
+	}
+}
+
 @media only screen and (min-width: 728px) {
 
 	.wprm-recipe-ingredients-container.mai-ad-container,
