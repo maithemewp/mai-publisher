@@ -1,5 +1,6 @@
 .mai-ad-unit-container {
 	display: flex;
+	justify-content: center;
 	max-width: var(--mai-ad-unit-max-width);
 	margin-inline: auto;
 }
