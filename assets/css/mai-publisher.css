@@ -143,12 +143,9 @@
 	overflow: visible !important;
 }
 
-@media only screen and (max-width: 727px) {
-
-	.wprm-recipe-ingredients-container.mai-ad-container .mai-ad-unit-container,
-	.wprm-recipe-instructions-container.mai-ad-container .mai-ad-unit-container {
-		margin-block: 36px 24px;
-	}
+.wprm-recipe-ingredients-container.mai-ad-container .mai-ad-unit-container,
+.wprm-recipe-instructions-container.mai-ad-container .mai-ad-unit-container {
+	margin-block: 36px 24px;
 }
 
 @media only screen and (min-width: 728px) {
@@ -172,7 +169,6 @@
 		grid-row: 1 / 99;
 		position: sticky;
 		top: var(--mai-ad-scroll-margin-top);
-		margin-top: 0;
 	}
 }
 
