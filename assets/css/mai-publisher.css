@@ -145,7 +145,7 @@
 
 .wprm-recipe-ingredients-container.mai-ad-container .mai-ad-unit-container,
 .wprm-recipe-instructions-container.mai-ad-container .mai-ad-unit-container {
-	margin-block: 36px 24px;
+	margin-block-start: 36px;
 }
 
 @media only screen and (min-width: 728px) {
