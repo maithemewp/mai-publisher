@@ -10,10 +10,10 @@ defined( 'ABSPATH' ) || die;
 return [
 	'ad_units' => [
 		'billboard' => [
-			'sizes'         => [ [970, 250] ],
-			'sizes_desktop' => [ [970, 250] ],
-			'sizes_tablet'  => [], // Invalid arguments: SizeMappingBuilder.addSize([728, 480], [[0, 0]]). All zero-area slot sizes were removed.
-			'sizes_mobile'  => [], // Invalid arguments: SizeMappingBuilder.addSize([728, 480], [[0, 0]]). All zero-area slot sizes were removed.
+			'sizes'         => [ 'fluid', [300, 50], [320, 50], [336, 280], [728, 90], [970, 90], [970, 250] ],
+			'sizes_desktop' => [ 'fluid', [728, 90], [970, 90], [970, 250] ],
+			'sizes_tablet'  => [ 'fluid', [300, 50], [320, 50], [336, 280], [728, 90] ],
+			'sizes_mobile'  => [ 'fluid', [300, 50], [320, 50], [336, 280] ],
 		],
 		'button' => [
 			'sizes'         => [ [120, 60], [120, 90], [125, 125] ],
@@ -106,10 +106,10 @@ return [
 			'sizes_mobile'  => [ [160, 600], [300, 250], [300, 600], [320, 50] ],
 		],
 		'sidebar' => [
-			'sizes'         => [ [120, 600], [160, 600], [300, 250], [300, 600], [320, 50] ],
-			'sizes_desktop' => [ [120, 600], [160, 600], [300, 250], [300, 600], [320, 50] ],
-			'sizes_tablet'  => [ [120, 600], [160, 600], [300, 250], [300, 600], [320, 50] ],
-			'sizes_mobile'  => [ [120, 600], [160, 600], [300, 250], [300, 600], [320, 50] ],
+			'sizes'         => [ [120, 600], [160, 600], [300, 250], [300, 600] ],
+			'sizes_desktop' => [ [120, 600], [160, 600], [300, 250], [300, 600] ],
+			'sizes_tablet'  => [ [120, 600], [160, 600], [300, 250], [300, 600] ],
+			'sizes_mobile'  => [ [120, 600], [160, 600], [300, 250], [300, 600] ],
 		],
 	],
 ];
