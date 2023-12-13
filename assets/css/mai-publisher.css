@@ -82,6 +82,7 @@
 	width: 100%;
 	max-width: var(--mai-ad-unit-max-width);
 	margin-inline: auto;
+	overflow: hidden; /* Prevents ::after from overflowing container */
 }
 
 .mai-ad-unit-spacer::before {
