@@ -1,21 +1,35 @@
-.mai-ad-unit {
-	--mai-ad-scroll-margin-top: calc(var(--scroll-margin-top, 2em) + 16px);
-	position: relative;
-	width: min(100%, var(--mai-ad-unit-max-width));
-	aspect-ratio: var(--mai-ad-unit-aspect-ratio);
+.mai-ad-unit-container {
+	display: flex;
+	max-width: var(--mai-ad-unit-max-width);
 	margin-inline: auto;
 }
 
-.mai-ad-unit:not(:first-child) {
+.mai-ad-unit-container::before {
+	display: block;
+	width: 1px;
+	margin-left: -1px;
+	padding-bottom: calc(100% / (var(--mai-ad-unit-aspect-ratio)));
+	content: "";
+}
+
+.mai-ad-unit-container:not([data-label]):not(:first-child) {
 	margin-block-start: var(--spacing-md, 24px);
 }
 
-.mai-ad-unit[data-label]:not(:first-child) {
+.mai-ad-unit-container[data-label]:not(:first-child) {
 	margin-block-start: var(--spacing-lg, 36px);
 }
 
-.mai-ad-unit:not(:last-child) {
+.mai-ad-unit-container:not(:last-child) {
 	margin-block-end: var(--spacing-md, 24px);
+}
+
+.mai-ad-container {
+	--mai-ad-scroll-margin-top: calc(var(--scroll-margin-top, 2em) + 16px);
+}
+
+.mai-ad-unit {
+	position: relative;
 }
 
 .mai-ad-unit[data-label]::before {
@@ -35,37 +49,60 @@
 }
 
 @media only screen and (max-width: 727px) {
-	.mai-ad-unit-has-sticky,
-	.mai-ad-unit {
+
+	.mai-ad-unit-spacer,
+	.mai-ad-unit-container {
 		--mai-ad-unit-max-width: var(--mai-ad-unit-max-width-sm, unset);
 		--mai-ad-unit-aspect-ratio: var(--mai-ad-unit-aspect-ratio-sm, unset);
 	}
 }
 
 @media only screen and (min-width: 728px) and (max-width: 1023px) {
-	.mai-ad-unit-has-sticky,
-	.mai-ad-unit {
+
+	.mai-ad-unit-spacer,
+	.mai-ad-unit-container {
 		--mai-ad-unit-max-width: var(--mai-ad-unit-max-width-md, unset);
 		--mai-ad-unit-aspect-ratio: var(--mai-ad-unit-aspect-ratio-md, unset);
 	}
 }
 
 @media only screen and (min-width: 1024px) {
-	.mai-ad-unit-has-sticky,
-	.mai-ad-unit {
+
+	.mai-ad-unit-spacer,
+	.mai-ad-unit-container {
 		--mai-ad-unit-max-width: var(--mai-ad-unit-max-width-lg, unset);
 		--mai-ad-unit-aspect-ratio: var(--mai-ad-unit-aspect-ratio-lg, unset);
 	}
 }
 
-.mai-ad-unit-has-sticky-header,
-.mai-ad-unit-has-sticky-footer {
-	padding-bottom: calc((1 / (var(--mai-ad-unit-aspect-ratio)) * 100%) + 24px) !important;
+.mai-ad-unit-spacer {
+	position: relative;
+	display: flex;
+	width: 100%;
+	max-width: var(--mai-ad-unit-max-width);
+	margin-inline: auto;
+}
+
+.mai-ad-unit-spacer::before {
+	display: block;
+	width: 1px;
+	margin-left: -1px;
+	padding-bottom: calc(100% / (var(--mai-ad-unit-aspect-ratio)));
+	content: "";
+}
+
+.mai-ad-unit-spacer::after {
+	display: block;
+	position: absolute;
+	top: 0;
+	right: -50vw;
+	bottom: 0;
+	left: -50vw;
+	background: inherit;
+	content: "";
 }
 
 .mai-ad-unit-sticky {
-	display: grid;
-	place-content: center;
 	position: fixed;
 	left: 0;
 	right: 0;
@@ -81,13 +118,11 @@
 	bottom: 0;
 }
 
-.mai-ad-unit-sticky-header[data-label]::before,
-.mai-ad-unit-sticky-footer[data-label]::before {
+.mai-ad-unit-sticky .mai-ad-unit[data-label]::before {
 	display: none;
 }
 
-.mai-ad-unit-sticky-header::after,
-.mai-ad-unit-sticky-footer::after {
+.mai-ad-unit-sticky .mai-ad-unit::after {
 	position: absolute;
 	top: 0;
 	bottom: 0;
@@ -110,8 +145,8 @@
 
 @media only screen and (max-width: 727px) {
 
-	.wprm-recipe-ingredients-container.mai-ad-container .mai-ad-unit,
-	.wprm-recipe-instructions-container.mai-ad-container .mai-ad-unit {
+	.wprm-recipe-ingredients-container.mai-ad-container .mai-ad-unit-container,
+	.wprm-recipe-instructions-container.mai-ad-container .mai-ad-unit-container {
 		margin-block: 36px 24px;
 	}
 }
@@ -126,13 +161,13 @@
 		grid-template-columns: 1fr auto;
 	}
 
-	.wprm-recipe-ingredients-container.mai-ad-container > *:not(.mai-ad-unit),
-	.wprm-recipe-instructions-container.mai-ad-container > *:not(.mai-ad-unit) {
+	.wprm-recipe-ingredients-container.mai-ad-container > *:not(.mai-ad-unit-container),
+	.wprm-recipe-instructions-container.mai-ad-container > *:not(.mai-ad-unit-container) {
 		grid-column: 1;
 	}
 
-	.wprm-recipe-ingredients-container.mai-ad-container .mai-ad-unit,
-	.wprm-recipe-instructions-container.mai-ad-container .mai-ad-unit {
+	.wprm-recipe-ingredients-container.mai-ad-container .mai-ad-unit-container,
+	.wprm-recipe-instructions-container.mai-ad-container .mai-ad-unit-container {
 		grid-column: 2;
 		grid-row: 1 / 99;
 		position: sticky;
