@@ -131,30 +131,33 @@ final class Mai_Publisher_Plugin {
 		include MAI_PUBLISHER_DIR . 'blocks/analytics-tracker/block.php';
 
 		// Instantiate classes.
-		$field_group      = new Mai_Publisher_Ad_Field_Group;
-		$fields           = new Mai_Publisher_Ad_Fields;
-		$post_settings    = new Mai_Publisher_Settings_Posts;
-		$compabitility    = new Mai_Publisher_Plugin_Compatibility;
-		$categories       = new Mai_Publisher_Categories_Field_Group;
-		$generate         = new Mai_Publisher_Generate_Ads;
-		$ad_block         = new Mai_Publisher_Ad_Block;
-		$ad_unit_block    = new Mai_Publisher_Ad_Unit_Block;
-		$ad_video_block   = new Mai_Publisher_Ad_Video_Block;
-		$display          = new Mai_Publisher_Display;
-		$output           = new Mai_Publisher_Output;
-		$views            = new Mai_Publisher_Views;
-		$tracking         = new Mai_Publisher_Tracking;
-		$tracking_content = new Mai_Publisher_Tracking_Content;
+		new Mai_Publisher_Ad_Field_Group;
+		new Mai_Publisher_Ad_Fields;
+		new Mai_Publisher_Settings_Posts;
+		new Mai_Publisher_Plugin_Compatibility;
+		new Mai_Publisher_Categories_Field_Group;
+		new Mai_Publisher_Generate_Ads;
+		new Mai_Publisher_Ad_Unit_Block;
+		new Mai_Publisher_Ad_Video_Block;
+		new Mai_Publisher_Display;
+		new Mai_Publisher_Output;
+		new Mai_Publisher_Views;
+		new Mai_Publisher_Tracking;
+		new Mai_Publisher_Tracking_Content;
+
+		if ( ! class_exists( 'Mai_Ads_Manager' ) ) {
+			new Mai_Publisher_Ad_Block;
+		}
 
 		if ( ! class_exists( 'Mai_Analytics_Plugin' ) ) {
-			$tracker_block = new Mai_Publisher_Analytics_Tracker_Block;
+			new Mai_Publisher_Analytics_Tracker_Block;
 		}
 
 		if ( is_admin() ) {
-			$admin         = new Mai_Publisher_Admin;
-			$settings      = new Mai_Publisher_Settings;
-			$settings_cats = new Mai_Publisher_Settings_Categories;
-			$settings_ad   = new Mai_Publisher_Settings_Ad_Units_Config;
+			new Mai_Publisher_Admin;
+			new Mai_Publisher_Settings;
+			new Mai_Publisher_Settings_Categories;
+			new Mai_Publisher_Settings_Ad_Units_Config;
 		}
 	}
 
