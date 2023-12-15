@@ -111,7 +111,7 @@ function maipub_should_track() {
 		return $cache;
 	}
 
-	// If not enabled globally, check if we have hte data we need.
+	// If not enabled globally, check if we have the data we need.
 	if ( ! $enabled_global ) {
 		$site_url = maipub_get_option( 'matomo_url', false );
 		$site_id  = maipub_get_option( 'matomo_site_id', false );
