@@ -119,7 +119,7 @@ class Mai_Publisher_Views {
 	 * @return array
 	 */
 	function add_views_choice( $field ) {
-		$field['choices'] = array_merge( [ 'views' => __( 'Views', 'mai-publisher' ) . ' (Mai Analytics)' ], $field['choices'] );
+		$field['choices'] = array_merge( [ 'views' => __( 'Views', 'mai-publisher' ) . ' (Mai Publisher)' ], $field['choices'] );
 
 		return $field;
 	}
