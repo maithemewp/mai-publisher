@@ -243,7 +243,6 @@ class Mai_Publisher_Output {
 			$element = $this->xpath->query( '//head/link' )->item(0);
 
 			// Insert scripts.
-			// $this->insert_nodes( $scripts, $element, 'before' );
 			foreach ( $scripts as $script ) {
 				$this->insert_nodes( $script, $element, 'before' );
 			}
