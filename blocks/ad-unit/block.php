@@ -101,10 +101,10 @@ class Mai_Publisher_Ad_Unit_Block {
 
 			// Build inner HTML.
 			$inner .= '<picture>';
-				$inner .= sprintf( '<source srcset="https://placehold.co/%s" media="(max-width: 727px)" />', implode( 'x', $mobile ) );
-				$inner .= sprintf( '<source srcset="https://placehold.co/%s" media="(min-width: 728px) and (max-width: 1023px)" />', implode( 'x', $tablet ) );
-				$inner .= sprintf( '<source srcset="https://placehold.co/%s" media="(min-width: 1024px)" />', implode( 'x', $desktop ) );
-				$inner .= sprintf( '<img src="https://placehold.co/%s" />', implode( 'x', $desktop ) );
+				$inner .= sprintf( '<source srcset="https://placehold.co/%s" media="(max-width: 727px)">', implode( 'x', $mobile ) );
+				$inner .= sprintf( '<source srcset="https://placehold.co/%s" media="(min-width: 728px) and (max-width: 1023px)">', implode( 'x', $tablet ) );
+				$inner .= sprintf( '<source srcset="https://placehold.co/%s" media="(min-width: 1024px)">', implode( 'x', $desktop ) );
+				$inner .= sprintf( '<img src="https://placehold.co/%s">', implode( 'x', $desktop ) );
 			$inner .= '</picture>';
 		}
 
