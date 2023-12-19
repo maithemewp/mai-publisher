@@ -46,6 +46,10 @@ class Mai_Publisher_Output {
 	 * @return void
 	 */
 	function start() {
+		if ( is_admin() ) {
+			return;
+		}
+
 		$this->domain       = (string) maipub_get_option( 'gam_domain' );
 		$this->network_code = (string) maipub_get_option( 'gam_network_code' );
 		$this->locations    = maipub_get_locations();
@@ -71,6 +75,10 @@ class Mai_Publisher_Output {
 	 * @return void
 	 */
 	function end() {
+		if ( is_admin() ) {
+			return;
+		}
+
 		// Bail if no ads.
 		if ( ! $this->ads ) {
 			return;
@@ -155,7 +163,7 @@ class Mai_Publisher_Output {
 			if ( ! $this->mode ) {
 				// Build script, import into dom and append to ad unit.
 				$script = sprintf( '<script>window.googletag = window.googletag || {};googletag.cmd = googletag.cmd || [];if ( window.googletag && googletag.apiReady ) { googletag.cmd.push(function(){ googletag.display("mai-ad-%s"); }); }</script>', $slot );
-				$this->insert_node( $script, $ad_unit, 'append' );
+				$this->insert_nodes( $script, $ad_unit, 'append' );
 
 				// Add to gam array.
 				$this->gam[ $slot ] = [
@@ -235,9 +243,10 @@ class Mai_Publisher_Output {
 			$element = $this->xpath->query( '//head/link' )->item(0);
 
 			// Insert scripts.
-			foreach ( $scripts as $script ) {
-				$this->insert_node( $script, $element, 'before' );
-			}
+			$this->insert_nodes( $scripts, $element, 'before' );
+			// foreach ( $scripts as $script ) {
+				// $this->insert_nodes( $script, $element, 'before' );
+			// }
 		}
 
 		// Check connatix. This checks the context of the script to see if it contains the connatix domain.
@@ -249,7 +258,7 @@ class Mai_Publisher_Output {
 			$head   = $this->dom->getElementsByTagName( 'head' )->item(0);
 
 			// Append to head.
-			$this->insert_node( $script, $head, 'append' );
+			$this->insert_nodes( $script, $head, 'append' );
 		}
 
 		// Save HTML.
@@ -356,7 +365,7 @@ class Mai_Publisher_Output {
 
 				// Before headings.
 				if ( 'before' === $ad['content_location'] ) {
-					$this->insert_node( $ad['content'], $element, 'before' );
+					$this->insert_nodes( $ad['content'], $element, 'before' );
 				}
 				// After elements.
 				else {
@@ -369,7 +378,7 @@ class Mai_Publisher_Output {
 					}
 
 					// Insert the node into the dom.
-					$this->insert_node( $ad['content'], $element, 'after' );
+					$this->insert_nodes( $ad['content'], $element, 'after' );
 				}
 
 				// Remove from temp counts.
@@ -453,7 +462,7 @@ class Mai_Publisher_Output {
 					// Insert styles before wrap.
 					$file   = "assets/css/mai-engine{$this->suffix}.css";
 					$link   = sprintf( '<link href="%s" rel="stylesheet">', maipub_get_file_data( $file, 'url' ) );
-					$this->insert_node( $link, $wrap, 'before' );
+					$this->insert_nodes( $link, $wrap, 'before' );
 				}
 			}
 		} // End Mai_Engine logic.
@@ -533,7 +542,7 @@ class Mai_Publisher_Output {
 					$html = sprintf( '<div%s>%s</div>', maipub_build_attributes( $item_atts ), $ad['content'] );
 
 					// Insert the html into the dom.
-					$this->insert_node( $html, $wrap, 'append' );
+					$this->insert_nodes( $html, $wrap, 'append' );
 				}
 			}
 			// Not Mai_Engine.
@@ -541,7 +550,7 @@ class Mai_Publisher_Output {
 				// Loop through each ad count.
 				foreach ( $ad['content_count'] as $count ) {
 					// Insert the html into the dom.
-					$this->insert_node( $ad['content'], $wrap, 'append' );
+					$this->insert_nodes( $ad['content'], $wrap, 'append' );
 				}
 			}
 		} // End ad loop.
@@ -575,7 +584,7 @@ class Mai_Publisher_Output {
 				$class = $list->getAttribute( 'class' );
 				$class = trim( $class . ' mai-ad-container' );
 				$list->setAttribute( 'class', $class );
-				$this->insert_node( $ad['content'], $list, 'append' );
+				$this->insert_nodes( $ad['content'], $list, 'append' );
 			}
 		}
 	}
@@ -642,7 +651,7 @@ class Mai_Publisher_Output {
 				}
 
 				// Insert the ad.
-				$this->insert_node( $ad['content'], $sidebar, $action );
+				$this->insert_nodes( $ad['content'], $sidebar, $action );
 			}
 		}
 	}
@@ -682,7 +691,7 @@ class Mai_Publisher_Output {
 				}
 
 				// Insert the ad into the dom.
-				$this->insert_node( $ad['content'], $comment, 'after' );
+				$this->insert_nodes( $ad['content'], $comment, 'after' );
 			}
 		}
 	}
@@ -748,16 +757,16 @@ class Mai_Publisher_Output {
 	 *
 	 * @since 0.13.0
 	 *
-	 * @param DOMNode|DOMElement|string $insert The node to insert.
-	 * @param DOMNode                   $target The target element.
-	 * @param string                    $action The insertion location.
+	 * @param string|DOMNode[] $insert The node to insert.
+	 * @param DOMNode          $target The target element.
+	 * @param string           $action The insertion location.
 	 *
 	 * @return void
 	 */
-	function insert_node( $insert, $target, $action ) {
+	function insert_nodes( $insert, $target, $action ) {
 		// If string, convert to node.
 		if ( is_string( $insert ) ) {
-			$insert = $this->import_node( $insert );
+			$insert = $this->import_nodes( $insert );
 		}
 
 		// Bail if nothing to insert.
@@ -765,25 +774,45 @@ class Mai_Publisher_Output {
 			return;
 		}
 
+		// Make sure this is an array.
+		$insert = (array) $insert;
+
+		// Reverse so they are inserted in the order we want.
+		$insert = array_reverse( $insert );
+
+		// Filter only DOMElement nodes from array.
+		$insert = array_filter( $insert, function( $node ) {
+			return $node instanceof DOMElement;
+		} );
+
+		// Find the action.
 		switch ( $action ) {
+			// Insert before this element.
 			case 'before':
-				// Insert before this element.
-				$target->parentNode->insertBefore( $insert, $target );
+				foreach ( $insert as $node ) {
+					$target->parentNode->insertBefore( $node, $target );
+				}
 				break;
+			/**
+			 * Insert after this element. There is no insertAfter() in PHP ¯\_(ツ)_/¯.
+			 * @link https://gist.github.com/deathlyfrantic/cd8d7ef8ba91544cdf06
+			 */
 			case 'after':
-				/**
-				 * Insert after this element. There is no insertAfter() in PHP ¯\_(ツ)_/¯.
-				 * @link https://gist.github.com/deathlyfrantic/cd8d7ef8ba91544cdf06
-				 */
-				$target->parentNode->insertBefore( $insert, $target->nextSibling );
+				foreach ( $insert as $node ) {
+					$target->parentNode->insertBefore( $node, $target->nextSibling );
+				}
 				break;
+			// Insert before first child.
 			case 'prepend':
-				// Insert before first child.
-				$target->insertBefore( $insert, $target->firstChild );
+				foreach ( $insert as $node ) {
+					$target->insertBefore( $node, $target->firstChild );
+				}
 				break;
+			// Insert after last child.
 			case 'append':
-				// Insert after last child.
-				$target->appendChild( $insert );
+				foreach ( $insert as $node ) {
+					$target->appendChild( $node );
+				}
 				break;
 		}
 	}
@@ -799,7 +828,7 @@ class Mai_Publisher_Output {
 	 *
 	 * @return DOMNode[]
 	 */
-	function import_node( $content ) {
+	function import_nodes( $content ) {
 		if ( ! $content ) {
 			return false;
 		}
@@ -822,7 +851,15 @@ class Mai_Publisher_Output {
 			$tmp->appendChild( $container->firstChild );
 		}
 
-		return $this->dom->importNode( $tmp->documentElement, true );
+		// return $this->dom->importNode( $tmp->documentElement, true );
+
+		$nodes = [];
+
+		foreach ( $tmp->childNodes as $node ) {
+			$nodes[] = $this->dom->importNode( $node, true );
+		}
+
+		return $nodes;
 	}
 
 	/**
