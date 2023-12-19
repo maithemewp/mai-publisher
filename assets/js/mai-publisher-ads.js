@@ -206,6 +206,7 @@ if ( window.googletag && googletag.apiReady ) {
 		if ( maiPubAdsVars.amazonUAM ) {
 			apstag.setDisplayBids();
 		}
+
 		googletag.pubads().refresh( [slot] );
 	});
 }

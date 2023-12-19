@@ -175,6 +175,7 @@
 }
 
 .mai-connatix {
+	width: 100%; /* without this it was breaking when shown before-entry-content, no idea why. */
 	margin-inline: auto;
 	aspect-ratio: var(--mai-connatix-aspect-ratio, 16/9);
 }
