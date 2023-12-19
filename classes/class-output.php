@@ -264,6 +264,9 @@ class Mai_Publisher_Output {
 		// Save HTML.
 		$buffer = $this->dom->saveHTML();
 
+		// Remove closing tags that are added by DOMDocument.
+		$buffer = str_replace( '</source>', '', $buffer );
+
 		return $buffer;
 	}
 
