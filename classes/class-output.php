@@ -243,10 +243,10 @@ class Mai_Publisher_Output {
 			$element = $this->xpath->query( '//head/link' )->item(0);
 
 			// Insert scripts.
-			$this->insert_nodes( $scripts, $element, 'before' );
-			// foreach ( $scripts as $script ) {
-				// $this->insert_nodes( $script, $element, 'before' );
-			// }
+			// $this->insert_nodes( $scripts, $element, 'before' );
+			foreach ( $scripts as $script ) {
+				$this->insert_nodes( $script, $element, 'before' );
+			}
 		}
 
 		// Check connatix. This checks the context of the script to see if it contains the connatix domain.
@@ -786,7 +786,7 @@ class Mai_Publisher_Output {
 		// Filter only DOMElement nodes from array.
 		$insert = array_filter( $insert, function( $node ) {
 			return $node instanceof DOMElement;
-		} );
+		});
 
 		// Find the action.
 		switch ( $action ) {
@@ -836,10 +836,6 @@ class Mai_Publisher_Output {
 			return false;
 		}
 
-		/**
-		 * Using `maipub_get_dom_document()` breaks when there are multiple top level elements.
-		 * I think it's because of `$this->dom` is the full dom with doctype and html element.
-		 */
 		$tmp = $this->dom_document( "<div>$content</div>" );
 
 		// Handle wraps.
@@ -853,8 +849,6 @@ class Mai_Publisher_Output {
 		while ( $container->firstChild ) {
 			$tmp->appendChild( $container->firstChild );
 		}
-
-		// return $this->dom->importNode( $tmp->documentElement, true );
 
 		$nodes = [];
 
