@@ -178,6 +178,10 @@
 	z-index: 1; /* for fixed ads floating over sidebar */
 }
 
+.sidebar {
+	z-index: 0; /* for fixed ads floating over sidebar */
+}
+
 .mai-connatix {
 	width: 100%; /* without this it was breaking when shown before-entry-content, no idea why. */
 	margin-inline: auto;
