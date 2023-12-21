@@ -174,8 +174,8 @@
 	}
 }
 
-.sidebar {
-	z-index: -1; /* for fixed ads floating over sidebar */
+.content {
+	z-index: 1; /* for fixed ads floating over sidebar */
 }
 
 .mai-connatix {
