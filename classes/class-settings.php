@@ -750,6 +750,12 @@ class Mai_Publisher_Settings {
 					if ( 200 !== $code ) {
 						$type    = 'error';
 						$message =  $code . ' ' . wp_remote_retrieve_response_message( $response );
+
+						// Add Matomo message if available.
+						if ( is_object( $body ) && isset( $body->result ) && isset( $body->message ) ) {
+							$message .= '. ' . $body->message;
+						}
+
 					} elseif ( is_string( $body ) ) {
 						$type    = 'success';
 						$message = __( 'Connected', 'mai-publisher' );
