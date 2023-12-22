@@ -124,6 +124,13 @@ class Mai_Publisher_Settings {
 		);
 
 		add_settings_section(
+			'maipub_settings_views', // id
+			'', // title
+			[ $this, 'maipub_section_views' ], // callback
+			'mai-publisher-section' // page
+		);
+
+		add_settings_section(
 			'maipub_settings_scripts', // id
 			'', // title
 			[ $this, 'maipub_section_scripts' ], // callback
@@ -263,12 +270,24 @@ class Mai_Publisher_Settings {
 			'maipub_settings_matomo' // section
 		);
 
+		/**
+		 * Views
+		 */
+
+		add_settings_field(
+			'views_api', // id
+			__( 'Views API', 'mai-publisher' ), // title
+			[ $this, 'views_api_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings_views' // section
+		);
+
 		add_settings_field(
 			'views_years', // id
 			__( 'Total Views Years', 'mai-publisher' ), // title
 			[ $this, 'views_years_callback' ], // callback
 			'mai-publisher-section', // page
-			'maipub_settings_matomo' // section
+			'maipub_settings_views' // section
 		);
 
 		add_settings_field(
@@ -276,7 +295,7 @@ class Mai_Publisher_Settings {
 			__( 'Trending Days', 'mai-publisher' ), // title
 			[ $this, 'trending_days_callback' ], // callback
 			'mai-publisher-section', // page
-			'maipub_settings_matomo' // section
+			'maipub_settings_views' // section
 		);
 
 
@@ -285,7 +304,7 @@ class Mai_Publisher_Settings {
 			__( 'Trending/Popular Interval', 'mai-publisher' ), // title
 			[ $this, 'views_interval_callback' ], // callback
 			'mai-publisher-section', // page
-			'maipub_settings_matomo' // section
+			'maipub_settings_views' // section
 		);
 
 		/**
@@ -330,8 +349,9 @@ class Mai_Publisher_Settings {
 			'matomo_url'             => 'trailingslashit',
 			'matomo_site_id'         => 'absint',
 			'matomo_token'           => 'sanitize_text_field',
-			'trending_days'          => 'absint',
+			'views_api'              => 'sanitize_text_field',
 			'views_years'            => 'absint',
+			'trending_days'          => 'absint',
 			'views_interval'         => 'absint',
 			'ad_label'               => 'sanitize_text_field',
 			'header'                 => 'trim',
@@ -370,6 +390,10 @@ class Mai_Publisher_Settings {
 
 	function maipub_section_scripts() {
 		printf( '<h3 style="margin-top:48px;">%s</h3>', __( 'Scripts', 'mai-publisher' ) );
+	}
+
+	function maipub_section_views() {
+		printf( '<h3 style="margin-top:48px;">%s</h3>', __( 'Views', 'mai-publisher' ) );
 	}
 
 	/**
@@ -622,6 +646,33 @@ class Mai_Publisher_Settings {
 		);
 	}
 
+	/**
+	 * Setting callback.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	function views_api_callback() {
+		$selected = maipub_get_option( 'views_api', false );
+
+		echo '<select name="mai_publisher[views_api]">';
+		printf( '<option value="matomo"%s>%s</option>', selected( $selected, 'matomo' ), __( 'Matomo', 'mai-publisher' ) );
+		printf( '<option value="jetpack"%s>%s</option>', selected( $selected, 'jetpack' ), __( 'Jetpack', 'mai-publisher' ) );
+		printf( '<option value="disabled">%s</option>', __( 'Disabled', 'mai-publisher' ) );
+		echo '</select>';
+
+		if ( 'jetpack' === $selected ) {
+			$connected = class_exists( 'Jetpack' ) && Jetpack::is_module_active( 'stats' );
+			$color     = $connected ? '#00a32a' : '#d63638';
+			$text      = $connected ? __( ' Jetpack Stats is running', 'mai-publisher' ) : __( 'Jetpack Stats is not running', 'mai-publisher' );
+
+			printf( '<span style="margin-left:8px;color:%s;">%s</span>', $color, $text );
+		}
+
+		printf( '<p class="description">%s</p>', __( 'Select the API to use for fetching post views. If Matomo is used, it must be enabled and connected above. If Jetpack is used, Jetpack and the Stats module must both be active.', 'mai-publisher' ) );
+
+	}
 
 	/**
 	 * Setting callback.
