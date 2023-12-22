@@ -104,22 +104,17 @@ function maipub_should_track() {
 
 	$cache          = false;
 	$enabled_global = maipub_get_option( 'matomo_enabled_global', false );
+	$site_url       = maipub_get_option( 'matomo_url', false );
+	$site_id        = maipub_get_option( 'matomo_site_id', false );
 	$enabled        = maipub_get_option( 'matomo_enabled', false );
+	$enabled        = $enabled && $site_url && $site_id;
+	$views_api      = maipub_get_option( 'views_api' );
+	$is_matomo      = 'matomo'  === $views_api && $enabled && ( is_singular() || is_category() || is_tag() || is_tax() );
+	$is_jetpack     = 'jetpack' === $views_api && class_exists( 'Jetpack' ) && Jetpack::is_module_active( 'stats' ) && class_exists( 'Automattic\Jetpack\Stats\WPCOM_Stats' ) && is_singular();
 
 	// Bail if not enabled.
-	if ( ! ( $enabled_global || $enabled ) ) {
+	if ( ! ( $enabled_global || $enabled || $is_matomo || $is_jetpack ) ) {
 		return $cache;
-	}
-
-	// If not enabled globally, check if we have the data we need.
-	if ( ! $enabled_global ) {
-		$site_url = maipub_get_option( 'matomo_url', false );
-		$site_id  = maipub_get_option( 'matomo_site_id', false );
-
-		// Bail if we don't have the data we need.
-		if ( ! ( $site_url && $site_id ) ) {
-			return $cache;
-		}
 	}
 
 	// Bail if contributor or above.

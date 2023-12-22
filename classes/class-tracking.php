@@ -93,8 +93,8 @@ class Mai_Publisher_Tracking {
 
 		// Get views API.
 		$views_api  = maipub_get_option( 'views_api' );
-		$is_matomo  = 'matomo'  === $views_api && $matomo_enabled && ( is_singular() || is_category() || is_tag() || is_tax() );
-		$is_jetpack = 'jetpack' === $views_api && class_exists( 'Jetpack' ) && Jetpack::is_module_active( 'stats' ) && class_exists( 'Automattic\Jetpack\Stats\WPCOM_Stats' ) && is_singular();
+		$is_matomo  = 'matomo'  === $views_api;
+		$is_jetpack = 'jetpack' === $views_api;
 
 		// If an api we can use.
 		if ( $is_matomo || $is_jetpack ) {
