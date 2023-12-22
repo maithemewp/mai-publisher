@@ -438,7 +438,7 @@ class Mai_Publisher_Views {
 		];
 
 		// Get views data.
-		$stats = new WPCOM_Stats();
+		$stats = new Automattic\Jetpack\Stats\WPCOM_Stats;
 		$views = $stats->get_post_views( $post_id );
 
 		// Bail if error.
