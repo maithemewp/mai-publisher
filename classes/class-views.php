@@ -247,6 +247,7 @@ class Mai_Publisher_Views {
 		$this->type    = isset( $_POST['type'] ) ? sanitize_key( $_POST['type'] ) : '';
 		$this->url     = isset( $_POST['url'] ) ? esc_url( $_POST['url'] ) : '';
 		$this->current = isset( $_POST['current'] ) ? absint( $_POST['current'] ) : '';
+		$return        = [];
 
 		// Bail if we don't have the post data we need.
 		if ( ! ( $this->id && $this->type && $this->url && $this->current ) ) {
@@ -257,18 +258,18 @@ class Mai_Publisher_Views {
 		// Get API data.
 		switch ( $this->api ) {
 			case 'matomo':
-				$data = $this->update_views_from_matomo();
+				$return = $this->update_views_from_matomo();
 
-				if ( is_wp_error( $data ) ) {
-					wp_send_json_error( $data->get_error_message(), $data->get_error_code() );
+				if ( is_wp_error( $return ) ) {
+					wp_send_json_error( $return->get_error_message(), $return->get_error_code() );
 					exit();
 				}
 			break;
 			case 'jetpack':
-				$data = $this->update_views_from_jetpack();
+				$return = $this->update_views_from_jetpack();
 
-				if ( is_wp_error( $data ) ) {
-					wp_send_json_error( $data->get_error_message(), $data->get_error_code() );
+				if ( is_wp_error( $return ) ) {
+					wp_send_json_error( $return->get_error_message(), $return->get_error_code() );
 					exit();
 				}
 			break;
