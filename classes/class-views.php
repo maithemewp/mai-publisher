@@ -431,7 +431,7 @@ class Mai_Publisher_Views {
 	 *
 	 * @return array
 	 */
-	function update_views_from_jetpack( $post_id ) {
+	function update_views_from_jetpack() {
 		$return = [
 			'views'    => null,
 			'trending' => null,
@@ -439,7 +439,7 @@ class Mai_Publisher_Views {
 
 		// Get views data.
 		$stats = new Automattic\Jetpack\Stats\WPCOM_Stats;
-		$views = $stats->get_post_views( $post_id );
+		$views = $stats->get_post_views( $this->id );
 
 		// Bail if error.
 		if ( is_wp_error( $views ) ) {
@@ -450,7 +450,7 @@ class Mai_Publisher_Views {
 		if ( isset( $views['views'] ) ) {
 			$total = absint( $views['views'] );
 
-			update_post_meta( $post_id, 'mai_views', $total );
+			update_post_meta( $this->id, 'mai_views', $total );
 
 			$return['views'] = $total;
 		}
@@ -483,7 +483,7 @@ class Mai_Publisher_Views {
 
 			// Set trending.
 			if ( ! is_null( $trending ) ) {
-				update_post_meta( $post_id, 'mai_trending', $trending );
+				update_post_meta( $this->id, 'mai_trending', $trending );
 
 				$return['trending'] = $trending;
 			}
