@@ -4,6 +4,15 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 class Mai_Publisher_Views {
+	protected $api;
+	protected $trending_days;
+	protected $views_years;
+	protected $interval;
+	protected $id;
+	protected $type;
+	protected $url;
+	protected $current;
+
 	/**
 	 * Construct the class.
 	 *
@@ -211,57 +220,115 @@ class Mai_Publisher_Views {
 		}
 
 		// Get options.
-		$site_url      = maipub_get_option( 'matomo_url' );
-		$site_id       = maipub_get_option( 'matomo_site_id' );
-		$token         = maipub_get_option( 'matomo_token' );
-		$trending_days = maipub_get_option( 'trending_days' );
-		$views_years   = maipub_get_option( 'views_years' );
-		$interval      = maipub_get_option( 'views_interval' );
+		$this->api           = maipub_get_option( 'views_api' );
+		$this->trending_days = maipub_get_option( 'trending_days' );
+		$this->views_years   = maipub_get_option( 'views_years' );
+		$this->interval      = maipub_get_option( 'views_interval' );
 
-		// Bail if no API data.
-		if ( ! ( $site_url && $site_id && $token ) ) {
-			wp_send_json_error( __( 'Missing Matomo API data.', 'mai-publisher' ) );
+		// Bail if API is disabled.
+		if ( ! $this->api || 'disabled' === $this->api ) {
+			wp_send_json_error( __( 'Views API is disabled.', 'mai-publisher' ) );
+			exit();
+		}
+
+		if ( ! in_array( $this->api, [ 'matomo', 'jetpack' ] ) ) {
+			wp_send_json_error( __( 'Not a valid API option.', 'mai-publisher' ) );
 			exit();
 		}
 
 		// Bail if nothing to fetch.
-		if ( ! ( ( $trending_days || $views_years ) && $interval ) ) {
-			wp_send_json_error( __( 'Missing views or trending days or interval.', 'mai-publisher' ) );
+		if ( ! ( ( $this->trending_days || $this->views_years ) && $this->interval ) ) {
+			wp_send_json_error( __( 'Missing views years, trending days, or interval.', 'mai-publisher' ) );
 			exit();
 		}
 
 		// Get post data.
-		$type    = isset( $_POST['type'] ) ? sanitize_key( $_POST['type'] ) : '';
-		$id      = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : '';
-		$url     = isset( $_POST['url'] ) ? esc_url( $_POST['url'] ) : '';
-		$current = isset( $_POST['current'] ) ? absint( $_POST['current'] ) : '';
+		$this->id      = isset( $_POST['id'] ) ? absint( $_POST['id'] ) : '';
+		$this->type    = isset( $_POST['type'] ) ? sanitize_key( $_POST['type'] ) : '';
+		$this->url     = isset( $_POST['url'] ) ? esc_url( $_POST['url'] ) : '';
+		$this->current = isset( $_POST['current'] ) ? absint( $_POST['current'] ) : '';
 
 		// Bail if we don't have the post data we need.
-		if ( ! ( $type && $id && $url && $current ) ) {
-			wp_send_json_error( __( 'Missing type, id, url, or current.', 'mai-publisher' ) );
+		if ( ! ( $this->id && $this->type && $this->url && $this->current ) ) {
+			wp_send_json_error( __( 'Missing id, type, url, or current.', 'mai-publisher' ) );
 			exit();
+		}
+
+		// Get API data.
+		switch ( $this->api ) {
+			case 'matomo':
+				$data = $this->update_views_from_matomo();
+
+				if ( is_wp_error( $data ) ) {
+					wp_send_json_error( $data->get_error_message(), $data->get_error_code() );
+					exit();
+				}
+			break;
+			case 'jetpack':
+				$data = $this->update_views_from_jetpack();
+
+				if ( is_wp_error( $data ) ) {
+					wp_send_json_error( $data->get_error_message(), $data->get_error_code() );
+					exit();
+				}
+			break;
+		}
+
+		// Update updated time.
+		switch ( $this->type ) {
+			case 'post':
+				update_post_meta( $this->id, 'mai_views_updated', $this->current );
+			break;
+			case 'term':
+				update_term_meta( $this->id, 'mai_views_updated', $this->current );
+			break;
+		}
+
+		// Send it home.
+		wp_send_json_success( $return );
+		exit();
+	}
+
+	/**
+	 * Get views from Matomo.
+	 *
+	 * @since TBD
+	 *
+	 * @return array
+	 */
+	function update_views_from_matomo() {
+		$site_url = maipub_get_option( 'matomo_url' );
+		$site_id  = maipub_get_option( 'matomo_site_id' );
+		$token    = maipub_get_option( 'matomo_token' );
+
+		// Bail if no API data.
+		if ( ! ( $site_url && $site_id && $token ) ) {
+			return new WP_Error( 'missing_api_data', __( 'Missing Matomo API data.', 'mai-publisher' ) );
 		}
 
 		// Start API data.
 		$api_url = trailingslashit( $site_url ) . 'index.php';
-		$return  = [];
 		$fetch   = [];
+		$return = [
+			'views'    => null,
+			'trending' => null,
+		];
 
 		// Add trending first incase views times out.
-		if ( $trending_days ) {
+		if ( $this->trending_days ) {
 			$fetch[] = [
 				'key'    => 'trending',
 				'period' => 'day',
-				'date'   => 'last' . $trending_days,
+				'date'   => 'last' . $this->trending_days,
 			];
 		}
 
 		// Add views.
-		if ( $views_years ) {
+		if ( $this->views_years ) {
 			$fetch[] = [
 				'key'    => 'views',
 				'period' => 'year',
-				'date'   => 'last' . $views_years,
+				'date'   => 'last' . $this->views_years,
 			];
 		}
 
@@ -280,7 +347,7 @@ class Mai_Publisher_Views {
 				'method'      => 'Actions.getPageUrl',
 				'idSite'      => $site_id,
 				'token_auth'  => $token,
-				'pageUrl'     => $url,
+				'pageUrl'     => $this->url,
 				'hideColumns' => 'label',
 				'showColumns' => 'nb_visits',
 				'period'      => $values['period'],
@@ -303,8 +370,7 @@ class Mai_Publisher_Views {
 
 		// Check for a successful request.
 		if ( is_wp_error( $response ) ) {
-			wp_send_json_error( $response->get_error_message(), $response->get_error_code() );
-			exit();
+			return $response;
 		}
 
 		// Get the response code.
@@ -312,8 +378,7 @@ class Mai_Publisher_Views {
 
 		// Bail if not a successful response.
 		if ( 200 !== $code ) {
-			wp_send_json_error( wp_remote_retrieve_response_message( $response ), $code );
-			exit();
+			return new WP_Error( 'matomo_api_error', wp_remote_retrieve_response_message( $response ), $code );
 		}
 
 		// Get the data.
@@ -322,49 +387,108 @@ class Mai_Publisher_Views {
 
 		// Bail if no data.
 		if ( ! $data ) {
-			wp_send_json_error( __( 'No data returned.', 'mai-publisher' ) );
-			exit();
+			return new WP_Error( 'matomo_no_data', __( 'No data returned.', 'mai-publisher' ) );
 		}
 
 		// Loop through each item in the bulk request.
 		foreach ( $data as $index => $row ) {
 			$key    = $fetch[ $index ]['key'];
-			$visits = 0;
+			$visits = null;
 
 			foreach ( $row as $values ) {
 				if ( ! $values || ! isset( $values[0]['nb_visits'] ) ) {
 					continue;
 				}
 
+				$visits  = is_null( $visits ) ? 0 : $visits;
 				$visits += absint( $values[0]['nb_visits'] );
 			}
 
-			// Update meta. `mai_trending` or `mai_views`.
-			switch ( $type ) {
-				case 'post':
-					update_post_meta( $id, "mai_{$key}", $visits );
-				break;
-				case 'term':
-					update_term_meta( $id, "mai_{$key}", $visits );
-				break;
+			// Only update if not null.
+			if ( ! is_null( $visits ) ) {
+				// Update meta. `mai_trending` or `mai_views`.
+				switch ( $this->type ) {
+					case 'post':
+						update_post_meta( $id, "mai_{$key}", $visits );
+					break;
+					case 'term':
+						update_term_meta( $id, "mai_{$key}", $visits );
+					break;
+				}
 			}
 
 			// Add to return.
 			$return[ $key ] = $visits;
 		}
 
-		// Update updated time.
-		switch ( $type ) {
-			case 'post':
-				update_post_meta( $id, 'mai_views_updated', $current );
-			break;
-			case 'term':
-				update_term_meta( $id, 'mai_views_updated', $current );
-			break;
+		return $return;
+	}
+
+	/**
+	 * Get views from Jetpack.
+	 *
+	 * @since TBD
+	 *
+	 * @return array
+	 */
+	function update_views_from_jetpack( $post_id ) {
+		$return = [
+			'views'    => null,
+			'trending' => null,
+		];
+
+		// Get views data.
+		$stats = new WPCOM_Stats();
+		$views = $stats->get_post_views( $post_id );
+
+		// Bail if error.
+		if ( is_wp_error( $views ) ) {
+			return $views;
 		}
 
-		// Send it home.
-		wp_send_json_success( $return );
-		exit();
+		// Get total views.
+		if ( isset( $views['views'] ) ) {
+			$total = absint( $views['views'] );
+
+			update_post_meta( $post_id, 'mai_views', $total );
+
+			$return['views'] = $total;
+		}
+
+		// Get trending views.
+		if ( isset( $views['data'] ) ) {
+			$i        = 1;
+			$trending = null;
+			$days     = array_reverse( $views['data'] );
+
+			// Loop through days.
+			foreach ( $days as $day ) {
+				// Break the loop if we've reached the trending days.
+				if ( $i > $this->trending_days ) {
+					break;
+				}
+
+				// Skip if no count.
+				if ( ! isset( $day[1] ) ) {
+					continue;
+				}
+
+				// Add to the count.
+				$trending  = is_null( $trending ) ? 0 : $trending;
+				$trending += absint( $day[1] );
+
+				// Increment.
+				$i++;
+			}
+
+			// Set trending.
+			if ( ! is_null( $trending ) ) {
+				update_post_meta( $post_id, 'mai_trending', $trending );
+
+				$return['trending'] = $trending;
+			}
+		}
+
+		return $return;
 	}
 }

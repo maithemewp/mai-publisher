@@ -57,79 +57,95 @@ class Mai_Publisher_Tracking {
 	 * @return void
 	 */
 	function get_vars() {
-		$vars       = [];
-		$this->user = wp_get_current_user();
+		$vars           = [];
+		$this->user     = wp_get_current_user();
+		$site_url       = maipub_get_option( 'matomo_url', false );
+		$site_id        = maipub_get_option( 'matomo_site_id', false );
+		$matomo_enabled = maipub_get_option( 'matomo_enabled', false );
+		$matomo_enabled = $matomo_enabled && $site_url && $site_id;
+		$analytics      = [];
 
 		// Handle site tracking vars.
-		if ( maipub_get_option( 'matomo_enabled', false ) ) {
-			$site_url = maipub_get_option( 'matomo_url', false );
-			$site_id  = maipub_get_option( 'matomo_site_id', false );
+		if ( $matomo_enabled ) {
+			$vars['analytics'] = [];
+			$dimensions        = $this->get_site_dimensions();
+			$analytics         = [
+				'url'    => trailingslashit( $site_url ),
+				'id'     => absint( $site_id ),
+				'toPush' => [],
+			];
 
-			if ( $site_url && $site_id ) {
-				$vars['analytics'] = [];
-				$dimensions        = $this->get_site_dimensions();
-				$analytics         = [
-					'url'    => trailingslashit( $site_url ),
-					'id'     => absint( $site_id ),
-					'toPush' => [],
-				];
+			if ( $this->user->ID ) {
+				$analytics['toPush'][] = [ 'setUserId', $this->user->user_email ];
+			}
 
-				if ( $this->user->ID ) {
-					$analytics['toPush'][] = [ 'setUserId', $this->user->user_email ];
+			if ( $dimensions ) {
+				foreach ( $dimensions as $index => $value ) {
+					$analytics['toPush'][] = [ 'setCustomDimension', $index, $value ];
 				}
+			}
 
-				if ( $dimensions ) {
-					foreach ( $dimensions as $index => $value ) {
-						$analytics['toPush'][] = [ 'setCustomDimension', $index, $value ];
-					}
-				}
+			$analytics['toPush'][] = [ 'enableLinkTracking' ];
+			$analytics['toPush'][] = [ 'trackPageView' ];
+			$analytics['toPush'][] = [ 'trackVisibleContentImpressions' ];
+			// $analytics['toPush'][] = [ 'trackAllContentImpressions' ];
+		}
 
-				$analytics['toPush'][] = [ 'enableLinkTracking' ];
-				$analytics['toPush'][] = [ 'trackPageView' ];
-				$analytics['toPush'][] = [ 'trackVisibleContentImpressions' ];
-				// $analytics['toPush'][] = [ 'trackAllContentImpressions' ];
+		// Get views API.
+		$views_api  = maipub_get_option( 'views_api' );
+		$is_matomo  = 'matomo'  === $views_api && $matomo_enabled && ( is_singular() || is_category() || is_tag() || is_tax() );
+		$is_jetpack = 'jetpack' === $views_api && class_exists( 'Jetpack' ) && Jetpack::is_module_active( 'stats' ) && is_singular();
 
+		// If an api we can use.
+		if ( $is_matomo || $is_jetpack ) {
+			$trending_days = (int) maipub_get_option( 'trending_days', false );
+			$views_years   = (int) maipub_get_option( 'views_years', false );
+			$interval      = (int) maipub_get_option( 'views_interval', false );
 
-				// If singular or a term archive (all we care about now).
-				if ( is_singular() || is_category() || is_tag() || is_tax() ) {
-					$trending_days = (int) maipub_get_option( 'trending_days', false );
-					$views_years   = (int) maipub_get_option( 'views_years', false );
-					$interval      = (int) maipub_get_option( 'views_interval', false );
+			// If we're fetching trending or popular counts.
+			if ( ( $trending_days || $views_years ) && $interval ) {
+				// Get page data and current timestamp.
+				$page    = maipub_get_current_page();
+				$current = current_datetime()->getTimestamp();
+				$updated = null;
 
-					// If we're fetching trending or popular counts.
-					if ( ( $trending_days || $views_years ) && $interval ) {
-						// Get page data and current timestamp.
-						$page    = maipub_get_current_page();
-						$current = current_datetime()->getTimestamp();
-						$updated = false;
-
-						// If we have an ID, get the last updated timestamp.
-						if ( $page['id'] ) {
+				// If we have an ID, get the last updated timestamp.
+				if ( $page['id'] ) {
+					switch ( $views_api ) {
+						case 'matomo':
 							if ( is_singular() ) {
 								$updated = get_post_meta( $page['id'], 'mai_views_updated', true );
 							} else {
 								$updated = get_term_meta( $page['id'], 'mai_views_updated', true );
 							}
-						}
-
-						// If last updated timestampe is more than N minutes (converted to seconds) ago.
-						if ( ! $updated || $updated < ( $current - ( $interval * 60 ) ) ) {
-							$analytics['ajaxUrl'] = admin_url( 'admin-ajax.php' );
-							$analytics['body']    = [
-								'action'  => 'maipub_views',
-								'nonce'   => wp_create_nonce( 'maipub_views_nonce' ),
-								'type'    => $page['type'],
-								'id'      => $page['id'],
-								'url'     => $page['url'],
-								'current' => $current,
-							];
-						}
+						break;
+						case 'jetpack';
+							$updated = get_post_meta( $page['id'], 'mai_views_updated', true );
+						break;
 					}
 				}
 
-				// Add site analytics.
-				$vars['analytics'][] = $analytics;
+				// If some value other than null.
+				if ( ! is_null( $updated ) ) {
+					// If last updated timestampe is more than N minutes (converted to seconds) ago.
+					if ( ! $updated || $updated < ( $current - ( $interval * 60 ) ) ) {
+						$analytics['ajaxUrl'] = admin_url( 'admin-ajax.php' );
+						$analytics['body']    = [
+							'action'  => 'maipub_views',
+							'nonce'   => wp_create_nonce( 'maipub_views_nonce' ),
+							'type'    => $page['type'],
+							'id'      => $page['id'],
+							'url'     => $page['url'],
+							'current' => $current,
+						];
+					}
+				}
 			}
+		}
+
+		// Add site analytics.
+		if ( $analytics ) {
+			$vars['analytics'][] = $analytics;
 		}
 
 		// Handle global tracking vars.
