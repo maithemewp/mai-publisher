@@ -238,9 +238,9 @@ class Mai_Publisher_Output {
 
 			// Build scripts.
 			$file      = "assets/js/mai-publisher-ads{$this->suffix}.js";
-			$scripts[] = sprintf( '<script src="https://securepubads.g.doubleclick.net/tag/js/gpt.js?ver=%s"></script>', maipub_get_file_data( $file, 'version' ) );  // Google Ad Manager GPT.
+			$scripts[] = sprintf( '<script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js?ver=%s"></script>', maipub_get_file_data( $file, 'version' ) );  // Google Ad Manager GPT.
 			$scripts[] = sprintf( '<script>/* <![CDATA[ */%svar maiPubAdsVars = %s;%s/* ]]> */</script>', PHP_EOL, wp_json_encode( $localize ), PHP_EOL );
-			$scripts[] = sprintf( '<script src="%s?ver=%s"></script>', maipub_get_file_data( $file, 'url' ), maipub_get_file_data( $file, 'version' ) ); // Initial testing showed async broke ads.
+			$scripts[] = sprintf( '<script async src="%s?ver=%s"></script>', maipub_get_file_data( $file, 'url' ), maipub_get_file_data( $file, 'version' ) ); // Initial testing showed async broke ads.
 		}
 
 		// Handle scripts.

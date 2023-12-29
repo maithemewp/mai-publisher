@@ -2,9 +2,9 @@ window.googletag = window.googletag || {};
 googletag.cmd    = googletag.cmd || [];
 
 /**
- * When googletag and the API are ready, set up ads.
+ * Main function to set up ads.
  */
-if ( window.googletag && googletag.apiReady ) {
+function setupAds() {
 	const ads           = maiPubAdsVars['ads'];
 	const refreshKey    = 'refresh';
 	const refreshvalue  = 'true';
@@ -223,4 +223,14 @@ if ( window.googletag && googletag.apiReady ) {
 
 		googletag.pubads().refresh( [slot] );
 	});
+}
+
+/**
+ * When googletag and the API are ready, set up ads.
+ */
+if ( window.googletag && googletag.apiReady ) {
+	setupAds();
+} else {
+	// If not ready, use the cmd array to queue up the setupAds function.
+	googletag.cmd.push(setupAds);
 }
