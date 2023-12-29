@@ -340,6 +340,7 @@ class Mai_Publisher_Settings {
 			'ad_mode'                => 'sanitize_text_field',
 			'gam_domain'             => 'maipub_get_url_host',
 			'gam_network_code'       => 'absint',
+			'gam_sellers_id'         => 'sanitize_text_field',
 			'gam_targets'            => 'sanitize_text_field',
 			'category'               => 'sanitize_text_field',
 			'amazon_uam_enabled'     => 'rest_sanitize_boolean',
