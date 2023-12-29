@@ -64,9 +64,6 @@ class Mai_Publisher_Endpoint {
 			'trending_days'          => (int) maipub_get_option( 'trending_days', false ),
 		];
 
-		// Set domain. GAM domain doesn't have protocol.
-		$data['domain'] = home_url();
-
 		// Set plugin version.
 		$data['version'] = MAI_PUBLISHER_VERSION;
 
