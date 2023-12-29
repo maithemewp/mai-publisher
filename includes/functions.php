@@ -385,6 +385,7 @@ function maipub_get_default_options() {
 		'ad_mode'                => '',
 		'gam_domain'             => (string) maipub_get_url_host( home_url() ),
 		'gam_network_code'       => '',
+		'gam_sellers_id'         => '',
 		'gam_targets'            => '',
 		'category'               => '',
 		'amazon_uam_enabled'     => 0,
