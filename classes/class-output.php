@@ -52,6 +52,8 @@ class Mai_Publisher_Output {
 
 		$this->domain       = (string) maipub_get_option( 'gam_domain' );
 		$this->network_code = (string) maipub_get_option( 'gam_network_code' );
+		$this->sellers_name = (string) maipub_get_option( 'gam_sellers_name' );
+		$this->sellers_id   = (string) maipub_get_option( 'gam_sellers_id' );
 		$this->locations    = maipub_get_locations();
 		$this->ads          = maipub_get_page_ads();
 		$this->grouped      = $this->get_grouped_ads( $this->ads );
@@ -225,10 +227,13 @@ class Mai_Publisher_Output {
 
 			$gam_base .= "/$this->domain/";
 			$localize  = [
-				'gamBase'   => $gam_base,
-				'ads'       => $this->gam,
-				'targeting' => $this->get_targets(),
-				'amazonUAM' => maipub_get_option( 'amazon_uam_enabled' ),
+				'domain'      => $this->domain,
+				'sellersName' => $this->sellers_name,
+				'sellersId'   => $this->sellers_id,
+				'gamBase'     => $gam_base,
+				'ads'         => $this->gam,
+				'targeting'   => $this->get_targets(),
+				'amazonUAM'   => maipub_get_option( 'amazon_uam_enabled' ),
 			];
 
 			// Build scripts.

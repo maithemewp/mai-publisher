@@ -101,6 +101,20 @@ if ( window.googletag && googletag.apiReady ) {
 				adServer: 'googletag',
 				// bidTimeout: prebidTimeout,
 				// us_privacy: '-1', // https://ams.amazon.com/webpublisher/uam/docs/web-integration-documentation/integration-guide/uam-ccpa.html?source=menu
+				// @link https://ams.amazon.com/webpublisher/uam/docs/reference/api-reference.html#configschain
+				schain: {
+					complete: 1, // Integer 1 or 0 indicating if all preceding nodes are complete.
+					ver: '1.0', // Version of the spec used.
+					nodes: [
+						{
+							asi: 'bizbudding.com', // Populate with the canonical domain of the advertising system where the seller.JSON file is hosted.
+							sid: maiPubAdsVars['sellersId'], // The identifier associated with the seller or reseller account within your advertising system.
+							hp: 1, // 1 or 0, whether this node is involved in the payment flow.
+							name: maiPubAdsVars['sellersName'], // Name of the company paid for inventory under seller ID (optional).
+							domain: maiPubAdsVars['domain'], // Business domain of this node (optional).
+						}
+					]
+				}
 			});
 
 			// Loop through maiPubAdsVars getting key and values.

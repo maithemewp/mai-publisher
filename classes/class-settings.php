@@ -186,13 +186,20 @@ class Mai_Publisher_Settings {
 		);
 
 		add_settings_field(
+			'gam_sellers_name', // id
+			__( 'GAM Sellers Name', 'mai-publisher' ), // title
+			[ $this, 'gam_sellers_name_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings' // section
+		);
+
+		add_settings_field(
 			'gam_sellers_id', // id
 			__( 'GAM Sellers ID', 'mai-publisher' ), // title
 			[ $this, 'gam_sellers_id_callback' ], // callback
 			'mai-publisher-section', // page
 			'maipub_settings' // section
 		);
-
 
 		add_settings_field(
 			'gam_targets', // id
@@ -341,6 +348,7 @@ class Mai_Publisher_Settings {
 			'gam_domain'             => 'maipub_get_url_host',
 			'gam_network_code'       => 'absint',
 			'gam_sellers_id'         => 'sanitize_text_field',
+			'gam_sellers_name'       => 'sanitize_text_field',
 			'gam_targets'            => 'sanitize_text_field',
 			'category'               => 'sanitize_text_field',
 			'amazon_uam_enabled'     => 'rest_sanitize_boolean',
@@ -464,6 +472,20 @@ class Mai_Publisher_Settings {
 	/**
 	 * Setting callback.
 	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	function gam_sellers_name_callback() {
+		$sellers_name = maipub_get_option( 'gam_sellers_name', false );
+
+		printf( '<input class="regular-text" type="text" name="mai_publisher[gam_sellers_name]" id="gam_sellers_name" value="%s">', $sellers_name );
+		printf( '<p class="description">%s <a href="https://bizbudding.com/sellers.json">sellers.json</a></p>', __( 'Must match', 'mai-publisher' ) );
+	}
+
+	/**
+	 * Setting callback.
+	 *
 	 * @since 0.11.0?
 	 *
 	 * @return void
@@ -473,6 +495,7 @@ class Mai_Publisher_Settings {
 		$sellers_id    = $network_code ? maipub_encode( $network_code ) : '';
 
 		printf( '<input class="regular-text" type="text" name="mai_publisher[gam_sellers_id]" id="gam_sellers_id" value="%s" readonly>', $sellers_id );
+		printf( '<p class="description">%s <a href="https://bizbudding.com/sellers.json">sellers.json</a></p>', __( 'Must match', 'mai-publisher' ) );
 	}
 
 	/**
