@@ -480,7 +480,7 @@ class Mai_Publisher_Settings {
 		$sellers_name = maipub_get_option( 'gam_sellers_name', false );
 
 		printf( '<input class="regular-text" type="text" name="mai_publisher[gam_sellers_name]" id="gam_sellers_name" value="%s">', $sellers_name );
-		printf( '<p class="description">%s <a href="https://bizbudding.com/sellers.json">sellers.json</a></p>', __( 'Must match', 'mai-publisher' ) );
+		printf( '<p class="description">%s <a target="_blank" href="https://bizbudding.com/sellers.json">sellers.json</a></p>', __( 'Must match', 'mai-publisher' ) );
 	}
 
 	/**
@@ -495,7 +495,7 @@ class Mai_Publisher_Settings {
 		$sellers_id    = $network_code ? maipub_encode( $network_code ) : '';
 
 		printf( '<input class="regular-text" type="text" name="mai_publisher[gam_sellers_id]" id="gam_sellers_id" value="%s" readonly>', $sellers_id );
-		printf( '<p class="description">%s <a href="https://bizbudding.com/sellers.json">sellers.json</a></p>', __( 'Must match', 'mai-publisher' ) );
+		printf( '<p class="description">%s <a target="_blank" href="https://bizbudding.com/sellers.json">sellers.json</a></p>', __( 'Must match', 'mai-publisher' ) );
 	}
 
 	/**
