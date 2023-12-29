@@ -140,6 +140,7 @@ final class Mai_Publisher_Plugin {
 		new Mai_Publisher_Ad_Unit_Block;
 		new Mai_Publisher_Ad_Video_Block;
 		new Mai_Publisher_Display;
+		new Mai_Publisher_Endpoint;
 		new Mai_Publisher_Output;
 		new Mai_Publisher_Views;
 		new Mai_Publisher_Tracking;
