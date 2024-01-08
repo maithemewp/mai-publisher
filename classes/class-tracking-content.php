@@ -26,11 +26,13 @@ class Mai_Publisher_Tracking_Content {
 	 * @return void
 	 */
 	function hooks() {
-		add_filter( 'wp_nav_menu',    [ $this, 'add_menu_attributes' ], 10, 2 );
-		add_filter( 'maicca_content', [ $this, 'add_cca_attributes' ], 12, 2 );
-		add_filter( 'maiam_ad',       [ $this, 'add_ad_attributes' ], 12, 2 );
-		add_filter( 'render_block',   [ $this, 'render_navigation_block' ], 10, 2 );
-		add_filter( 'render_block',   [ $this, 'render_post_preview_block' ], 10, 2 );
+		add_filter( 'wp_nav_menu',            [ $this, 'add_menu_attributes' ], 10, 2 );
+		add_filter( 'maicca_content',         [ $this, 'add_cca_attributes' ], 12, 2 );
+		add_filter( 'maiam_ad',               [ $this, 'add_ad_attributes' ], 12, 2 );
+		add_filter( 'render_block',           [ $this, 'render_navigation_block' ], 10, 2 );
+		add_filter( 'render_block',           [ $this, 'render_post_preview_block' ], 10, 2 );
+		add_filter( 'render_block',           [ $this, 'render_elasticpress_facet_blocks' ], 10, 2 );
+		add_filter( 'ep_facet_search_widget', [ $this, 'render_elasticpress_taxonomy_facet' ], 10, 5 );
 	}
 
 	/**
@@ -189,6 +191,81 @@ class Mai_Publisher_Tracking_Content {
 		$name = 'Mai Post Preview | ' . $url;
 
 		return maipub_add_attributes( $block_content, $name );
+	}
+
+	/**
+	 * Add attributes to Elasticpress filter blocks.
+	 *
+	 * @since TBD
+	 *
+	 * @param string $block_content The existing block content.
+	 * @param array  $block         The button block object.
+	 *
+	 * @return string
+	 */
+	function render_elasticpress_facet_blocks( $block_content, $block ) {
+		// Bail if Elasticpress is not active.
+		if ( ! defined( 'EP_URL' ) ) {
+			return $block_content;
+		}
+
+		// Bail if not tracking.
+		if ( ! $this->should_track() ) {
+			return $block_content;
+		}
+
+		// Bail if no content.
+		if ( ! $block_content ) {
+			return $block_content;
+		}
+
+		// Facet blocks.
+		$facets = [
+			'elasticpress/facet-date',
+			'elasticpress/facet-meta',
+			'elasticpress/facet-meta-range',
+			'elasticpress/facet-post-type',
+			'elasticpress/related-posts',
+			// 'elasticpress/facet', // This has a widget as well, so we're using the filter below instead.
+		];
+
+		// Flip.
+		$facets = array_flip( $facets );
+
+		// Bail if not the block(s) we want.
+		if ( ! isset( $facets[ $block['blockName'] ] ) ) {
+			return $block_content;
+		}
+
+		// Get slug from block name.
+		$slug = str_replace( 'elasticpress/facet-', '', $block['blockName'] );
+
+		// Bail if no slug.
+		if ( ! $slug ) {
+			return $block_content;
+		}
+
+		return maipub_add_attributes( $block_content, "mai-elasticpress-{$slug}-filter" );
+	}
+
+	/**
+	 * Add attributes to Elasticpress taxonomy filter.
+	 *
+	 * @since TBD
+	 *
+	 * @param string $facet_html       Facet HTML
+	 * @param array  $selected_filters Selected filters
+	 * @param array  $terms_by_slug    Terms by slug
+	 * @param array  $outputted_terms  Outputted $terms
+	 * @param string $title            Widget title
+	 *
+	 * @return string
+	 */
+	function render_elasticpress_taxonomy_facet( $facet_html, $selected_filters, $terms_by_slug, $outputted_terms, $title ) {
+		$first    = reset( $terms_by_slug );
+		$taxonomy = isset( $first->taxonomy ) ? $first->taxonomy : 'taxonomy';
+
+		return maipub_add_attributes( $facet_html, "mai-elasticpress-{$taxonomy}-filter" );
 	}
 
 	/**
