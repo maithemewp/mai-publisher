@@ -6,14 +6,16 @@ defined( 'ABSPATH' ) || die;
 class Mai_Publisher_Output {
 	protected $domain;
 	protected $network_code;
+	protected $sellers_name;
+	protected $sellers_id;
 	protected $locations;
 	protected $ads;
 	protected $grouped;
-	protected $dom;
-	protected $xpath;
 	protected $gam;
 	protected $mode;
 	protected $suffix;
+	protected $dom;
+	protected $xpath;
 
 	/**
 	 * Constructs the class.
@@ -177,6 +179,7 @@ class Mai_Publisher_Output {
 					'targets'      => [],
 				];
 
+				// TODO: Move this to each block individually. See TODO in mai-ad-unit.
 				// Add analytics tracking.
 				$ad_unit->setAttribute( 'data-content-name', esc_attr( $slot ) );
 				$ad_unit->setAttribute( 'data-track-content', '' );

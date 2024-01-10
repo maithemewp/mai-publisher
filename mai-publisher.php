@@ -208,6 +208,7 @@ final class Mai_Publisher_Plugin {
 
 		// Add icons for Dashboard > Updates screen.
 		if ( function_exists( 'mai_get_updater_icons' ) && $icons = mai_get_updater_icons() ) {
+
 			$updater->addResultFilter(
 				function ( $info ) use ( $icons ) {
 					$info->icons = $icons;
