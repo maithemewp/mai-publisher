@@ -39,6 +39,9 @@ function maipub_get_page_ads() {
 				continue;
 			}
 
+			// Set location targets. Manually added ads are handled in `class-display.php`.
+			$args['content'] = maipub_add_location_attributes( $args['content'], $args['location'] );
+
 			// Add to ads.
 			$ads[] = $args;
 		}
@@ -486,14 +489,60 @@ function maipub_validate_ad_conditions_archive( $args ) {
 }
 
 /**
+ * Set data-location attribute to ads and videos.
+ *
+ * @access private
+ *
+ * @since TBD
+ *
+ * @param string $html     The markup that contains ad/video blocks.
+ * @param string $location The full location name. Example: `before_entry_content`.
+ *
+ * @return string
+ */
+function maipub_add_location_attributes( $html, $location = '' ) {
+	// Bail if no location.
+	if ( ! $location ) {
+		return $html;
+	}
+
+	// Format location.
+	$location = str_replace( '_', '-', $location );
+
+	// Set up tag processor.
+	$tags = new WP_HTML_Tag_Processor( $html );
+
+	// Set start.
+	$tags->next_tag();
+	$tags->set_bookmark( 'start' );
+
+	// Loop through ad units and set location.
+	while ( $tags->next_tag( [ 'tag_name' => 'div', 'class_name' => 'mai-ad-unit' ] ) ) {
+		$tags->set_attribute( 'data-location', $location );
+	}
+
+	// Reset to start.
+	$tags->seek( 'start' );
+
+	// Loop through videos and set location.
+	while ( $tags->next_tag( [ 'tag_name' => 'div', 'class_name' => 'mai-ad-video' ] ) ) {
+		$tags->set_attribute( 'data-location', $location );
+	}
+
+	return $tags->get_updated_html();
+}
+
+/**
  * Gets an array of valid key=value pairs from a string.
  * This is typically from a text field.
+ *
+ * @since 0.13.0
  *
  * @param string $string
  *
  * @return array
  */
-function maipub_get_valid_targets( $string ) {
+function maipub_sanitize_targets( $string ) {
 	$pairs = [];
 	$array = maipub_string_to_array( ',', $string );
 

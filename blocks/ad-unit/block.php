@@ -129,8 +129,7 @@ class Mai_Publisher_Ad_Unit_Block {
 
 		// Handle sticky.
 		if ( $is_sticky ) {
-			$location              = 'ts' === $pos ? 'header' : 'footer';
-			// $spacer_attr['class'] .= " mai-ad-unit-sticky-spacer mai-ad-unit-sticky-{$location}";
+			$location             = 'ts' === $pos ? 'header' : 'footer';
 			$outer_attr['class'] .= " mai-ad-unit-sticky mai-ad-unit-sticky-{$location}";
 		}
 

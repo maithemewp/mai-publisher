@@ -3,6 +3,29 @@
 // Prevent direct file access.
 defined( 'ABSPATH' ) || die;
 
+
+// /**
+//  * Increments a string, if needed.
+//  *
+//  * @since TBD
+//  *
+//  * @param string $string
+//  *
+//  * @return string
+//  */
+// function maipub_increment_string( $string ) {
+// 	static $counts  = [];
+
+// 	if ( isset( $counts[ $string ] ) ) {
+// 		$counts[ $string ]++;
+// 		$string = $string . '-' . $counts[ $string ];
+// 	} else {
+// 		$counts[ $string ] = 1;
+// 	}
+
+// 	return $string;
+// }
+
 /**
  * Insert a value or key/value pair after a specific key in an array.
  * If key doesn't exist, value is appended to the end of the array.

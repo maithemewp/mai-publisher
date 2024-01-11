@@ -71,6 +71,7 @@ class Mai_Publisher_Display {
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue' ] );
 		add_action( 'wp_head',            [ $this, 'header' ] );
 		add_action( 'wp_footer',          [ $this, 'footer' ], 20 );
+		add_filter( 'the_content',        [ $this, 'content' ] );
 
 		$this->render();
 	}
@@ -126,6 +127,20 @@ class Mai_Publisher_Display {
 		}
 
 		echo $footer;
+	}
+
+	/**
+	 * Adds targetting and tracking attributes to manually inserted ads.
+	 *
+	 * @since TBD
+	 *
+	 * @param string $content
+	 *
+	 * @return string
+	 */
+	function content( $content ) {
+		// Set location targets. Auto displayed ads are handled in `class-output.php`.
+		return maipub_add_location_attributes( $content, 'content' );
 	}
 
 	/**

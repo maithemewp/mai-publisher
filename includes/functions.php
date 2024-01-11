@@ -70,7 +70,7 @@ function maipub_get_dom_document( $html ) {
 
 	// Encode. Can't use `mb_convert_encoding()` because it's deprecated in PHP 8.2.
 	// @link https://stackoverflow.com/questions/8218230/php-domdocument-loadhtml-not-encoding-utf-8-correctly
-	$html = mb_encode_numericentity( $html, [0x80, 0x10FFFF, 0, ~0], 'UTF-8' );
+	// $html = mb_encode_numericentity( $html, [0x80, 0x10FFFF, 0, ~0], 'UTF-8' );
 
 	// Load the content in the document HTML.
 	$dom->loadHTML( "<div>$html</div>" );
@@ -114,109 +114,118 @@ function maipub_get_locations() {
 		'before_header' => [
 			'hook'     => 'genesis_before_header',
 			'priority' => 5, // Before header default content area is 10.
+			'target'   => 'bh',
 		],
 		'after_header' => [
 			'hook'     => 'genesis_after_header',
 			'priority' => 15,
+			'target'   => 'ah',
 		],
 		'before_loop' => [
 			'hook'     => 'genesis_loop',
 			'priority' => 5,
+			'target'   => 'bl',
 		],
 		'before_entry' => [
 			'hook'     => 'genesis_before_entry',
 			'priority' => 10,
+			'target'   => 'be',
 		],
 		'before_entry_content' => [
 			'hook'     => 'genesis_before_entry_content',
 			'priority' => 10,
+			'target'   => 'bec',
 		],
 		'content' => [
 			'hook'     => '', // No hooks, handled in class-output.
 			'priority' => null,
+			'target'   => 'icn',
 		],
 		'recipe' => [
 			'hook'     => '', // No hooks, handled in class-output.
 			'priority' => null,
+			'target'   => 'ir',
 		],
 		'comments' => [
 			'hook'     => '', // No hooks, handled in class-output.
 			'priority' => null,
+			'target'   => 'icm',
 		],
 		'entries' => [
 			'hook'     => '', // No hooks, handled in class-output.
 			'priority' => null,
+			'target'   => 'if',
 		],
 		'after_entry_content'  => [
 			'hook'     => 'genesis_after_entry_content',
 			'priority' => 10,
+			'target'   => 'aec',
 		],
 		'after_entry' => [
 			'hook'     => 'genesis_after_entry',
 			'priority' => 8, // Comments are at 10.
+			'target'   => 'ae',
 		],
 		'after_loop' => [
 			'hook'     => 'genesis_loop',
 			'priority' => 15,
+			'target'   => 'al',
 		],
 		'before_sidebar_content' => [
 			'hook'     => '', // No hooks, handled in class-output.
 			'priority' => null,
+			'target'   => 'bsc',
 		],
 		'after_sidebar_content' => [
 			'hook'     => '', // No hooks, handled in class-output.
 			'priority' => null,
+			'target'   => 'asc',
 		],
 		'before_footer' => [
 			'hook'     => 'genesis_after_content_sidebar_wrap',
 			'priority' => 10,
+			'target'   => 'bf',
 		],
 		'after_footer' => [
 			'hook'     => 'wp_footer',
 			'priority' => 20,
+			'target'   => 'af',
 		],
 	];
 
+	// Handle WooCommerce locations.
 	if ( maipub_is_product_archive() || maipub_is_product_singular() ) {
-		$locations['before_loop'] = [
-			'hook'     => 'woocommerce_before_shop_loop',
-			'priority' => 12, // Notices are at 10.
-		];
+		$locations['before_loop']['hook']     = 'woocommerce_before_shop_loop';
+		$locations['before_loop']['priority'] = 12; // Notices are at 10.
 
-		$locations['before_entry'] = [
-			'hook'     => 'woocommerce_before_single_product',
-			'priority' => 12, // Notices are at 10.
-		];
+		$locations['before_entry']['hook']     = 'woocommerce_before_single_product';
+		$locations['before_entry']['priority'] = 12; // Notices are at 10.
 
-		$locations['before_entry_content'] = [
-			'hook'     => 'woocommerce_after_single_product_summary',
-			'priority' => 8, // Tabs are at 10.
-		];
+		$locations['before_entry_content']['hook']     = 'woocommerce_after_single_product_summary';
+		$locations['before_entry_content']['priority'] = 8;// Tabs are at 10.
 
-		$locations['after_entry_content'] = [
-			'hook'     => 'woocommerce_after_single_product_summary',
-			'priority' => 12, // Tabs are at 10, upsells and related products are 15.
-		];
+		$locations['after_entry_content']['hook']     = 'woocommerce_after_single_product_summary';
+		$locations['after_entry_content']['priority'] = 12; // Tabs are at 10, upsells and related products are 15.
 
-		$locations['after_entry'] = [
-			'hook'     => 'woocommerce_after_single_product',
-			'priority' => 10,
-		];
+		$locations['after_entry']['hook']     = 'woocommerce_after_single_product';
+		$locations['after_entry']['priority'] = 10;
 
-		$locations['after_loop'] = [
-			'hook'     => 'woocommerce_after_shop_loop',
-			'priority' => 12, // Pagination is at 10.
-		];
+		$locations['after_loop']['hook']     = 'woocommerce_after_shop_loop';
+		$locations['after_loop']['priority'] = 12; // Pagination is at 10.
 	}
 
+	// Filter.
 	$locations = apply_filters( 'mai_publisher_locations', $locations );
 
+	// If locations.
 	if ( $locations ) {
+		// Make sure all locations have the required keys.
 		foreach ( $locations as $name => $location ) {
 			$locations[ $name ] = wp_parse_args( (array) $location,
 				[
 					'hook'     => '',
 					'priority' => null,
+					'target'   => '',
 				]
 			);
 		}
