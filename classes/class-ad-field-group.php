@@ -460,7 +460,7 @@ class Mai_Publisher_Ad_Field_Group {
 			[
 				'label'             => __( 'Taxonomy', 'mai-publisher' ),
 				'key'               => 'maipub_single_taxonomy',
-				'name'              => 'taxogam_nomy',
+				'name'              => 'taxonomy',
 				'type'              => 'select',
 				'choices'           => [],
 				'ui'                => 1,
@@ -469,7 +469,7 @@ class Mai_Publisher_Ad_Field_Group {
 			[
 				'label'             => __( 'Terms', 'mai-publisher' ),
 				'key'               => 'maipub_single_terms',
-				'name'              => 'termgam_s',
+				'name'              => 'terms',
 				'type'              => 'select',
 				'choices'           => [],
 				'ui'                => 1,
@@ -486,7 +486,7 @@ class Mai_Publisher_Ad_Field_Group {
 			],
 			[
 				'key'        => 'maipub_single_operator',
-				'name'       => 'opergam_ator',
+				'name'       => 'operator',
 				'label'      => __( 'Operator', 'mai-publisher' ),
 				'type'       => 'select',
 				'default'    => 'IN',
