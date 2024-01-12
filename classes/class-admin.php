@@ -204,6 +204,7 @@ class Mai_Publisher_Admin {
 	 */
 	function display_sizes( $post_id ) {
 		$ad_units = maipub_get_config( 'ad_units' );
+		$legacy   = maipub_get_legacy_ad_units();
 		$post     = get_post( $post_id );
 		$slugs    = $this->get_ad_unit_slugs( $post->post_content );
 
@@ -218,7 +219,13 @@ class Mai_Publisher_Admin {
 				continue;
 			}
 
-			$sizes[] = $slug . ': ' . $this->format_sizes( $ad_units[ $slug ]['sizes'] );
+			$label = $slug;
+
+			if ( isset( $legacy[ $slug ] ) ) {
+				$label .= ' ' . __( '(legacy)', 'mai-publisher' );
+			}
+
+			$sizes[] = $label . ': ' . $this->format_sizes( $ad_units[ $slug ]['sizes'] );
 		}
 
 		if ( ! $sizes ) {

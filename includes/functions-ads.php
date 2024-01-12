@@ -4,6 +4,35 @@
 defined( 'ABSPATH' ) || die;
 
 /**
+ * Returns the soon to be removed/deperecated ad units.
+ *
+ * @access private
+ *
+ * @since TBD
+ *
+ * @return array
+ */
+function maipub_get_legacy_ad_units() {
+	return [
+		'button'            => 'button',
+		'footer'            => 'footer',
+		'halfpage'          => 'halfpage',
+		'header'            => 'header',
+		'incontent'         => 'incontent',
+		'incontent-wide'    => 'incontent-wide',
+		'infeed'            => 'infeed',
+		'inrecipe'          => 'inrecipe',
+		'medium-rectangle'  => 'medium-rectangle',
+		'micro-bar'         => 'micro-bar',
+		'podcast-footer'    => 'podcast-footer',
+		'podcast-header'    => 'podcast-header',
+		'skyscraper'        => 'skyscraper',
+		'sponsored-sidebar' => 'sponsored-sidebar',
+		'sidebar'           => 'sidebar',
+	];
+}
+
+/**
  * Returns array of ads for the currently viewed page.
  *
  * @since 0.13.0

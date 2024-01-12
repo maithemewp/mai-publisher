@@ -399,9 +399,16 @@ class Mai_Publisher_Ad_Unit_Block {
 
 		$choices = [ '' => __( 'None', 'mai-publisher' ) ];
 		$units   = maipub_get_config( 'ad_units' );
+		$legacy  = maipub_get_legacy_ad_units();
 
 		foreach ( $units as $slug => $unit ) {
-			$choices[ $slug ] = $slug;
+			$label = $slug;
+
+			if ( isset( $legacy[ $slug ] ) ) {
+				$label .= ' ' . __( '(legacy)', 'mai-publisher' );
+			}
+
+			$choices[ $slug ] = $label;
 		}
 
 		$field['choices'] = $choices;

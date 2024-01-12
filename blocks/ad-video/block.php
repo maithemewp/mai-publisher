@@ -138,30 +138,4 @@ class Mai_Publisher_Ad_Video_Block {
 			]
 		);
 	}
-
-	/**
-	 * Loads ad unit choices.
-	 *
-	 * @since 0.15.0
-	 *
-	 * @param array $field The field data.
-	 *
-	 * @return array
-	 */
-	function load_ad_unit_choices( $field ) {
-		if ( ! is_admin() ) {
-			return $field;
-		}
-
-		$choices = [ '' => __( 'None', 'mai-publisher' ) ];
-		$units   = maipub_get_config( 'ad_units' );
-
-		foreach ( $units as $slug => $unit ) {
-			$choices[ $slug ] = $slug;
-		}
-
-		$field['choices'] = $choices;
-
-		return $field;
-	}
 }
