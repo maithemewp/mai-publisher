@@ -319,7 +319,18 @@ class Mai_Publisher_Output {
 		}
 
 		// Get last child element.
-		$last = $children->item( $children->length - 1 );
+		$last = null;
+
+		// Loop through from the end to the start.
+		for ( $i = $children->length - 1; $i >= 0; $i-- ) {
+			$node = $children->item($i);
+
+			// Check if the node is an element node.
+			if ( $node instanceof DOMElement ) {
+				$last = $node;
+				break;
+			}
+		}
 
 		// Loop through in-content ads.
 		foreach ( $this->grouped['content'] as $ad ) {
