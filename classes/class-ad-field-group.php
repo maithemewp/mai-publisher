@@ -186,7 +186,7 @@ class Mai_Publisher_Ad_Field_Group {
 				'type'              => 'text',
 				'append'            => __( 'elements', 'mai-publisher' ),
 				'required'          => 1,
-				'default_value'     => 6,
+				'default_value'     => '4, 12, 20, 28, 36, 44, 56, 64',
 				'conditional_logic' => [
 					[
 						[
@@ -359,7 +359,7 @@ class Mai_Publisher_Ad_Field_Group {
 				'name'              => 'maipub_archive_content_count',
 				'type'              => 'text',
 				'required'          => 1,
-				'default_value'     => '3, 6',
+				'default_value'     => '2, 7, 12, 17, 22, 27, 32',
 				'wrapper'           => [ 'width' => '75' ],
 				'conditional_logic' => [
 					[

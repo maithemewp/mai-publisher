@@ -75,7 +75,7 @@ class Mai_Publisher_Settings_Ad_Units_Config {
 					'posts_per_page'         => 100,
 					'offset'                 => 0,
 					'post_status'            => 'any',
-					'orderby'                => 'name',
+					'orderby'                => 'menu_order',
 					'order'                  => 'ASC',
 					'no_found_rows'          => true,
 					'update_post_meta_cache' => false,
@@ -106,6 +106,8 @@ class Mai_Publisher_Settings_Ad_Units_Config {
 
 
 					$json[ $post->post_name ] = [
+						'menu_order'   => $post->menu_order,
+						'post_title'   => $post->post_title,
 						'post_content' => $post->post_content,
 						'meta_input'   => $meta,
 					];

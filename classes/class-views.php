@@ -293,7 +293,7 @@ class Mai_Publisher_Views {
 	/**
 	 * Get views from Matomo.
 	 *
-	 * @since TBD
+	 * @since 0.1.0
 	 *
 	 * @return array
 	 */
@@ -428,7 +428,7 @@ class Mai_Publisher_Views {
 	/**
 	 * Get views from Jetpack.
 	 *
-	 * @since TBD
+	 * @since 0.23.0
 	 *
 	 * @return array
 	 */

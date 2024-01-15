@@ -8,7 +8,7 @@ defined( 'ABSPATH' ) || die;
  *
  * @access private
  *
- * @since TBD
+ * @since 0.23.0
  *
  * @return array
  */
@@ -522,7 +522,7 @@ function maipub_validate_ad_conditions_archive( $args ) {
  *
  * @access private
  *
- * @since TBD
+ * @since 0.23.0
  *
  * @param string $html     The markup that contains ad/video blocks.
  * @param string $location The full location name. Example: `before_entry_content`.

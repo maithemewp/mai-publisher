@@ -132,7 +132,7 @@ class Mai_Publisher_Display {
 	/**
 	 * Adds targetting and tracking attributes to manually inserted ads.
 	 *
-	 * @since TBD
+	 * @since 0.23.0
 	 *
 	 * @param string $content
 	 *

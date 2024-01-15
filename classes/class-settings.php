@@ -472,7 +472,7 @@ class Mai_Publisher_Settings {
 	/**
 	 * Setting callback.
 	 *
-	 * @since TBD
+	 * @since 0.23.0
 	 *
 	 * @return void
 	 */
@@ -673,7 +673,7 @@ class Mai_Publisher_Settings {
 	/**
 	 * Setting callback.
 	 *
-	 * @since TBD
+	 * @since 0.12.0
 	 *
 	 * @return void
 	 */

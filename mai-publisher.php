@@ -261,7 +261,7 @@ final class Mai_Publisher_Plugin {
 				'show_in_rest'       => true,
 				'show_ui'            => true,
 				'rewrite'            => false,
-				'supports'           => [ 'title', 'editor' ],
+				'supports'           => [ 'title', 'editor', 'excerpt' ],
 			]
 		);
 	}
@@ -292,7 +292,7 @@ final class Mai_Publisher_Plugin {
 		}
 
 		// Set order.
-		$query->set( 'orderby', 'title' );
+		$query->set( 'orderby', 'menu_order' );
 		$query->set( 'order','ASC' );
 	}
 

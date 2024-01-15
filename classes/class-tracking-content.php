@@ -196,7 +196,7 @@ class Mai_Publisher_Tracking_Content {
 	/**
 	 * Add attributes to Elasticpress filter blocks.
 	 *
-	 * @since TBD
+	 * @since 0.22.0
 	 *
 	 * @param string $block_content The existing block content.
 	 * @param array  $block         The button block object.
@@ -251,7 +251,7 @@ class Mai_Publisher_Tracking_Content {
 	/**
 	 * Add attributes to Elasticpress taxonomy filter.
 	 *
-	 * @since TBD
+	 * @since 0.22.0
 	 *
 	 * @param string $facet_html       Facet HTML
 	 * @param array  $selected_filters Selected filters
