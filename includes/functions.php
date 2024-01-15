@@ -110,6 +110,28 @@ function maipub_get_locations() {
 		return $locations;
 	}
 
+	$after_header_hook     = 'genesis_after_header';
+	$after_header_priority = 15;
+	$before_entry_hook     = 'genesis_before_entry';
+
+	// If Mai Engine.
+	if ( class_exists( 'Mai_Engine' ) ) {
+		$page_header  = mai_has_page_header();
+		$trans_header = mai_has_transparent_header_enabled();
+		$full_first   = mai_has_alignfull_first();
+
+		// If page header, so after the page header.
+		if ( $page_header ) {
+			$after_header_hook     = 'genesis_before_content_sidebar_wrap';
+			$after_header_priority = 11; // Mai Engine page header is 10 and breadcrumbs are 12.
+		}
+		// No page header but has transparent header and alignfull first. This will break layout so we disable these ads.
+		elseif ( $trans_header && $full_first ) {
+			$after_header_hook = '';
+			$before_entry_hook = '';
+		}
+	}
+
 	$locations = [
 		'before_header' => [
 			'hook'     => 'genesis_before_header',
@@ -117,8 +139,8 @@ function maipub_get_locations() {
 			'target'   => 'bh',
 		],
 		'after_header' => [
-			'hook'     => 'genesis_after_header',
-			'priority' => 15,
+			'hook'     => $after_header_hook,
+			'priority' => $after_header_priority,
 			'target'   => 'ah',
 		],
 		'before_loop' => [
@@ -127,7 +149,7 @@ function maipub_get_locations() {
 			'target'   => 'bl',
 		],
 		'before_entry' => [
-			'hook'     => 'genesis_before_entry',
+			'hook'     => $before_entry_hook,
 			'priority' => 10,
 			'target'   => 'be',
 		],
