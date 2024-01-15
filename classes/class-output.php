@@ -716,11 +716,12 @@ class Mai_Publisher_Output {
 	 * @return void
 	 */
 	function handle_comments() {
-		$comments = $this->xpath->query( '//ol[contains(concat(" ", normalize-space(@class), " "), " comment-list ")]/li[contains(concat(" ", normalize-space(@class), " "), " comment ")]' );
+		$comments = $this->xpath->query( '//ol[contains(concat(" ", normalize-space(@class), " "), " comment-list ")]/li[contains(concat(" ", normalize-space(@class), " "), " comment ") and not(position() = last())]' );
 
 		if ( ! $comments->length ) {
 			return;
 		}
+
 
 		// Loop through comments ads.
 		foreach ( $this->grouped['comments'] as $ad ) {
@@ -994,7 +995,7 @@ class Mai_Publisher_Output {
 	/**
 	 * Increments a string, if needed.
 	 *
-	 * @since TBD
+	 * @since 0.23.0
 	 *
 	 * @param string $string
 	 *
