@@ -324,8 +324,6 @@ class Mai_Publisher_Ad_Unit_Block {
 							''     => __( 'Not set', 'mai-publisher' ),
 							'atf'  => __( 'Above the Fold', 'mai-publisher' ),
 							'btf'  => __( 'Below the Fold', 'mai-publisher' ),
-							's'    => __( 'Sidebar', 'mai-publisher' ),
-							'satf' => __( 'Sidebar Above the Fold', 'mai-publisher' ),
 							'vs'   => __( 'Sticky Vertical', 'mai-publisher' ),
 							'ts'   => __( 'Sticky Top Horizontal', 'mai-publisher' ),
 							'bs'   => __( 'Sticky Bottom Horizontal', 'mai-publisher' ),
