@@ -342,7 +342,7 @@ class Mai_Publisher_Admin {
 				$label = $slug;
 
 				if ( isset( $legacy[ $slug ] ) ) {
-					$label .= ' ' . __( '(legacy)', 'mai-publisher' );
+					$label .= ' <span style="color:red;">' . __( '(legacy)', 'mai-publisher' ) . '</span>';
 				}
 
 
