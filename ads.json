@@ -106,8 +106,21 @@
             ]
         }
     },
-    "recipe": {
+    "content_video": {
         "menu_order": 100,
+        "post_title": "In Single Content Video",
+        "post_content": "<!-- wp:acf\/mai-ad-video {\"name\":\"acf\/mai-ad-video\",\"data\":{\"id\":\"6f704650-514c-4dc1-8481-8a75bbfb2eea\",\"_id\":\"maipub_ad_video_id\"},\"mode\":\"preview\"} \/-->",
+        "meta_input": {
+            "maipub_single_location": "content",
+            "maipub_single_content_location": "after",
+            "maipub_single_content_count": "1",
+            "maipub_single_types": [
+                "post"
+            ]
+        }
+    },
+    "recipe": {
+        "menu_order": 110,
         "post_title": "In Recipe",
         "post_content": "<!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"rectangle-medium\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"btf\",\"_position\":\"maipub_ad_unit_position\",\"split_test\":\"\",\"_split_test\":\"maipub_ad_unit_split_test\",\"targets\":\"\",\"_targets\":\"maipub_ad_unit_targets\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\"} \/-->",
         "meta_input": {
@@ -118,7 +131,7 @@
         }
     },
     "after_entry_content": {
-        "menu_order": 110,
+        "menu_order": 120,
         "post_title": "After Single Entry Content",
         "post_content": "<!-- wp:group {\"layout\":{\"type\":\"constrained\"},\"contentWidth\":\"xl\",\"verticalSpacingTop\":\"sm\",\"verticalSpacingBottom\":\"sm\"} -->\n<div class=\"wp-block-group\"><!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"leaderboard\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"btf\",\"_position\":\"maipub_ad_unit_position\",\"split_test\":\"\",\"_split_test\":\"maipub_ad_unit_split_test\",\"targets\":\"\",\"_targets\":\"maipub_ad_unit_targets\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\"} \/--><\/div>\n<!-- \/wp:group -->",
         "meta_input": {
@@ -129,7 +142,7 @@
         }
     },
     "after_entry": {
-        "menu_order": 120,
+        "menu_order": 130,
         "post_title": "After Single Entry",
         "post_content": "<!-- wp:group {\"layout\":{\"type\":\"constrained\"},\"contentWidth\":\"xl\",\"verticalSpacingTop\":\"sm\",\"verticalSpacingBottom\":\"sm\"} -->\n<div class=\"wp-block-group\"><!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"billboard\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"btf\",\"_position\":\"maipub_ad_unit_position\",\"split_test\":\"\",\"_split_test\":\"maipub_ad_unit_split_test\",\"targets\":\"\",\"_targets\":\"maipub_ad_unit_targets\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\"} \/--><\/div>\n<!-- \/wp:group -->",
         "meta_input": {
@@ -140,7 +153,7 @@
         }
     },
     "comments": {
-        "menu_order": 130,
+        "menu_order": 140,
         "post_title": "In Comments",
         "post_content": "<!-- wp:group {\"layout\":{\"type\":\"constrained\"},\"verticalSpacingTop\":\"sm\",\"verticalSpacingBottom\":\"sm\"} -->\n<div class=\"wp-block-group\"><!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"billboard\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"btf\",\"_position\":\"maipub_ad_unit_position\",\"split_test\":\"\",\"_split_test\":\"maipub_ad_unit_split_test\",\"targets\":\"\",\"_targets\":\"maipub_ad_unit_targets\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\"} \/--><\/div>\n<!-- \/wp:group -->",
         "meta_input": {
@@ -152,7 +165,7 @@
         }
     },
     "after_loop": {
-        "menu_order": 140,
+        "menu_order": 150,
         "post_title": "After Archive Entries",
         "post_content": "<!-- wp:group {\"align\":\"full\",\"layout\":{\"type\":\"constrained\"},\"contentWidth\":\"xl\",\"verticalSpacingTop\":\"sm\",\"verticalSpacingBottom\":\"sm\"} -->\n<div class=\"wp-block-group alignfull\"><!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"billboard-wide\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"atf\",\"_position\":\"maipub_ad_unit_position\",\"split_test\":\"\",\"_split_test\":\"maipub_ad_unit_split_test\",\"targets\":\"\",\"_targets\":\"maipub_ad_unit_targets\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\"} \/--><\/div>\n<!-- \/wp:group -->",
         "meta_input": {
@@ -166,7 +179,7 @@
         }
     },
     "before_sidebar_content": {
-        "menu_order": 150,
+        "menu_order": 160,
         "post_title": "Before Sidebar Content",
         "post_content": "<!-- wp:group {\"layout\":{\"type\":\"constrained\"},\"marginBottom\":\"xl\"} -->\n<div class=\"wp-block-group\"><!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"rectangle-medium\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"atf\",\"_position\":\"maipub_ad_unit_position\",\"split_test\":\"\",\"_split_test\":\"maipub_ad_unit_split_test\",\"targets\":\"\",\"_targets\":\"maipub_ad_unit_targets\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\"} \/--><\/div>\n<!-- \/wp:group -->",
         "meta_input": {
@@ -174,7 +187,7 @@
         }
     },
     "after_sidebar_content": {
-        "menu_order": 160,
+        "menu_order": 170,
         "post_title": "After Sidebar Content",
         "post_content": "<!-- wp:group {\"layout\":{\"type\":\"constrained\"}} -->\n<div class=\"wp-block-group\"><!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"rectangle-medium\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"vs\",\"_position\":\"maipub_ad_unit_position\",\"split_test\":\"\",\"_split_test\":\"maipub_ad_unit_split_test\",\"targets\":\"\",\"_targets\":\"maipub_ad_unit_targets\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\"} \/--><\/div>\n<!-- \/wp:group -->",
         "meta_input": {
@@ -182,7 +195,7 @@
         }
     },
     "before_footer": {
-        "menu_order": 170,
+        "menu_order": 180,
         "post_title": "Before Footer",
         "post_content": "<!-- wp:group {\"align\":\"full\",\"layout\":{\"type\":\"constrained\"},\"contentWidth\":\"xl\",\"verticalSpacingTop\":\"sm\",\"verticalSpacingBottom\":\"sm\"} -->\n<div class=\"wp-block-group alignfull\"><!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"billboard-wide\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"btf\",\"_position\":\"maipub_ad_unit_position\",\"split_test\":\"\",\"_split_test\":\"maipub_ad_unit_split_test\",\"targets\":\"\",\"_targets\":\"maipub_ad_unit_targets\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\"} \/--><\/div>\n<!-- \/wp:group -->",
         "meta_input": {
@@ -190,7 +203,7 @@
         }
     },
     "after_footer": {
-        "menu_order": 180,
+        "menu_order": 190,
         "post_title": "Sticky Footer",
         "post_content": "<!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"leaderboard-wide\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"bs\",\"_position\":\"maipub_ad_unit_position\",\"split_test\":\"\",\"_split_test\":\"maipub_ad_unit_split_test\",\"targets\":\"\",\"_targets\":\"maipub_ad_unit_targets\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\",\"backgroundColor\":\"alt\"} \/-->",
         "meta_input": {
