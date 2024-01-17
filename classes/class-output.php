@@ -193,8 +193,13 @@ class Mai_Publisher_Output {
 				$targets = $ad_unit->getAttribute( 'data-targets' );
 
 				// Ad location.
-				if ( $location && isset( $this->locations[ $location ]['target'] ) ) {
-					$this->gam[ $slot ]['targets']['al'] = $this->locations[ $location ]['target'];
+				if ( $location ) {
+					$loc_formatted = str_replace( '-', '_', $location );
+
+					// If mapped target is set, add it.
+					if ( isset( $this->locations[ $loc_formatted ]['target'] ) ) {
+						$this->gam[ $slot ]['targets']['al'] = $this->locations[ $loc_formatted ]['target'];
+					}
 				}
 
 				// Ad type.
