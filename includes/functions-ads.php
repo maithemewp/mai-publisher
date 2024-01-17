@@ -518,7 +518,7 @@ function maipub_validate_ad_conditions_archive( $args ) {
 }
 
 /**
- * Set data-location attribute to ads and videos.
+ * Set data-al attribute to ads and videos.
  *
  * @access private
  *
@@ -547,7 +547,7 @@ function maipub_add_location_attributes( $html, $location = '' ) {
 
 	// Loop through ad units and set location.
 	while ( $tags->next_tag( [ 'tag_name' => 'div', 'class_name' => 'mai-ad-unit' ] ) ) {
-		$tags->set_attribute( 'data-location', $location );
+		$tags->set_attribute( 'data-al', $location );
 	}
 
 	// Reset to start.
@@ -555,7 +555,7 @@ function maipub_add_location_attributes( $html, $location = '' ) {
 
 	// Loop through videos and set location.
 	while ( $tags->next_tag( [ 'tag_name' => 'div', 'class_name' => 'mai-ad-video' ] ) ) {
-		$tags->set_attribute( 'data-location', $location );
+		$tags->set_attribute( 'data-al', $location );
 	}
 
 	return $tags->get_updated_html();

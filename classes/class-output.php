@@ -158,7 +158,7 @@ class Mai_Publisher_Output {
 		// Loop through ad units.
 		foreach ( $ad_units as $ad_unit ) {
 			// Build name from location and unit.
-			$location = $ad_unit->getAttribute( 'data-location' );
+			$location = $ad_unit->getAttribute( 'data-al' );
 			$unit     = $ad_unit->getAttribute( 'data-unit' );
 			$slot     = $this->increment_string( $unit );
 			$name     = sprintf( 'mai-ad-%s-%s', $location, $unit );
@@ -224,7 +224,7 @@ class Mai_Publisher_Output {
 		// Loop through videos.
 		foreach ( $videos as $video ) {
 			// Build name from location and unit.
-			$location = $video->getAttribute( 'data-location' );
+			$location = $video->getAttribute( 'data-al' );
 			$unit     = $video->getAttribute( 'data-unit' );
 			$name     = sprintf( 'mai-ad-%s-%s', $location, $unit );
 			$name     = $this->increment_string( $name );
