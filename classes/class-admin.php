@@ -339,6 +339,7 @@ class Mai_Publisher_Admin {
 			$slug    = $values['slug'];
 			$targets = $values['targets'];
 
+			// If GAM ad unit.
 			if ( isset( $ad_units[ $slug ]['sizes'] ) ) {
 				$label = $slug;
 
@@ -346,10 +347,14 @@ class Mai_Publisher_Admin {
 					$label .= ' <span style="color:red;">' . __( '(legacy)', 'mai-publisher' ) . '</span>';
 				}
 
-
 				$sizes[] = '<strong>' . $label . '</strong>: ' . $this->format_sizes( $ad_units[ $slug ]['sizes'] );
 			}
+			// Not GAM, only video for now.
+			else {
+				$sizes[] = '<strong>' . $slug . '</strong>: ' . __( 'video', 'mai-publisher' );
+			}
 
+			// Targets.
 			foreach ( $targets as $key => $value ) {
 				$sizes[] = '<strong>' . $key . '</strong>: ' . $value;
 			}
@@ -381,9 +386,10 @@ class Mai_Publisher_Admin {
 		$positions   = $positions ? $positions['choices'] : [];
 		$split_tests = get_field_object( 'maipub_ad_unit_split_test' );
 		$split_tests = $split_tests ? $split_tests['choices'] : [];
+		$videos      = get_field_object( 'maipub_ad_video_id' );
+		$videos      = $videos ? $videos['choices'] : [];
 
 		foreach ( $blocks as $block ) {
-
 			if ( 'acf/mai-ad-unit' === $block['blockName'] && isset( $block['attrs']['data']['id'] ) && ! empty( $block['attrs']['data']['id'] ) ) {
 				$array            = [];
 				$array['slug']    = $block['attrs']['data']['id'];
@@ -410,6 +416,13 @@ class Mai_Publisher_Admin {
 				}
 
 				$units[] = $array;
+			}
+
+			if ( 'acf/mai-ad-video' === $block['blockName'] && isset( $block['attrs']['data']['id'] ) && ! empty( $block['attrs']['data']['id'] ) ) {
+				$units[] = [
+					'slug'    => isset( $videos[ $block['attrs']['data']['id'] ] ) ? sanitize_title_with_dashes( $videos[ $block['attrs']['data']['id'] ] ) : $block['attrs']['data']['id'],
+					'targets' => [],
+				];
 			}
 		}
 
