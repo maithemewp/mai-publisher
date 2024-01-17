@@ -77,7 +77,7 @@
     },
     "entries_wide": {
         "menu_order": 80,
-        "post_title": "In Archive Entries Wide",
+        "post_title": "In Archive Entries (Wide)",
         "post_content": "<!-- wp:group {\"align\":\"full\",\"layout\":{\"type\":\"constrained\"},\"contentWidth\":\"xl\",\"verticalSpacingTop\":\"sm\",\"verticalSpacingBottom\":\"sm\"} -->\n<div class=\"wp-block-group alignfull\"><!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"billboard-wide\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"btf\",\"_position\":\"maipub_ad_unit_position\",\"split_test\":\"\",\"_split_test\":\"maipub_ad_unit_split_test\",\"targets\":\"\",\"_targets\":\"maipub_ad_unit_targets\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\"} \/--><\/div>\n<!-- \/wp:group -->",
         "meta_input": {
             "maipub_archive_location": "entries",
@@ -106,7 +106,7 @@
     },
     "content_wide": {
         "menu_order": 100,
-        "post_title": "In Single Content Wide",
+        "post_title": "In Single Content (Wide)",
         "post_content": "<!-- wp:group {\"align\":\"full\",\"layout\":{\"type\":\"constrained\"},\"contentWidth\":\"xl\",\"verticalSpacingTop\":\"sm\",\"verticalSpacingBottom\":\"sm\"} -->\n<div class=\"wp-block-group alignfull\"><!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"billboard-wide\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"btf\",\"_position\":\"maipub_ad_unit_position\",\"split_test\":\"\",\"_split_test\":\"maipub_ad_unit_split_test\",\"targets\":\"\",\"_targets\":\"maipub_ad_unit_targets\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\"} \/--><\/div>\n<!-- \/wp:group -->",
         "meta_input": {
             "maipub_single_location": "content",
@@ -119,8 +119,9 @@
     },
     "content_video": {
         "menu_order": 110,
-        "post_title": "In Single Content Video",
-        "post_content": "<!-- wp:group {\"layout\":{\"type\":\"constrained\"},\"contentWidth\":\"sm\",\"marginBottom\":\"xl\"} -->\n<div class=\"wp-block-group\"><!-- wp:acf\/mai-ad-video {\"name\":\"acf\/mai-ad-video\",\"data\":{\"id\":\"6f704650-514c-4dc1-8481-8a75bbfb2eea\",\"_id\":\"maipub_ad_video_id\"},\"mode\":\"preview\"} \/--><\/div>\n<!-- \/wp:group -->",        "meta_input": {
+        "post_title": "In Single Content (Video)",
+        "post_content": "<!-- wp:group {\"layout\":{\"type\":\"constrained\"},\"contentWidth\":\"sm\",\"marginBottom\":\"xl\"} -->\n<div class=\"wp-block-group\"><!-- wp:acf\/mai-ad-video {\"name\":\"acf\/mai-ad-video\",\"data\":{\"id\":\"6f704650-514c-4dc1-8481-8a75bbfb2eea\",\"_id\":\"maipub_ad_video_id\"},\"mode\":\"preview\"} \/--><\/div>\n<!-- \/wp:group -->",
+        "meta_input": {
             "maipub_single_location": "content",
             "maipub_single_content_location": "after",
             "maipub_single_content_count": "1",
