@@ -61,6 +61,7 @@ class Mai_Publisher_Display {
 	 * @return void
 	 */
 	function maybe_run() {
+		// Bail if ads are disabled.
 		if ( 'disabled' === maipub_get_option( 'ad_mode', false ) ) {
 			return;
 		}
