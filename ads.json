@@ -51,8 +51,19 @@
             ]
         }
     },
-    "entries": {
+    "before_entry_content_toc": {
         "menu_order": 60,
+        "post_title": "In Single Entry Content (TOC)",
+        "post_content": "<!-- wp:group {\"align\":\"wide\",\"layout\":{\"type\":\"constrained\"},\"contentWidth\":\"xl\",\"verticalSpacingTop\":\"sm\",\"verticalSpacingBottom\":\"sm\",\"marginBottom\":\"xxl\"} -->\n<div class=\"wp-block-group alignwide\"><!-- wp:acf\/mai-columns {\"name\":\"acf\/mai-columns\",\"data\":{\"columns\":\"0\",\"_columns\":\"mai_columns_columns\",\"align_columns\":\"center\",\"_align_columns\":\"mai_columns_align_columns\",\"align_columns_vertical\":\"middle\",\"_align_columns_vertical\":\"mai_columns_align_columns_vertical\",\"column_gap\":\"xl\",\"_column_gap\":\"mai_columns_column_gap\",\"row_gap\":\"xl\",\"_row_gap\":\"mai_columns_row_gap\",\"margin_top\":\"\",\"_margin_top\":\"mai_columns_margin_top\",\"margin_bottom\":\"\",\"_margin_bottom\":\"mai_columns_margin_bottom\"},\"mode\":\"preview\"} -->\n<!-- wp:acf\/mai-column {\"name\":\"acf\/mai-column\",\"data\":{\"align_column_vertical\":\"start\",\"_align_column_vertical\":\"mai_column_align_column_vertical\",\"spacing\":\"\",\"_spacing\":\"mai_column_spacing\",\"background\":\"\",\"_background\":\"mai_column_background\",\"shadow\":\"0\",\"_shadow\":\"mai_columns_shadow\",\"border\":\"0\",\"_border\":\"mai_columns_border\",\"radius\":\"0\",\"_radius\":\"mai_columns_radius\",\"first_xs\":\"0\",\"_first_xs\":\"mai_columns_first_xs\",\"first_sm\":\"0\",\"_first_sm\":\"mai_columns_first_sm\",\"first_md\":\"0\",\"_first_md\":\"mai_columns_first_md\"},\"mode\":\"preview\"} -->\n<!-- wp:acf\/mai-table-of-contents {\"name\":\"acf\/mai-table-of-contents\",\"data\":{\"maitoc_custom\":\"1\",\"_maitoc_custom\":\"field_5dd59fad35b30\",\"maitoc_open\":\"1\",\"_maitoc_open\":\"field_5dd5a09a56ef9\",\"maitoc_headings\":\"2\",\"_maitoc_headings\":\"field_5dd5a0d956efa\"},\"mode\":\"preview\",\"className\":\"is-sticky has-no-margin-bottom\"} \/-->\n<!-- \/wp:acf\/mai-column -->\n\n<!-- wp:acf\/mai-column {\"name\":\"acf\/mai-column\",\"data\":{\"align_column_vertical\":\"start\",\"_align_column_vertical\":\"mai_column_align_column_vertical\",\"spacing\":\"\",\"_spacing\":\"mai_column_spacing\",\"background\":\"\",\"_background\":\"mai_column_background\",\"shadow\":\"0\",\"_shadow\":\"mai_columns_shadow\",\"border\":\"0\",\"_border\":\"mai_columns_border\",\"radius\":\"0\",\"_radius\":\"mai_columns_radius\",\"first_xs\":\"0\",\"_first_xs\":\"mai_columns_first_xs\",\"first_sm\":\"0\",\"_first_sm\":\"mai_columns_first_sm\",\"first_md\":\"0\",\"_first_md\":\"mai_columns_first_md\"},\"mode\":\"preview\"} -->\n<!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"rectangle-medium\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"btf\",\"_position\":\"maipub_ad_unit_position\",\"split_test\":\"\",\"_split_test\":\"maipub_ad_unit_split_test\",\"targets\":\"\",\"_targets\":\"maipub_ad_unit_targets\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\"} \/-->\n<!-- \/wp:acf\/mai-column -->\n<!-- \/wp:acf\/mai-columns --><\/div>\n<!-- \/wp:group -->",
+        "meta_input": {
+            "maipub_single_location": "before_entry_content",
+            "maipub_single_types": [
+                "post"
+            ]
+        }
+    },
+    "entries": {
+        "menu_order": 70,
         "post_title": "In Archive Entries",
         "post_content": "<!-- wp:group {\"layout\":{\"type\":\"constrained\"},\"contentWidth\":\"xl\",\"verticalSpacingTop\":\"sm\",\"verticalSpacingBottom\":\"sm\"} -->\n<div class=\"wp-block-group\"><!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"billboard\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"btf\",\"_position\":\"maipub_ad_unit_position\",\"split_test\":\"\",\"_split_test\":\"maipub_ad_unit_split_test\",\"targets\":\"\",\"_targets\":\"maipub_ad_unit_targets\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\"} \/--><\/div>\n<!-- \/wp:group -->",
         "meta_input": {
@@ -65,7 +76,7 @@
         }
     },
     "entries_wide": {
-        "menu_order": 70,
+        "menu_order": 80,
         "post_title": "In Archive Entries Wide",
         "post_content": "<!-- wp:group {\"align\":\"full\",\"layout\":{\"type\":\"constrained\"},\"contentWidth\":\"xl\",\"verticalSpacingTop\":\"sm\",\"verticalSpacingBottom\":\"sm\"} -->\n<div class=\"wp-block-group alignfull\"><!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"billboard-wide\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"btf\",\"_position\":\"maipub_ad_unit_position\",\"split_test\":\"\",\"_split_test\":\"maipub_ad_unit_split_test\",\"targets\":\"\",\"_targets\":\"maipub_ad_unit_targets\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\"} \/--><\/div>\n<!-- \/wp:group -->",
         "meta_input": {
@@ -81,7 +92,7 @@
         }
     },
     "content": {
-        "menu_order": 80,
+        "menu_order": 90,
         "post_title": "In Single Content",
         "post_content": "<!-- wp:group {\"layout\":{\"type\":\"constrained\"},\"contentWidth\":\"xl\",\"verticalSpacingTop\":\"sm\",\"verticalSpacingBottom\":\"sm\"} -->\n<div class=\"wp-block-group\"><!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"billboard\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"btf\",\"_position\":\"maipub_ad_unit_position\",\"split_test\":\"\",\"_split_test\":\"maipub_ad_unit_split_test\",\"targets\":\"\",\"_targets\":\"maipub_ad_unit_targets\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\"} \/--><\/div>\n<!-- \/wp:group -->",
         "meta_input": {
@@ -94,7 +105,7 @@
         }
     },
     "content_wide": {
-        "menu_order": 90,
+        "menu_order": 100,
         "post_title": "In Single Content Wide",
         "post_content": "<!-- wp:group {\"align\":\"full\",\"layout\":{\"type\":\"constrained\"},\"contentWidth\":\"xl\",\"verticalSpacingTop\":\"sm\",\"verticalSpacingBottom\":\"sm\"} -->\n<div class=\"wp-block-group alignfull\"><!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"billboard-wide\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"btf\",\"_position\":\"maipub_ad_unit_position\",\"split_test\":\"\",\"_split_test\":\"maipub_ad_unit_split_test\",\"targets\":\"\",\"_targets\":\"maipub_ad_unit_targets\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\"} \/--><\/div>\n<!-- \/wp:group -->",
         "meta_input": {
@@ -107,7 +118,7 @@
         }
     },
     "content_video": {
-        "menu_order": 100,
+        "menu_order": 110,
         "post_title": "In Single Content Video",
         "post_content": "<!-- wp:group {\"layout\":{\"type\":\"constrained\"},\"contentWidth\":\"sm\",\"marginBottom\":\"xl\"} -->\n<div class=\"wp-block-group\"><!-- wp:acf\/mai-ad-video {\"name\":\"acf\/mai-ad-video\",\"data\":{\"id\":\"6f704650-514c-4dc1-8481-8a75bbfb2eea\",\"_id\":\"maipub_ad_video_id\"},\"mode\":\"preview\"} \/--><\/div>\n<!-- \/wp:group -->",        "meta_input": {
             "maipub_single_location": "content",
@@ -119,7 +130,7 @@
         }
     },
     "recipe": {
-        "menu_order": 110,
+        "menu_order": 120,
         "post_title": "In Recipe",
         "post_content": "<!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"rectangle-medium\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"btf\",\"_position\":\"maipub_ad_unit_position\",\"split_test\":\"\",\"_split_test\":\"maipub_ad_unit_split_test\",\"targets\":\"\",\"_targets\":\"maipub_ad_unit_targets\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\"} \/-->",
         "meta_input": {
@@ -130,7 +141,7 @@
         }
     },
     "after_entry_content": {
-        "menu_order": 120,
+        "menu_order": 130,
         "post_title": "After Single Entry Content",
         "post_content": "<!-- wp:group {\"layout\":{\"type\":\"constrained\"},\"contentWidth\":\"xl\",\"verticalSpacingTop\":\"sm\",\"verticalSpacingBottom\":\"sm\"} -->\n<div class=\"wp-block-group\"><!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"leaderboard\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"btf\",\"_position\":\"maipub_ad_unit_position\",\"split_test\":\"\",\"_split_test\":\"maipub_ad_unit_split_test\",\"targets\":\"\",\"_targets\":\"maipub_ad_unit_targets\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\"} \/--><\/div>\n<!-- \/wp:group -->",
         "meta_input": {
@@ -141,7 +152,7 @@
         }
     },
     "after_entry": {
-        "menu_order": 130,
+        "menu_order": 140,
         "post_title": "After Single Entry",
         "post_content": "<!-- wp:group {\"layout\":{\"type\":\"constrained\"},\"contentWidth\":\"xl\",\"verticalSpacingTop\":\"sm\",\"verticalSpacingBottom\":\"sm\"} -->\n<div class=\"wp-block-group\"><!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"billboard\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"btf\",\"_position\":\"maipub_ad_unit_position\",\"split_test\":\"\",\"_split_test\":\"maipub_ad_unit_split_test\",\"targets\":\"\",\"_targets\":\"maipub_ad_unit_targets\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\"} \/--><\/div>\n<!-- \/wp:group -->",
         "meta_input": {
@@ -152,7 +163,7 @@
         }
     },
     "comments": {
-        "menu_order": 140,
+        "menu_order": 150,
         "post_title": "In Comments",
         "post_content": "<!-- wp:group {\"layout\":{\"type\":\"constrained\"},\"verticalSpacingTop\":\"sm\",\"verticalSpacingBottom\":\"sm\"} -->\n<div class=\"wp-block-group\"><!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"billboard\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"btf\",\"_position\":\"maipub_ad_unit_position\",\"split_test\":\"\",\"_split_test\":\"maipub_ad_unit_split_test\",\"targets\":\"\",\"_targets\":\"maipub_ad_unit_targets\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\"} \/--><\/div>\n<!-- \/wp:group -->",
         "meta_input": {
@@ -164,7 +175,7 @@
         }
     },
     "after_loop": {
-        "menu_order": 150,
+        "menu_order": 160,
         "post_title": "After Archive Entries",
         "post_content": "<!-- wp:group {\"align\":\"full\",\"layout\":{\"type\":\"constrained\"},\"contentWidth\":\"xl\",\"verticalSpacingTop\":\"sm\",\"verticalSpacingBottom\":\"sm\"} -->\n<div class=\"wp-block-group alignfull\"><!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"billboard-wide\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"atf\",\"_position\":\"maipub_ad_unit_position\",\"split_test\":\"\",\"_split_test\":\"maipub_ad_unit_split_test\",\"targets\":\"\",\"_targets\":\"maipub_ad_unit_targets\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\"} \/--><\/div>\n<!-- \/wp:group -->",
         "meta_input": {
@@ -178,7 +189,7 @@
         }
     },
     "before_sidebar_content": {
-        "menu_order": 160,
+        "menu_order": 170,
         "post_title": "Before Sidebar Content",
         "post_content": "<!-- wp:group {\"layout\":{\"type\":\"constrained\"},\"marginBottom\":\"xl\"} -->\n<div class=\"wp-block-group\"><!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"rectangle-medium\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"atf\",\"_position\":\"maipub_ad_unit_position\",\"split_test\":\"\",\"_split_test\":\"maipub_ad_unit_split_test\",\"targets\":\"\",\"_targets\":\"maipub_ad_unit_targets\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\"} \/--><\/div>\n<!-- \/wp:group -->",
         "meta_input": {
@@ -186,7 +197,7 @@
         }
     },
     "after_sidebar_content": {
-        "menu_order": 170,
+        "menu_order": 180,
         "post_title": "After Sidebar Content",
         "post_content": "<!-- wp:group {\"layout\":{\"type\":\"constrained\"}} -->\n<div class=\"wp-block-group\"><!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"rectangle-medium\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"vs\",\"_position\":\"maipub_ad_unit_position\",\"split_test\":\"\",\"_split_test\":\"maipub_ad_unit_split_test\",\"targets\":\"\",\"_targets\":\"maipub_ad_unit_targets\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\"} \/--><\/div>\n<!-- \/wp:group -->",
         "meta_input": {
@@ -194,7 +205,7 @@
         }
     },
     "before_footer": {
-        "menu_order": 180,
+        "menu_order": 190,
         "post_title": "Before Footer",
         "post_content": "<!-- wp:group {\"align\":\"full\",\"backgroundColor\":\"alt\",\"layout\":{\"type\":\"constrained\"},\"contentWidth\":\"xl\",\"verticalSpacingTop\":\"sm\",\"verticalSpacingBottom\":\"sm\"} -->\n<div class=\"wp-block-group alignfull has-alt-background-color has-background\"><!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"billboard-wide\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"btf\",\"_position\":\"maipub_ad_unit_position\",\"split_test\":\"\",\"_split_test\":\"maipub_ad_unit_split_test\",\"targets\":\"\",\"_targets\":\"maipub_ad_unit_targets\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\"} \/--><\/div>\n<!-- \/wp:group -->",
         "meta_input": {
@@ -202,7 +213,7 @@
         }
     },
     "after_footer": {
-        "menu_order": 190,
+        "menu_order": 200,
         "post_title": "Sticky Footer",
         "post_content": "<!-- wp:acf\/mai-ad-unit {\"name\":\"acf\/mai-ad-unit\",\"data\":{\"id\":\"leaderboard-wide\",\"_id\":\"maipub_ad_unit_id\",\"type\":\"\",\"_type\":\"maipub_ad_unit_type\",\"position\":\"bs\",\"_position\":\"maipub_ad_unit_position\",\"split_test\":\"\",\"_split_test\":\"maipub_ad_unit_split_test\",\"targets\":\"\",\"_targets\":\"maipub_ad_unit_targets\",\"label\":\"\",\"_label\":\"maipub_ad_unit_label\",\"label_hide\":\"0\",\"_label_hide\":\"maipub_ad_unit_label_hide\"},\"mode\":\"preview\",\"backgroundColor\":\"alt\"} \/-->",
         "meta_input": {

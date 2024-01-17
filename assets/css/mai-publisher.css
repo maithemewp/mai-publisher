@@ -141,6 +141,10 @@
 	top: var(--mai-ad-scroll-margin-top);
 }
 
+.mai-column:has(.mai-toc) {
+	flex-grow: 1;
+}
+
 .wprm-recipe {
 	overflow: visible !important;
 }
