@@ -4,6 +4,8 @@
 defined( 'ABSPATH' ) || die;
 
 class Mai_Publisher_Admin {
+	protected $descriptions;
+
 	/**
 	 * Construct the class.
 	 */
@@ -91,7 +93,7 @@ class Mai_Publisher_Admin {
 		}
 
 		// Get descriptions.
-		$descriptions = [
+		$this->descriptions = [
 			'before_header'          => __( 'Use this location to display large ads before the header. Typically uses leaderboard-wide.', 'mai-publisher' ),
 			'after_header'           => __( 'Use this location to display large ads after the header. Typically uses leaderboard-wide.', 'mai-publisher' ),
 			'before_loop'            => __( 'Use this location to display large ads before archive entries. Typically uses leaderboard-wide or billboard-wide.', 'mai-publisher' ),
@@ -102,6 +104,7 @@ class Mai_Publisher_Admin {
 			'entries_native'         => __( 'N/A', 'mai-publisher' ),
 			'content'                => __( 'Use this location to display ads inside single entry content. The available space is limited by the content width. Typically uses leaderboard, billboard, or rectangle-large.', 'mai-publisher' ),
 			'content_wide'           => __( 'Use this location to display large ads inside single entry content. Typically uses leaderboard-wide or billboard-wide.', 'mai-publisher' ),
+			'content_video'          => __( 'Use this location to display video ads inside single entry content. Typically uses Mai Ad Video block.', 'mai-publisher' ),
 			'recipe'                 => __( 'Use this location to display ads inside recipe cards from WP Recipe Maker.', 'mai-publisher' ),
 			'after_entry_content'    => __( 'Use this location to display ads after single entry content. The available space is limited by the content width. Typically uses leaderboard, billboard, or rectangle-large.', 'mai-publisher' ),
 			'after_entry'            => __( 'Use this location to display ads after a single entry. The available space is limited by the content width. Typically uses leaderboard, billboard, or rectangle-large.', 'mai-publisher' ),
@@ -123,15 +126,15 @@ class Mai_Publisher_Admin {
 		 *
 		 * @return string
 		 */
-		add_filter( 'get_the_excerpt', function( $excerpt, $post ) use ( $descriptions ) {
+		add_filter( 'get_the_excerpt', function( $excerpt, $post ) {
 			// Bail if we already have a custom excerpt.
 			if ( $excerpt ) {
 				return $excerpt;
 			}
 
 			// If we have a custom description.
-			if ( isset( $descriptions[ $post->post_name ] ) ) {
-				$excerpt = $descriptions[ $post->post_name ];
+			if ( isset( $this->descriptions[ $post->post_name ] ) ) {
+				$excerpt = $this->descriptions[ $post->post_name ];
 			}
 
 			return $excerpt;
@@ -154,7 +157,16 @@ class Mai_Publisher_Admin {
 			return $states;
 		}
 
+		// Remove draft.
 		unset( $states['draft'] );
+
+		// Get default locations.
+		$locations = maipub_get_locations();
+
+		// If not a default location, add custom state.
+		if ( ! isset( $this->descriptions[ $post->post_name ] ) ) {
+			$states['custom'] = __( 'Custom', 'mai-publisher' );
+		}
 
 		return $states;
 	}
