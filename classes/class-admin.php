@@ -240,11 +240,13 @@ class Mai_Publisher_Admin {
 			$html .= '<strong class="mai-ad-status mai-ad-status__draft">' . __( 'Draft', 'mai-publisher' ) . '</strong><br>';
 		}
 
+		// Global.
 		if ( $global ) {
 			$html .= sprintf( '%s (%s)', __( 'Global', 'mai-publisher' ), $choices['global'][ $global ] ) . '<br>';
 		}
 
-		if ( $singles ) {
+		// Single.
+		if ( $single && $singles ) {
 			$array = [];
 
 			foreach ( $singles as $post_type ) {
@@ -262,7 +264,8 @@ class Mai_Publisher_Admin {
 			}
 		}
 
-		if ( $archives || $taxonomies ) {
+		// Archives.
+		if ( $archive && ( $archives || $taxonomies || $terms ) ) {
 			$array = [];
 
 			if ( $archives ) {
@@ -289,24 +292,22 @@ class Mai_Publisher_Admin {
 				}
 			}
 
-			if ( $array ) {
-				$html .= sprintf( '%s (%s) -- %s', __( 'Archives', 'mai-publisher' ), $choices['archive'][ $archive ], implode( ' | ', $array ) ) . '<br>';
-			}
-		}
+			if ( $terms ) {
+				foreach ( $terms as $term ) {
+					$object = get_term( $term );
 
-		if ( $terms ) {
-			$array = [];
+					if ( $object && ! is_wp_error( $object ) ) {
+						$array[] = $object->name;
+					}
+				}
 
-			foreach ( $terms as $term ) {
-				$object = get_term( $term );
-
-				if ( $object && ! is_wp_error( $object ) ) {
-					$array[] = $object->name;
+				if ( $array ) {
+					$html .= sprintf( '%s (%s) -- %s', __( 'Terms', 'mai-publisher' ), $choices['archive'][ $archive ], implode( ' | ', $array ) ) . '<br>';
 				}
 			}
 
 			if ( $array ) {
-				$html .= sprintf( '%s (%s) -- %s', __( 'Terms', 'mai-publisher' ), $choices['archive'][ $archive ], implode( ' | ', $array ) ) . '<br>';
+				$html .= sprintf( '%s (%s) -- %s', __( 'Archives', 'mai-publisher' ), $choices['archive'][ $archive ], implode( ' | ', $array ) ) . '<br>';
 			}
 		}
 
