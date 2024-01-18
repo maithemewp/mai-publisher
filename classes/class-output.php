@@ -6,14 +6,16 @@ defined( 'ABSPATH' ) || die;
 class Mai_Publisher_Output {
 	protected $domain;
 	protected $network_code;
+	protected $sellers_name;
+	protected $sellers_id;
 	protected $locations;
 	protected $ads;
 	protected $grouped;
-	protected $dom;
-	protected $xpath;
 	protected $gam;
 	protected $mode;
 	protected $suffix;
+	protected $dom;
+	protected $xpath;
 
 	/**
 	 * Constructs the class.
@@ -151,17 +153,25 @@ class Mai_Publisher_Output {
 		// Set vars and get all ad units.
 		$config   = maipub_get_config( 'ad_units' );
 		$ad_units = $this->xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " mai-ad-unit ")]' );
+		$videos   = $this->xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " mai-ad-video ")]' );
 
 		// Loop through ad units.
 		foreach ( $ad_units as $ad_unit ) {
-			// Build slot from ad unit.
-			$unit = $ad_unit->getAttribute( 'data-unit' );
-			$slot = $this->get_slot( $unit );
+			// Build name from location and unit.
+			$location = $ad_unit->getAttribute( 'data-al' );
+			$unit     = $ad_unit->getAttribute( 'data-unit' );
+			$slot     = $this->increment_string( $unit );
+			$name     = sprintf( 'mai-ad-%s-%s', $location, $unit );
+			$name     = $this->increment_string( $name );
 
 			// Set slot as id.
 			$ad_unit->setAttribute( 'id', 'mai-ad-' . $slot );
 
-			// If ads are active.
+			// Add analytics tracking.
+			$ad_unit->setAttribute( 'data-content-name', $name );
+			$ad_unit->setAttribute( 'data-track-content', '' );
+
+			// If ads are active. Mode is empty when active. Values would be 'demo' or 'disabled'.
 			if ( ! $this->mode ) {
 				// Build script, import into dom and append to ad unit.
 				$script = sprintf( '<script>window.googletag = window.googletag || {};googletag.cmd = googletag.cmd || [];if ( window.googletag && googletag.apiReady ) { googletag.cmd.push(function(){ googletag.display("mai-ad-%s"); }); }</script>', $slot );
@@ -177,25 +187,34 @@ class Mai_Publisher_Output {
 					'targets'      => [],
 				];
 
-				// Add analytics tracking.
-				$ad_unit->setAttribute( 'data-content-name', esc_attr( $slot ) );
-				$ad_unit->setAttribute( 'data-track-content', '' );
-
 				// Get and add targets.
 				$at      = $ad_unit->getAttribute( 'data-at' );
 				$ap      = $ad_unit->getAttribute( 'data-ap' );
 				$targets = $ad_unit->getAttribute( 'data-targets' );
 
+				// Ad location.
+				if ( $location ) {
+					$loc_formatted = str_replace( '-', '_', $location );
+
+					// If mapped target is set, add it.
+					if ( isset( $this->locations[ $loc_formatted ]['target'] ) ) {
+						$this->gam[ $slot ]['targets']['al'] = $this->locations[ $loc_formatted ]['target'];
+					}
+				}
+
+				// Ad type.
 				if ( $at ) {
 					$this->gam[ $slot ]['targets']['at'] = $at;
 				}
 
+				// Ad position.
 				if ( $ap ) {
 					$this->gam[ $slot ]['targets']['ap'] = $ap;
 				}
 
+				// Custom targets.
 				if ( $targets ) {
-					$this->gam[ $slot ]['targets'] = array_merge( $this->gam[ $slot ]['targets'], maipub_get_valid_targets( $targets ) );
+					$this->gam[ $slot ]['targets'] = array_merge( $this->gam[ $slot ]['targets'], maipub_sanitize_targets( $targets ) );
 				}
 
 				// Add split testing.
@@ -205,6 +224,19 @@ class Mai_Publisher_Output {
 					$this->gam[ $slot ]['splitTest'] = $split_test;
 				}
 			}
+		}
+
+		// Loop through videos.
+		foreach ( $videos as $video ) {
+			// Build name from location and unit.
+			$location = $video->getAttribute( 'data-al' );
+			$unit     = $video->getAttribute( 'data-unit' );
+			$name     = sprintf( 'mai-ad-%s-%s', $location, $unit );
+			$name     = $this->increment_string( $name );
+
+			// Add analytics tracking.
+			$video->setAttribute( 'data-content-name', $name );
+			$video->setAttribute( 'data-track-content', '' );
 		}
 
 		// Start scripts array.
@@ -292,7 +324,18 @@ class Mai_Publisher_Output {
 		}
 
 		// Get last child element.
-		$last = $children->item( $children->length - 1 );
+		$last = null;
+
+		// Loop through from the end to the start.
+		for ( $i = $children->length - 1; $i >= 0; $i-- ) {
+			$node = $children->item($i);
+
+			// Check if the node is an element node.
+			if ( $node instanceof DOMElement ) {
+				$last = $node;
+				break;
+			}
+		}
 
 		// Loop through in-content ads.
 		foreach ( $this->grouped['content'] as $ad ) {
@@ -616,12 +659,19 @@ class Mai_Publisher_Output {
 
 		// Add before sidebar content.
 		if ( isset( $this->grouped['before_sidebar_content'] ) ) {
+			$before_after           = 'before';
 			$sidebar_ads['prepend'] = $this->grouped['before_sidebar_content'];
 		}
 
 		// Add after sidebar content.
 		if ( isset( $this->grouped['after_sidebar_content'] ) ) {
+			$before_after          = 'after';
 			$sidebar_ads['append'] = $this->grouped['after_sidebar_content'];
+		}
+
+		// Bail if no sidebar ads.
+		if ( ! $sidebar_ads ) {
+			return;
 		}
 
 		// Loop through sidebar ads.
@@ -671,11 +721,12 @@ class Mai_Publisher_Output {
 	 * @return void
 	 */
 	function handle_comments() {
-		$comments = $this->xpath->query( '//ol[contains(concat(" ", normalize-space(@class), " "), " comment-list ")]/li[contains(concat(" ", normalize-space(@class), " "), " comment ")]' );
+		$comments = $this->xpath->query( '//ol[contains(concat(" ", normalize-space(@class), " "), " comment-list ")]/li[contains(concat(" ", normalize-space(@class), " "), " comment ") and not(position() = last())]' );
 
 		if ( ! $comments->length ) {
 			return;
 		}
+
 
 		// Loop through comments ads.
 		foreach ( $this->grouped['comments'] as $ad ) {
@@ -704,28 +755,6 @@ class Mai_Publisher_Output {
 	}
 
 	/**
-	 * Increments the slot ID, if needed.
-	 *
-	 * @since 0.13.0
-	 *
-	 * @param string $slot
-	 *
-	 * @return string
-	 */
-	function get_slot( $slot ) {
-		static $counts  = [];
-
-		if ( isset( $counts[ $slot ] ) ) {
-			$counts[ $slot ]++;
-			$slot = $slot . '-' . $counts[ $slot ];
-		} else {
-			$counts[ $slot ] = 1;
-		}
-
-		return $slot;
-	}
-
-	/**
 	 * Gets the full DOMDocument object, including DOCTYPE and <html>.
 	 *
 	 * @since 0.13.0
@@ -745,7 +774,7 @@ class Mai_Publisher_Output {
 
 		// Encode. Can't use `mb_convert_encoding()` because it's deprecated in PHP 8.2.
 		// @link https://stackoverflow.com/questions/8218230/php-domdocument-loadhtml-not-encoding-utf-8-correctly
-		$html = mb_encode_numericentity( $html, [0x80, 0x10FFFF, 0, ~0], 'UTF-8' );
+		// $html = mb_encode_numericentity( $html, [0x80, 0x10FFFF, 0, ~0], 'UTF-8' );
 
 		// Load the content in the document HTML.
 		$dom->loadHTML( $html );
@@ -957,14 +986,37 @@ class Mai_Publisher_Output {
 
 		// Global key value pairs.
 		if ( $global ) {
-			$targets = array_merge( $targets, maipub_get_valid_targets( $global ) );
+			$targets = array_merge( $targets, maipub_sanitize_targets( $global ) );
 		}
 
 		// Custom key value pairs.
 		if ( $custom ) {
-			$targets = array_merge( $targets, maipub_get_valid_targets( $custom ) );
+			$targets = array_merge( $targets, maipub_sanitize_targets( $custom ) );
 		}
 
 		return $targets;
 	}
+
+	/**
+	 * Increments a string, if needed.
+	 *
+	 * @since 0.23.0
+	 *
+	 * @param string $string
+	 *
+	 * @return string
+	 */
+	function increment_string( $string ) {
+		static $counts  = [];
+
+		if ( isset( $counts[ $string ] ) ) {
+			$counts[ $string ]++;
+			$string = $string . '-' . $counts[ $string ];
+		} else {
+			$counts[ $string ] = 1;
+		}
+
+		return $string;
+	}
+
 }

@@ -399,6 +399,7 @@ class Mai_Publisher_Settings {
 
 	function maipub_section_scripts() {
 		printf( '<h3 style="margin-top:48px;">%s</h3>', __( 'Scripts', 'mai-publisher' ) );
+		printf( '<p>%s</p>', __( 'Scripts are only output in the header and footer if ad mode is active or demo.', 'mai-publisher' ) );
 	}
 
 	function maipub_section_views() {
@@ -472,7 +473,7 @@ class Mai_Publisher_Settings {
 	/**
 	 * Setting callback.
 	 *
-	 * @since TBD
+	 * @since 0.23.0
 	 *
 	 * @return void
 	 */
@@ -673,7 +674,7 @@ class Mai_Publisher_Settings {
 	/**
 	 * Setting callback.
 	 *
-	 * @since TBD
+	 * @since 0.12.0
 	 *
 	 * @return void
 	 */

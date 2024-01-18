@@ -111,7 +111,7 @@ class Mai_Publisher_Generate_Ads {
 			return $actions;
 		}
 
-		$config = $this->get_ads_config();
+		$config = $this->get_ads_json_config();
 
 		// Bail if slug is not in our config.
 		if ( ! isset( $config[ $post->post_name ] ) ) {
@@ -212,7 +212,7 @@ class Mai_Publisher_Generate_Ads {
 		}
 
 		$slug   = $post->post_name;
-		$config = $this->get_ads_config();
+		$config = $this->get_ads_json_config();
 
 		if ( ! isset( $config[ $slug ] ) ) {
 			return [];
@@ -222,7 +222,6 @@ class Mai_Publisher_Generate_Ads {
 		wp_update_post(
 			[
 				'ID'           => $post_id,
-				// 'post_status'  => $post->post_status,
 				'post_content' => $config[ $slug ]['post_content'],
 			]
 		);
@@ -246,10 +245,11 @@ class Mai_Publisher_Generate_Ads {
 			$post_id = wp_insert_post(
 				[
 					'post_type'    => 'mai_ad',
-					'post_name'    => $slug,
 					'post_status'  => 'draft',
-					'post_title'   => sprintf( 'mai-ad-%s', $slug ),
+					'post_name'    => $slug,
+					'post_title'   => $ad['post_title'],
 					'post_content' => $ad['post_content'],
+					'menu_order'   => $ad['menu_order'],
 					'meta_input'   => $ad['meta_input'],
 				]
 			);
@@ -273,7 +273,7 @@ class Mai_Publisher_Generate_Ads {
 	 */
 	function get_missing_ads() {
 		$ads      = [];
-		$config   = $this->get_ads_config();
+		$config   = $this->get_ads_json_config();
 		$existing = $this->get_existing_ads();
 
 		if ( ! $config ) {
@@ -342,7 +342,7 @@ class Mai_Publisher_Generate_Ads {
 	 *
 	 * @return array
 	 */
-	function get_ads_config() {
+	function get_ads_json_config() {
 		static $cache = null;
 
 		if ( ! is_null( $cache ) ) {

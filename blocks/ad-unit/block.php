@@ -129,8 +129,7 @@ class Mai_Publisher_Ad_Unit_Block {
 
 		// Handle sticky.
 		if ( $is_sticky ) {
-			$location              = 'ts' === $pos ? 'header' : 'footer';
-			// $spacer_attr['class'] .= " mai-ad-unit-sticky-spacer mai-ad-unit-sticky-{$location}";
+			$location             = 'ts' === $pos ? 'header' : 'footer';
 			$outer_attr['class'] .= " mai-ad-unit-sticky mai-ad-unit-sticky-{$location}";
 		}
 
@@ -325,8 +324,6 @@ class Mai_Publisher_Ad_Unit_Block {
 							''     => __( 'Not set', 'mai-publisher' ),
 							'atf'  => __( 'Above the Fold', 'mai-publisher' ),
 							'btf'  => __( 'Below the Fold', 'mai-publisher' ),
-							's'    => __( 'Sidebar', 'mai-publisher' ),
-							'satf' => __( 'Sidebar Above the Fold', 'mai-publisher' ),
 							'vs'   => __( 'Sticky Vertical', 'mai-publisher' ),
 							'ts'   => __( 'Sticky Top Horizontal', 'mai-publisher' ),
 							'bs'   => __( 'Sticky Bottom Horizontal', 'mai-publisher' ),
@@ -400,9 +397,16 @@ class Mai_Publisher_Ad_Unit_Block {
 
 		$choices = [ '' => __( 'None', 'mai-publisher' ) ];
 		$units   = maipub_get_config( 'ad_units' );
+		$legacy  = maipub_get_legacy_ad_units();
 
 		foreach ( $units as $slug => $unit ) {
-			$choices[ $slug ] = $slug;
+			$label = $slug;
+
+			if ( isset( $legacy[ $slug ] ) ) {
+				$label .= ' ' . __( '(legacy)', 'mai-publisher' );
+			}
+
+			$choices[ $slug ] = $label;
 		}
 
 		$field['choices'] = $choices;

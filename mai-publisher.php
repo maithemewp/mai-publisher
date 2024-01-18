@@ -4,7 +4,7 @@
  * Plugin Name:     Mai Publisher
  * Plugin URI:      https://bizbudding.com
  * Description:     Manage ads and more for websites in the Mai Publisher network.
- * Version:         0.22.0
+ * Version:         1.0.0
  *
  * Author:          BizBudding
  * Author URI:      https://bizbudding.com
@@ -93,7 +93,7 @@ final class Mai_Publisher_Plugin {
 	private function setup_constants() {
 		// Plugin version.
 		if ( ! defined( 'MAI_PUBLISHER_VERSION' ) ) {
-			define( 'MAI_PUBLISHER_VERSION', '0.22.0' );
+			define( 'MAI_PUBLISHER_VERSION', '1.0.0' );
 		}
 
 		// Plugin Folder Path.
@@ -208,6 +208,7 @@ final class Mai_Publisher_Plugin {
 
 		// Add icons for Dashboard > Updates screen.
 		if ( function_exists( 'mai_get_updater_icons' ) && $icons = mai_get_updater_icons() ) {
+
 			$updater->addResultFilter(
 				function ( $info ) use ( $icons ) {
 					$info->icons = $icons;
@@ -260,7 +261,7 @@ final class Mai_Publisher_Plugin {
 				'show_in_rest'       => true,
 				'show_ui'            => true,
 				'rewrite'            => false,
-				'supports'           => [ 'title', 'editor' ],
+				'supports'           => [ 'title', 'editor', 'excerpt' ],
 			]
 		);
 	}
@@ -291,7 +292,7 @@ final class Mai_Publisher_Plugin {
 		}
 
 		// Set order.
-		$query->set( 'orderby', 'title' );
+		$query->set( 'orderby', 'menu_order' );
 		$query->set( 'order','ASC' );
 	}
 

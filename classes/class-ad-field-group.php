@@ -186,7 +186,7 @@ class Mai_Publisher_Ad_Field_Group {
 				'type'              => 'text',
 				'append'            => __( 'elements', 'mai-publisher' ),
 				'required'          => 1,
-				'default_value'     => 6,
+				'default_value'     => '4, 12, 20, 28, 36, 44, 56, 64',
 				'conditional_logic' => [
 					[
 						[
@@ -359,7 +359,7 @@ class Mai_Publisher_Ad_Field_Group {
 				'name'              => 'maipub_archive_content_count',
 				'type'              => 'text',
 				'required'          => 1,
-				'default_value'     => '3, 6',
+				'default_value'     => '2, 7, 12, 17, 22, 27, 32',
 				'wrapper'           => [ 'width' => '75' ],
 				'conditional_logic' => [
 					[
@@ -460,7 +460,7 @@ class Mai_Publisher_Ad_Field_Group {
 			[
 				'label'             => __( 'Taxonomy', 'mai-publisher' ),
 				'key'               => 'maipub_single_taxonomy',
-				'name'              => 'taxogam_nomy',
+				'name'              => 'taxonomy',
 				'type'              => 'select',
 				'choices'           => [],
 				'ui'                => 1,
@@ -469,7 +469,7 @@ class Mai_Publisher_Ad_Field_Group {
 			[
 				'label'             => __( 'Terms', 'mai-publisher' ),
 				'key'               => 'maipub_single_terms',
-				'name'              => 'termgam_s',
+				'name'              => 'terms',
 				'type'              => 'select',
 				'choices'           => [],
 				'ui'                => 1,
@@ -486,7 +486,7 @@ class Mai_Publisher_Ad_Field_Group {
 			],
 			[
 				'key'        => 'maipub_single_operator',
-				'name'       => 'opergam_ator',
+				'name'       => 'operator',
 				'label'      => __( 'Operator', 'mai-publisher' ),
 				'type'       => 'select',
 				'default'    => 'IN',

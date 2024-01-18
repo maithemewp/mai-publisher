@@ -14,7 +14,7 @@ class Mai_Publisher_Endpoint {
 	/**
 	 * Add hooks.
 	 *
-	 * @since TBD
+	 * @since 0.1.0
 	 *
 	 * @return void
 	 */
@@ -25,7 +25,7 @@ class Mai_Publisher_Endpoint {
 	/**
 	 * Register the endpoints.
 	 *
-	 * @since TBD
+	 * @since 0.1.0
 	 *
 	 * @return void
 	 */
@@ -40,7 +40,7 @@ class Mai_Publisher_Endpoint {
 	/**
 	 * Handle the request.
 	 *
-	 * @since TBD
+	 * @since 0.1.0
 	 *
 	 * @return void
 	 */
