@@ -41,10 +41,10 @@ return [
 			'sizes_mobile'  => [ [300, 50], [300, 100], [320, 50], [468, 60] ],
 		],
 		'native' => [
-			'sizes'         => [ 'native' ],
-			'sizes_desktop' => [ 'native' ],
-			'sizes_tablet'  => [ 'native' ],
-			'sizes_mobile'  => [ 'native' ],
+			'sizes'         => [ 'fluid' ],
+			'sizes_desktop' => [ 'fluid' ],
+			'sizes_tablet'  => [ 'fluid' ],
+			'sizes_mobile'  => [ 'fluid' ],
 		],
 		'rectangle-small' => [
 			'sizes'         => [ [88, 31], [120, 60], [120, 90], [125, 125] ],
