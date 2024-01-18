@@ -216,7 +216,7 @@ class Mai_Publisher_Views {
 		// Bail if failed nonce check.
 		if ( false === check_ajax_referer( 'maipub_views_nonce', 'nonce' ) ) {
 			wp_send_json_error( __( 'Invalid nonce.', 'mai-publisher' ) );
-			exit();
+			wp_die();
 		}
 
 		// Get options.
@@ -228,18 +228,18 @@ class Mai_Publisher_Views {
 		// Bail if API is disabled.
 		if ( ! $this->api || 'disabled' === $this->api ) {
 			wp_send_json_error( __( 'Views API is disabled.', 'mai-publisher' ) );
-			exit();
+			wp_die();
 		}
 
 		if ( ! in_array( $this->api, [ 'matomo', 'jetpack' ] ) ) {
 			wp_send_json_error( __( 'Not a valid API option.', 'mai-publisher' ) );
-			exit();
+			wp_die();
 		}
 
 		// Bail if nothing to fetch.
 		if ( ! ( ( $this->trending_days || $this->views_years ) && $this->interval ) ) {
 			wp_send_json_error( __( 'Missing views years, trending days, or interval.', 'mai-publisher' ) );
-			exit();
+			wp_die();
 		}
 
 		// Get post data.
@@ -252,7 +252,7 @@ class Mai_Publisher_Views {
 		// Bail if we don't have the post data we need.
 		if ( ! ( $this->id && $this->type && $this->url && $this->current ) ) {
 			wp_send_json_error( __( 'Missing id, type, url, or current.', 'mai-publisher' ) );
-			exit();
+			wp_die();
 		}
 
 		// Get API data.
@@ -262,7 +262,7 @@ class Mai_Publisher_Views {
 
 				if ( is_wp_error( $return ) ) {
 					wp_send_json_error( $return->get_error_message(), $return->get_error_code() );
-					exit();
+					wp_die();
 				}
 			break;
 			case 'jetpack':
@@ -270,7 +270,7 @@ class Mai_Publisher_Views {
 
 				if ( is_wp_error( $return ) ) {
 					wp_send_json_error( $return->get_error_message(), $return->get_error_code() );
-					exit();
+					wp_die();
 				}
 			break;
 		}
@@ -287,7 +287,7 @@ class Mai_Publisher_Views {
 
 		// Send it home.
 		wp_send_json_success( $return );
-		exit();
+		wp_die();
 	}
 
 	/**
@@ -410,10 +410,10 @@ class Mai_Publisher_Views {
 				// Update meta. `mai_trending` or `mai_views`.
 				switch ( $this->type ) {
 					case 'post':
-						update_post_meta( $id, "mai_{$key}", $visits );
+						update_post_meta( $this->id, "mai_{$key}", $visits );
 					break;
 					case 'term':
-						update_term_meta( $id, "mai_{$key}", $visits );
+						update_term_meta( $this->id, "mai_{$key}", $visits );
 					break;
 				}
 			}
