@@ -26,7 +26,6 @@ function maipub_get_legacy_ad_units() {
 		'micro-bar'         => 'micro-bar',
 		'podcast-footer'    => 'podcast-footer',
 		'podcast-header'    => 'podcast-header',
-		'skyscraper'        => 'skyscraper',
 		'sponsored-sidebar' => 'sponsored-sidebar',
 		'sidebar'           => 'sidebar',
 	];
