@@ -68,6 +68,9 @@ function maipub_get_dom_document( $html ) {
 	// Modify state.
 	$libxml_previous_state = libxml_use_internal_errors( true );
 
+	// Encode.
+	$html = mb_encode_numericentity( $html, [0x80, 0x10FFFF, 0, ~0], 'UTF-8' );
+
 	// Load the content in the document HTML.
 	$dom->loadHTML( "<div>$html</div>" );
 
@@ -90,6 +93,22 @@ function maipub_get_dom_document( $html ) {
 	libxml_use_internal_errors( $libxml_previous_state );
 
 	return $dom;
+}
+
+/**
+ * Saves HTML from DOMDocument and decode entities.
+ *
+ * @since TBD
+ *
+ * @param DOMDocument $dom
+ *
+ * @return string
+ */
+function maipub_get_dom_html( $dom ) {
+	$html = $dom->saveHTML();
+	$html = mb_convert_encoding( $html, 'UTF-8', 'HTML-ENTITIES' );
+
+	return $html;
 }
 
 /**

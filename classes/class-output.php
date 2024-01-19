@@ -298,7 +298,7 @@ class Mai_Publisher_Output {
 		}
 
 		// Save HTML.
-		$buffer = $this->dom->saveHTML();
+		$buffer = $this->dom_html( $this->dom );
 
 		// Remove closing tags that are added by DOMDocument.
 		$buffer = str_replace( '</source>', '', $buffer );
@@ -772,6 +772,9 @@ class Mai_Publisher_Output {
 		// Modify state.
 		$libxml_previous_state = libxml_use_internal_errors( true );
 
+		// Encode.
+		$html = mb_encode_numericentity( $html, [0x80, 0x10FFFF, 0, ~0], 'UTF-8' );
+
 		// Load the content in the document HTML.
 		$dom->loadHTML( $html );
 
@@ -782,6 +785,22 @@ class Mai_Publisher_Output {
 		libxml_use_internal_errors( $libxml_previous_state );
 
 		return $dom;
+	}
+
+	/**
+	 * Saves HTML from DOMDocument and decode entities.
+	 *
+	 * @since TBD
+	 *
+	 * @param DOMDocument $dom
+	 *
+	 * @return string
+	 */
+	function dom_html( $dom ) {
+		$html = $dom->saveHTML();
+		$html = mb_convert_encoding( $html, 'UTF-8', 'HTML-ENTITIES' );
+
+		return $html;
 	}
 
 	/**

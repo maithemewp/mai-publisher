@@ -216,7 +216,7 @@ function maipub_add_attributes( $content, $name ) {
 	}
 
 	// Save new content.
-	$content = $dom->saveHTML();
+	$content = maipub_get_dom_html( $dom );
 
 	return $content;
 }
