@@ -49,6 +49,15 @@
 	content: attr(data-label);
 }
 
+.mai-ad-unit-native {
+	width: 100%;
+	flex: 1 1 100%;
+}
+
+.mai-ad-unit[data-unit="native"] {
+	width: 100%;
+}
+
 @media only screen and (max-width: 727px) {
 
 	.mai-ad-unit-spacer,

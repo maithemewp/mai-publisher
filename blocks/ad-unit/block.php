@@ -133,6 +133,11 @@ class Mai_Publisher_Ad_Unit_Block {
 			$outer_attr['class'] .= " mai-ad-unit-sticky mai-ad-unit-sticky-{$location}";
 		}
 
+		// Handle native.
+		if ( 'native' === $id ) {
+			$outer_attr['class'] .= ' mai-ad-unit-native';
+		}
+
 		// Add custom classes.
 		if ( isset( $block['className'] ) && $block['className'] ) {
 			$outer_attr['class'] .= ' ' . esc_attr( $block['className'] );
