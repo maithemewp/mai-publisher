@@ -54,7 +54,7 @@ class Mai_Publisher_Ad_Video_Block {
 		$id = get_field( 'id' );
 
 		// If previewing in editor and no video selected, show placeholder.
-		if ( $is_preview || 'demo' === maipub_get_option( 'ad_mode', false ) ) {
+		if ( $is_preview || 'demo' === maipub_get_option( 'ad_mode', false ) || is_customize_preview() ) {
 			$text = $id ? __( 'Mai Video Ad Placeholder', 'mai-publisher' ) : __( 'No Video Selected', 'mai-publisher' );
 			printf( '<div class="mai-ad-video mai-connatix" data-unit="video" style="display:grid;place-content:center;aspect-ratio:16/9;margin-block:24px;text-align:center;background:rgba(0,0,0,0.05);border:2px dashed rgba(0,0,0,0.25);"><span style="font-size:1.1rem;">%s</span></div>', $text );
 			return;
