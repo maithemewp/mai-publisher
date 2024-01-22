@@ -605,3 +605,56 @@ function maipub_string_to_array( $split, $pairs ) {
 
 	return array_filter( $array );
 }
+
+/**
+ * Generate Mai Engine CSS for native ads.
+ *
+ * @since TBD
+ *
+ * @return bool Whether file was generated.
+ */
+function maipub_generate_mai_engine_css( $force = false ) {
+	// Get the uploads directory.
+	$upload_dir      = wp_get_upload_dir();
+	$upload_url      = $upload_dir['baseurl'];
+	$destination_dir = $upload_dir['basedir'] . '/mai-publisher/';
+
+	// Maybe create the destination directory.
+	if ( ! is_dir( $destination_dir ) ) {
+		wp_mkdir_p( $destination_dir );
+	}
+
+	// Set file contents var.
+	$css_contents = '';
+
+	// Set CSS file path.
+	$destination_file = $destination_dir . 'mai-engine.css';
+
+	// Bail if not forcing and the file already exists.
+	if ( ! $force && file_exists( $destination_file ) ) {
+		return false;
+	}
+
+	// Get it started.
+	ob_start();
+
+	// Print CSS from Customizer/Kirki.
+	if ( class_exists( 'Kirki\Module\CSS' ) ) {
+		$css = new \Kirki\Module\CSS();
+		$css->print_styles_inline();
+	}
+
+	// Store the contents.
+	$css_contents = ob_get_clean();
+	$css_contents = $css_contents ? strip_tags( $css_contents ) : '';
+
+	// Bail if no contents.
+	if ( ! $css_contents ) {
+		return false;
+	}
+
+	// Save to the destination file.
+	file_put_contents( $destination_file, $css_contents );
+
+	return true;
+}

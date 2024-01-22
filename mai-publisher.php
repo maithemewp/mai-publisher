@@ -154,6 +154,10 @@ final class Mai_Publisher_Plugin {
 			new Mai_Publisher_Analytics_Tracker_Block;
 		}
 
+		if ( class_exists( 'Mai_Engine' ) ) {
+			new Mai_Publisher_Mai_Engine;
+		}
+
 		if ( is_admin() ) {
 			new Mai_Publisher_Admin;
 			new Mai_Publisher_Settings;
