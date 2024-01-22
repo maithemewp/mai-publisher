@@ -264,7 +264,7 @@ class Mai_Publisher_Output {
 				'sellersId'   => $this->sellers_id,
 				'gamBase'     => $gam_base,
 				'ads'         => $this->gam,
-				'targeting'   => $this->get_targets(),
+				'targets'     => $this->get_targets(),
 				'amazonUAM'   => maipub_get_option( 'amazon_uam_enabled' ),
 			];
 

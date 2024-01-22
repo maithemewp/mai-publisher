@@ -24,9 +24,9 @@ function setupAds() {
 			slot.setTargeting( refreshKey, refreshvalue );
 
 			// Set slot-level targeting.
-			if ( ads[slug].targeting ) {
-				Object.keys( ads[slug].targeting ).forEach( key => {
-					slot.setTargeting( key, ads[slug].targeting[key] );
+			if ( ads[slug].targets ) {
+				Object.keys( ads[slug].targets ).forEach( key => {
+					slot.setTargeting( key, ads[slug].targets[key] );
 				});
 			}
 
@@ -53,9 +53,9 @@ function setupAds() {
 		});
 
 		// Set page-level targeting.
-		if ( maiPubAdsVars.targeting ) {
-			Object.keys( maiPubAdsVars.targeting ).forEach( key => {
-				googletag.pubads().setTargeting( key, maiPubAdsVars.targeting[key].toString() );
+		if ( maiPubAdsVars.targets ) {
+			Object.keys( maiPubAdsVars.targets ).forEach( key => {
+				googletag.pubads().setTargeting( key, maiPubAdsVars.targets[key].toString() );
 			});
 		}
 

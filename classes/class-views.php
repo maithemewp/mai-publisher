@@ -231,6 +231,7 @@ class Mai_Publisher_Views {
 			wp_die();
 		}
 
+		// Bail if not Matomo or Jetpack.
 		if ( ! in_array( $this->api, [ 'matomo', 'jetpack' ] ) ) {
 			wp_send_json_error( __( 'Not a valid API option.', 'mai-publisher' ) );
 			wp_die();
