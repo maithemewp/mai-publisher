@@ -119,6 +119,11 @@ function setupAds() {
 
 			// Loop through maiPubAdsVars getting key and values.
 			Object.keys( ads ).forEach( slug => {
+				// Skip if ads[slug].sizes only contains a single size named 'fluid'. This was throwing an error in amazon.
+				if ( 1 === ads[slug].sizes.length && 'fluid' === ads[slug].sizes[0] ) {
+					return;
+				}
+
 				// Add slot to array for UAD.
 				uadSlots.push({
 					slotID: 'mai-ad-' + slug,
