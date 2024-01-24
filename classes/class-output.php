@@ -126,11 +126,6 @@ class Mai_Publisher_Output {
 			$this->handle_content();
 		}
 
-		// In entries.
-		if ( isset( $this->grouped['entries'] ) && $this->grouped['entries'] ) {
-			$this->handle_entries();
-		}
-
 		// Recipes.
 		if ( isset( $this->grouped['recipe'] ) && $this->grouped['recipe'] ) {
 			$this->handle_recipes();
@@ -438,175 +433,6 @@ class Mai_Publisher_Output {
 	}
 
 	/**
-	 * Handle in-entries ads.
-	 *
-	 * @since 0.13.0
-	 *
-	 * @return void
-	 */
-	function handle_entries() {
-		$wrap    = $this->xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " entries-archive ")]/div[contains(concat(" ", normalize-space(@class), " "), " entries-wrap ")]' )->item(0);
-		$entries = $wrap ? count( $wrap->childNodes ) : 0;
-
-		// Bail if no wrap and no entries.
-		if ( ! ( $wrap && $entries ) ) {
-			return;
-		}
-
-		// Mai Theme v2 logic for rows/columns inline styles.
-		if ( class_exists( 'Mai_Engine' ) ) {
-			// Set has rows.
-			$has_rows = false;
-
-			// Check if we have an ad with rows.
-			foreach ( $this->grouped['entries'] as $ad ) {
-				if ( 'rows' === $ad['content_item'] ) {
-					$has_rows = true;
-					break;
-				}
-			}
-
-			// Set rows.
-			if ( $has_rows ) {
-				$style   = $wrap->getAttribute( 'style' );
-				$styles  = array_filter( explode( ';' , $style ) );
-				$columns = [];
-
-				// Build columns array from inlines styles.
-				foreach ( $styles as $style ) {
-					if ( ! str_starts_with( $style, '--columns-' ) ) {
-						continue;
-					}
-
-					$column = explode( ':', $style );
-
-					if ( 2 !== count( $column ) ) {
-						continue;
-					}
-
-					$break  = str_replace( '--columns-', '', $column[0] );
-					$column = explode( '/', $column[1] );
-
-					if ( 2 !== count( $column ) ) {
-						continue;
-					}
-
-					$columns[ $break ] = $column[1];
-				}
-
-				// If columns.
-				if ( $columns ) {
-					// Get existing styles as an array.
-					$style  = $wrap->getAttribute( 'style' );
-					$styles = array_filter( explode( ';' , $style ) );
-					$styles = array_map( 'trim', $styles );
-
-					// Add row breakpoint styles.
-					foreach ( $columns as $break => $column ) {
-						$styles[] = sprintf( '--maipub-row-%s:%s;', $break, $column );
-					}
-
-					// Set new styles.
-					$wrap->setAttribute( 'style', implode( ';', $styles ) . ';' );
-
-					// Insert styles before wrap.
-					$file   = "assets/css/mai-engine{$this->suffix}.css";
-					$link   = sprintf( '<link href="%s" rel="stylesheet">', maipub_get_file_data( $file, 'url' ) );
-					$this->insert_nodes( $link, $wrap, 'before' );
-				}
-			}
-		} // End Mai_Engine logic.
-
-		// Loop through entries ads.
-		foreach ( $this->grouped['entries'] as $ad ) {
-			// Skip if no content.
-			if ( ! $ad['content'] ) {
-				continue;
-			}
-
-			// Setup vars.
-			$class = [];
-			$style = [];
-
-			// Build atts.
-			switch ( $ad['content_item'] ) {
-				case 'rows':
-					$class[] = 'maipub-row';
-					break;
-				case 'entries':
-					$class[] = 'maipub-entry';
-					break;
-			}
-
-			// Sort counts lowest to highest.
-			asort( $ad['content_count'] );
-
-			// Mai Theme v2 logic for inserting rows/columns.
-			if ( class_exists( 'Mai_Engine' ) ) {
-				$compare = null;
-
-				// If counting rows.
-				if ( 'rows' === $ad['content_item'] ) {
-					$args    = mai_get_template_args();
-					$columns = mai_get_breakpoint_columns( $args );
-
-					// If columns.
-					if ( isset( $columns['lg'] ) && $columns['lg'] ) {
-						// Get desktop rows and round up.
-						$rows    = $entries / (int) $columns['lg'];
-						$compare = absint( ceil( $rows ) );
-					}
-
-				}
-				// If counting entries.
-				elseif ( 'entries' === $ad['content_item'] ) {
-					$class[] = 'entry';
-					$class[] = 'entry-archive';
-					$class[] = 'is-column';
-					$compare = $entries;
-				}
-
-				// If comparing.
-				if ( ! is_null( $compare ) ) {
-					// Remove counts that are greater than the posts per page.
-					foreach ( $ad['content_count'] as $index => $count ) {
-						if ( (int) $count >= $compare ) {
-							// Remove this one and any after it, and break.
-							$ad['content_count'] = array_slice( $ad['content_count'], 0, $index );
-							break;
-						}
-					}
-				}
-
-				// Loop through each ad count.
-				foreach ( $ad['content_count'] as $count ) {
-					$item_class   = $class;
-					$item_style   = $style;
-					$item_style[] = 'rows' === $ad['content_item'] ? "order:calc(var(--maipub-row) * {$count})" : "order:{$count}";
-					$item_atts    = [
-						'class' => trim( implode( ' ', $item_class ) ),
-						'style' => trim( implode( ';', $item_style ) ),
-					];
-
-					// Build ad with wrapper.
-					$html = sprintf( '<div%s>%s</div>', maipub_build_attributes( $item_atts ), $ad['content'] );
-
-					// Insert the html into the dom.
-					$this->insert_nodes( $html, $wrap, 'append' );
-				}
-			}
-			// Not Mai_Engine.
-			else {
-				// Loop through each ad count.
-				foreach ( $ad['content_count'] as $count ) {
-					// Insert the html into the dom.
-					$this->insert_nodes( $ad['content'], $wrap, 'append' );
-				}
-			}
-		} // End ad loop.
-	}
-
-	/**
 	 * Handle recipe ads.
 	 *
 	 * @since 0.13.0
@@ -726,7 +552,6 @@ class Mai_Publisher_Output {
 		if ( ! $comments->length ) {
 			return;
 		}
-
 
 		// Loop through comments ads.
 		foreach ( $this->grouped['comments'] as $ad ) {
@@ -1033,5 +858,4 @@ class Mai_Publisher_Output {
 
 		return $string;
 	}
-
 }

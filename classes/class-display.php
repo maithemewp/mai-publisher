@@ -168,7 +168,7 @@ class Mai_Publisher_Display {
 				continue;
 			}
 
-			// Skip if a location handled directly in the dom.
+			// Skip if a location handled directly in the dom or with custom implementation (entries).
 			if ( in_array( $args['location'], [ 'content', 'entries', 'recipe', 'comments', 'before_sidebar_content', 'after_sidebar_content' ] ) ) {
 				continue;
 			}
