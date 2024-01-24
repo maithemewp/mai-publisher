@@ -155,7 +155,7 @@ final class Mai_Publisher_Plugin {
 		}
 
 		if ( class_exists( 'Mai_Engine' ) ) {
-			new Mai_Publisher_Mai_Engine;
+			new Mai_Publisher_Entries;
 		}
 
 		if ( is_admin() ) {
