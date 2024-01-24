@@ -84,19 +84,28 @@ class Mai_Publisher_Ad_Video_Block {
 			case '6f704650-514c-4dc1-8481-8a75bbfb2eea':
 				$attr['class']     .= ' mai-connatix';
 				$attr['data-unit']  = 'tdih';
-				$html               = '<script id="b242539108714840b61d0122f61a84b0">(new Image()).src = "https://capi.connatix.com/tr/si?token=6f704650-514c-4dc1-8481-8a75bbfb2eea&cid=db8b4096-c769-48da-a4c5-9fbc9ec753f0"; cnx.cmd.push(function() { cnx({ playerId: "6f704650-514c-4dc1-8481-8a75bbfb2eea" }).render("b242539108714840b61d0122f61a84b0"); });</script>';
+				$return             = '<script id="b242539108714840b61d0122f61a84b0">(new Image()).src = "https://capi.connatix.com/tr/si?token=6f704650-514c-4dc1-8481-8a75bbfb2eea&cid=db8b4096-c769-48da-a4c5-9fbc9ec753f0"; cnx.cmd.push(function() { cnx({ playerId: "6f704650-514c-4dc1-8481-8a75bbfb2eea" }).render("b242539108714840b61d0122f61a84b0"); });</script>';
+			break;
+			// Custom.
+			case 'custom':
+				$name   = get_field( 'name' );
+				$name   = $name ?: 'custom';
+				$name   = sanitize_title_with_dashes( strtolower( $name ) );
+				$name   = str_replace( '-', '', $name );
+				$embed  = get_field( 'html' );
+				$return = $name && $embed ? $embed : '';
 			break;
 			default:
-				$html = '';
+				$return = '';
 		}
 
 		// Bail if no video script.
-		if ( ! $html ) {
+		if ( ! $return ) {
 			return;
 		}
 
 		// Output the video.
-		printf( '<div%s>%s</div>', maipub_build_attributes( $attr ), $html );
+		printf( '<div%s>%s</div>', maipub_build_attributes( $attr ), $return );
 	}
 
 	/**
@@ -125,6 +134,38 @@ class Mai_Publisher_Ad_Video_Block {
 							''                                     => __( 'None', 'mai-publisher' ),
 							'd98b3dc2-bc10-43cf-b1b9-bd2c68c9615b' => __( 'Cool Stuff', 'mai-publisher' ),
 							'6f704650-514c-4dc1-8481-8a75bbfb2eea' => __( 'This Day In History', 'mai-publisher' ),
+							'custom'                               => __( 'Custom', 'mai-publisher' ),
+						],
+					],
+					[
+						'label'             => __( 'Video Name', 'mai-publisher' ),
+						'key'               => 'maipub_ad_video_name',
+						'name'              => 'name',
+						'type'              => 'text',
+						'conditional_logic' => [
+							[
+								[
+									'field'    => 'maipub_ad_video_id',
+									'operator' => '==',
+									'value'    => 'custom',
+								],
+							],
+						],
+					],
+					[
+						'label'             => __( 'Video HTML', 'mai-publisher' ),
+						'key'               => 'maipub_ad_video_html',
+						'name'              => 'html',
+						'type'              => 'textarea',
+						'rows'              => 4,
+						'conditional_logic' => [
+							[
+								[
+									'field'    => 'maipub_ad_video_id',
+									'operator' => '==',
+									'value'    => 'custom',
+								],
+							],
 						],
 					],
 				],
