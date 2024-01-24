@@ -32,6 +32,22 @@ function maipub_get_legacy_ad_units() {
 }
 
 /**
+ * Renders an ad unit.
+ *
+ * @access private
+ *
+ * @since TBD
+ *
+ * @param array $args
+ *
+ * @return void
+ */
+function maipub_do_ad_unit( $args ) {
+	$ad = new Mai_Publisher_Ad_Unit( $args );
+	$ad->render();
+}
+
+/**
  * Returns array of ads for the currently viewed page.
  *
  * @since 0.13.0
