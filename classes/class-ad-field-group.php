@@ -199,7 +199,7 @@ class Mai_Publisher_Ad_Field_Group {
 			],
 			[
 				'label'             => __( 'Comment count', 'mai-publisher' ),
-				'instructions'      => __( 'Count this many elements between repeated ads in comments.', 'mai-publisher' ),
+				'instructions'      => __( 'Set comment interval for ad repetition.', 'mai-publisher' ),
 				'key'               => 'maipub_single_comment_count',
 				'name'              => 'maipub_single_comment_count',
 				'type'              => 'number',
