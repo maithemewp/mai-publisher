@@ -129,7 +129,10 @@ class Mai_Publisher_Ad_Unit {
 
 		// Add styles.
 		if ( $styles ) {
-			$spacer_attr['style'] = $styles;
+			if ( $is_sticky ) {
+				$spacer_attr['style'] = $styles;
+			}
+
 			$outer_attr['style']  = $styles;
 		}
 
@@ -158,16 +161,21 @@ class Mai_Publisher_Ad_Unit {
 			$inner_attr['data-st'] = esc_attr( $split_test );
 		}
 
+		// Get spacer attributes string.
+		if ( $is_sticky ) {
+			$spacer_attr = $is_preview ? maipub_build_attributes( $spacer_attr ) : ' ' . get_block_wrapper_attributes( $spacer_attr );
+			$spacer_attr = $is_preview ? str_replace( ' wp-block-acf-mai-ad-unit', '', $spacer_attr ) : $spacer_attr;
+		}
+
 		// Get attributes string.
-		$spacer_attr = get_block_wrapper_attributes( $spacer_attr );
-		$spacer_attr = str_replace( ' wp-block-acf-mai-ad-unit', '', $spacer_attr );
-		$outer_attr  = maipub_build_attributes( $outer_attr );
-		$inner_attr  = str_replace( ' wp-block-acf-mai-ad-unit', '', get_block_wrapper_attributes( $inner_attr ) );
+		$outer_attr = maipub_build_attributes( $outer_attr );
+		$inner_attr = $is_preview ? maipub_build_attributes( $inner_attr ) : ' ' . get_block_wrapper_attributes( $inner_attr );
+		$inner_attr = $is_preview ? str_replace( ' wp-block-acf-mai-ad-unit', '', $inner_attr ) : $inner_attr;
 
 		// Build HTML.
-		$html .= $is_sticky ? sprintf( '<div %s></div>', $spacer_attr ) : '';
+		$html .= $is_sticky ? sprintf( '<div%s></div>', $spacer_attr ) : '';
 		$html .= sprintf( '<div%s>', $outer_attr ); // No space for `maipub_build_attributes()`.
-			$html .= sprintf( '<div %s>', $inner_attr );
+			$html .= sprintf( '<div%s>', $inner_attr );
 				$html .= $inner;
 			$html .= '</div>';
 		$html .= '</div>';
