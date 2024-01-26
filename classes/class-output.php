@@ -63,8 +63,8 @@ class Mai_Publisher_Output {
 		$this->mode         = maipub_get_option( 'ad_mode', false );
 		$this->suffix       = maipub_get_suffix();
 
-		// Bail if no ads or ads are disabled.
-		if ( ! $this->ads || 'disabled' === $this->mode ) {
+		// Bail if disabled. Not checking `$this->ads` because there may be manual ads in the content.
+		if ( 'disabled' === $this->mode ) {
 			return;
 		}
 
