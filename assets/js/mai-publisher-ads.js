@@ -26,14 +26,15 @@ function setupAds() {
 			// Set slot-level targeting.
 			if ( ads[slug].targets ) {
 				Object.keys( ads[slug].targets ).forEach( key => {
-					slot.setTargeting( key, ads[slug].targets[key] );
+					var value = ads[slug].targets[key];
+					slot.setTargeting( key, Array.isArray(value) ? value : [value] );
 				});
 			}
 
 			// Set split testing.
 			if ( ads[slug].splitTest && 'rand' === ads[slug].splitTest ) {
 				// Set 'st' to a value between 0-99.
-				slot.setTargeting( 'st', Math.floor(Math.random() * 100) );
+				slot.setTargeting( 'st', [ Math.floor(Math.random() * 100) ] );
 			}
 
 			// Get it running.
@@ -55,7 +56,7 @@ function setupAds() {
 		// Set page-level targeting.
 		if ( maiPubAdsVars.targets ) {
 			Object.keys( maiPubAdsVars.targets ).forEach( key => {
-				googletag.pubads().setTargeting( key, maiPubAdsVars.targets[key].toString() );
+				googletag.pubads().setTargeting( key, [ maiPubAdsVars.targets[key].toString() ] );
 			});
 		}
 
