@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.1.1 (1/26/24)
+* Fixed: Sticky footer was causing horizontal scroll.
+
 ## 1.1.0 (1/26/24)
 * Added: Requires Mai Engine 2.32.3 to use in entries/grid settings.
 * Added: Mai Engine support to insert ad units in between Mai Post/Term Grid entries.
