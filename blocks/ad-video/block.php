@@ -88,12 +88,18 @@ class Mai_Publisher_Ad_Video_Block {
 			break;
 			// Custom.
 			case 'custom':
-				$name   = get_field( 'name' );
-				$name   = $name ?: 'custom';
-				$name   = sanitize_title_with_dashes( strtolower( $name ) );
-				$name   = str_replace( '-', '', $name );
-				$embed  = get_field( 'html' );
-				$return = $name && $embed ? $embed : '';
+				$name  = get_field( 'name' );
+				$name  = $name ?: 'custom';
+				$name  = sanitize_title_with_dashes( strtolower( $name ) );
+				$name  = str_replace( '-', '', $name );
+				$embed = get_field( 'html' );
+
+				if ( $embed && str_contains( $embed, 'connatix' ) ) {
+					$attr['class'] .= ' mai-connatix';
+				}
+
+				$attr['data-unit'] = $name;
+				$return            = $name && $embed ? $embed : '';
 			break;
 			default:
 				$return = '';
