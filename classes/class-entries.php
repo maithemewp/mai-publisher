@@ -402,13 +402,12 @@ class Mai_Publisher_Entries {
 				'title'    => __( 'Mai Publisher', 'mai-publisher' ),
 				'fields'   => [
 					[
-						'label'             => __( 'Entry count', 'mai-publisher' ),
-						'instructions'      => __( 'Count this many entries before displaying ads. Use comma-separated values to repeat this ad after a different number of elements.', 'mai-publisher' ),
-						'key'               => 'maipub_ad_unit_content_count',
-						'name'              => 'maipub_ad_unit_content_count',
-						'type'              => 'text',
-						'append'            => __( 'entries', 'mai-publisher' ),
-						'default_value'     => '4, 12, 20, 28, 36, 44, 56, 64',
+						'label'         => __( 'Entry count', 'mai-publisher' ),
+						'instructions'  => __( 'Count this many entries before displaying ads. Use comma-separated values to repeat this ad after a different number of elements.', 'mai-publisher' ),
+						'key'           => 'maipub_ad_unit_content_count',
+						'name'          => 'maipub_ad_unit_content_count',
+						'type'          => 'text',
+						'default_value' => '4, 12, 20, 28, 36, 44, 56, 64',
 					],
 					[
 						'label'         => __( 'Count Items', 'mai-publisher' ),
