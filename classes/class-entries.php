@@ -205,7 +205,7 @@ class Mai_Publisher_Entries {
 		$ad            = $this->archive_ads[ $i ];
 		$ad['columns'] = mai_get_breakpoint_columns( $args );
 
-		return $this->get_ads( $ad );
+		return $this->get_ads( $ad, $args );
 	}
 
 	/**
@@ -246,7 +246,7 @@ class Mai_Publisher_Entries {
 		$ad['content_item']  = $args['ad_unit_content_item'];
 		$ad['columns']       = mai_get_breakpoint_columns( $args );
 
-		return $this->get_ads( $ad );
+		return $this->get_ads( $ad, $args );
 	}
 
 	/**
@@ -254,11 +254,12 @@ class Mai_Publisher_Entries {
 	 *
 	 * @since TBD
 	 *
-	 * @param array $ad The add args.
+	 * @param array $ad   The add args.
+	 * @param array $args The layout args.
 	 *
 	 * @return array
 	 */
-	function get_ads( $ad ) {
+	function get_ads( $ad, $args ) {
 		$ads     = '';
 		$class   = [];
 		$style   = [];
@@ -275,9 +276,13 @@ class Mai_Publisher_Entries {
 			// Entries compares to the number of entries.
 			case 'entries':
 				$class[] = 'maipub-entry';
-				// $class[] = 'entry'; // This adds entry styling, which we don't want for programmatic native ads.
 				$class[] = 'entry-archive';
 				$class[] = 'is-column';
+
+				if ( isset( $args['boxed'] ) && $args['boxed'] ) {
+					$class[] = 'entry'; // This adds styling for the entry in Mai.
+				}
+
 				$compare = $this->index;
 				break;
 		}
