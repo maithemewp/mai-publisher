@@ -9,7 +9,7 @@
 	display: block;
 	width: 1px;
 	margin-left: -1px;
-	padding-bottom: calc(100% / (var(--mai-ad-unit-aspect-ratio)));
+	padding-bottom: calc(var(--mai-ad-unit-aspect-ratio-width, 100%) / (var(--mai-ad-unit-aspect-ratio)));
 	content: "";
 }
 
