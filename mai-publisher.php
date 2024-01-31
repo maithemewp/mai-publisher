@@ -177,6 +177,7 @@ final class Mai_Publisher_Plugin {
 		add_action( 'plugins_loaded', [ $this, 'updater' ] );
 		add_action( 'init',           [ $this, 'register_content_types' ] );
 		add_action( 'pre_get_posts',  [ $this, 'orderby_title' ] );
+		add_action( 'admin_menu',     [ $this, 'add_page' ], 12 );
 
 		register_activation_hook( __FILE__, [ $this, 'activate' ] );
 		register_deactivation_hook( __FILE__, 'flush_rewrite_rules' );
@@ -257,7 +258,7 @@ final class Mai_Publisher_Plugin {
 					'not_found_in_trash' => __( 'No Mai Ads found in Trash.', 'mai-publisher' )
 				],
 				'menu_icon'          => 'dashicons-media-code',
-				'menu_position'      => 50,
+				'menu_position'      => 58,
 				'public'             => false,
 				'publicly_queryable' => false,
 				'show_in_menu'       => true,
@@ -298,6 +299,29 @@ final class Mai_Publisher_Plugin {
 		// Set order.
 		$query->set( 'orderby', 'menu_order' );
 		$query->set( 'order','ASC' );
+	}
+
+	/**
+	 * Adds additional link to Mai Ads menu item via Mai Theme.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	public function add_page() {
+		if ( ! class_exists( 'Mai_Engine' ) ) {
+			return;
+		}
+
+		add_submenu_page(
+			'mai-theme',
+			esc_html__( 'Mai Ads', 'mai-publisher' ),
+			esc_html__( 'Mai Ads', 'mai-publisher' ),
+			'manage_options',
+			'edit.php?post_type=mai_ad',
+			'',
+			null
+		);
 	}
 
 	/**
