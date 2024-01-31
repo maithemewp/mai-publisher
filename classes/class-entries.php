@@ -44,15 +44,19 @@ class Mai_Publisher_Entries {
 	 * @return array
 	 */
 	function add_grid_args( $args ) {
-		$args['ad_unit_id']            = get_field( 'maipub_ad_unit_id' );
-		$args['ad_unit_content_count'] = array_map( 'absint', array_filter( explode( ',', (string) get_field( 'maipub_ad_unit_content_count' ) ) ) );
-		$args['ad_unit_content_item']  = get_field( 'maipub_ad_unit_content_item' );
-		$args['ad_unit_type']          = get_field( 'maipub_ad_unit_type' );
-		$args['ad_unit_position']      = get_field( 'maipub_ad_unit_position' );
-		$args['ad_unit_split_test']    = get_field( 'maipub_ad_unit_split_test' );
-		$args['ad_unit_targets']       = get_field( 'maipub_ad_unit_targets' );
-		$args['ad_unit_label']         = get_field( 'maipub_ad_unit_label' );
-		$args['ad_unit_label_hide']    = get_field( 'maipub_ad_unit_label_hide' );
+		// Get the ad clone field data.
+		$ad = get_field( 'maipub_ad_unit' );
+
+		// Set new args.
+		$args['ad_unit_id']            = isset( $ad['id'] ) ? $ad['id'] : '';
+		$args['ad_unit_content_count'] = array_map( 'absint', array_filter( explode( ',', (string) isset( $ad['content_count'] ) ? $ad['content_count'] : '' ) ) );
+		$args['ad_unit_content_item']  = isset( $ad['content_item'] ) ? $ad['content_item'] : '';
+		$args['ad_unit_type']          = isset( $ad['type'] ) ? $ad['type'] : '';
+		$args['ad_unit_position']      = isset( $ad['position'] ) ? $ad['position'] : '';
+		$args['ad_unit_split_test']    = isset( $ad['split_test'] ) ? $ad['split_test'] : '';
+		$args['ad_unit_targets']       = isset( $ad['targets'] ) ? $ad['targets'] : '';
+		$args['ad_unit_label']         = isset( $ad['label'] ) ? $ad['label'] : '';
+		$args['ad_unit_label_hide']    = isset( $ad['label_hide'] ) ? $ad['label_hide'] : '';
 
 		return $args;
 	}
@@ -410,15 +414,15 @@ class Mai_Publisher_Entries {
 						'label'         => __( 'Entry/Row position', 'mai-publisher' ),
 						'instructions'  => __( 'Display ads in these entry/row positions. Use comma-separated values to display multiple ads in various locations.', 'mai-publisher' ),
 						'key'           => 'maipub_ad_unit_content_count',
-						'name'          => 'maipub_ad_unit_content_count',
+						'name'          => 'content_count',
 						'type'          => 'text',
-						'default_value' => '3, 6, 9, 12, 14, 17, 20, 23, 26, 29, 32, 35, 38, 41, 44',
+						'default_value' => '3, 6, 9, 12',
 					],
 					[
 						'label'         => __( 'Entry/Row count', 'mai-publisher' ),
 						'instructions'  => __( 'Whether to count entries or rows.', 'mai-publisher' ),
 						'key'           => 'maipub_ad_unit_content_item',
-						'name'          => 'maipub_ad_unit_content_item',
+						'name'          => 'content_item',
 						'type'          => 'select',
 						'default_value' => 'entries',
 						'choices'       => [
@@ -450,10 +454,10 @@ class Mai_Publisher_Entries {
 						'key'          => 'maipub_ad_unit',
 						'name'         => 'maipub_ad_unit',
 						'type'         => 'clone',
-						'display'      => 'seamless',
+						'display'      => 'group',
 						'layout'       => 'block',
 						'prefix_label' => 0,
-						'prefix_name'  => 0,
+						'prefix_name'  => 1,
 						'clone'        => [
 							'maipub_ad_unit_id',
 							'maipub_ad_unit_content_count',
