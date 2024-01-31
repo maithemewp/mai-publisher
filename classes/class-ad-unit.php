@@ -16,7 +16,7 @@ class Mai_Publisher_Ad_Unit {
 	/**
 	 * Renders an ad.
 	 *
-	 * @since TBD
+	 * @since 1.1.0
 	 *
 	 * @return void
 	 */

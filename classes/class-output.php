@@ -615,7 +615,7 @@ class Mai_Publisher_Output {
 	/**
 	 * Saves HTML from DOMDocument and decode entities.
 	 *
-	 * @since TBD
+	 * @since 1.1.0
 	 *
 	 * @param DOMDocument $dom
 	 *

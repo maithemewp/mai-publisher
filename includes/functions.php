@@ -98,7 +98,7 @@ function maipub_get_dom_document( $html ) {
 /**
  * Saves HTML from DOMDocument and decode entities.
  *
- * @since TBD
+ * @since 1.1.0
  *
  * @param DOMDocument $dom
  *

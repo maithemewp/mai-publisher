@@ -304,7 +304,7 @@ final class Mai_Publisher_Plugin {
 	/**
 	 * Adds additional link to Mai Ads menu item via Mai Theme.
 	 *
-	 * @since TBD
+	 * @since 1.2.0
 	 *
 	 * @return void
 	 */

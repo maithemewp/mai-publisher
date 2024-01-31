@@ -26,7 +26,7 @@ class Mai_Publisher_Entries {
 	/**
 	 * Do entries relate things.
 	 *
-	 * @since TBD
+	 * @since 1.2.0
 	 *
 	 * @return void
 	 */
@@ -37,7 +37,7 @@ class Mai_Publisher_Entries {
 	/**
 	 * Adds custom grid fields as args.
 	 *
-	 * @since TBD
+	 * @since 1.1.0
 	 *
 	 * @param array $args The existing grid args.
 	 *
@@ -60,7 +60,7 @@ class Mai_Publisher_Entries {
 	/**
 	 * Adds custom attributes for ordering ads inside entries.
 	 *
-	 * @since TBD
+	 * @since 1.1.0
 	 *
 	 * @param array  $attr    The existing attributes.
 	 * @param string $context The context.
@@ -106,7 +106,7 @@ class Mai_Publisher_Entries {
 	/**
 	 * Adds CSS via `<link>` after opening entries div.
 	 *
-	 * @since TBD
+	 * @since 1.1.0
 	 *
 	 * @param string $content The existing content.
 	 * @param array  $args    The layout args.
@@ -146,7 +146,7 @@ class Mai_Publisher_Entries {
 	 * Adds ads before the entries closing div.
 	 * Adds attributes for ordering.
 	 *
-	 * @since TBD
+	 * @since 1.1.0
 	 *
 	 * @param string $content The existing content.
 	 * @param array  $args    The layout args.
@@ -181,7 +181,7 @@ class Mai_Publisher_Entries {
 	 * Gets ads for archives.
 	 * Adds attributes for ordering.
 	 *
-	 * @since TBD
+	 * @since 1.1.0
 	 *
 	 * @param array $args The archive args.
 	 *
@@ -211,7 +211,7 @@ class Mai_Publisher_Entries {
 	 * Gets ads for grid blocks.
 	 * Adds attributes for ordering.
 	 *
-	 * @since TBD
+	 * @since 1.1.0
 	 *
 	 * @param array $args The grid args.
 	 *
@@ -252,7 +252,7 @@ class Mai_Publisher_Entries {
 	/**
 	 * Gets ads with attributes.
 	 *
-	 * @since TBD
+	 * @since 1.1.0
 	 *
 	 * @param array $ad   The add args.
 	 * @param array $args The layout args.
@@ -327,7 +327,7 @@ class Mai_Publisher_Entries {
 	/**
 	 * Increments the entry index each time one is rendered.
 	 *
-	 * @since TBD
+	 * @since 1.1.0
 	 *
 	 * @param object $entry The entry object.
 	 * @param array  $args  The layout args.
@@ -342,7 +342,7 @@ class Mai_Publisher_Entries {
 	/**
 	 * Whether the args are valid for the context and location we want.
 	 *
-	 * @since TBD
+	 * @since 1.1.0
 	 *
 	 * @param array $args The existing args.
 	 *
@@ -391,7 +391,7 @@ class Mai_Publisher_Entries {
 	/**
 	 * Register field groups for the grid block.
 	 *
-	 * @since TBD
+	 * @since 1.1.0
 	 *
 	 * @return void
 	 */
@@ -491,7 +491,7 @@ class Mai_Publisher_Entries {
 	/**
 	 * Maybe generate CSS for Mai Engine native ads.
 	 *
-	 * @since TBD
+	 * @since 1.1.0
 	 *
 	 * @return void
 	 */
@@ -508,7 +508,7 @@ class Mai_Publisher_Entries {
 	/**
 	 * Force generate CSS.
 	 *
-	 * @since TBD
+	 * @since 1.1.0
 	 *
 	 * @param WP_Customize_Manager $customizer The customizer manager.
 	 *

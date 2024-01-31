@@ -36,7 +36,7 @@ function maipub_get_legacy_ad_units() {
  *
  * @access private
  *
- * @since TBD
+ * @since 1.1.0
  *
  * @param array $args
  *
@@ -625,7 +625,7 @@ function maipub_string_to_array( $split, $pairs ) {
 /**
  * Generate Mai Engine CSS for native ads.
  *
- * @since TBD
+ * @since 1.1.0
  *
  * @return bool Whether file was generated.
  */
