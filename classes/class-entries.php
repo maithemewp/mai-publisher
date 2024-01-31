@@ -407,20 +407,20 @@ class Mai_Publisher_Entries {
 				'title'    => __( 'Mai Publisher', 'mai-publisher' ),
 				'fields'   => [
 					[
-						'label'         => __( 'Entry count', 'mai-publisher' ),
-						'instructions'  => __( 'Count this many entries before displaying ads. Use comma-separated values to repeat this ad after a different number of elements.', 'mai-publisher' ),
+						'label'         => __( 'Entry/Row position', 'mai-publisher' ),
+						'instructions'  => __( 'Display ads in these entry/row positions. Use comma-separated values to display multiple ads in various locations.', 'mai-publisher' ),
 						'key'           => 'maipub_ad_unit_content_count',
 						'name'          => 'maipub_ad_unit_content_count',
 						'type'          => 'text',
-						'default_value' => '4, 12, 20, 28, 36, 44, 56, 64',
+						'default_value' => '3, 6, 9, 12, 14, 17, 20, 23, 26, 29, 32, 35, 38, 41, 44',
 					],
 					[
-						'label'         => __( 'Count Items', 'mai-publisher' ),
-						'instructions'  => __( 'Whether to count rows or entries.', 'mai-publisher' ),
+						'label'         => __( 'Entry/Row count', 'mai-publisher' ),
+						'instructions'  => __( 'Whether to count entries or rows.', 'mai-publisher' ),
 						'key'           => 'maipub_ad_unit_content_item',
 						'name'          => 'maipub_ad_unit_content_item',
 						'type'          => 'select',
-						'default_value' => 'rows',
+						'default_value' => 'entries',
 						'choices'       => [
 							'rows'    => __( 'Rows', 'mai-publisher' ),
 							'entries' => __( 'Entries', 'mai-publisher' ),

@@ -353,8 +353,8 @@ class Mai_Publisher_Ad_Field_Group {
 				'choices'      => maipub_get_location_choices( 'archive' ),
 			],
 			[
-				'label'             => __( 'Count', 'mai-publisher' ),
-				'instructions'      => __( 'Count this many entries or rows of entries before displaying content. Use comma-separated values to repeat this add after a different number of items.', 'mai-publisher' ),
+				'label'             => __( 'Entry/Row position', 'mai-publisher' ),
+				'instructions'      => __( 'Display ads in these entry/row positions. Use comma-separated values to display multiple ads in various locations.', 'mai-publisher' ),
 				'key'               => 'maipub_archive_content_count',
 				'name'              => 'maipub_archive_content_count',
 				'type'              => 'text',
@@ -372,8 +372,8 @@ class Mai_Publisher_Ad_Field_Group {
 				],
 			],
 			[
-				'label'         => __( 'Count Items', 'mai-publisher' ),
-				'instructions'  => __( 'Whether to count rows or entries.', 'mai-publisher' ),
+				'label'         => __( 'Entry/Row count', 'mai-publisher' ),
+				'instructions'  => __( 'Whether to count entries or rows.', 'mai-publisher' ),
 				'key'           => 'maipub_archive_content_item',
 				'name'          => 'maipub_archive_content_item',
 				'type'          => 'select',
