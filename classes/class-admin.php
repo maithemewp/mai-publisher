@@ -390,9 +390,8 @@ class Mai_Publisher_Admin {
 	 * @return array
 	 */
 	function get_ad_unit_data( $input ) {
-		$units  = [];
-		$blocks = is_array( $input ) ? $input : parse_blocks( $input );
-
+		$units       = [];
+		$blocks      = is_array( $input ) ? $input : parse_blocks( $input );
 		$types       = get_field_object( 'maipub_ad_unit_type' );
 		$types       = $types ? $types['choices'] : [];
 		$positions   = get_field_object( 'maipub_ad_unit_position' );
@@ -437,11 +436,46 @@ class Mai_Publisher_Admin {
 					'targets' => [],
 				];
 			}
-		}
 
-		// If we have inner blocks, recurse.
-		if ( isset( $block['innerBlocks'] ) && $block['innerBlocks'] ) {
-			$units = array_merge( $units, $this->get_ad_unit_data( $block['innerBlocks'] ) );
+			if ( in_array( $block['blockName'], [ 'acf/mai-post-grid', 'acf/mai-term-grid' ] ) ) {
+				if ( isset( $block['attrs']['data']['maipub_ad_unit_id'] )
+					&& ! empty( $block['attrs']['data']['maipub_ad_unit_id'] )
+					&& isset( $block['attrs']['data']['maipub_ad_unit_content_count'] )
+					&& ! empty( $block['attrs']['data']['maipub_ad_unit_content_count'] )
+					) {
+
+					$array            = [];
+					$array['slug']    = '(grid) ' . $block['attrs']['data']['maipub_ad_unit_id'];
+					$array['targets'] = [];
+
+					// Ad type.
+					if ( isset( $block['attrs']['data']['maipub_ad_unit_type'] ) && ! empty( $block['attrs']['data']['maipub_ad_unit_type'] ) ) {
+						$array['targets']['maipub_ad_unit_type'] = isset( $types[ $block['attrs']['data']['maipub_ad_unit_type'] ] ) ? $types[ $block['attrs']['data']['maipub_ad_unit_type'] ] : $block['attrs']['data']['maipub_ad_unit_type'];
+					}
+
+					// Position.
+					if ( isset( $block['attrs']['data']['maipub_ad_unit_position'] ) && ! empty( $block['attrs']['data']['maipub_ad_unit_position'] ) ) {
+						$array['targets']['maipub_ad_unit_position'] = isset( $positions[ $block['attrs']['data']['maipub_ad_unit_position'] ] ) ? $positions[ $block['attrs']['data']['maipub_ad_unit_position'] ] : $block['attrs']['data']['maipub_ad_unit_position'];
+					}
+
+					// Split test.
+					if ( isset( $block['attrs']['data']['split_test'] ) && ! empty( $block['attrs']['data']['split_test'] ) ) {
+						$array['targets']['split-test'] = isset( $split_tests[ $block['attrs']['data']['maipub_ad_unit_split_test'] ] ) ? $split_tests[ $block['attrs']['data']['maipub_ad_unit_split_test'] ] : $block['attrs']['data']['maipub_ad_unit_split_test'];
+					}
+
+					// Targets.
+					if ( isset( $block['attrs']['data']['maipub_ad_unit_targets'] ) && ! empty( $block['attrs']['data']['maipub_ad_unit_targets'] ) ) {
+						$array['targets']['maipub_ad_unit_targets'] = $block['attrs']['data']['maipub_ad_unit_targets'];
+					}
+
+					$units[] = $array;
+				}
+			}
+
+			// If we have inner blocks, recurse.
+			if ( isset( $block['innerBlocks'] ) && $block['innerBlocks'] ) {
+				$units = array_merge( $units, $this->get_ad_unit_data( $block['innerBlocks'] ) );
+			}
 		}
 
 		return $units;
