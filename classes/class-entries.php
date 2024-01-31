@@ -12,8 +12,15 @@ class Mai_Publisher_Entries {
 	 * Construct the class.
 	 */
 	function __construct() {
-		add_action( 'template_redirect', [ $this, 'do_entries_ads' ] );
-		add_action( 'acf/init',          [ $this, 'register_grid_field_group' ] );
+		add_action( 'template_redirect',                   [ $this, 'get_page_ads' ] );
+		add_filter( 'mai_grid_args',                       [ $this, 'add_grid_args' ] );
+		add_filter( 'genesis_attr_entries-wrap',           [ $this, 'add_attributes' ], 10, 3 );
+		add_filter( 'genesis_markup_entries_content',      [ $this, 'add_css' ], 10, 2 );
+		add_filter( 'genesis_markup_entries-wrap_content', [ $this, 'add_ads' ], 10, 2 );
+		add_action( 'mai_after_entry',                     [ $this, 'increment_index' ], 10, 2 );
+		add_action( 'acf/init',                            [ $this, 'register_grid_field_group' ] );
+		// add_action( 'admin_footer',                        [ $this, 'settings_generate_file' ] );
+		// add_action( 'customize_save_after',                [ $this, 'customizer_generate_file' ] );
 	}
 
 	/**
@@ -23,16 +30,8 @@ class Mai_Publisher_Entries {
 	 *
 	 * @return void
 	 */
-	function do_entries_ads() {
+	function get_page_ads() {
 		$this->page_ads = maipub_get_page_ads();
-
-		add_filter( 'mai_grid_args',                       [ $this, 'add_grid_args' ] );
-		add_filter( 'genesis_attr_entries-wrap',           [ $this, 'add_attributes' ], 10, 3 );
-		add_filter( 'genesis_markup_entries_content',      [ $this, 'add_css' ], 10, 2 );
-		add_filter( 'genesis_markup_entries-wrap_content', [ $this, 'add_ads' ], 10, 2 );
-		add_action( 'mai_after_entry',                     [ $this, 'increment_index' ], 10, 2 );
-		// add_action( 'admin_footer',                   [ $this, 'settings_generate_file' ] );
-		// add_action( 'customize_save_after',           [ $this, 'customizer_generate_file' ] );
 	}
 
 	/**
@@ -232,6 +231,7 @@ class Mai_Publisher_Entries {
 		ob_start();
 		maipub_do_ad_unit(
 			[
+				'preview'    => is_admin(),
 				'id'         => $args['ad_unit_id'],
 				'type'       => $args['ad_unit_type'],
 				'position'   => $args['ad_unit_position'],
@@ -292,9 +292,13 @@ class Mai_Publisher_Entries {
 
 		// If comparing.
 		if ( ! is_null( $compare ) ) {
-			// Remove counts that are greater than the posts per page.
+			// Loop through ad count to insert.
 			foreach ( $ad['content_count'] as $index => $count ) {
-				if ( (int) $count >= $compare ) {
+				// Comparing rows/entries plus ads.
+				$compare_with_ads = $compare + ( $index + 1 );
+
+				// If this ad is past the compare amount with ads, remove it and any after it.
+				if ( (int) $count > $compare_with_ads ) {
 					// Remove this one and any after it, and break.
 					$ad['content_count'] = array_slice( $ad['content_count'], 0, $index );
 					break;
@@ -303,10 +307,11 @@ class Mai_Publisher_Entries {
 		}
 
 		// Loop through each ad count.
-		foreach ( $ad['content_count'] as $count ) {
+		foreach ( $ad['content_count'] as $index => $count ) {
+			$order        = $count - ( $index + 1 );
 			$item_class   = $class;
 			$item_style   = $style;
-			$item_style[] = 'rows' === $ad['content_item'] ? "order:calc(var(--maipub-row) * {$count})" : "order:{$count}";
+			$item_style[] = 'rows' === $ad['content_item'] ? "order:calc(var(--maipub-row) * {$order})" : "order:{$order}";
 			$item_atts    = [
 				'class' => trim( implode( ' ', $item_class ) ),
 				'style' => trim( implode( ';', $item_style ) ),
