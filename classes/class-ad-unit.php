@@ -76,6 +76,7 @@ class Mai_Publisher_Ad_Unit {
 			$mobile  = ! is_array( $mobile ) ? [ 300, 350 ] : $mobile;
 			$tablet  = ! is_array( $tablet ) ? [ 300, 350 ] : $tablet;
 			$desktop = ! is_array( $desktop ) ? [ 300, 350 ] : $desktop;
+			$text    = '';
 
 			if ( 'sidebar' === $id ) {
 				$mobile  = [ 300, 250 ];
@@ -83,13 +84,17 @@ class Mai_Publisher_Ad_Unit {
 				$desktop = [ 300, 250 ];
 			}
 
-			// Build inner HTML.
-			$inner .= '<picture>';
-				$inner .= sprintf( '<source srcset="https://placehold.co/%s" media="(max-width: 727px)">', implode( 'x', $mobile ) );
-				$inner .= sprintf( '<source srcset="https://placehold.co/%s" media="(min-width: 728px) and (max-width: 1023px)">', implode( 'x', $tablet ) );
-				$inner .= sprintf( '<source srcset="https://placehold.co/%s" media="(min-width: 1024px)">', implode( 'x', $desktop ) );
-				$inner .= sprintf( '<img src="https://placehold.co/%s">', implode( 'x', $desktop ) );
-			$inner .= '</picture>';
+			if ( 'native' === $id ) {
+				$inner .= sprintf( '<div style="display:grid;place-items:center;height:100%%;background:rgba(0,0,0,.05);border:2px dashed rgba(0,0,0,.25);"><h2 style="display:block;margin:0;padding:0;font-size:1.25em;">%s</h2></div>', __( 'Native Ad', 'mai-publisher' ) );
+			} else {
+				// Build inner HTML.
+				$inner .= '<picture>';
+					$inner .= sprintf( '<source srcset="https://placehold.co/%s" media="(max-width: 727px)">', implode( 'x', $mobile ) );
+					$inner .= sprintf( '<source srcset="https://placehold.co/%s" media="(min-width: 728px) and (max-width: 1023px)">', implode( 'x', $tablet ) );
+					$inner .= sprintf( '<source srcset="https://placehold.co/%s" media="(min-width: 1024px)">', implode( 'x', $desktop ) );
+					$inner .= sprintf( '<img src="https://placehold.co/%s">', implode( 'x', $desktop ) );
+				$inner .= '</picture>';
+			}
 		}
 
 		// Start spacer attributes.
