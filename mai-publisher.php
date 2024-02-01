@@ -44,7 +44,7 @@ final class Mai_Publisher_Plugin {
 	 * @see     Mai_Publisher_Plugin()
 	 * @return  object | Mai_Publisher_Plugin The one true Mai_Publisher_Plugin
 	 */
-	public static function instance() {
+	static function instance() {
 		if ( ! isset( self::$instance ) ) {
 			// Setup the setup.
 			self::$instance = new Mai_Publisher_Plugin;
@@ -66,7 +66,7 @@ final class Mai_Publisher_Plugin {
 	 *
 	 * @return void
 	 */
-	public function __clone() {
+	function __clone() {
 		// Cloning instances of the class is forbidden.
 		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'mai-publisher' ), '1.0' );
 	}
@@ -78,7 +78,7 @@ final class Mai_Publisher_Plugin {
 	 *
 	 * @return void
 	 */
-	public function __wakeup() {
+	function __wakeup() {
 		// Unserializing instances of the class is forbidden.
 		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'mai-publisher' ), '1.0' );
 	}
@@ -173,7 +173,7 @@ final class Mai_Publisher_Plugin {
 	 *
 	 * @return void
 	 */
-	public function hooks() {
+	function hooks() {
 		add_action( 'plugins_loaded', [ $this, 'updater' ] );
 		add_action( 'init',           [ $this, 'register_content_types' ] );
 		add_action( 'pre_get_posts',  [ $this, 'orderby_title' ] );
@@ -194,7 +194,7 @@ final class Mai_Publisher_Plugin {
 	 *
 	 * @return void
 	 */
-	public function updater() {
+	function updater() {
 		// Bail if plugin updater is not loaded.
 		if ( ! class_exists( 'YahnisElsts\PluginUpdateChecker\v5\PucFactory' ) ) {
 			return;
@@ -230,7 +230,7 @@ final class Mai_Publisher_Plugin {
 	 *
 	 * @return void
 	 */
-	public function register_content_types() {
+	function register_content_types() {
 
 		/***********************
 		 *  Custom Post Types  *
@@ -280,7 +280,7 @@ final class Mai_Publisher_Plugin {
 	 *
 	 * @return void
 	 */
-	public function orderby_title( $query ) {
+	function orderby_title( $query ) {
 		// Bail if not in admin.
 		if ( ! is_admin() ) {
 			return;
@@ -308,7 +308,7 @@ final class Mai_Publisher_Plugin {
 	 *
 	 * @return void
 	 */
-	public function add_page() {
+	function add_page() {
 		if ( ! class_exists( 'Mai_Engine' ) ) {
 			return;
 		}
@@ -331,7 +331,7 @@ final class Mai_Publisher_Plugin {
 	 *
 	 * @return  void
 	 */
-	public function activate() {
+	function activate() {
 		$this->register_content_types();
 		flush_rewrite_rules();
 	}
