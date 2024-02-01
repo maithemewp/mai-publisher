@@ -223,15 +223,17 @@ class Mai_Publisher_Admin {
 	 * @return void
 	 */
 	function display_status( $post_id ) {
-		$html       = '';
-		$global     = get_post_meta( $post_id, 'maipub_global_location', true );
-		$single     = get_post_meta( $post_id, 'maipub_single_location', true );
-		$singles    = get_post_meta( $post_id, 'maipub_single_types', true );
-		$archive    = get_post_meta( $post_id, 'maipub_archive_location', true );
-		$archives   = get_post_meta( $post_id, 'maipub_archive_types', true );
-		$taxonomies = get_post_meta( $post_id, 'maipub_archive_taxonomies', true );
-		$terms      = get_post_meta( $post_id, 'maipub_archive_terms', true );
-		$choices    = maipub_get_location_choices();
+		$html         = '';
+		$global       = get_post_meta( $post_id, 'maipub_global_location', true );
+		$single       = get_post_meta( $post_id, 'maipub_single_location', true );
+		$singles      = get_post_meta( $post_id, 'maipub_single_types', true );
+		$entries      = get_post_meta( $post_id, 'maipub_single_entries', true );
+		$archive      = get_post_meta( $post_id, 'maipub_archive_location', true );
+		$archives     = get_post_meta( $post_id, 'maipub_archive_types', true );
+		$archive_misc = get_post_meta( $post_id, 'maipub_archive_includes', true );
+		$taxonomies   = get_post_meta( $post_id, 'maipub_archive_taxonomies', true );
+		$terms        = get_post_meta( $post_id, 'maipub_archive_terms', true );
+		$choices      = maipub_get_location_choices();
 
 		// Bail if no locations.
 		if ( ! ( $global || ( $single && $singles ) || ( $archive && ( $archives || $taxonomies || $terms ) ) ) ) {
@@ -259,16 +261,29 @@ class Mai_Publisher_Admin {
 		}
 
 		// Single.
-		if ( $single && $singles ) {
+		if ( $single && ( $singles || $entries ) ) {
 			$array = [];
 
-			foreach ( $singles as $post_type ) {
-				$object = get_post_type_object( $post_type );
+			if ( $singles ) {
+				foreach ( $singles as $post_type ) {
+					$object = get_post_type_object( $post_type );
 
-				if ( $object ) {
-					$array[] = $object->label;
-				} elseif ( '*' === $post_type ) {
-					$array[] = __( 'All post types', 'mai-publisher' );
+					if ( $object ) {
+						$array[] = $object->label;
+					} elseif ( '*' === $post_type ) {
+						$array[] = __( 'All post types', 'mai-publisher' );
+					}
+				}
+			}
+
+			if ( $entries ) {
+				foreach ( $entries as $entry_id ) {
+					$post_type = get_post_type( $entry_id );
+					$title     = get_the_title( $entry_id );
+
+					if ( $post_type && $title ) {
+						$array[] = sprintf( '(%s) %s', $post_type, $title );
+					}
 				}
 			}
 
