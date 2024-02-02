@@ -556,23 +556,26 @@ function maipub_add_location_attributes( $html, $location = '' ) {
 	// Set up tag processor.
 	$tags = new WP_HTML_Tag_Processor( $html );
 
-	// Ad units.
-	do {
-		// Set a bookmark and set attributes.
-		$tags->set_bookmark( 'start' );
+	// Loop through ad units and set location.
+	while ( $tags->next_tag( [ 'tag_name' => 'div', 'class_name' => 'mai-ad-unit' ] ) ) {
 		$tags->set_attribute( 'data-al', $location );
+	}
 
-	} while ( $tags->next_tag( [ 'tag_name' => 'div', 'class_name' => 'mai-ad-unit' ] ) );
+	// Store changes.
+	$html = $tags->get_updated_html();
 
-	// Video ads.
-	do {
-		// Reset to start and set attributes.
-		$tags->seek( 'start' );
+	// Set up tag processor.
+	$tags = new WP_HTML_Tag_Processor( $html );
+
+	// Loop through videos and set location.
+	while ( $tags->next_tag( [ 'tag_name' => 'div', 'class_name' => 'mai-ad-video' ] ) ) {
 		$tags->set_attribute( 'data-al', $location );
+	}
 
-	} while ( $tags->next_tag( [ 'tag_name' => 'div', 'class_name' => 'mai-ad-video' ] ) );
+	// Store changes.
+	$html = $tags->get_updated_html();
 
-	return $tags->get_updated_html();
+	return $html;
 }
 
 /**
