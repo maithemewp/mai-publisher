@@ -8,7 +8,7 @@ function setupAds() {
 	const ads           = maiPubAdsVars['ads'];
 	const adSlots       = [];
 	const refreshKey    = 'refresh';
-	const refreshValue  = false;
+	const refreshValue  = true;
 	const refreshTime   = 30; // Time in seconds.
 
 	googletag.cmd.push(() => {
