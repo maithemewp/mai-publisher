@@ -235,8 +235,8 @@ class Mai_Publisher_Output {
 		}
 
 		// Set vars.
-		$scripts = [];
-		$adder   = null;
+		$scripts  = [];
+		$position = null;
 
 		// If we have gam domain and ads are active.
 		if ( $this->domain && $this->gam ) {
@@ -265,12 +265,12 @@ class Mai_Publisher_Output {
 			];
 
 			// Get script data.
-			$file      = "assets/js/mai-publisher-ads{$this->suffix}.js";
-			$gpt       = $this->xpath->query( '//script[contains(@src, "https://securepubads.g.doubleclick.net/tag/js/gpt.js")]' );
+			$file = "assets/js/mai-publisher-ads{$this->suffix}.js";
+			$gpt  = $this->xpath->query( '//script[contains(@src, "https://securepubads.g.doubleclick.net/tag/js/gpt.js")]' );
 
 			// Maybe add gpt script. Attemp to avoid duplicates.
 			if ( ! $gpt->length ) {
-				$adder     = $gpt->item(0);
+				$position  = $gpt->item(0);
 				$scripts[] = sprintf( '<script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js?ver=%s"></script>', maipub_get_file_data( $file, 'version' ) );  // Google Ad Manager GPT.
 			}
 
@@ -281,11 +281,11 @@ class Mai_Publisher_Output {
 
 		// Handle scripts.
 		if ( $scripts ) {
-			$adder = $adder ?: $this->xpath->query( '//head/link' )->item(0);
+			$position = $position ?: $this->xpath->query( '//head/link' )->item(0);
 
 			// Insert scripts.
 			foreach ( $scripts as $script ) {
-				$this->insert_nodes( $script, $adder, 'before' );
+				$this->insert_nodes( $script, $position, 'before' );
 			}
 		}
 
