@@ -6,8 +6,9 @@ googletag.cmd    = googletag.cmd || [];
  */
 function setupAds() {
 	const ads           = maiPubAdsVars['ads'];
+	const adSlots       = [];
 	const refreshKey    = 'refresh';
-	const refreshvalue  = 'true';
+	const refreshValue  = false;
 	const refreshTime   = 30; // Time in seconds.
 
 	googletag.cmd.push(() => {
@@ -16,12 +17,16 @@ function setupAds() {
 
 		// Loop through maiPubAdsVars getting key and values. The `slug` key is the incremented id like "incontent-2", etc.
 		Object.keys( ads ).forEach( slug => {
-			// Define ad slot.
-			// googletag.defineSlot( "/1234567/sports", [728, 90], "div-1" );
-			const slot = googletag.defineSlot( gamBase + ads[slug]['id'], ads[slug].sizes, 'mai-ad-' + slug );
+			// Define slot ID.
+			const slotId = gamBase + ads[slug]['id'];
+			// Define ad slot. googletag.defineSlot( "/1234567/sports", [728, 90], "div-1" );
+			const slot = googletag.defineSlot( slotId, ads[slug].sizes, 'mai-ad-' + slug );
+
+			// Add slot to our array.
+			adSlots.push( slotId );
 
 			// Set refresh targeting.
-			slot.setTargeting( refreshKey, refreshvalue );
+			slot.setTargeting( refreshKey, refreshValue );
 
 			// Set slot-level targeting.
 			if ( ads[slug].targets ) {
@@ -165,8 +170,13 @@ function setupAds() {
 		const slot   = event.slot;
 		const slotId = slot.getSlotElementId();
 
+		// Bail if not a mai ad defined here.
+		if ( ! adSlots.includes( slot.getAdUnitPath() ) ) {
+			return;
+		}
+
 		// Bail if not refreshing.
-		if ( slot.getTargeting( refreshKey ).indexOf( refreshvalue ) < 0 ) {
+		if ( ! Boolean( slot.getTargeting( refreshKey ).shift() ) ) {
 			return;
 		}
 
@@ -192,8 +202,13 @@ function setupAds() {
 		const slotId = slot.getSlotElementId();
 		const inView = event.inViewPercentage > 20;
 
+		// Bail if not a mai ad defined here.
+		if ( ! adSlots.includes( slot.getAdUnitPath() ) ) {
+			return;
+		}
+
 		// Bail if not refreshing.
-		if ( slot.getTargeting( refreshKey ).indexOf( refreshvalue ) < 0 ) {
+		if ( ! Boolean( slot.getTargeting( refreshKey ).shift() ) ) {
 			return;
 		}
 
