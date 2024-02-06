@@ -234,8 +234,9 @@ class Mai_Publisher_Output {
 			$video->setAttribute( 'data-track-content', '' );
 		}
 
-		// Start scripts array.
+		// Set vars.
 		$scripts = [];
+		$adder   = null;
 
 		// If we have gam domain and ads are active.
 		if ( $this->domain && $this->gam ) {
@@ -263,20 +264,28 @@ class Mai_Publisher_Output {
 				'amazonUAM'   => maipub_get_option( 'amazon_uam_enabled' ),
 			];
 
-			// Build scripts.
+			// Get script data.
 			$file      = "assets/js/mai-publisher-ads{$this->suffix}.js";
-			$scripts[] = sprintf( '<script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js?ver=%s"></script>', maipub_get_file_data( $file, 'version' ) );  // Google Ad Manager GPT.
+			$gpt       = $this->xpath->query( '//script[contains(@src, "https://securepubads.g.doubleclick.net/tag/js/gpt.js")]' );
+
+			// Maybe add gpt script. Attemp to avoid duplicates.
+			if ( ! $gpt->length ) {
+				$adder     = $gpt->item(0);
+				$scripts[] = sprintf( '<script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js?ver=%s"></script>', maipub_get_file_data( $file, 'version' ) );  // Google Ad Manager GPT.
+			}
+
+			// Add mai-publisher-ads scripts.
 			$scripts[] = sprintf( '<script>/* <![CDATA[ */%svar maiPubAdsVars = %s;%s/* ]]> */</script>', PHP_EOL, wp_json_encode( $localize ), PHP_EOL );
 			$scripts[] = sprintf( '<script async id="mai-publisher-ads" src="%s?ver=%s"></script>', maipub_get_file_data( $file, 'url' ), maipub_get_file_data( $file, 'version' ) ); // Initial testing showed async broke ads.
 		}
 
 		// Handle scripts.
 		if ( $scripts ) {
-			$element = $this->xpath->query( '//head/link' )->item(0);
+			$adder = $adder ?: $this->xpath->query( '//head/link' )->item(0);
 
 			// Insert scripts.
 			foreach ( $scripts as $script ) {
-				$this->insert_nodes( $script, $element, 'before' );
+				$this->insert_nodes( $script, $adder, 'before' );
 			}
 		}
 
