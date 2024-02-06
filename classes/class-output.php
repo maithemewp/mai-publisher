@@ -271,7 +271,7 @@ class Mai_Publisher_Output {
 			// Maybe add gpt script. Attemp to avoid duplicates.
 			if ( ! $gpt->length ) {
 				$position  = $gpt->item(0);
-				$scripts[] = sprintf( '<script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js?ver=%s"></script>', maipub_get_file_data( $file, 'version' ) );  // Google Ad Manager GPT.
+				$scripts[] = '<script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>'; // Google Ad Manager GPT.
 			}
 
 			// Add mai-publisher-ads scripts.
