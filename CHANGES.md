@@ -1,13 +1,20 @@
 # Changelog
 
-## 1.2.0 (1/31/24)
+## 1.2.0 (2/7/24)
 * Added: New admin menu link under Mai Theme.
 * Changed: In archive/grid count setting is now "position" and uses the value as the actual entry/row position in the loop.
 * Changed: Moved Mai Publisher admin menu link lower.
 * Changed: Adds `entry` class to native ads if in a boxed configuration.
 * Changed: Better aspect-ratio handling for CLS with native ads.
+* Changed: Now using ACF clone fields for some entries fields.
+* Changed: Added a div id to our ads script.
+* Changed: Attempt to check if gpt.js is already loaded to avoid duplicates.
+* Changed: Removed version number from gpt.js for better browser caching.
+* Fixed: Only refresh our registered ad slots.
 * Fixed: Better handling of placeholders for native ads.
+* Fixed: More thorough handling of admin columns data.
 * Fixed: Correctly pass custom video name to data-unit attribute for slot name, tracking, etc.
+* Fixed: Warning with `WP_HTML_Tag_Processor` and multiple while loops.
 
 ## 1.1.1 (1/26/24)
 * Fixed: Sticky footer was causing horizontal scroll.

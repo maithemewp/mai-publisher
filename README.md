@@ -1,2 +1,2 @@
 # Mai Publisher
-Manage ads and more for websites in the Mai Publisher network
+Manage ads and more for websites in the Mai Publisher network.
