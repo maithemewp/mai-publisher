@@ -6,19 +6,20 @@ googletag.cmd    = googletag.cmd || [];
  */
 function setupAds() {
 	const ads           = maiPubAdsVars['ads'];
+	const adSlotIds     = [];
 	const adSlots       = [];
 	const refreshKey    = 'refresh';
 	const refreshValue  = true;
 	const refreshTime   = 30; // Time in seconds.
 
-	// Bail if no ads.
-	// Split-testing in another file had these removed,
-	// so we need an additional check here even though we check the DOM in PHP.
-	if ( ! Object.keys(ads).length ) {
-		return;
-	}
-
 	googletag.cmd.push(() => {
+		// Bail if no ads.
+		// Split-testing in another file had these removed,
+		// so we need an additional check here even though we check the DOM in PHP.
+		if ( ! Object.keys(ads).length ) {
+			return;
+		}
+
 		const gamBase  = maiPubAdsVars['gamBase'];
 		const uadSlots = [];
 
@@ -30,7 +31,8 @@ function setupAds() {
 			const slot = googletag.defineSlot( slotId, ads[slug].sizes, 'mai-ad-' + slug );
 
 			// Add slot to our array.
-			adSlots.push( slotId );
+			adSlotIds.push( slotId );
+			adSlots.push( slot );
 
 			// Set refresh targeting.
 			slot.setTargeting( refreshKey, refreshValue );
@@ -155,13 +157,13 @@ function setupAds() {
 				// Set apstag bids, then trigger the first request to GAM.
 				googletag.cmd.push(function() {
 					apstag.setDisplayBids();
-					googletag.pubads().refresh();
+					googletag.pubads().refresh( adSlots );
 				});
 			});
 		}
 		// Standard GAM.
 		else {
-			googletag.pubads().refresh();
+			googletag.pubads().refresh( adSlots );
 		}
 	});
 
@@ -178,7 +180,7 @@ function setupAds() {
 		const slotId = slot.getSlotElementId();
 
 		// Bail if not a mai ad defined here.
-		if ( ! adSlots.includes( slot.getAdUnitPath() ) ) {
+		if ( ! adSlotIds.includes( slot.getAdUnitPath() ) ) {
 			return;
 		}
 
@@ -210,7 +212,7 @@ function setupAds() {
 		const inView = event.inViewPercentage > 20;
 
 		// Bail if not a mai ad defined here.
-		if ( ! adSlots.includes( slot.getAdUnitPath() ) ) {
+		if ( ! adSlotIds.includes( slot.getAdUnitPath() ) ) {
 			return;
 		}
 
