@@ -11,6 +11,13 @@ function setupAds() {
 	const refreshValue  = true;
 	const refreshTime   = 30; // Time in seconds.
 
+	// Bail if no ads.
+	// Split-testing in another file had these removed,
+	// so we need an additional check here even though we check the DOM in PHP.
+	if ( ! Object.keys(ads).length ) {
+		return;
+	}
+
 	googletag.cmd.push(() => {
 		const gamBase  = maiPubAdsVars['gamBase'];
 		const uadSlots = [];
