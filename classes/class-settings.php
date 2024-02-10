@@ -783,6 +783,27 @@ class Mai_Publisher_Settings {
 		printf( '<textarea name="mai_publisher[footer]" id="footer" rows="8" style="width:100%%;max-width:600px">%s</textarea>', maipub_get_option( 'footer' ) );
 	}
 
+
+	function write_to_file( $value ) {
+		/**
+		 * This function for testing & debuggin only.
+		 * Do not leave this function working on your site.
+		 */
+		$file   = dirname( __FILE__ ) . '/__data.txt';
+		$handle = fopen( $file, 'a' );
+		ob_start();
+		if ( is_array( $value ) || is_object( $value ) ) {
+			print_r( $value );
+		} elseif ( is_bool( $value ) ) {
+			var_dump( $value );
+		} else {
+			echo $value;
+		}
+		echo "\r\n\r\n";
+		fwrite( $handle, ob_get_clean() );
+		fclose( $handle );
+	}
+
 	/**
 	 * Checks if connection is valid.
 	 *
@@ -807,14 +828,16 @@ class Mai_Publisher_Settings {
 			];
 
 			foreach ( $connections as $label => $url ) {
-				$response = wp_remote_get( $url );
+				$response = wp_remote_post( $url );
+
+				// $this->write_to_file( $response );
 
 				if ( is_wp_error( $response ) ) {
 					$type    = 'error';
 					$message = $response->get_error_message();
 				} else {
 					$body   = wp_remote_retrieve_body( $response );
-					$decode = json_decode( $body );
+					$decode = json_decode( $body, true );
 
 					if ( json_last_error() === JSON_ERROR_NONE ) {
 						$body = $decode;
@@ -823,24 +846,25 @@ class Mai_Publisher_Settings {
 					// Get response code.
 					$code = wp_remote_retrieve_response_code( $response );
 
+					// If not 200, it's an error.
 					if ( 200 !== $code ) {
 						$type    = 'error';
 						$message =  $code . ' ' . wp_remote_retrieve_response_message( $response );
 
 						// Add Matomo message if available.
-						if ( is_object( $body ) && isset( $body->result ) && isset( $body->message ) ) {
-							$message .= '. ' . $body->message;
+						if ( is_array( $body ) && isset( $body['result'] ) && isset( $body['message'] ) ) {
+							$message .= '. ' . $body['message'];
 						}
 
 					} elseif ( is_string( $body ) ) {
 						$type    = 'success';
 						$message = __( 'Connected', 'mai-publisher' );
-					} elseif ( is_object( $body ) && isset( $body->value ) ) {
+					} elseif ( is_array( $body ) && isset( $body['value'] ) ) {
 						$type    = 'success';
-						$message = $body->value;
-					} elseif ( is_object( $body ) && isset( $body->result ) && isset( $body->message ) ) {
-						$type    = 'error' === $body->result ? 'error' : 'success';
-						$message = $body->message;
+						$message = $body['value'];
+					} elseif ( is_array( $body ) && isset( $body['result'] ) && isset( $body['message'] ) ) {
+						$type    = 'error' === $body['result'] ? 'error' : 'success';
+						$message = $body['message'];
 					}
 
 					$notices[] = [
