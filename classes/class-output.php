@@ -117,6 +117,11 @@ class Mai_Publisher_Output {
 			return $buffer;
 		}
 
+		// Bail if running on robots.txt file. Somehow WP is loading here.
+		if ( did_action( 'do_robotstxt' ) ) {
+			return $buffer;
+		}
+
 		// Setup dom and xpath.
 		$this->dom   = $this->dom_document( $buffer );
 		$this->xpath = new DOMXPath( $this->dom );
