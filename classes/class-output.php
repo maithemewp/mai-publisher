@@ -306,11 +306,18 @@ class Mai_Publisher_Output {
 			$this->insert_nodes( $script, $head, 'append' );
 		}
 
+		// Allow filter the entire dom.
+		$this->dom = apply_filters( 'mai_publisher_dom', $this->dom );
+
 		// Save HTML.
 		$buffer = $this->dom_html( $this->dom );
 
 		// Remove closing tags that are added by DOMDocument.
 		$buffer = str_replace( '</source>', '', $buffer );
+		$buffer = str_replace( '</img>', '', $buffer );
+
+		// Allow filtering all of the HTML.
+		$buffer = apply_filters( 'mai_publisher_html', $buffer );
 
 		return $buffer;
 	}
