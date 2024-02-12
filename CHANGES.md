@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.0 (2/12/24)
+* Changed: Taxonomy term checks now check for descendants as well. Now, if "Recipes" is a taxonomy condition and a post is only in a child category of "Entrees", the conditional still still be met.
+* Fixed: The "All Taxonomies" setting was not working correctly.
+
 ## 1.3.0 (2/12/24)
 * Added: New `mai_publisher_dom` and `mai_publisher_html` filters to hijack the full `DOMDocument` and `HTML` after things have run.
 * Added: Check for ads in JS incase other JS is hijacking (like our split-testing).
