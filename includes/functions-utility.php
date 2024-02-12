@@ -4,6 +4,66 @@
 defined( 'ABSPATH' ) || die;
 
 /**
+ * Check if a post has a term or a child term.
+ *
+ * @access private
+ *
+ * @version TBD
+ *
+ * @param string|int  $slug_or_id The 'slug', 'name', 'term_id' (or 'id', 'ID'), or 'term_taxonomy_id'.
+ * @param string      $taxonomy   The taxonomy name.
+ * @param int|WP_Post $post       The post or post ID to check.
+ *
+ * @return  bool
+ */
+function maipub_has_term_or_descendant( $slug_or_id, $taxonomy, $post = 0 ) {
+	static $cache = [];
+
+	// Set required vars.
+	$type = is_numeric( $slug_or_id ) ? 'id' : 'slug';
+	$term = get_term_by( $type, $slug_or_id, $taxonomy );
+	$post = get_post( $post ?: get_the_ID() );
+
+	// Bail if no post or term.
+	if ( ! ( $post && $term ) ) {
+		return false;
+	}
+
+	// Check cache.
+	if ( isset( $cache[ $post->ID ][ $taxonomy ][ $term->term_id ] ) ) {
+		return $cache[ $post->ID ][ $taxonomy ][ $term->term_id ];
+	}
+
+	// If has main term.
+	if ( has_term( $term->term_id, $taxonomy, $post ) ) {
+		$cache[ $post->ID ][ $taxonomy ][ $term->term_id ] = true;
+		return $cache[ $post->ID ][ $taxonomy ][ $term->term_id ];
+	}
+
+	// Get the term children. Only accepts term ID. Returns array of term IDs.
+	$children = get_term_children( $term->term_id, $taxonomy );
+
+	// Bail if no children.
+	if ( ! $children ) {
+		$cache[ $post->ID ][ $taxonomy ][ $term->term_id ] = false;
+		return $cache[ $post->ID ][ $taxonomy ][ $term->term_id ];
+	}
+
+	// Bail if not in child term.
+	if ( ! has_term( $children, $taxonomy, $post ) ) {
+		$cache[ $post->ID ][ $taxonomy ][ $term->term_id ] = false;
+		return $cache[ $post->ID ][ $taxonomy ][ $term->term_id ];
+	}
+
+	// Store in cache.
+	$cache[ $post->ID ][ $taxonomy ][ $term->term_id ] = true;
+
+	// Yep!
+	return $cache[ $post->ID ][ $taxonomy ][ $term->term_id ];
+}
+
+
+/**
  * Insert a value or key/value pair after a specific key in an array.
  * If key doesn't exist, value is appended to the end of the array.
  *

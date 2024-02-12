@@ -373,42 +373,49 @@ function maipub_validate_ad_conditions_single( $args ) {
 
 	// If not already including, check taxonomies.
 	if ( ! $include && $args['taxonomies'] ) {
-
+		// If we need all terms.
 		if ( 'AND' === $args['taxonomies_relation'] ) {
-
-			// Loop through all taxonomies to give a chance to bail if NOT IN.
+			// Loop through all taxonomies.
 			foreach ( $args['taxonomies'] as $data ) {
-				$has_term = has_term( $data['terms'], $data['taxonomy'] );
+				// Loop through all the terms.
+				foreach ( $data['terms'] as $term ) {
+					$has_term = maipub_has_term_or_descendant( $term, $data['taxonomy'] );
 
-				// Bail if we have a term and we aren't displaying here.
-				if ( $has_term && 'NOT IN' === $data['operator'] ) {
-					return [];
-				}
+					// Bail if we have a term and we aren't displaying here.
+					if ( $has_term && 'NOT IN' === $data['operator'] ) {
+						return [];
+					}
 
-				// Bail if we have don't a term and we are dislaying here.
-				if ( ! $has_term && 'IN' === $data['operator'] ) {
-					return [];
+					// Bail if we have don't a term and we are dislaying here.
+					if ( ! $has_term && 'IN' === $data['operator'] ) {
+						return [];
+					}
 				}
 			}
-
-		} elseif ( 'OR' === $args['taxonomies_relation'] ) {
-
+		}
+		// If we only need one of the terms.
+		elseif ( 'OR' === $args['taxonomies_relation'] ) {
 			$meets_any = [];
 
+			// Loop through all taxonomies.
 			foreach ( $args['taxonomies'] as $data ) {
-				$has_term = has_term( $data['terms'], $data['taxonomy'] );
+				// Loop through all the terms.
+				foreach ( $data['terms'] as $term ) {
+					$has_term = maipub_has_term_or_descendant( $term, $data['taxonomy'] );
 
-				if ( $has_term && 'IN' === $data['operator'] ) {
-					$meets_any = true;
-					break;
-				}
+					if ( $has_term && 'IN' === $data['operator'] ) {
+						$meets_any = true;
+						break 2;
+					}
 
-				if ( ! $has_term && 'NOT IN' === $data['operator'] ) {
-					$meets_any = true;
-					break;
+					if ( ! $has_term && 'NOT IN' === $data['operator'] ) {
+						$meets_any = true;
+						break 2;
+					}
 				}
 			}
 
+			// Bail if we didn't meet any.
 			if ( ! $meets_any ) {
 				return [];
 			}
@@ -514,7 +521,7 @@ function maipub_validate_ad_conditions_archive( $args ) {
 		$include = $args['terms'] && in_array( $object->term_id, $args['terms'] );
 
 		// If not already including, check taxonomies if we're restricting to specific taxonomies.
-		if ( ! $include && ! ( $args['taxonomies'] && in_array( $object->taxonomy, $args['taxonomies'] ) ) ) {
+		if ( ! $include && ! ( $args['taxonomies'] && ( in_array( '*', $args['taxonomies'] ) || in_array( $object->taxonomy, $args['taxonomies'] ) ) ) ) {
 			return [];
 		}
 	}
