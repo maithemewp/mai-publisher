@@ -193,7 +193,7 @@ class Mai_Publisher_Tracking {
 		$this->set_site_dimension_8();
 		$this->set_site_dimension_9();
 
-		return $this->site_dimensions;
+		return apply_filters( 'mai_publisher_site_dimensions', $this->site_dimensions );
 	}
 
 	/**
@@ -216,7 +216,7 @@ class Mai_Publisher_Tracking {
 		$this->set_global_dimension_8();
 		$this->set_global_dimension_9();
 
-		return $this->global_dimensions;
+		return apply_filters( 'mai_publisher_global_dimensions', $this->global_dimensions );
 	}
 
 	// TODO.

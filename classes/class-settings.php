@@ -808,11 +808,9 @@ class Mai_Publisher_Settings {
 		if ( $enabled ) {
 			// Build connection urls.
 			$connections = [
-				'Matomo Version' => $url . sprintf( 'index.php?module=API&method=API.getMatomoVersion&format=json&token_auth=%s', $token ),
+				'Matomo Version' => $url . sprintf( 'index.php?module=API&method=API.getMatomoVersion&format=JSON&token_auth=%s', $token ),
 				'Matomo Tracker' => $url . 'matomo.php',
 			];
-
-			ray( $connections );
 
 			// Check each connection.
 			foreach ( $connections as $label => $url ) {
