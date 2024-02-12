@@ -62,7 +62,6 @@ function maipub_has_term_or_descendant( $slug_or_id, $taxonomy, $post = 0 ) {
 	return $cache[ $post->ID ][ $taxonomy ][ $term->term_id ];
 }
 
-
 /**
  * Insert a value or key/value pair after a specific key in an array.
  * If key doesn't exist, value is appended to the end of the array.
