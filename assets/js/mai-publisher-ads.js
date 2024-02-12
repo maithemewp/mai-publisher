@@ -165,7 +165,7 @@ function setupAds() {
 		else {
 			googletag.pubads().refresh( adSlots );
 		}
-	});
+	}); // End `googletag.cmd.push`.
 
 	// Set currently visible ads and timeout ids objects.
 	const loadTimes        = {};

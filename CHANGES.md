@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.0 (2/12/24)
+* Added: New `mai_publisher_dom` and `mai_publisher_html` filters to hijack the full `DOMDocument` and `HTML` after things have run.
+* Added: Check for ads in JS incase other JS is hijacking (like our split-testing).
+* Changed: Added id to connatix header script.
+* Fixed: Only refresh our ad slots, no longer globally refreshing all GAM ads on the page.
+* Fixed: The DOM parser was affecting robots.txt files in some instances.
+
 ## 1.2.0 (2/7/24)
 * Added: New admin menu link under Mai Theme.
 * Changed: In archive/grid count setting is now "position" and uses the value as the actual entry/row position in the loop.
