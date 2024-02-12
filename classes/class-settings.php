@@ -783,33 +783,16 @@ class Mai_Publisher_Settings {
 		printf( '<textarea name="mai_publisher[footer]" id="footer" rows="8" style="width:100%%;max-width:600px">%s</textarea>', maipub_get_option( 'footer' ) );
 	}
 
-
-	function write_to_file( $value ) {
-		/**
-		 * This function for testing & debuggin only.
-		 * Do not leave this function working on your site.
-		 */
-		$file   = dirname( __FILE__ ) . '/__data.txt';
-		$handle = fopen( $file, 'a' );
-		ob_start();
-		if ( is_array( $value ) || is_object( $value ) ) {
-			print_r( $value );
-		} elseif ( is_bool( $value ) ) {
-			var_dump( $value );
-		} else {
-			echo $value;
-		}
-		echo "\r\n\r\n";
-		fwrite( $handle, ob_get_clean() );
-		fclose( $handle );
-	}
-
 	/**
 	 * Checks if connection is valid.
 	 *
 	 * @link https://matomo.org/faq/how-to/faq_20278/
 	 *
 	 * @since 0.3.0
+	 *
+	 * @param string $url     The Matomo URL.
+	 * @param string $token   The Matomo token.
+	 * @param bool   $enabled If tracking is enabled.
 	 *
 	 * @return void
 	 */
@@ -818,28 +801,35 @@ class Mai_Publisher_Settings {
 			return;
 		}
 
+		// Start notices.
 		$notices = [];
 
+		// If enabled.
 		if ( $enabled ) {
-
+			// Build connection urls.
 			$connections = [
 				'Matomo Version' => $url . sprintf( 'index.php?module=API&method=API.getMatomoVersion&format=json&token_auth=%s', $token ),
 				'Matomo Tracker' => $url . 'matomo.php',
 			];
 
+			ray( $connections );
+
+			// Check each connection.
 			foreach ( $connections as $label => $url ) {
-				$response = wp_remote_post( $url );
+				$response = wp_remote_get( $url );
 
-				// $this->write_to_file( $response );
-
+				// If error, add error message.
 				if ( is_wp_error( $response ) ) {
 					$type    = 'error';
 					$message = $response->get_error_message();
-				} else {
+				}
+				// Success.
+				else {
 					$body   = wp_remote_retrieve_body( $response );
 					$decode = json_decode( $body, true );
 
-					if ( json_last_error() === JSON_ERROR_NONE ) {
+					// If we have JSON, and no errors.
+					if ( ! is_null( $decode ) && json_last_error() === JSON_ERROR_NONE ) {
 						$body = $decode;
 					}
 
@@ -855,18 +845,29 @@ class Mai_Publisher_Settings {
 						if ( is_array( $body ) && isset( $body['result'] ) && isset( $body['message'] ) ) {
 							$message .= '. ' . $body['message'];
 						}
+					}
 
-					} elseif ( is_string( $body ) ) {
+					/**********************************
+					 * Handle various response types. *
+					 **********************************/
+
+					// String response for matomo.php.
+					elseif ( is_string( $body ) ) {
 						$type    = 'success';
 						$message = __( 'Connected', 'mai-publisher' );
-					} elseif ( is_array( $body ) && isset( $body['value'] ) ) {
+					}
+					// The getMatomoVersion response should be the version value.
+					elseif ( is_array( $body ) && isset( $body['value'] ) ) {
 						$type    = 'success';
 						$message = $body['value'];
-					} elseif ( is_array( $body ) && isset( $body['result'] ) && isset( $body['message'] ) ) {
+					}
+					// We hit this at one point when things were throwing errors.
+					elseif ( is_array( $body ) && isset( $body['result'] ) && isset( $body['message'] ) ) {
 						$type    = 'error' === $body['result'] ? 'error' : 'success';
 						$message = $body['message'];
 					}
 
+					// Add notice.
 					$notices[] = [
 						'type'    => $type,
 						'label'   => $label,
@@ -879,7 +880,9 @@ class Mai_Publisher_Settings {
 					break;
 				}
 			}
-		} else {
+		}
+		// Tracking not enabled.
+		else {
 			$notices[] = [
 				'type'    => 'warning',
 				'label'   => 'Matomo',
@@ -924,12 +927,12 @@ class Mai_Publisher_Settings {
 	 *
 	 * @since 0.1.0
 	 *
-	 * @param array  $actions     Associative array of action names to anchor tags
-	 * @param string $plugin_file Plugin file name, ie my-plugin/my-plugin.php
-	 * @param array  $plugin_data Associative array of plugin data from the plugin file headers
-	 * @param string $context     Plugin status context, ie 'all', 'active', 'inactive', 'recently_active'
+	 * @param array  $actions     Associative array of action names to anchor tags.
+	 * @param string $plugin_file Plugin file name, ie my-plugin/my-plugin.php.
+	 * @param array  $plugin_data Associative array of plugin data from the plugin file headers.
+	 * @param string $context     Plugin status context, ie 'all', 'active', 'inactive', 'recently_active'.
 	 *
-	 * @return array associative array of plugin action links
+	 * @return array associative array of plugin action links.
 	 */
 	function add_plugin_links( $actions, $plugin_file, $plugin_data, $context ) {
 		$actions['ads']      = sprintf( '<a href="%s">%s</a>', esc_url( admin_url( 'edit.php?post_type=mai_ad' ) ), __( 'Ads', 'mai-publisher' ) );
