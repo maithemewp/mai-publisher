@@ -808,13 +808,24 @@ class Mai_Publisher_Settings {
 		if ( $enabled ) {
 			// Build connection urls.
 			$connections = [
-				'Matomo Version' => $url . sprintf( 'index.php?module=API&method=API.getMatomoVersion&format=JSON&token_auth=%s', $token ),
+				// 'Matomo Version' => $url . sprintf( 'index.php?module=API&method=API.getMatomoVersion&format=JSON&token_auth=%s', $token ),
+				'Matomo Version' => $url . 'index.php?module=API&method=API.getMatomoVersion&format=JSON',
 				'Matomo Tracker' => $url . 'matomo.php',
 			];
 
+			$first = true;
+
 			// Check each connection.
 			foreach ( $connections as $label => $url ) {
-				$response = wp_remote_get( $url );
+				// Handle first request.
+				if ( $first ) {
+					$response = wp_remote_post( $url, [ 'body' => [ 'token_auth' => $token ] ] );
+					$first    = false;
+				}
+				// Not first.
+				else {
+					$response = wp_remote_get( $url );
+				}
 
 				// If error, add error message.
 				if ( is_wp_error( $response ) ) {
