@@ -8,7 +8,7 @@ defined( 'ABSPATH' ) || die;
  *
  * @access private
  *
- * @version TBD
+ * @version 1.5.0
  *
  * @param string|int  $slug_or_id The 'slug', 'name', 'term_id' (or 'id', 'ID'), or 'term_taxonomy_id'.
  * @param string      $taxonomy   The taxonomy name.

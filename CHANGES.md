@@ -1,6 +1,7 @@
 # Changelog
 
-## 1.4.1 (2/13/24)
+## 1.5.0 (2/13/24)
+* Changed: Ads with taxonomy conditions now include the descendant terms as well, when the taxonomy is hierarchical.
 * Fixed: Error showing version/status on settings page when using Matomo v5.
 
 ## 1.4.0 (2/12/24)
