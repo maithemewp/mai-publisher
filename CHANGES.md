@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.4.1 (TBD)
+* Fixed: Error showing version/status on settings page when using Matomo v5.
+
 ## 1.4.0 (2/12/24)
 * Changed: Taxonomy term checks now check for descendants as well. Now, if "Recipes" is a taxonomy condition and a post is only in a child category of "Entrees", the conditional still still be met.
 * Fixed: The "All Taxonomies" setting was not working correctly.
