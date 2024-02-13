@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.4.1 (TBD)
+## 1.4.1 (2/13/24)
 * Fixed: Error showing version/status on settings page when using Matomo v5.
 
 ## 1.4.0 (2/12/24)
