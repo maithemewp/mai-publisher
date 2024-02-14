@@ -654,7 +654,7 @@ class Mai_Publisher_Output {
 	 *
 	 * @since 0.13.0
 	 *
-	 * @param string|DOMNode[] $insert The node to insert.
+	 * @param string|DOMNode[] $insert The node(s) to insert.
 	 * @param DOMNode          $target The target element.
 	 * @param string           $action The insertion location.
 	 *
