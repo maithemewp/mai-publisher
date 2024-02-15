@@ -56,7 +56,13 @@ class Mai_Publisher_Ad_Video_Block {
 		// If previewing in editor and no video selected, show placeholder.
 		if ( $is_preview || 'demo' === maipub_get_option( 'ad_mode', false ) || is_customize_preview() ) {
 			$text = $id ? __( 'Mai Video Ad Placeholder', 'mai-publisher' ) : __( 'No Video Selected', 'mai-publisher' );
-			printf( '<div class="mai-ad-video mai-connatix" data-unit="video" style="display:grid;place-content:center;aspect-ratio:16/9;margin-block:24px;text-align:center;background:rgba(0,0,0,0.05);border:2px dashed rgba(0,0,0,0.25);"><span style="font-size:1.1rem;">%s</span></div>', $text );
+			$html = sprintf( '<div class="mai-ad-video mai-connatix" data-unit="video" style="display:grid;place-content:center;aspect-ratio:16/9;margin-block:24px;text-align:center;background:rgba(0,0,0,0.05);border:2px dashed rgba(0,0,0,0.25);"><span style="font-size:1.1rem;">%s</span></div>', $text );
+
+			// Allow filtering.
+			$html = apply_filters( 'mai_publisher_ad_video', $html );
+
+			echo $html;
+
 			return;
 		}
 
@@ -110,8 +116,13 @@ class Mai_Publisher_Ad_Video_Block {
 			return;
 		}
 
-		// Output the video.
-		printf( '<div%s>%s</div>', maipub_build_attributes( $attr ), $return );
+		// Get the video HTML.
+		$html = sprintf( '<div%s>%s</div>', maipub_build_attributes( $attr ), $return );
+
+		// Allow filtering.
+		$html = apply_filters( 'mai_publisher_ad_video', $html );
+
+		echo $html;
 	}
 
 	/**
