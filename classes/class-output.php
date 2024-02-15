@@ -174,7 +174,7 @@ class Mai_Publisher_Output {
 			// If ads are active. Mode is empty when active. Values would be 'demo' or 'disabled'.
 			if ( ! $this->mode ) {
 				// Build script, import into dom and append to ad unit.
-				$script = sprintf( '<script>googletag.cmd.push(function(){ googletag.display("mai-ad-%s"); });</script>', $slot );
+				$script = sprintf( '<script>window.googletag = window.googletag || {};googletag.cmd = googletag.cmd || [];if ( window.googletag && googletag.apiReady ) { googletag.cmd.push(function(){ googletag.display("mai-ad-%s"); }); }</script>', $slot );
 				$this->insert_nodes( $script, $ad_unit, 'append' );
 
 				// Add to gam array.
