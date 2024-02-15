@@ -83,7 +83,7 @@ function setupAds() {
 			// Render slots within 1.5 viewports.
 			renderMarginPercent: 150,
 			// Double the above values on mobile.
-			// mobileScaling: 2.0,
+			mobileScaling: 2.0,
 		});
 
 		/**
