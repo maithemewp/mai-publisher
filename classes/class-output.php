@@ -177,7 +177,6 @@ class Mai_Publisher_Output {
 			if ( ! $this->mode ) {
 				// Build script, import into dom and append to ad unit.
 				$script = sprintf( '
-					<script>
 					var maiAdsScript = document.getElementById( "mai-publisher-ads" );
 
 					// If already loaded, execute the code directly.
@@ -201,11 +200,13 @@ class Mai_Publisher_Output {
 							});
 						}
 					}
-					</script>
 					', $slot );
 
 				// Minify.
 				$this->minify_js( $script );
+
+				// Add tags.
+				$script = "<script>{$script}</script>";
 
 				// Insert the script.
 				$this->insert_nodes( $script, $ad_unit, 'append' );
