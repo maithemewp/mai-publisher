@@ -925,7 +925,7 @@ class Mai_Publisher_Output {
 			return $input;
 		}
 
-		return preg_replace(
+		$input = preg_replace(
 			[
 				// Remove comment(s).
 				'#\s*("(?:[^"\\\]++|\\\.)*+"|\'(?:[^\'\\\\]++|\\\.)*+\')\s*|\s*\/\*(?!\!|@cc_on)(?>[\s\S]*?\*\/)\s*|\s*(?<![\:\=])\/\/.*(?=[\n\r]|$)|^\s*|\s*$#',
@@ -947,5 +947,7 @@ class Mai_Publisher_Output {
 			],
 			$input
 		);
+
+		return trim( $input );
 	}
 }
