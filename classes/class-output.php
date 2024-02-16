@@ -316,8 +316,11 @@ class Mai_Publisher_Output {
 		// Check connatix. This checks the context of the script to see if it contains the connatix domain.
 		$connatix = $this->xpath->query( "//script[contains(text(), 'https://capi.connatix.com')]" );
 
+		// Temporary filters for TPS.
+		$load_connatix = apply_filters( 'mai_publisher_load_connatix', $connatix->length ? true : false );
+
 		// If we have connatix ads.
-		if ( $connatix->length ) {
+		if ( $load_connatix ) {
 			$scripts[] = "<script id=\"mai-publisher-connatix\">!function(n){if(!window.cnx){window.cnx={},window.cnx.cmd=[];var t=n.createElement('iframe');t.src='javascript:false'; t.display='none',t.onload=function(){var n=t.contentWindow.document,c=n.createElement('script');c.src='//cd.connatix.com/connatix.player.js?cid=db8b4096-c769-48da-a4c5-9fbc9ec753f0',c.setAttribute('async','1'),c.setAttribute('type','text/javascript'),n.body.appendChild(c)},n.head.appendChild(t)}}(document);</script>";
 		}
 
