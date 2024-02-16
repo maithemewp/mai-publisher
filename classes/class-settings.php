@@ -347,6 +347,7 @@ class Mai_Publisher_Settings {
 			'ad_mode'                => 'sanitize_text_field',
 			'gam_domain'             => 'maipub_get_url_host',
 			'gam_network_code'       => 'absint',
+			'gam_hashed_domain'      => 'sanitize_text_field',
 			'gam_sellers_id'         => 'sanitize_text_field',
 			'gam_sellers_name'       => 'sanitize_text_field',
 			'gam_targets'            => 'sanitize_text_field',
@@ -442,7 +443,7 @@ class Mai_Publisher_Settings {
 	 * @return void
 	 */
 	function gam_domain_callback() {
-		printf( '<input class="regular-text" type="text" name="mai_publisher[gam_domain]" id="gam_domain" value="%s" readonly>', maipub_get_option( 'gam_domain', true ) );
+		printf( '<input class="regular-text" type="text" name="mai_publisher[gam_domain]" id="gam_domain" value="%s">', maipub_get_option( 'gam_domain', true ) );
 	}
 
 	/**
@@ -464,10 +465,8 @@ class Mai_Publisher_Settings {
 	 * @return void
 	 */
 	function gam_hashed_domain_callback() {
-		$domain = maipub_get_option( 'gam_domain', false );
-		$hashed = $domain ? maipub_encode( $domain, 14 ) : ''; // Character limit needs to match in get_targets() in class-output.php.
-
-		printf( '<input class="regular-text" type="text" name="mai_publisher[gam_hashed_domain]" id="gam_hashed_domain" value="%s" readonly>', $hashed );
+		// printf( '<input class="regular-text" type="text" name="mai_publisher[gam_hashed_domain]" id="gam_hashed_domain" value="%s" readonly>', $hashed );
+		printf( '<input class="regular-text" type="text" name="mai_publisher[gam_hashed_domain]" id="gam_hashed_domain" value="%s">', maipub_get_option( 'gam_hashed_domain', false ) );
 	}
 
 	/**

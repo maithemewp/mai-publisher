@@ -6,6 +6,7 @@ defined( 'ABSPATH' ) || die;
 class Mai_Publisher_Output {
 	protected $domain;
 	protected $network_code;
+	protected $domain_hashed;
 	protected $sellers_name;
 	protected $sellers_id;
 	protected $locations;
@@ -52,16 +53,17 @@ class Mai_Publisher_Output {
 			return;
 		}
 
-		$this->domain       = (string) maipub_get_option( 'gam_domain' );
-		$this->network_code = (string) maipub_get_option( 'gam_network_code' );
-		$this->sellers_name = (string) maipub_get_option( 'gam_sellers_name' );
-		$this->sellers_id   = (string) maipub_get_option( 'gam_sellers_id' );
-		$this->locations    = maipub_get_locations();
-		$this->ads          = maipub_get_page_ads();
-		$this->grouped      = $this->get_grouped_ads( $this->ads );
-		$this->gam          = [];
-		$this->mode         = maipub_get_option( 'ad_mode', false );
-		$this->suffix       = maipub_get_suffix();
+		$this->domain        = (string) maipub_get_option( 'gam_domain' );
+		$this->network_code  = (string) maipub_get_option( 'gam_network_code' );
+		$this->domain_hashed = (string) maipub_get_option( 'gam_hashed_domain' );
+		$this->sellers_name  = (string) maipub_get_option( 'gam_sellers_name' );
+		$this->sellers_id    = (string) maipub_get_option( 'gam_sellers_id' );
+		$this->locations     = maipub_get_locations();
+		$this->ads           = maipub_get_page_ads();
+		$this->grouped       = $this->get_grouped_ads( $this->ads );
+		$this->gam           = [];
+		$this->mode          = maipub_get_option( 'ad_mode', false );
+		$this->suffix        = maipub_get_suffix();
 
 		// Bail if disabled. Not checking `$this->ads` because there may be manual ads in the content.
 		if ( 'disabled' === $this->mode ) {
@@ -839,7 +841,7 @@ class Mai_Publisher_Output {
 
 		// Hashed domain.
 		if ( $this->domain ) {
-			$targets['gd'] = maipub_encode( $this->domain, 14 ); // Character limit needs to match in gam_hashed_domain_callback() in class-settings.php.
+			// $targets['gd'] = maipub_encode( $this->domain, 14 ); // Character limit needs to match in gam_hashed_domain_callback() in class-settings.php.
 		}
 
 		// Sellers ID.
