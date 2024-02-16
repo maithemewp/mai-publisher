@@ -174,7 +174,36 @@ class Mai_Publisher_Output {
 			// If ads are active. Mode is empty when active. Values would be 'demo' or 'disabled'.
 			if ( ! $this->mode ) {
 				// Build script, import into dom and append to ad unit.
-				$script = sprintf( '<script>window.googletag = window.googletag || {};googletag.cmd = googletag.cmd || [];if ( window.googletag && googletag.apiReady ) { googletag.cmd.push(function(){ googletag.display("mai-ad-%s"); }); }</script>', $slot );
+				$script = sprintf( '
+					var maiAdsScript = document.getElementById( "mai-publisher-ads" );
+
+					// If already loaded, execute the code directly.
+					if ( maiAdsScript.complete ) {
+						initializeAd();
+					}
+					// If not loaded, attach the onload event listener.
+					else {
+						maiAdsScript.onload = function() {
+							initializeAd();
+						};
+					}
+
+					// Function to initialize the ad.
+					function initializeAd() {
+						window.googletag = window.googletag || {};
+						googletag.cmd    = googletag.cmd || [];
+						if ( window.googletag && googletag.apiReady ) {
+							googletag.cmd.push(function () {
+								googletag.display( "mai-ad-%s" );
+							});
+						}
+					}
+					', $slot );
+
+				// Minify.
+				$this->minify_js( $script );
+
+				// Insert the script.
 				$this->insert_nodes( $script, $ad_unit, 'append' );
 
 				// Add to gam array.
@@ -673,9 +702,6 @@ class Mai_Publisher_Output {
 		// Make sure this is an array.
 		$insert = (array) $insert;
 
-		// Reverse so they are inserted in the order we want.
-		$insert = array_reverse( $insert );
-
 		// Filter only DOMElement nodes from array.
 		$insert = array_filter( $insert, function( $node ) {
 			return $node instanceof DOMElement;
@@ -881,5 +907,45 @@ class Mai_Publisher_Output {
 		}
 
 		return $string;
+	}
+
+	/**
+	 * Minify inline JS.
+	 *
+	 * @since TBD
+	 *
+	 * @link https://gist.github.com/Rodrigo54/93169db48194d470188f
+	 *
+	 * @param string $input
+	 *
+	 * @return string
+	 */
+	function minify_js( $input ) {
+		if ( '' === trim( $input ) ) {
+			return $input;
+		}
+
+		return preg_replace(
+			[
+				// Remove comment(s).
+				'#\s*("(?:[^"\\\]++|\\\.)*+"|\'(?:[^\'\\\\]++|\\\.)*+\')\s*|\s*\/\*(?!\!|@cc_on)(?>[\s\S]*?\*\/)\s*|\s*(?<![\:\=])\/\/.*(?=[\n\r]|$)|^\s*|\s*$#',
+				// Remove white-space(s) outside the string and regex.
+				'#("(?:[^"\\\]++|\\\.)*+"|\'(?:[^\'\\\\]++|\\\.)*+\'|\/\*(?>.*?\*\/)|\/(?!\/)[^\n\r]*?\/(?=[\s.,;]|[gimuy]|$))|\s*([!%&*\(\)\-=+\[\]\{\}|;:,.<>?\/])\s*#s',
+				// Remove the last semicolon.
+				'#;+\}#',
+				// Minify object attribute(s) except JSON attribute(s). From `{'foo':'bar'}` to `{foo:'bar'}`.
+				'#([\{,])([\'])(\d+|[a-z_][a-z0-9_]*)\2(?=\:)#i',
+				// --ibid. From `foo['bar']` to `foo.bar`.
+				'#([a-z0-9_\)\]])\[([\'"])([a-z_][a-z0-9_]*)\2\]#i'
+			],
+			[
+				'$1',
+				'$1$2',
+				'}',
+				'$1$3',
+				'$1.$3'
+			],
+			$input
+		);
 	}
 }
