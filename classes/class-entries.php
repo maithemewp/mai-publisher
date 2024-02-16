@@ -325,6 +325,9 @@ class Mai_Publisher_Entries {
 			$ads .= sprintf( '<div%s>%s</div>', maipub_build_attributes( $item_atts ), $ad['content'] );
 		}
 
+		// Allow filtering of ads.
+		$ads = apply_filters( 'mai_publisher_entries_ads', $ads );
+
 		return $ads;
 	}
 
