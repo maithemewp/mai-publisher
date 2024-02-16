@@ -275,7 +275,7 @@ class Mai_Publisher_Output {
 		$position = null;
 
 		// If we have gam domain and ads are active.
-		if ( $this->domain && $this->gam ) {
+		if ( $this->domain && $this->domain_hashed && $this->gam ) {
 			$gam_base = '';
 
 			// Maybe disable MCM and use Network Code as base.
@@ -840,8 +840,9 @@ class Mai_Publisher_Output {
 		$custom  = $page_id ? get_post_meta( $page_id, 'maipub_targets', true ) : '';
 
 		// Hashed domain.
-		if ( $this->domain ) {
+		if ( $this->domain_hashed ) {
 			// $targets['gd'] = maipub_encode( $this->domain, 14 ); // Character limit needs to match in gam_hashed_domain_callback() in class-settings.php.
+			$targets['gd'] = $this->domain_hashed;
 		}
 
 		// Sellers ID.
