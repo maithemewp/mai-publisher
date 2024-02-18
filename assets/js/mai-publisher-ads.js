@@ -108,6 +108,11 @@ googletag.cmd.push(() => {
 		const slot   = event.slot;
 		const slotId = slot.getSlotElementId();
 
+		// Bail if no slot.
+		if ( ! slot ) {
+			return;
+		}
+
 		// Bail if not a mai ad defined here.
 		if ( ! adSlotIds.includes( slot.getAdUnitPath() ) ) {
 			return;
@@ -139,6 +144,11 @@ googletag.cmd.push(() => {
 		const slot   = event.slot;
 		const slotId = slot.getSlotElementId();
 		const inView = event.inViewPercentage > 20;
+
+		// Bail if no slot.
+		if ( ! slot ) {
+			return;
+		}
 
 		// Bail if not a mai ad defined here.
 		if ( ! adSlotIds.includes( slot.getAdUnitPath() ) ) {
