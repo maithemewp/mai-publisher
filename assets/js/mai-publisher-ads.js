@@ -109,6 +109,7 @@ googletag.cmd.push(() => {
 		const slotId = slot.getSlotElementId();
 
 		// Bail if no slot.
+		// TODO: Should this check for null/undefined?
 		if ( ! slot ) {
 			return;
 		}
@@ -146,6 +147,7 @@ googletag.cmd.push(() => {
 		const inView = event.inViewPercentage > 20;
 
 		// Bail if no slot.
+		// TODO: Should this check for null/undefined?
 		if ( ! slot ) {
 			return;
 		}
