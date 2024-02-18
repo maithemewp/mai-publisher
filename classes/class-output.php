@@ -153,9 +153,10 @@ class Mai_Publisher_Output {
 		}
 
 		// Set vars and get all ad units.
-		$config   = maipub_get_config( 'ad_units' );
-		$ad_units = $this->xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " mai-ad-unit ")]' );
-		$videos   = $this->xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " mai-ad-video ")]' );
+		$config     = maipub_get_config( 'ad_units' );
+		$ad_units   = $this->xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " mai-ad-unit ")]' );
+		$videos     = $this->xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " mai-ad-video ")]' );
+		$first_slot = false;
 
 		// Loop through ad units.
 		foreach ( $ad_units as $ad_unit ) {
@@ -166,6 +167,11 @@ class Mai_Publisher_Output {
 			$name     = sprintf( 'mai-ad-%s-%s', $location, $unit );
 			$name     = $this->increment_string( $name );
 
+			// Set first slot for later `display()`.
+			if ( ! $first_slot ) {
+				$first_slot = $slot;
+			}
+
 			// Set slot as id.
 			$ad_unit->setAttribute( 'id', 'mai-ad-' . $slot );
 
@@ -175,41 +181,41 @@ class Mai_Publisher_Output {
 
 			// If ads are active. Mode is empty when active. Values would be 'demo' or 'disabled'.
 			if ( ! $this->mode ) {
-				// Build script, import into dom and append to ad unit.
-				$script = sprintf( '
-					var maiAdsScript = document.getElementById( "mai-publisher-ads" );
+				// // Build script, import into dom and append to ad unit.
+				// $script = sprintf( '
+				// 	var maiAdsScript = document.getElementById( "mai-publisher-ads" );
 
-					// If already loaded, execute the code directly.
-					if ( maiAdsScript.complete ) {
-						initializeAd();
-					}
-					// If not loaded, attach the onload event listener.
-					else {
-						maiAdsScript.onload = function() {
-							initializeAd();
-						};
-					}
+				// 	// If already loaded, execute the code directly.
+				// 	if ( maiAdsScript.complete ) {
+				// 		initializeAd();
+				// 	}
+				// 	// If not loaded, attach the onload event listener.
+				// 	else {
+				// 		maiAdsScript.onload = function() {
+				// 			initializeAd();
+				// 		};
+				// 	}
 
-					// Function to initialize the ad.
-					function initializeAd() {
-						window.googletag = window.googletag || {};
-						googletag.cmd    = googletag.cmd || [];
-						if ( window.googletag && googletag.apiReady ) {
-							googletag.cmd.push(function () {
-								googletag.display( "mai-ad-%s" );
-							});
-						}
-					}
-					', $slot );
+				// 	// Function to initialize the ad.
+				// 	function initializeAd() {
+				// 		window.googletag = window.googletag || {};
+				// 		googletag.cmd    = googletag.cmd || [];
+				// 		if ( window.googletag && googletag.apiReady ) {
+				// 			googletag.cmd.push(function () {
+				// 				googletag.display( "mai-ad-%s" );
+				// 			});
+				// 		}
+				// 	}
+				// 	', $slot );
 
-				// Minify.
-				$this->minify_js( $script );
+				// // Minify.
+				// $this->minify_js( $script );
 
-				// Add tags.
-				$script = "<script>{$script}</script>";
+				// // Add tags.
+				// $script = "<script>{$script}</script>";
 
-				// Insert the script.
-				$this->insert_nodes( $script, $ad_unit, 'append' );
+				// // Insert the script.
+				// $this->insert_nodes( $script, $ad_unit, 'append' );
 
 				// Add to gam array.
 				$this->gam[ $slot ] = [
@@ -341,6 +347,49 @@ class Mai_Publisher_Output {
 				$this->insert_nodes( $script, $position, 'before' );
 			}
 		}
+
+		// Handle main `display()` script.
+
+		// Get body.
+		$body = $this->dom->getElementsByTagName( 'body' )->item(0);
+
+		// Build script, import into dom and append to ad unit.
+		$script = sprintf( '
+			var maiAdsScript = document.getElementById( "mai-publisher-ads" );
+
+			// If script.
+			if ( maiAdsScript ) {
+				// If already loaded, execute the code directly.
+				if ( maiAdsScript.complete ) {
+					initializeAd();
+				}
+				// If not loaded, attach the onload event listener.
+				else {
+					maiAdsScript.onload = function() {
+						initializeAd();
+					};
+				}
+				// Function to initialize the ad.
+				function initializeAd() {
+					window.googletag = window.googletag || {};
+					googletag.cmd    = googletag.cmd || [];
+					if ( window.googletag && googletag.apiReady ) {
+						googletag.cmd.push(function () {
+							googletag.display( "mai-ad-%s" );
+						});
+					}
+				}
+			}
+			', $first_slot );
+
+		// Minify.
+		$this->minify_js( $script );
+
+		// Add tags.
+		$script = "<script>{$script}</script>";
+
+		// Insert the script at the end of the body.
+		$this->insert_nodes( $script, $body, 'append' );
 
 		// Allow filter the entire dom.
 		$this->dom = apply_filters( 'mai_publisher_dom', $this->dom );
