@@ -465,8 +465,7 @@ class Mai_Publisher_Settings {
 	 * @return void
 	 */
 	function gam_hashed_domain_callback() {
-		// printf( '<input class="regular-text" type="text" name="mai_publisher[gam_hashed_domain]" id="gam_hashed_domain" value="%s" readonly>', $hashed );
-		printf( '<input class="regular-text" type="text" name="mai_publisher[gam_hashed_domain]" id="gam_hashed_domain" value="%s">', maipub_get_option( 'gam_hashed_domain', false ) );
+		printf( '<input class="regular-text" type="text" name="mai_publisher[gam_hashed_domain]" id="gam_hashed_domain" value="%s">', maipub_get_option( 'gam_hashed_domain', true ) );
 	}
 
 	/**

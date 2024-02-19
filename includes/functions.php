@@ -431,7 +431,7 @@ function maipub_get_default_options() {
 		'ad_mode'                => '',
 		'gam_domain'             => (string) maipub_get_url_host( home_url() ),
 		'gam_network_code'       => '',
-		'gam_hashed_domain'      => '',
+		'gam_hashed_domain'      => (string) maipub_encode( maipub_get_option( 'gam_domain', true ), 14 ),
 		'gam_sellers_id'         => '',
 		'gam_sellers_name'       => '',
 		'gam_targets'            => '',
