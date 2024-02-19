@@ -7,6 +7,7 @@ const adSlots       = [];
 const refreshKey    = 'refresh';
 const refreshValue  = true;
 const refreshTime   = 30; // Time in seconds.
+const debug         = window.location.search.includes( 'dfpdeb' );
 
 googletag.cmd.push(() => {
 	// Bail if no ads.
@@ -15,6 +16,12 @@ googletag.cmd.push(() => {
 	if ( ! Object.keys(ads).length ) {
 		return;
 	}
+
+	/**
+	 * Set SafeFrame -- This setting will only take effect for subsequent ad requests made for the respective slots.
+	 * To enable cross domain rendering for all creatives, execute setForceSafeFrame before loading any ad slots.
+	 */
+	googletag.pubads().setForceSafeFrame( true );
 
 	const gamBase  = maiPubAdsVars.gamBase;
 	const uadSlots = [];
@@ -76,18 +83,11 @@ googletag.cmd.push(() => {
 	googletag.pubads().enableLazyLoad({
 		// Fetch slots within 2 viewports.
 		fetchMarginPercent: 200,
-		// Render slots within 1.5 viewports.
-		renderMarginPercent: 150,
-		// Double the above values on mobile.
+		// Render slots within .5 viewports.
+		renderMarginPercent: 50,
+		// Double the above values on mobile, where viewports are smaller and users tend to scroll faster.
 		mobileScaling: 2.0,
 	});
-
-	/**
-	 * Set SafeFrame -- This setting will only take effect for subsequent ad requests made for the respective slots.
-	 * To enable cross domain rendering for all creatives, execute setForceSafeFrame before loading any ad slots.
-	 */
-	// Currently disabled for Amazon UAM.
-	// googletag.pubads().setForceSafeFrame( true );
 
 	// Make ads centered.
 	googletag.pubads().setCentering( true );
@@ -109,7 +109,6 @@ googletag.cmd.push(() => {
 		const slotId = slot.getSlotElementId();
 
 		// Bail if no slot.
-		// TODO: Should this check for null/undefined?
 		if ( ! slot ) {
 			return;
 		}
@@ -133,7 +132,14 @@ googletag.cmd.push(() => {
 			if ( maiPubAdsVars.amazonUAM ) {
 				apstag.setDisplayBids();
 			}
+
+			// If debugging, log.
+			if ( debug ) {
+				console.log( 'refreshed:', slotId );
+			}
+
 			googletag.pubads().refresh( [slot] );
+
 		}, refreshTime * 1000 ); // Time in milliseconds.
 	});
 
@@ -144,10 +150,9 @@ googletag.cmd.push(() => {
 	googletag.pubads().addEventListener( 'slotVisibilityChanged', (event) => {
 		const slot   = event.slot;
 		const slotId = slot.getSlotElementId();
-		const inView = event.inViewPercentage > 20;
+		const inView = event.inViewPercentage > 5;
 
 		// Bail if no slot.
-		// TODO: Should this check for null/undefined?
 		if ( ! slot ) {
 			return;
 		}
@@ -186,12 +191,16 @@ googletag.cmd.push(() => {
 			return;
 		}
 
-		// console.log( slotId + ' is refreshing (slotVisibilityChanged).' );
 		if ( maiPubAdsVars.amazonUAM ) {
 			apstag.setDisplayBids();
 		}
 
 		googletag.pubads().refresh( [slot] );
+
+		// If debugging, log.
+		if ( debug ) {
+			console.log( 'refreshed:', slotId );
+		}
 	});
 
 	// Enable services.
@@ -260,5 +269,23 @@ googletag.cmd.push(() => {
 	// Standard GAM.
 	else {
 		googletag.pubads().refresh( adSlots );
+	}
+
+	// If debugging, set listeners to log.
+	if ( debug ) {
+		// Log when a slot ID is fetched.
+		googletag.pubads().addEventListener( 'slotRequested', (event) => {
+			console.log( 'fetched:', event.slot.getSlotElementId() );
+		});
+
+		// Log when a slot ID is rendered.
+		googletag.pubads().addEventListener( 'slotOnload', (event) => {
+			console.log( 'rendered:', event.slot.getSlotElementId() );
+		});
+
+		// Log when a slot ID visibility changed.
+		// googletag.pubads().addEventListener( 'slotVisibilityChanged', (event) => {
+		// 	console.log( 'changed:', event.slot.getSlotElementId(), `${event.inViewPercentage}%` );
+		// });
 	}
 }); // End `googletag.cmd.push`.
