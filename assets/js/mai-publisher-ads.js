@@ -48,6 +48,11 @@ googletag.cmd.push(() => {
 	Object.keys( adSlotsATF ).forEach( slug => {
 		// Add to immediate array.
 		immediate.push( maiPubDefineSlot( slug ) );
+
+		// If debugging, add border.
+		if ( debug ) {
+			document.getElementById( 'mai-ad-' + slug ).style.border = '2px dashed green';
+		}
 	});
 
 	// Set page-level targeting.
@@ -377,7 +382,7 @@ document.addEventListener( 'DOMContentLoaded', function() {
 
 			// If debugging, add border.
 			if ( debug ) {
-				entry.target.style.border = '2px dashed red';
+				entry.target.style.border = '2px dashed lightgreen';
 			}
 
 			// Define.
