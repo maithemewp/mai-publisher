@@ -46,10 +46,8 @@ googletag.cmd.push(() => {
 
 	// Loop through ATF ads. The `slug` key is the incremented id like "incontent-2", etc.
 	Object.keys( adSlotsATF ).forEach( slug => {
-		// Define.
-		const slot = maiPubDefineSlot( slug );
 		// Add to immediate array.
-		immediate.push( slot );
+		immediate.push( maiPubDefineSlot( slug ) );
 	});
 
 	// Set page-level targeting.
