@@ -26,7 +26,7 @@ const { adSlotsATF, adSlotsBTF } = Object.entries(ads).reduce( ( acc, [ key, val
 
 // If debugging, log.
 if ( debug ) {
-	console.log( 'v19', 'debug:', debug );
+	console.log( 'v20', 'debug:', debug );
 }
 
 // Add to googletag items.
@@ -48,11 +48,6 @@ googletag.cmd.push(() => {
 	Object.keys( adSlotsATF ).forEach( slug => {
 		// Add to immediate array.
 		immediate.push( maiPubDefineSlot( slug ) );
-
-		// If debugging, add border.
-		if ( debug ) {
-			document.getElementById( 'mai-ad-' + slug ).style.border = '2px dashed lightgreen';
-		}
 	});
 
 	// Set page-level targeting.
