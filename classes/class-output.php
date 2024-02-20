@@ -727,6 +727,11 @@ class Mai_Publisher_Output {
 		// Make sure this is an array.
 		$insert = (array) $insert;
 
+		// Reverse the array if we are before or prepending.
+		if ( in_array( $action, [ 'before', 'prepend' ] ) ) {
+			$insert = array_reverse( $insert );
+		}
+
 		// Filter only DOMElement nodes from array.
 		$insert = array_filter( $insert, function( $node ) {
 			return $node instanceof DOMElement;
