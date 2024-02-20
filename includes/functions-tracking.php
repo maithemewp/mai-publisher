@@ -483,7 +483,7 @@ function maipub_get_iab_category() {
 		$iab = get_term_meta( $primary->term_id, 'maipub_category', true );
 	}
 
-	return $iab;
+	return $iab ?: maipub_get_option( 'category' );
 }
 
 /**
