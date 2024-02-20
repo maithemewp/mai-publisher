@@ -51,7 +51,7 @@ googletag.cmd.push(() => {
 
 		// If debugging, add border.
 		if ( debug ) {
-			document.getElementById( 'mai-ad-' + slug ).style.border = '2px dashed green';
+			document.getElementById( 'mai-ad-' + slug ).style.border = '2px dashed lightgreen';
 		}
 	});
 
@@ -382,7 +382,7 @@ document.addEventListener( 'DOMContentLoaded', function() {
 
 			// If debugging, add border.
 			if ( debug ) {
-				entry.target.style.border = '2px dashed lightgreen';
+				entry.target.style.border = '2px dashed red';
 			}
 
 			// Define.
