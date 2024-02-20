@@ -14,15 +14,15 @@
 }
 
 .mai-ad-unit-container:not([data-label]):not(:first-child) {
-	margin-block-start: var(--spacing-md, 24px);
+	margin-block-start: var(--mai-ad-unit-margin-top, var(--spacing-md, 24px));
 }
 
 .mai-ad-unit-container[data-label]:not(:first-child) {
-	margin-block-start: var(--spacing-lg, 36px);
+	margin-block-start: var(--mai-ad-unit-margin-top, var(--spacing-lg, 36px));
 }
 
 .mai-ad-unit-container:not(:last-child) {
-	margin-block-end: var(--spacing-md, 24px);
+	margin-block-end: var(--mai-ad-unit-margin-bottom, var(--spacing-md, 24px));
 }
 
 .mai-ad-container {
@@ -151,6 +151,10 @@
 .mai-ad-container.is-sticky,
 .mai-ad-unit.is-sticky {
 	top: var(--mai-ad-scroll-margin-top);
+}
+
+.maipub-entry {
+	--mai-ad-unit-margin-bottom: 0;
 }
 
 .mai-column:has(.mai-toc) {
