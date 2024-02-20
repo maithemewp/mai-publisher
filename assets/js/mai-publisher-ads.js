@@ -1,14 +1,35 @@
 window.googletag = window.googletag || {};
 googletag.cmd    = googletag.cmd || [];
 
-const ads           = maiPubAdsVars['ads'];
-const adSlotIds     = [];
-const adSlots       = [];
-const refreshKey    = 'refresh';
-const refreshValue  = true;
-const refreshTime   = 30; // Time in seconds.
-const debug         = window.location.search.includes( 'dfpdeb' );
+const ads          = maiPubAdsVars['ads'];
+const adSlotIds    = [];
+const adSlots      = [];
+const immediate    = [];
+const gamBase      = maiPubAdsVars.gamBase;
+const refreshKey   = 'refresh';
+const refreshValue = true;
+const refreshTime  = 30; // Time in seconds.
+const debug        = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb');
 
+// Separate ATF and BTF slots.
+const { adSlotsATF, adSlotsBTF } = Object.entries(ads).reduce( ( acc, [ key, value ] ) => {
+	// If above the fold or bottom sticky.
+	if ( 'atf' === value.targets.ap || 'bs' === value.targets.ap ) {
+		acc.adSlotsATF[ key ] = value;
+	} else {
+		acc.adSlotsBTF[ key ] = value;
+	}
+
+	return acc;
+
+}, { adSlotsATF: {}, adSlotsBTF: {} });
+
+// If debugging, log.
+if ( debug ) {
+	console.log( 'v19', 'debug:', debug );
+}
+
+// Add to googletag items.
 googletag.cmd.push(() => {
 	// Bail if no ads.
 	// Split-testing in another file had these removed,
@@ -23,50 +44,12 @@ googletag.cmd.push(() => {
 	 */
 	googletag.pubads().setForceSafeFrame( true );
 
-	const gamBase  = maiPubAdsVars.gamBase;
-	const uadSlots = [];
-
-	// Loop through maiPubAdsVars getting key and values. The `slug` key is the incremented id like "incontent-2", etc.
-	Object.keys( ads ).forEach( slug => {
-		// Define slot ID.
-		const slotId = gamBase + ads[slug]['id'];
-		// Define ad slot. googletag.defineSlot( "/1234567/sports", [728, 90], "div-1" );
-		const slot = googletag.defineSlot( slotId, ads[slug].sizes, 'mai-ad-' + slug );
-
-		// Add slot to our array.
-		adSlotIds.push( slotId );
-		adSlots.push( slot );
-
-		// Set refresh targeting.
-		slot.setTargeting( refreshKey, refreshValue );
-
-		// Set slot-level targeting.
-		if ( ads[slug].targets ) {
-			Object.keys( ads[slug].targets ).forEach( key => {
-				slot.setTargeting( key, ads[slug].targets[key] );
-			});
-		}
-
-		// Set split testing.
-		if ( ads[slug].splitTest && 'rand' === ads[slug].splitTest ) {
-			// Set 'st' to a value between 0-99.
-			slot.setTargeting( 'st', Math.floor(Math.random() * 100) );
-		}
-
-		// Get it running.
-		slot.addService( googletag.pubads() );
-
-		/**
-		 * Define size mapping.
-		 * If these breakpoints change, make sure to update the breakpoints in the mai-publisher.css file.
-		 */
-		slot.defineSizeMapping(
-			googletag.sizeMapping()
-			.addSize( [ 1024, 768 ], ads[slug].sizesDesktop )
-			.addSize( [ 728, 480 ], ads[slug].sizesTablet )
-			.addSize( [ 0, 0 ], ads[slug].sizesMobile )
-			.build()
-		);
+	// Loop through ATF ads. The `slug` key is the incremented id like "incontent-2", etc.
+	Object.keys( adSlotsATF ).forEach( slug => {
+		// Define.
+		const slot = maiPubDefineSlot( slug );
+		// Add to immediate array.
+		immediate.push( slot );
 	});
 
 	// Set page-level targeting.
@@ -80,14 +63,14 @@ googletag.cmd.push(() => {
 	 * Lazy loading.
 	 * @link https://developers.google.com/publisher-tag/reference?utm_source=lighthouse&utm_medium=lr#googletag.PubAdsService_enableLazyLoad
 	 */
-	googletag.pubads().enableLazyLoad({
-		// Fetch slots within 2 viewports.
-		fetchMarginPercent: 200,
-		// Render slots within .5 viewports.
-		renderMarginPercent: 50,
-		// Double the above values on mobile, where viewports are smaller and users tend to scroll faster.
-		mobileScaling: 2.0,
-	});
+	// googletag.pubads().enableLazyLoad({
+	// 	// Fetch slots within 2 viewports.
+	// 	fetchMarginPercent: 200,
+	// 	// Render slots within .5 viewports.
+	// 	renderMarginPercent: 50,
+	// 	// Double the above values on mobile, where viewports are smaller and users tend to scroll faster.
+	// 	mobileScaling: 2.0,
+	// });
 
 	// Make ads centered.
 	googletag.pubads().setCentering( true );
@@ -128,17 +111,12 @@ googletag.cmd.push(() => {
 
 		// Set timeout to refresh ads for current visible ads.
 		timeoutIds[slotId] = setTimeout(() => {
-			// console.log( slotId + ' is refreshing (impressionViewable).' );
-			if ( maiPubAdsVars.amazonUAM ) {
-				apstag.setDisplayBids();
-			}
-
 			// If debugging, log.
 			if ( debug ) {
-				console.log( 'refreshed:', slotId );
+				console.log( 'refreshed A:', slotId );
 			}
 
-			googletag.pubads().refresh( [slot] );
+			maiPubRefreshSlots( [slot] );
 
 		}, refreshTime * 1000 ); // Time in milliseconds.
 	});
@@ -191,85 +169,28 @@ googletag.cmd.push(() => {
 			return;
 		}
 
-		if ( maiPubAdsVars.amazonUAM ) {
-			apstag.setDisplayBids();
-		}
-
-		googletag.pubads().refresh( [slot] );
-
 		// If debugging, log.
 		if ( debug ) {
-			console.log( 'refreshed:', slotId );
+			console.log( 'refreshed B:', slotId );
 		}
+
+		maiPubRefreshSlots( [slot] );
 	});
 
 	// Enable services.
 	googletag.enableServices();
 
-	// Handle Amazon UAM bids.
+	// If using Amazon UAM bids, add it.
 	if ( maiPubAdsVars.amazonUAM ) {
 		/**
 		 * Amazon UAD.
 		 * Debug via `apstag.debug('enableConsole')`
 		 */
 		!function(a9,a,p,s,t,A,g){if(a[a9])return;function q(c,r){a[a9]._Q.push([c,r])}a[a9]={init:function(){q("i",arguments)},fetchBids:function(){q("f",arguments)},setDisplayBids:function(){},targetingKeys:function(){return[]},_Q:[]};A=p.createElement(s);A.async=!0;A.src=t;g=p.getElementsByTagName(s)[0];g.parentNode.insertBefore(A,g)}("apstag",window,document,"script","//c.amazon-adsystem.com/aax2/apstag.js");
-
-		// Initialize apstag and have apstag set bids on the googletag slots when they are returned to the page.
-		apstag.init({
-			pubID: '79166f25-5776-4c3e-9537-abad9a584b43', // BB.
-			adServer: 'googletag',
-			// bidTimeout: prebidTimeout,
-			// us_privacy: '-1', // https://ams.amazon.com/webpublisher/uam/docs/web-integration-documentation/integration-guide/uam-ccpa.html?source=menu
-			// @link https://ams.amazon.com/webpublisher/uam/docs/reference/api-reference.html#configschain
-			schain: {
-				complete: 1, // Integer 1 or 0 indicating if all preceding nodes are complete.
-				ver: '1.0', // Version of the spec used.
-				nodes: [
-					{
-						asi: 'bizbudding.com', // Populate with the canonical domain of the advertising system where the seller.JSON file is hosted.
-						sid: maiPubAdsVars['sellersId'], // The identifier associated with the seller or reseller account within your advertising system.
-						hp: 1, // 1 or 0, whether this node is involved in the payment flow.
-						name: maiPubAdsVars['sellersName'], // Name of the company paid for inventory under seller ID (optional).
-						domain: maiPubAdsVars['domain'], // Business domain of this node (optional).
-					}
-				]
-			}
-		});
-
-		// Loop through maiPubAdsVars getting key and values.
-		Object.keys( ads ).forEach( slug => {
-			// Skip if ads[slug].sizes only contains a single size named 'fluid'. This was throwing an error in amazon.
-			if ( 1 === ads[slug].sizes.length && 'fluid' === ads[slug].sizes[0] ) {
-				return;
-			}
-
-			// Add slot to array for UAD.
-			uadSlots.push({
-				slotID: 'mai-ad-' + slug,
-				slotName: gamBase + ads[slug]['id'],
-				sizes: ads[slug].sizes,
-			});
-		});
-
-		// Fetch bids from Amazon UAM using apstag.
-		apstag.fetchBids({
-			slots: uadSlots,
-			timeout: 2e3,
-			params: {
-				adRefresh: '1',
-			}
-		}, function( bids ) {
-			// Set apstag bids, then trigger the first request to GAM.
-			googletag.cmd.push(function() {
-				apstag.setDisplayBids();
-				googletag.pubads().refresh( adSlots );
-			});
-		});
 	}
-	// Standard GAM.
-	else {
-		googletag.pubads().refresh( adSlots );
-	}
+
+	// Display ATF ads.
+	maiPubDisplaySlots( immediate );
 
 	// If debugging, set listeners to log.
 	if ( debug ) {
@@ -289,3 +210,198 @@ googletag.cmd.push(() => {
 		// });
 	}
 }); // End `googletag.cmd.push`.
+
+/**
+ * Define a slot.
+ *
+ * @param {string} slug The ad slug.
+ */
+function maiPubDefineSlot( slug ) {
+	let toReturn = null;
+
+	googletag.cmd.push(() => {
+		// Define slot ID.
+		const slotId = gamBase + ads[slug]['id'];
+		// Define ad slot. googletag.defineSlot( "/1234567/sports", [728, 90], "div-1" );
+		const slot = googletag.defineSlot( slotId, ads[slug].sizes, 'mai-ad-' + slug );
+
+		// Add slot to our array.
+		adSlotIds.push( slotId );
+		adSlots.push( slot );
+
+		// Set refresh targeting.
+		slot.setTargeting( refreshKey, refreshValue );
+
+		// Set slot-level targeting.
+		if ( ads[slug].targets ) {
+			Object.keys( ads[slug].targets ).forEach( key => {
+				slot.setTargeting( key, ads[slug].targets[key] );
+			});
+		}
+
+		// Set split testing.
+		if ( ads[slug].splitTest && 'rand' === ads[slug].splitTest ) {
+			// Set 'st' to a value between 0-99.
+			slot.setTargeting( 'st', Math.floor(Math.random() * 100) );
+		}
+
+		// Get it running.
+		slot.addService( googletag.pubads() );
+
+		/**
+		 * Define size mapping.
+		 * If these breakpoints change, make sure to update the breakpoints in the mai-publisher.css file.
+		 */
+		slot.defineSizeMapping(
+			googletag.sizeMapping()
+			.addSize( [ 1024, 768 ], ads[slug].sizesDesktop )
+			.addSize( [ 728, 480 ], ads[slug].sizesTablet )
+			.addSize( [ 0, 0 ], ads[slug].sizesMobile )
+			.build()
+		);
+
+		toReturn = slot;
+	});
+
+	return toReturn;
+}
+
+/**
+ * Initial display of slots.
+ *
+ * @param {array} slots The defined slots.
+ */
+function maiPubDisplaySlots( slots ) {
+	googletag.cmd.push(() => {
+		// Handle Amazon UAM bids.
+		if ( maiPubAdsVars.amazonUAM ) {
+			const uadSlots = [];
+
+			// Initialize apstag and have apstag set bids on the googletag slots when they are returned to the page.
+			apstag.init({
+				pubID: '79166f25-5776-4c3e-9537-abad9a584b43', // BB.
+				adServer: 'googletag',
+				// bidTimeout: prebidTimeout,
+				// us_privacy: '-1', // https://ams.amazon.com/webpublisher/uam/docs/web-integration-documentation/integration-guide/uam-ccpa.html?source=menu
+				// @link https://ams.amazon.com/webpublisher/uam/docs/reference/api-reference.html#configschain
+				schain: {
+					complete: 1, // Integer 1 or 0 indicating if all preceding nodes are complete.
+					ver: '1.0', // Version of the spec used.
+					nodes: [
+						{
+							asi: 'bizbudding.com', // Populate with the canonical domain of the advertising system where the seller.JSON file is hosted.
+							sid: maiPubAdsVars['sellersId'], // The identifier associated with the seller or reseller account within your advertising system.
+							hp: 1, // 1 or 0, whether this node is involved in the payment flow.
+							name: maiPubAdsVars['sellersName'], // Name of the company paid for inventory under seller ID (optional).
+							domain: maiPubAdsVars['domain'], // Business domain of this node (optional).
+						}
+					]
+				}
+			});
+
+			// Loop through maiPubAdsVars getting key and values.
+			Object.keys( slots ).forEach( slug => {
+				// Skip if ads[slug].sizes only contains a single size named 'fluid'. This was throwing an error in amazon.
+				if ( 1 === ads[slug].sizes.length && 'fluid' === ads[slug].sizes[0] ) {
+					// Remove from slots array and skip.
+					delete slots[slug];
+					return;
+				}
+
+				// Add slot to array for UAD.
+				uadSlots.push({
+					slotID: 'mai-ad-' + slug,
+					slotName: gamBase + ads[slug]['id'],
+					sizes: ads[slug].sizes,
+				});
+			});
+
+			// Fetch bids from Amazon UAM using apstag.
+			apstag.fetchBids({
+				slots: uadSlots,
+				timeout: 2e3,
+				params: {
+					adRefresh: '1',
+				}
+			}, function( bids ) {
+				// Set apstag bids, then trigger the first request to GAM.
+				googletag.cmd.push(function() {
+					apstag.setDisplayBids();
+					googletag.pubads().refresh( slots );
+				});
+			});
+		}
+		// Standard GAM.
+		else {
+			googletag.pubads().refresh( slots );
+		}
+	});
+}
+
+/**
+ * Refreshes slots.
+ *
+ * @param {array} slots The defined slots.
+ */
+function maiPubRefreshSlots( slots ) {
+	googletag.cmd.push(() => {
+		if ( maiPubAdsVars.amazonUAM ) {
+			apstag.setDisplayBids();
+		}
+
+		googletag.pubads().refresh( slots );
+	});
+}
+
+/**
+ * Handler for IntersectionObserver.
+ */
+document.addEventListener( 'DOMContentLoaded', function() {
+	// Create the IntersectionObserver.
+	const observer = new IntersectionObserver( (entries, observer) => {
+		entries.forEach( entry => {
+			// Skip if not intersecting.
+			if ( ! entry.isIntersecting ) {
+				return;
+			}
+
+			// Get slot from adSlotsBTF.
+			const slug    = entry.target.getAttribute('id').replace( 'mai-ad-', '' );
+			const slotBTF = adSlotsBTF[slug];
+
+			// If not in adSlotsBTF.
+			if ( undefined === slotBTF ) {
+				// Unobserve.
+				observer.unobserve( entry.target );
+				// Skip.
+				return;
+			}
+
+			// If debugging, add border.
+			if ( debug ) {
+				entry.target.style.border = '2px dashed red';
+			}
+
+			// Define.
+			const slot = maiPubDefineSlot( slug );
+
+			// Display.
+			maiPubDisplaySlots( [slot] );
+
+			// Unobserve. GAM event listener will handle refreshes.
+			observer.unobserve( entry.target );
+		});
+	}, {
+		root: null, // Use the viewport as the root
+		rootMargin: '500px 0px 500px 0px', // Trigger when the top of the element is X away from each part of the viewport.
+		threshold: 0 // No threshold needed
+	});
+
+	// Select all ad units.
+	const adUnits = document.querySelectorAll( '.mai-ad-unit:not([data-ap="atf"])' );
+
+	// Observe each element.
+	adUnits.forEach( adUnit => {
+		observer.observe( adUnit );
+	});
+});
