@@ -41,7 +41,7 @@ class Mai_Publisher_Ad_Fields {
 	function admin_css( $field ) {
 		echo '<style>
 		#acf-maipub_ad_field_group > .acf-fields {
-			padding-bottom: 5vh !important;
+			padding-bottom: 10vh !important;
 		}
 		.acf-field-maipub-single-taxonomies .acf-repeater .acf-actions {
 			text-align: start;
