@@ -157,13 +157,13 @@ class Mai_Publisher_Output {
 		$ad_units   = $this->xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " mai-ad-unit ")]' );
 		$videos     = $this->xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " mai-ad-video ")]' );
 		$ads_count  = $ad_units->length;
-		$ad_count   = 0;
-		$first_slot = false;
+		// $ad_count   = 0;
+		// $first_slot = false;
 
 		// Loop through ad units.
 		foreach ( $ad_units as $ad_unit ) {
 			// Increment count, to start at 1.
-			$ad_count++;
+			// $ad_count++;
 
 			// Build name from location and unit.
 			$location = $ad_unit->getAttribute( 'data-al' );
@@ -172,10 +172,10 @@ class Mai_Publisher_Output {
 			$name     = sprintf( 'mai-ad-%s-%s', $location, $unit );
 			$name     = $this->increment_string( $name );
 
-			// Set first slot for later `display()`.
-			if ( ! $first_slot ) {
-				$first_slot = $slot;
-			}
+			// // Set first slot for later `display()`.
+			// if ( ! $first_slot ) {
+			// 	$first_slot = $slot;
+			// }
 
 			// Set slot as id.
 			$ad_unit->setAttribute( 'id', 'mai-ad-' . $slot );
@@ -233,47 +233,48 @@ class Mai_Publisher_Output {
 					$this->gam[ $slot ]['splitTest'] = $split_test;
 				}
 
-				// Bail if not the last ad unit.
-				if ( $ad_count !== $ads_count ) {
-					continue;
-				}
+				// // Bail if not the last ad unit.
+				// if ( $ad_count !== $ads_count ) {
+				// 	continue;
+				// }
 
-				// Build script, import into dom and append to ad unit.
-				$script = sprintf( '
-					var maiAdsScript = document.getElementById( "mai-publisher-ads" );
+				// // Build script, import into dom and append to ad unit.
+				// $script = sprintf(
+				// 	`var maiAdsScript = document.getElementById( "mai-publisher-ads" );
 
-					// If already loaded, execute the code directly.
-					if ( maiAdsScript.complete ) {
-						initializeAd();
-					}
-					// If not loaded, attach the onload event listener.
-					else {
-						maiAdsScript.onload = function() {
-							initializeAd();
-						};
-					}
+				// 	// If already loaded, execute the code directly.
+				// 	if ( maiAdsScript.complete ) {
+				// 		initializeAd();
+				// 	}
+				// 	// If not loaded, attach the onload event listener.
+				// 	else {
+				// 		maiAdsScript.onload = function() {
+				// 			initializeAd();
+				// 		};
+				// 	}
 
-					// Function to initialize the ad.
-					// When using SRA, this will fetch all ads.
-					function initializeAd() {
-						window.googletag = window.googletag || {};
-						googletag.cmd    = googletag.cmd || [];
-						if ( window.googletag && googletag.apiReady ) {
-							googletag.cmd.push(function () {
-								googletag.display( "mai-ad-%s" );
-							});
-						}
-					}
-					', $first_slot );
+				// 	// Function to initialize the ad.
+				// 	// When using SRA, this will fetch all ads.
+				// 	function initializeAd() {
+				// 		window.googletag = window.googletag || {};
+				// 		googletag.cmd    = googletag.cmd || [];
 
-				// Minify.
-				$this->minify_js( $script );
+				// 		if ( window.googletag && googletag.apiReady ) {
+				// 			googletag.cmd.push(function () {
+				// 				googletag.display( "mai-ad-%s" );
+				// 			});
+				// 		}
+				// 	}`
+				// 	, $first_slot );
 
-				// Add tags.
-				$script = "<script>{$script}</script>";
+				// // Minify.
+				// $this->minify_js( $script );
 
-				// Insert the script.
-				$this->insert_nodes( $script, $ad_unit, 'append' );
+				// // Add tags.
+				// $script = "<script>{$script}</script>";
+
+				// // Insert the script.
+				// $this->insert_nodes( $script, $ad_unit, 'append' );
 			}
 		}
 
