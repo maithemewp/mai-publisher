@@ -26,23 +26,18 @@ const { adSlotsATF, adSlotsBTF } = Object.entries(ads).reduce( ( acc, [ key, val
 
 // If debugging, log.
 if ( debug ) {
-	console.log( 'v21', 'debug:', debug );
+	console.log( 'v22', 'debug:', debug );
 }
 
 // Add to googletag items.
 googletag.cmd.push(() => {
-	// Bail if no ads.
-	// Split-testing in another file had these removed,
-	// so we need an additional check here even though we check the DOM in PHP.
-	// if ( ! Object.keys(ads).length ) {
-	// 	return;
-	// }
-
 	/**
 	 * Set SafeFrame -- This setting will only take effect for subsequent ad requests made for the respective slots.
 	 * To enable cross domain rendering for all creatives, execute setForceSafeFrame before loading any ad slots.
+	 *
+	 * UAM breaks when this is true.
 	 */
-	googletag.pubads().setForceSafeFrame( true );
+	googletag.pubads().setForceSafeFrame( ! maiPubAdsVars.amazonUAM );
 
 	// Loop through ATF ads. The `slug` key is the incremented id like "incontent-2", etc.
 	Object.keys( adSlotsATF ).forEach( slug => {
