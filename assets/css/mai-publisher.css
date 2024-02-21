@@ -1,8 +1,8 @@
 .mai-ad-unit-container {
 	display: flex;
-	justify-content: center;
+	justify-content: var(--mai-ad-unit-justify-content, center);
 	max-width: var(--mai-ad-unit-max-width);
-	margin-inline: auto;
+	margin-inline: var(--mai-ad-unit-margin-inline, auto);
 }
 
 .mai-ad-unit-container::before {
@@ -14,15 +14,15 @@
 }
 
 .mai-ad-unit-container:not([data-label]):not(:first-child) {
-	margin-block-start: var(--mai-ad-unit-margin-top, var(--spacing-md, 24px));
+	margin-block-start: var(--mai-ad-unit-margin-block, var(--spacing-md, 24px) 0);
 }
 
 .mai-ad-unit-container[data-label]:not(:first-child) {
-	margin-block-start: var(--mai-ad-unit-margin-top, var(--spacing-lg, 36px));
+	margin-block-start: var(--mai-ad-unit-margin-block, var(--spacing-lg, 36px) 0);
 }
 
 .mai-ad-unit-container:not(:last-child) {
-	margin-block-end: var(--mai-ad-unit-margin-bottom, var(--spacing-md, 24px));
+	margin-block-end: var(--mai-ad-unit-margin-block, 0 var(--spacing-md, 24px));
 }
 
 .mai-ad-container {
@@ -153,8 +153,11 @@
 	top: var(--mai-ad-scroll-margin-top);
 }
 
-.maipub-entry {
-	--mai-ad-unit-margin-bottom: 0;
+.maipub-entry,
+.maipub-row {
+	--mai-ad-unit-justify-content: start;
+	--mai-ad-unit-margin-block: 0;
+	--mai-ad-unit-margin-inline: 0;
 }
 
 .mai-column:has(.mai-toc) {
