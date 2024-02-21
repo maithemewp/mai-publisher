@@ -410,6 +410,11 @@ function maiPubDisplaySlots( slots ) {
 		}
 		// Standard GAM.
 		else {
+			// Bail if no slots.
+			if ( ! slots.length ) {
+				return;
+			}
+
 			googletag.pubads().refresh( slots );
 		}
 	});
