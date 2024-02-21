@@ -204,8 +204,12 @@ googletag.cmd.push(() => {
 document.addEventListener( 'DOMContentLoaded', function() {
 	// Push, so this runs after the above code.
 	googletag.cmd.push(() => {
+		let initialLoad = true;
+		let toLoad      = [];
+
 		// Create the IntersectionObserver.
 		const observer = new IntersectionObserver( (entries, observer) => {
+			// Loop through the entries.
 			entries.forEach( entry => {
 				// Skip if not intersecting.
 				if ( ! entry.isIntersecting ) {
@@ -229,17 +233,42 @@ document.addEventListener( 'DOMContentLoaded', function() {
 					entry.target.style.border = '2px dashed red';
 				}
 
-				// Define and display.
-				maiPubDisplaySlots( [ maiPubDefineSlot( slug ) ] );
+				// Add to toLoad array.
+				toLoad.push( slug );
 
 				// Unobserve. GAM event listener will handle refreshes.
 				observer.unobserve( entry.target );
-			});
+			}); // End entries loop.
+
+			// Process the first array immediately after observing.
+			if ( initialLoad ) {
+				// console.log( 'Elements in view immediately:', toLoad );
+				// Process the slots.
+				processSlots();
+				// Set initialLoad to false.
+				initialLoad = false;
+			}
+			// All batching via a short delay.
+			else {
+				setTimeout(() => {
+					// console.log( 'Elements in view after delay:', toLoad );
+					// Process the slots.
+					processSlots();
+				}, 200 );
+			}
 		}, {
 			root: null, // Use the viewport as the root
-			rootMargin: '500px 0px 500px 0px', // Trigger when the top of the element is X away from each part of the viewport.
+			rootMargin: '600px 0px 600px 0px', // Trigger when the top of the element is X away from each part of the viewport.
 			threshold: 0 // No threshold needed
 		});
+
+		// Function to process slots.
+		function processSlots() {
+			// Define and display all slots in view.
+			maiPubDisplaySlots( toLoad.map( slug => maiPubDefineSlot( slug ) ) );
+			// Clear toLoad array.
+			toLoad = [];
+		}
 
 		// Select all ad units.
 		const adUnits = document.querySelectorAll( '.mai-ad-unit:not([data-ap="atf"])' );
