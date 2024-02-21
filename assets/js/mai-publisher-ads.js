@@ -34,9 +34,9 @@ googletag.cmd.push(() => {
 	// Bail if no ads.
 	// Split-testing in another file had these removed,
 	// so we need an additional check here even though we check the DOM in PHP.
-	if ( ! Object.keys(ads).length ) {
-		return;
-	}
+	// if ( ! Object.keys(ads).length ) {
+	// 	return;
+	// }
 
 	/**
 	 * Set SafeFrame -- This setting will only take effect for subsequent ad requests made for the respective slots.
@@ -56,19 +56,6 @@ googletag.cmd.push(() => {
 			googletag.pubads().setTargeting( key, maiPubAdsVars.targets[key].toString() );
 		});
 	}
-
-	/**
-	 * Lazy loading.
-	 * @link https://developers.google.com/publisher-tag/reference?utm_source=lighthouse&utm_medium=lr#googletag.PubAdsService_enableLazyLoad
-	 */
-	// googletag.pubads().enableLazyLoad({
-	// 	// Fetch slots within 2 viewports.
-	// 	fetchMarginPercent: 200,
-	// 	// Render slots within .5 viewports.
-	// 	renderMarginPercent: 50,
-	// 	// Double the above values on mobile, where viewports are smaller and users tend to scroll faster.
-	// 	mobileScaling: 2.0,
-	// });
 
 	// Make ads centered.
 	googletag.pubads().setCentering( true );
@@ -210,6 +197,59 @@ googletag.cmd.push(() => {
 }); // End `googletag.cmd.push`.
 
 /**
+ * Handler for IntersectionObserver.
+ */
+document.addEventListener( 'DOMContentLoaded', function() {
+	// Push, so this runs after the above code.
+	googletag.cmd.push(() => {
+		// Create the IntersectionObserver.
+		const observer = new IntersectionObserver( (entries, observer) => {
+			entries.forEach( entry => {
+				// Skip if not intersecting.
+				if ( ! entry.isIntersecting ) {
+					return;
+				}
+
+				// Get slot from adSlotsBTF.
+				const slug    = entry.target.getAttribute('id').replace( 'mai-ad-', '' );
+				const slotBTF = adSlotsBTF[slug];
+
+				// If not in adSlotsBTF.
+				if ( undefined === slotBTF ) {
+					// Unobserve.
+					observer.unobserve( entry.target );
+					// Skip.
+					return;
+				}
+
+				// If debugging, add border.
+				if ( debug ) {
+					entry.target.style.border = '2px dashed red';
+				}
+
+				// Define and display.
+				maiPubDisplaySlots( [ maiPubDefineSlot( slug ) ] );
+
+				// Unobserve. GAM event listener will handle refreshes.
+				observer.unobserve( entry.target );
+			});
+		}, {
+			root: null, // Use the viewport as the root
+			rootMargin: '500px 0px 500px 0px', // Trigger when the top of the element is X away from each part of the viewport.
+			threshold: 0 // No threshold needed
+		});
+
+		// Select all ad units.
+		const adUnits = document.querySelectorAll( '.mai-ad-unit:not([data-ap="atf"])' );
+
+		// Observe each element.
+		adUnits.forEach( adUnit => {
+			observer.observe( adUnit );
+		});
+	});
+});
+
+/**
  * Define a slot.
  *
  * @param {string} slug The ad slug.
@@ -270,6 +310,7 @@ function maiPubDefineSlot( slug ) {
  * @param {array} slots The defined slots.
  */
 function maiPubDisplaySlots( slots ) {
+	// Push it.
 	googletag.cmd.push(() => {
 		// Handle Amazon UAM bids.
 		if ( maiPubAdsVars.amazonUAM ) {
@@ -317,6 +358,11 @@ function maiPubDisplaySlots( slots ) {
 				});
 			});
 
+			// Bail if no uadSlots.
+			if ( ! uadSlots.length ) {
+				return;
+			}
+
 			// Fetch bids from Amazon UAM using apstag.
 			apstag.fetchBids({
 				slots: uadSlots,
@@ -353,56 +399,3 @@ function maiPubRefreshSlots( slots ) {
 		googletag.pubads().refresh( slots );
 	});
 }
-
-/**
- * Handler for IntersectionObserver.
- */
-document.addEventListener( 'DOMContentLoaded', function() {
-	// Create the IntersectionObserver.
-	const observer = new IntersectionObserver( (entries, observer) => {
-		entries.forEach( entry => {
-			// Skip if not intersecting.
-			if ( ! entry.isIntersecting ) {
-				return;
-			}
-
-			// Get slot from adSlotsBTF.
-			const slug    = entry.target.getAttribute('id').replace( 'mai-ad-', '' );
-			const slotBTF = adSlotsBTF[slug];
-
-			// If not in adSlotsBTF.
-			if ( undefined === slotBTF ) {
-				// Unobserve.
-				observer.unobserve( entry.target );
-				// Skip.
-				return;
-			}
-
-			// If debugging, add border.
-			if ( debug ) {
-				entry.target.style.border = '2px dashed red';
-			}
-
-			// Define.
-			const slot = maiPubDefineSlot( slug );
-
-			// Display.
-			maiPubDisplaySlots( [slot] );
-
-			// Unobserve. GAM event listener will handle refreshes.
-			observer.unobserve( entry.target );
-		});
-	}, {
-		root: null, // Use the viewport as the root
-		rootMargin: '500px 0px 500px 0px', // Trigger when the top of the element is X away from each part of the viewport.
-		threshold: 0 // No threshold needed
-	});
-
-	// Select all ad units.
-	const adUnits = document.querySelectorAll( '.mai-ad-unit:not([data-ap="atf"])' );
-
-	// Observe each element.
-	adUnits.forEach( adUnit => {
-		observer.observe( adUnit );
-	});
-});
