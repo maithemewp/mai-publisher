@@ -297,8 +297,11 @@ function maiPubDisplaySlots( slots ) {
 				}
 			});
 
-			// Loop through maiPubAdsVars getting key and values.
-			Object.keys( slots ).forEach( slug => {
+			// Loop through slots.
+			slots.forEach( slot => {
+				// Get slug from slot ID.
+				const slug = slot.getSlotElementId().replace( 'mai-ad-', '' );
+
 				// Skip if ads[slug].sizes only contains a single size named 'fluid'. This was throwing an error in amazon.
 				if ( 1 === ads[slug].sizes.length && 'fluid' === ads[slug].sizes[0] ) {
 					// Remove from slots array and skip.
