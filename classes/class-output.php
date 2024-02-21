@@ -715,7 +715,7 @@ class Mai_Publisher_Output {
 	 */
 	function insert_nodes( $insert, $target, $action ) {
 		// If string, convert to node.
-		if ( is_string( $insert ) ) {
+		if ( $insert && is_string( $insert ) ) {
 			$insert = $this->import_nodes( $insert );
 		}
 
@@ -724,11 +724,8 @@ class Mai_Publisher_Output {
 			return;
 		}
 
-		// Make sure this is an array.
-		$insert = (array) $insert;
-
-		// Reverse the array if we are before or prepending.
-		if ( in_array( $action, [ 'before', 'prepend' ] ) ) {
+		// Reverse the array if prepending, so they end up in the right order.
+		if ( 'prepend' === $action ) {
 			$insert = array_reverse( $insert );
 		}
 
