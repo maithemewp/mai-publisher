@@ -33,7 +33,7 @@
 	position: relative;
 }
 
-.mai-ad-unit[data-label]::before {
+.mai-ad-unit[data-label]:not(:empty)::before {
 	display: block;
 	width: 100%;
 	position: absolute;
