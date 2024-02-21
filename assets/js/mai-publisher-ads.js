@@ -259,6 +259,10 @@ document.addEventListener( 'DOMContentLoaded', function() {
 
 		// Function to process slots.
 		function processSlots() {
+			// If no slots to load, bail.
+			if ( ! toLoad.length ) {
+				return;
+			}
 			// Define and display all slots in view.
 			maiPubDisplaySlots( toLoad.map( slug => maiPubDefineSlot( slug ) ) );
 			// Clear toLoad array.
