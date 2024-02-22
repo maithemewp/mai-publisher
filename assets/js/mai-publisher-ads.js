@@ -199,7 +199,7 @@ googletag.cmd.push(() => {
 document.addEventListener( 'DOMContentLoaded', function() {
 	// Push, so this runs after the above code.
 	googletag.cmd.push(() => {
-		// let initialLoad = true;
+		let initialLoad = true;
 		let toLoad      = [];
 
 		// Create the IntersectionObserver.
@@ -235,25 +235,22 @@ document.addEventListener( 'DOMContentLoaded', function() {
 				observer.unobserve( entry.target );
 			}); // End entries loop.
 
-			// Process the slots.
-			processSlots();
-
-			// // Process the first array immediately after observing.
-			// if ( initialLoad ) {
-			// 	// console.log( 'Elements in view immediately:', toLoad );
-			// 	// Process the slots.
-			// 	processSlots();
-			// 	// Set initialLoad to false.
-			// 	initialLoad = false;
-			// }
-			// // All batching via a short delay.
-			// else {
-			// 	setTimeout(() => {
-			// 		// console.log( 'Elements in view after delay:', toLoad );
-			// 		// Process the slots.
-			// 		processSlots();
-			// 	}, 200 );
-			// }
+			// Process the first array immediately after observing.
+			if ( initialLoad ) {
+				// console.log( 'Elements in view immediately:', toLoad );
+				// Process the slots.
+				processSlots();
+				// Set initialLoad to false.
+				initialLoad = false;
+			}
+			// All batching via a short delay.
+			else {
+				setTimeout(() => {
+					// console.log( 'Elements in view after delay:', toLoad );
+					// Process the slots.
+					processSlots();
+				}, 250 );
+			}
 		}, {
 			root: null, // Use the viewport as the root
 			rootMargin: '600px 0px 600px 0px', // Trigger when the top of the element is X away from each part of the viewport.
