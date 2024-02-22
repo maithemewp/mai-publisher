@@ -26,7 +26,7 @@ const { adSlotsATF, adSlotsBTF } = Object.entries(ads).reduce( ( acc, [ key, val
 
 // If debugging, log.
 if ( debug ) {
-	console.log( 'v22', 'debug:', debug );
+	console.log( 'v23', 'debug:', debug );
 }
 
 // Add to googletag items.
@@ -266,6 +266,12 @@ document.addEventListener( 'DOMContentLoaded', function() {
 			if ( ! toLoad.length ) {
 				return;
 			}
+
+			// If debugging, log.
+			if ( debug ) {
+				console.log( 'processing slots' );
+			}
+
 			// Define and display all slots in view.
 			maiPubDisplaySlots( toLoad.map( slug => maiPubDefineSlot( slug ) ) );
 			// Clear toLoad array.
