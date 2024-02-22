@@ -105,6 +105,14 @@ class Mai_Publisher_Settings {
 			[ $this, 'maipub_sanitize' ] // sanitize_callback
 		);
 
+		/****************
+		 * Set Defaults *
+		 ****************/
+
+		if ( is_null( get_option( 'mai_publisher', null ) ) ) {
+			update_option( 'mai_publisher', maipub_get_default_options() );
+		}
+
 		/************
 		 * Sections *
 		 ************/
@@ -682,7 +690,7 @@ class Mai_Publisher_Settings {
 		echo '<select name="mai_publisher[views_api]">';
 		printf( '<option value="matomo"%s>%s</option>', selected( $selected, 'matomo' ), __( 'Matomo', 'mai-publisher' ) );
 		printf( '<option value="jetpack"%s>%s</option>', selected( $selected, 'jetpack' ), __( 'Jetpack', 'mai-publisher' ) );
-		printf( '<option value="disabled">%s</option>', __( 'Disabled', 'mai-publisher' ) );
+		printf( '<option value="disabled"%s>%s</option>', selected( $selected, 'disabled' ), __( 'Disabled', 'mai-publisher' ) );
 		echo '</select>';
 
 		if ( 'jetpack' === $selected ) {
