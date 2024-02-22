@@ -26,7 +26,7 @@ const { adSlotsATF, adSlotsBTF } = Object.entries(ads).reduce( ( acc, [ key, val
 
 // If debugging, log.
 if ( debug ) {
-	console.log( 'v24', 'debug:', debug );
+	console.log( 'v25', 'debug:', debug );
 }
 
 // Add to googletag items.
