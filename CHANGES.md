@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.6.0 (2/23/24)
+* Added: New `leaderboard-small` ad unit size.
+* Added: New `mai_publisher_header_scripts` header scripts filter.
+* Added: New `mai_publisher_ad_unit` and `mai_publisher_ad_video` filters on ad/video block final HTML.
+* Added: New `mai_publisher_entries_ads` filter for ads in archives and Mai Post Grid in Mai Theme v2.
+* Added: New `mai_publisher_load_connatix` filter to override if connatix header script should load or not.
+* Added: BTF ads are now only fetched rendered as they scroll into view.
+* Added: Better debugging when `?dfpdeb` and/or new `?maideb` query param are used.
+* Changed: GAM domain and hashed domain are now editable.
+* Changed: Better mobile size limits for some ads.
+* Changed: Optimized load order for ad script fetching/rendering.
+* Changed: Settings page heading CSS tweaks.
+* Fixed: Layout CSS tweaks for WPRM recipes.
+* Fixed: IATB sitewide category is now passed if there is no per-category category set.
+
 ## 1.5.0 (2/13/24)
 * Changed: Ads with taxonomy conditions now include the descendant terms as well, when the taxonomy is hierarchical.
 * Fixed: Error showing version/status on settings page when using Matomo v5.
