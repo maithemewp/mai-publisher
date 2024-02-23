@@ -145,6 +145,7 @@ final class Mai_Publisher_Plugin {
 		new Mai_Publisher_Views;
 		new Mai_Publisher_Tracking;
 		new Mai_Publisher_Tracking_Content;
+		new Mai_Publisher_Upgrade;
 
 		if ( ! class_exists( 'Mai_Ads_Manager' ) ) {
 			new Mai_Publisher_Ad_Block;

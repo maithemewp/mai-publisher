@@ -426,7 +426,7 @@ class Mai_Publisher_Settings {
 		$selected = maipub_get_option( 'ad_mode' );
 
 		echo '<select name="mai_publisher[ad_mode]">';
-			printf( '<option value="">%s</option>', __( 'Active', 'mai-publisher' ) );
+			printf( '<option value="active">%s</option>', __( 'Active', 'mai-publisher' ) );
 			printf( '<option value="disabled"%s>%s</option>', selected( $selected, 'disabled' ), __( 'Disabled', 'mai-publisher' ) );
 			printf( '<option value="demo"%s>%s</option>', selected( $selected, 'demo' ), __( 'Demo', 'mai-publisher' ) );
 		echo '</select>';

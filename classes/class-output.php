@@ -53,6 +53,7 @@ class Mai_Publisher_Output {
 			return;
 		}
 
+		$this->mode          = maipub_get_option( 'ad_mode' );
 		$this->domain        = (string) maipub_get_option( 'gam_domain' );
 		$this->network_code  = (string) maipub_get_option( 'gam_network_code' );
 		$this->domain_hashed = (string) maipub_get_option( 'gam_hashed_domain' );
@@ -62,7 +63,6 @@ class Mai_Publisher_Output {
 		$this->ads           = maipub_get_page_ads();
 		$this->grouped       = $this->get_grouped_ads( $this->ads );
 		$this->gam           = [];
-		$this->mode          = maipub_get_option( 'ad_mode', false );
 		$this->suffix        = maipub_get_suffix();
 
 		// Bail if disabled. Not checking `$this->ads` because there may be manual ads in the content.
@@ -184,8 +184,8 @@ class Mai_Publisher_Output {
 			$ad_unit->setAttribute( 'data-content-name', $name );
 			$ad_unit->setAttribute( 'data-track-content', '' );
 
-			// If ads are active. Mode is empty when active. Values would be 'demo' or 'disabled'.
-			if ( ! $this->mode ) {
+			// If ads are active.
+			if ( 'active' === $this->mode ) {
 				// Add to gam array.
 				$this->gam[ $slot ] = [
 					'id'           => $unit,
