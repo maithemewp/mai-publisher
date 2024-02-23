@@ -1,9 +1,9 @@
 .heading-tab {
-	--heading-tab-border-color: rgba(0, 0, 0, 0.1);
+	--heading-tab-border-color: rgba(0, 0, 0, 0.2);
 	display: flex;
 	justify-content: start;
 	align-items: end;
-	margin-top: 48px;
+	margin: 56px 0 24px;
 }
 
 .heading-tab:before,

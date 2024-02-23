@@ -706,7 +706,7 @@ class Mai_Publisher_Settings {
 			printf( '<span style="margin-left:8px;color:%s;">%s</span>', $color, $text );
 		}
 
-		printf( '<p class="description">%s</p>', __( 'Select the API to use for fetching post views. If Matomo is used, it must be enabled and connected above. If Jetpack is used, Jetpack and the Stats module must both be active.', 'mai-publisher' ) );
+		printf( '<p class="description">%s</p>', __( 'Select the API to use for fetching post views. If Matomo is used, it must be enabled and connected in the Analytics settings. If Jetpack is used, Jetpack and the Stats module must both be active.', 'mai-publisher' ) );
 
 	}
 
@@ -780,7 +780,7 @@ class Mai_Publisher_Settings {
 	 * @return void
 	 */
 	function header_callback() {
-		printf( '<textarea name="mai_publisher[header]" id="header" rows="8" style="width:100%%;max-width:600px">%s</textarea>', maipub_get_option( 'header' ) );
+		printf( '<textarea name="mai_publisher[header]" id="header" rows="16" style="width:100%%;max-width:600px">%s</textarea>', maipub_get_option( 'header' ) );
 	}
 
 	/**
@@ -791,7 +791,7 @@ class Mai_Publisher_Settings {
 	 * @return void
 	 */
 	function footer_callback() {
-		printf( '<textarea name="mai_publisher[footer]" id="footer" rows="8" style="width:100%%;max-width:600px">%s</textarea>', maipub_get_option( 'footer' ) );
+		printf( '<textarea name="mai_publisher[footer]" id="footer" rows="16" style="width:100%%;max-width:600px">%s</textarea>', maipub_get_option( 'footer' ) );
 	}
 
 	/**
