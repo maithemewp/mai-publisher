@@ -67,9 +67,14 @@ class Mai_Publisher_Settings {
 		wp_enqueue_style( 'mai-publisher-select2', 'https://cdn.jsdelivr.net/npm/select2/dist/css/select2.min.css' );
 		wp_enqueue_script( 'mai-publisher-select2', 'https://cdn.jsdelivr.net/npm/select2/dist/js/select2.min.js' );
 
+		// Get files.
 		$suffix = maipub_get_suffix();
-		$file   = "assets/js/mai-publisher-settings{$suffix}.js";
-		wp_enqueue_script( 'mai-publisher-settings', maipub_get_file_data( $file, 'url' ), [ 'jquery', 'mai-publisher-select2' ], maipub_get_file_data( $file, 'version' ), [ 'in_footer' => true ] );
+		$css    = "assets/css/mai-publisher-settings{$suffix}.css";
+		$js     = "assets/js/mai-publisher-settings{$suffix}.js";
+
+		// Enqueue.
+		wp_enqueue_style( 'mai-publisher-settings', maipub_get_file_data( $css, 'url' ), [], maipub_get_file_data( $css, 'version' ) );
+		wp_enqueue_script( 'mai-publisher-settings', maipub_get_file_data( $js, 'url' ), [ 'jquery', 'mai-publisher-select2' ], maipub_get_file_data( $js, 'version' ), [ 'in_footer' => true ] );
 	}
 
 	/**
@@ -399,20 +404,20 @@ class Mai_Publisher_Settings {
 	 * @return string
 	 */
 	function maipub_section_info() {
-		printf( '<h3 style="margin-top:48px;">%s</h3>', __( 'Ads', 'mai-publisher' ) );
+		printf( '<h3 class="heading-tab"><span class="heading-tab__text">%s</span></h3>', __( 'Ads', 'mai-publisher' ) );
 	}
 
 	function maipub_section_matomo() {
-		printf( '<h3 style="margin-top:48px;">%s</h3>', __( 'Analytics', 'mai-publisher' ) );
+		printf( '<h3 class="heading-tab"><span class="heading-tab__text">%s</span></h3>', __( 'Analytics', 'mai-publisher' ) );
 	}
 
 	function maipub_section_scripts() {
-		printf( '<h3 style="margin-top:48px;">%s</h3>', __( 'Scripts', 'mai-publisher' ) );
+		printf( '<h3 class="heading-tab"><span class="heading-tab__text">%s</span></h3>', __( 'Scripts', 'mai-publisher' ) );
 		printf( '<p>%s</p>', __( 'Scripts are only output in the header and footer if ad mode is active or demo.', 'mai-publisher' ) );
 	}
 
 	function maipub_section_views() {
-		printf( '<h3 style="margin-top:48px;">%s</h3>', __( 'Views', 'mai-publisher' ) );
+		printf( '<h3 class="heading-tab"><span class="heading-tab__text">%s</span></h3>', __( 'Views', 'mai-publisher' ) );
 	}
 
 	/**
