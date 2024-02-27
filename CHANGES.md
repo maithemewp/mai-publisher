@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.6.1 (2/27/24)
+* Added: After footer location was added to Single Content and Content Archives settings.
+
 ## 1.6.0 (2/23/24)
 * Added: New `leaderboard-small` ad unit size.
 * Added: New `mai_publisher_header_scripts` header scripts filter.
