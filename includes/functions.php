@@ -315,6 +315,7 @@ function maipub_get_location_choices( $type = '' ) {
 			'before_sidebar_content' => __( 'Before sidebar content', 'mai-publisher' ),
 			'after_sidebar_content'  => __( 'After sidebar content', 'mai-publisher' ),
 			'before_footer'          => __( 'Before footer', 'mai-publisher' ),
+			'after_footer'           => __( 'After footer', 'mai-publisher' ),
 		],
 		'archive' => [
 			''                       => __( 'None (inactive)', 'mai-publisher' ),
@@ -326,6 +327,7 @@ function maipub_get_location_choices( $type = '' ) {
 			'before_sidebar_content' => __( 'Before sidebar content', 'mai-publisher' ),
 			'after_sidebar_content'  => __( 'After sidebar content', 'mai-publisher' ),
 			'before_footer'          => __( 'Before footer', 'mai-publisher' ),
+			'after_footer'           => __( 'After footer', 'mai-publisher' ),
 		],
 	];
 
