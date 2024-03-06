@@ -296,6 +296,7 @@ function maiPubDefineSlot( slug ) {
 	googletag.cmd.push(() => {
 		// Define slot ID.
 		const slotId = gamBase + ads[slug]['id'];
+
 		// Define ad slot. googletag.defineSlot( "/1234567/sports", [728, 90], "div-1" );
 		const slot = googletag.defineSlot( slotId, ads[slug].sizes, 'mai-ad-' + slug );
 
@@ -404,7 +405,7 @@ function maiPubDisplaySlots( slots ) {
 				slots: uadSlots,
 				timeout: 2e3,
 				params: {
-					adRefresh: '1',
+					adRefresh: '1', // Must be string.
 				}
 			}, function( bids ) {
 				// Set apstag bids, then trigger the first request to GAM.
