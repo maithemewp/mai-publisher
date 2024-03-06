@@ -4,6 +4,7 @@
 defined( 'ABSPATH' ) || die;
 
 class Mai_Publisher_Output {
+	protected $bb_network_code;
 	protected $domain;
 	protected $network_code;
 	protected $domain_hashed;
@@ -53,17 +54,18 @@ class Mai_Publisher_Output {
 			return;
 		}
 
-		$this->mode          = maipub_get_option( 'ad_mode' );
-		$this->domain        = (string) maipub_get_option( 'gam_domain' );
-		$this->network_code  = (string) maipub_get_option( 'gam_network_code' );
-		$this->domain_hashed = (string) maipub_get_option( 'gam_hashed_domain' );
-		$this->sellers_name  = (string) maipub_get_option( 'gam_sellers_name' );
-		$this->sellers_id    = (string) maipub_get_option( 'gam_sellers_id' );
-		$this->locations     = maipub_get_locations();
-		$this->ads           = maipub_get_page_ads();
-		$this->grouped       = $this->get_grouped_ads( $this->ads );
-		$this->gam           = [];
-		$this->suffix        = maipub_get_suffix();
+		$this->mode            = maipub_get_option( 'ad_mode' );
+		$this->bb_network_code = '23001026477';
+		$this->domain          = (string) maipub_get_option( 'gam_domain' );
+		$this->network_code    = (string) maipub_get_option( 'gam_network_code' );
+		$this->domain_hashed   = (string) maipub_get_option( 'gam_hashed_domain' );
+		$this->sellers_name    = (string) maipub_get_option( 'gam_sellers_name' );
+		$this->sellers_id      = (string) maipub_get_option( 'gam_sellers_id' );
+		$this->locations       = maipub_get_locations();
+		$this->ads             = maipub_get_page_ads();
+		$this->grouped         = $this->get_grouped_ads( $this->ads );
+		$this->gam             = [];
+		$this->suffix          = maipub_get_suffix();
 
 		// Bail if disabled. Not checking `$this->ads` because there may be manual ads in the content.
 		if ( 'disabled' === $this->mode ) {
@@ -303,9 +305,10 @@ class Mai_Publisher_Output {
 			if ( defined( 'MAI_PUBLISHER_DISABLE_MCM' ) && MAI_PUBLISHER_DISABLE_MCM && $this->network_code ) {
 				$gam_base = "/$this->network_code";
 			} else {
-				$gam_base = '/23001026477';
+				$gam_base = "/$this->bb_network_code";
 
-				if ( $this->network_code ) {
+				// Add network code if it's not the same. If this is a parent/owned site, it will be the same code.
+				if ( $this->network_code && $this->network_code !== $this->bb_network_code ) {
 					$gam_base .= ",$this->network_code";
 				}
 			}
