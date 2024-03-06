@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.6.2 (3/6/24)
+* Fixed: Only show the parent network code when the child code is the same. This is for owned domains.
+
 ## 1.6.1 (2/27/24)
 * Added: After footer location was added to Single Content and Content Archives settings.
 
