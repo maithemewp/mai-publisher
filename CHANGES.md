@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.6.3 (3/15/24)
+* Fixed: Mai Publisher settings showing above default block settings on Mai Term Grid.
+
 ## 1.6.2 (3/6/24)
 * Fixed: Only show the parent network code when the child code is the same. This is for owned domains.
 

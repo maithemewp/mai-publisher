@@ -490,7 +490,8 @@ class Mai_Publisher_Entries {
 						],
 					],
 				],
-				'active' => true,
+				'menu_order' => 10,
+				'active'     => true,
 			]
 		);
 	}
