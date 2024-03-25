@@ -292,8 +292,11 @@ document.addEventListener( 'DOMContentLoaded', function() {
 			// Get the height of the first sibling with .entry class
 			let firstEntryHeight = firstEntry.offsetHeight;
 
-			// Set the min-height of the .maipub-entry element to the height of the first sibling with .entry class.
-			maiPubEntry.style.minHeight = firstEntryHeight + 'px';
+			// Get the higher value of 90 or firstEntryHeight.
+			firstEntryHeight = Math.max( 90, firstEntryHeight );
+
+			// Set the min-height of the .maipub-entry element to the height of the first sibling with .entry class. Must be at least 90.
+			maiPubEntry.style.minHeight = Math.max( 90, firstEntryHeight ) + 'px';
 		});
 
 		// Select all ad units.
