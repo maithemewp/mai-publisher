@@ -141,7 +141,7 @@ class Mai_Publisher_Entries {
 		// Get file (with suffix) and add it after the existing content.
 		$suffix   = maipub_get_suffix();
 		$file     = "assets/css/mai-engine-entries{$suffix}.css";
-		$content .= sprintf( '<link href="%s" rel="stylesheet">', maipub_get_file_data( $file, 'url' ) );
+		$content .= sprintf( '<link href="%s&ver=%s" rel="stylesheet">', maipub_get_file_data( $file, 'url' ), maipub_get_file_data( $file, 'version' ) );
 
 		return $content;
 	}
