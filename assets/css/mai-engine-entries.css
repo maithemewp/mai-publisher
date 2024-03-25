@@ -7,6 +7,11 @@
 	--mai-ad-unit-aspect-ratio: var(--aspect-ratio);
 }
 
+.maipub-entry:not(.entry) {
+	--entry-display: grid;
+	--align-text-vertical: center;
+}
+
 .maipub-entry.entry {
 	--entry-display: block;
 }
