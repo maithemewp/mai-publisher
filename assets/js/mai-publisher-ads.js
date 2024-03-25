@@ -221,6 +221,7 @@ document.addEventListener( 'DOMContentLoaded', function() {
 
 			// Define and display all slots in view.
 			maiPubDisplaySlots( toLoad.map( slug => maiPubDefineSlot( slug ) ) );
+
 			// Clear toLoad array.
 			toLoad = [];
 		}
