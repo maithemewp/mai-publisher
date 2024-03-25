@@ -8,8 +8,8 @@
 }
 
 .maipub-entry:not(.entry) {
-	--entry-display: grid;
-	--align-text-vertical: center;
+	display: grid;
+	align-items: center;
 }
 
 .maipub-entry.entry {
