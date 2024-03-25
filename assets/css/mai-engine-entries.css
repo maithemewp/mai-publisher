@@ -34,12 +34,3 @@
 		--maipub-row: var(--maipub-row-lg);
 	}
 }
-
-.mai-ad-unit-container::before {
-    display: block;
-    width: 1px;
-    margin-left: -1px;
-    padding-bottom: calc(var(--entry-image-link-max-width)/(var(--mai-ad-unit-aspect-ratio)));
-    content: "";
-    --mai-ad-unit-aspect-ratio: var(--aspect-ratio);
-}
