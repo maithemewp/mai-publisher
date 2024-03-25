@@ -55,6 +55,10 @@
 	flex: 1 1 100%;
 }
 
+.mai-ad-unit-container.mai-ad-unit-native::before {
+	display: none;
+}
+
 .mai-ad-unit[data-unit="native"] {
 	width: 100%;
 }

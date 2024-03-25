@@ -207,6 +207,24 @@ document.addEventListener( 'DOMContentLoaded', function() {
 		let initialLoad = true;
 		let toLoad      = [];
 
+		// Function to process slots.
+		function processSlots() {
+			// If no slots to load, bail.
+			if ( ! toLoad.length ) {
+				return;
+			}
+
+			// If debugging, log.
+			if ( debug ) {
+				console.log( 'processing slots', toLoad );
+			}
+
+			// Define and display all slots in view.
+			maiPubDisplaySlots( toLoad.map( slug => maiPubDefineSlot( slug ) ) );
+			// Clear toLoad array.
+			toLoad = [];
+		}
+
 		// Create the IntersectionObserver.
 		const observer = new IntersectionObserver( (entries, observer) => {
 			// Loop through the entries.
@@ -262,23 +280,20 @@ document.addEventListener( 'DOMContentLoaded', function() {
 			threshold: 0 // No threshold needed
 		});
 
-		// Function to process slots.
-		function processSlots() {
-			// If no slots to load, bail.
-			if ( ! toLoad.length ) {
-				return;
-			}
+		// Select all .maipub-entry elements.
+		const maiPubEntries = document.querySelectorAll( '.maipub-entry' );
 
-			// If debugging, log.
-			if ( debug ) {
-				console.log( 'processing slots', toLoad );
-			}
+		// Loop through each .maipub-entry element.
+		maiPubEntries.forEach( maiPubEntry => {
+			// Find the first sibling element with the class .entry
+			let firstEntry = maiPubEntry.parentElement.querySelector( '.entry:first-of-type' );
 
-			// Define and display all slots in view.
-			maiPubDisplaySlots( toLoad.map( slug => maiPubDefineSlot( slug ) ) );
-			// Clear toLoad array.
-			toLoad = [];
-		}
+			// Get the height of the first sibling with .entry class
+			let firstEntryHeight = firstEntry.offsetHeight;
+
+			// Set the min-height of the .maipub-entry element to the height of the first sibling with .entry class.
+			maiPubEntry.style.minHeight = firstEntryHeight + 'px';
+		});
 
 		// Select all ad units.
 		const adUnits = document.querySelectorAll( '.mai-ad-unit:not([data-ap="atf"])' );
