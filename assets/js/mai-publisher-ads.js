@@ -26,7 +26,7 @@ const { adSlotsATF, adSlotsBTF } = Object.entries(ads).reduce( ( acc, [ key, val
 
 // If debugging, log.
 if ( debug ) {
-	console.log( 'v25', 'debug:', debug );
+	console.log( 'v37', 'debug:', debug );
 }
 
 // Add to googletag items.
@@ -34,10 +34,9 @@ googletag.cmd.push(() => {
 	/**
 	 * Set SafeFrame -- This setting will only take effect for subsequent ad requests made for the respective slots.
 	 * To enable cross domain rendering for all creatives, execute setForceSafeFrame before loading any ad slots.
-	 *
-	 * UAM breaks when this is true.
 	 */
-	googletag.pubads().setForceSafeFrame( ! maiPubAdsVars.amazonUAM );
+	// Disabled for now: https://developers.google.com/publisher-tag/reference#googletag.PubAdsService_setForceSafeFrame
+	// googletag.pubads().setForceSafeFrame( true );
 
 	// Loop through ATF ads. The `slug` key is the incremented id like "incontent-2", etc.
 	Object.keys( adSlotsATF ).forEach( slug => {
@@ -292,6 +291,9 @@ document.addEventListener( 'DOMContentLoaded', function() {
 			// Get the height of the first sibling with .entry class
 			let firstEntryHeight = firstEntry.offsetHeight;
 
+			// TODO: Is this necessary? This was a test to see if min-height affected native ad load.
+			// Leaving for now.
+
 			// Get the higher value of 90 or firstEntryHeight.
 			firstEntryHeight = Math.max( 90, firstEntryHeight );
 
@@ -327,6 +329,17 @@ function maiPubDefineSlot( slug ) {
 		// Add slot to our array.
 		adSlotIds.push( slotId );
 		adSlots.push( slot );
+
+		// If amazon is enalbed and ads[slug].sizes only contains a single size named 'fluid'.
+		if ( maiPubAdsVars.amazonUAM && 1 === ads[slug].sizes.length && 'fluid' === ads[slug].sizes[0] ) {
+			// If debugging, log.
+			if ( debug ) {
+				console.log( 'disabled safeframe: ', slot.getSlotElementId() );
+			}
+
+			// Disabled SafeFrame for this slot.
+			slot.setForceSafeFrame( false );
+		}
 
 		// Set refresh targeting.
 		slot.setTargeting( refreshKey, refreshValue );
@@ -366,6 +379,21 @@ function maiPubDefineSlot( slug ) {
 }
 
 /**
+ * Refreshes slots.
+ *
+ * @param {array} slots The defined slots.
+ */
+function maiPubRefreshSlots( slots ) {
+	googletag.cmd.push(() => {
+		if ( maiPubAdsVars.amazonUAM ) {
+			apstag.setDisplayBids();
+		}
+
+		googletag.pubads().refresh( slots );
+	});
+}
+
+/**
  * Initial display of slots.
  *
  * @param {array} slots The defined slots.
@@ -376,6 +404,26 @@ function maiPubDisplaySlots( slots ) {
 		// Handle Amazon UAM bids.
 		if ( maiPubAdsVars.amazonUAM ) {
 			const uadSlots = [];
+
+			// Loop through slots.
+			slots.forEach( slot => {
+				// Get slug from slot ID.
+				const slug = slot.getSlotElementId().replace( 'mai-ad-', '' );
+
+				// Skip if ads[slug].sizes only contains a single size named 'fluid'. This was throwing an error in amazon.
+				if ( 1 === ads[slug].sizes.length && 'fluid' === ads[slug].sizes[0] ) {
+					// Remove from slots array and skip.
+					// delete slots[slug];
+					return;
+				}
+
+				// Add slot to array for UAD.
+				uadSlots.push({
+					slotID: 'mai-ad-' + slug,
+					slotName: gamBase + ads[slug]['id'],
+					sizes: ads[slug].sizes,
+				});
+			});
 
 			// Initialize apstag and have apstag set bids on the googletag slots when they are returned to the page.
 			apstag.init({
@@ -399,45 +447,26 @@ function maiPubDisplaySlots( slots ) {
 				}
 			});
 
-			// Loop through slots.
-			slots.forEach( slot => {
-				// Get slug from slot ID.
-				const slug = slot.getSlotElementId().replace( 'mai-ad-', '' );
+			// If we have uadSlots.
+			if ( uadSlots.length ) {
 
-				// Skip if ads[slug].sizes only contains a single size named 'fluid'. This was throwing an error in amazon.
-				if ( 1 === ads[slug].sizes.length && 'fluid' === ads[slug].sizes[0] ) {
-					// Remove from slots array and skip.
-					delete slots[slug];
-					return;
-				}
-
-				// Add slot to array for UAD.
-				uadSlots.push({
-					slotID: 'mai-ad-' + slug,
-					slotName: gamBase + ads[slug]['id'],
-					sizes: ads[slug].sizes,
-				});
-			});
-
-			// Bail if no uadSlots.
-			if ( ! uadSlots.length ) {
-				return;
-			}
-
-			// Fetch bids from Amazon UAM using apstag.
-			apstag.fetchBids({
-				slots: uadSlots,
-				timeout: 2e3,
-				params: {
-					adRefresh: '1', // Must be string.
-				}
-			}, function( bids ) {
-				// Set apstag bids, then trigger the first request to GAM.
-				googletag.cmd.push(function() {
+				// Fetch bids from Amazon UAM using apstag.
+				apstag.fetchBids({
+					slots: uadSlots,
+					timeout: 2e3,
+					params: {
+						adRefresh: '1', // Must be string.
+					}
+				}, function( bids ) {
+					// Set apstag bids, then trigger the first request to GAM.
 					apstag.setDisplayBids();
 					googletag.pubads().refresh( slots );
 				});
-			});
+			}
+			// No UAD, but we have others.
+			else if ( slots.length ) {
+				googletag.pubads().refresh( slots );
+			}
 		}
 		// Standard GAM.
 		else {
@@ -448,20 +477,5 @@ function maiPubDisplaySlots( slots ) {
 
 			googletag.pubads().refresh( slots );
 		}
-	});
-}
-
-/**
- * Refreshes slots.
- *
- * @param {array} slots The defined slots.
- */
-function maiPubRefreshSlots( slots ) {
-	googletag.cmd.push(() => {
-		if ( maiPubAdsVars.amazonUAM ) {
-			apstag.setDisplayBids();
-		}
-
-		googletag.pubads().refresh( slots );
 	});
 }
