@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.4 (3/29/24)
+* Changed: Vertically center native ads when not boxed in Mai Post Grid.
+* Fixed: Aspect ratio not working correctly on Mai Post Grid ads.
+* Fixed: Enabling Amazon ads was breaking native/fluid ads.
+
 ## 1.6.3 (3/15/24)
 * Fixed: Mai Publisher settings showing above default block settings on Mai Term Grid.
 
