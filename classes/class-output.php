@@ -87,8 +87,8 @@ class Mai_Publisher_Output {
 			return;
 		}
 
-		// Bail if no ads.
-		if ( ! $this->ads ) {
+		// Bail if disabled. Not checking `$this->ads` because there may be manual ads in the content.
+		if ( 'disabled' === $this->mode ) {
 			return;
 		}
 
@@ -336,7 +336,15 @@ class Mai_Publisher_Output {
 	 * @return void
 	 */
 	function handle_content() {
-		$content  = $this->xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " entry-content-single ")]' )->item(0);
+		$expression = '//div[contains(concat(" ", normalize-space(@class), " "), " entry-content-single ")]';
+
+		// If LearnDash post type.
+		if ( class_exists( 'SFWD_LMS' ) && function_exists( 'learndash_get_post_types' ) && is_singular( learndash_get_post_types() ) ) {
+			$expression = '//div[contains(concat(" ", normalize-space(@class), " "), " ld-tab-content ")]';
+		}
+
+		// Set vars.
+		$content  = $this->xpath->query( $expression )->item(0);
 		$children = $content ? $content->childNodes : [];
 		$tags     = [];
 
