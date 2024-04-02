@@ -1,4 +1,10 @@
 *.log
+*.lock
 .DS_Store
-.AppleDouble
-.LSOverride
+LICENSE
+*test*
+/vendor/*
+!/vendor/matomo/
+!/vendor/matomo/matomo-php-tracker/
+!/vendor/yahnis-elsts/
+!/vendor/yahnis-elsts/plugin-update-checker/

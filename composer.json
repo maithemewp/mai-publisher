@@ -2,5 +2,8 @@
     "require": {
         "yahnis-elsts/plugin-update-checker": "^5",
         "matomo/matomo-php-tracker": "^3.2"
+    },
+    "require-dev": {
+        "spatie/ray": "^1.41"
     }
 }
