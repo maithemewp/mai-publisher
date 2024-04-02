@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.5 (4/2/24)
+* Added: Better support for in content ads on LearnDash content pages.
+* Added: Spatie Ray for local/dev debugging before the WordPress plugin is loaded.
+
 ## 1.6.4 (3/29/24)
 * Changed: Vertically center native ads when not boxed in Mai Post Grid.
 * Fixed: Aspect ratio not working correctly on Mai Post Grid ads.
