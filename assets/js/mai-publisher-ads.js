@@ -26,7 +26,7 @@ const { adSlotsATF, adSlotsBTF } = Object.entries(ads).reduce( ( acc, [ key, val
 
 // If debugging, log.
 if ( debug ) {
-	console.log( 'v37', 'debug:', debug );
+	console.log( 'v42', 'debug:', debug );
 }
 
 // Add to googletag items.
@@ -449,7 +449,6 @@ function maiPubDisplaySlots( slots ) {
 
 			// If we have uadSlots.
 			if ( uadSlots.length ) {
-
 				// Fetch bids from Amazon UAM using apstag.
 				apstag.fetchBids({
 					slots: uadSlots,
