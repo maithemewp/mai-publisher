@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.6.5.1 (4/3/24)
+* Fixed: Error trying to load dev dependencies on production sites.
+
 ## 1.6.5 (4/2/24)
 * Added: Better support for in content ads on LearnDash content pages.
 * Added: Spatie Ray for local/dev debugging before the WordPress plugin is loaded.
