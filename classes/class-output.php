@@ -910,7 +910,7 @@ class Mai_Publisher_Output {
 				config: {
 					accountId: 1970,
 					baseEndpoint: "https://cdn.privacy-mgmt.com",
-					propertyId: "' . $this->sourcepoint_id . '",
+					propertyId: ' . (string) $this->sourcepoint_id . ',
 					usnat: { includeUspApi: true },
 					gdpr: { },
 					events: {
