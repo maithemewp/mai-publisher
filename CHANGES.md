@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.6.6 (4/5/24)
+* Added: Integrates Sourcepoint.
+
 ## 1.6.5.1 (4/3/24)
 * Fixed: Error trying to load dev dependencies on production sites.
 
