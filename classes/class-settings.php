@@ -231,6 +231,22 @@ class Mai_Publisher_Settings {
 		);
 
 		add_settings_field(
+			'sourcepoint_msps_message_id', // id
+			__( 'Sourcepoint MSPS Message ID', 'mai-publisher' ), // title
+			[ $this, 'sourcepoint_msps_message_id_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings' // section
+		);
+
+		add_settings_field(
+			'sourcepoint_tcf_message_id', // id
+			__( 'Sourcepoint TCF Message ID', 'mai-publisher' ), // title
+			[ $this, 'sourcepoint_tcf_message_id_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings' // section
+		);
+
+		add_settings_field(
 			'category', // id
 			__( 'Sitewide Category', 'mai-publisher' ), // title
 			[ $this, 'category_callback' ], // callback
@@ -365,29 +381,31 @@ class Mai_Publisher_Settings {
 	 */
 	function maipub_sanitize( $input ) {
 		$allowed = [
-			'ad_mode'                 => 'sanitize_text_field',
-			'gam_domain'              => 'maipub_get_url_host',
-			'gam_network_code'        => 'absint',
-			'gam_hashed_domain'       => 'sanitize_text_field',
-			'gam_sellers_id'          => 'sanitize_text_field',
-			'gam_sellers_name'        => 'sanitize_text_field',
-			'gam_targets'             => 'sanitize_text_field',
-			'sourcepoint_property_id' => 'absint',
-			'category'                => 'sanitize_text_field',
-			'amazon_uam_enabled'      => 'rest_sanitize_boolean',
-			'matomo_enabled_global'   => 'rest_sanitize_boolean',
-			'matomo_enabled'          => 'rest_sanitize_boolean',
-			'matomo_enabled_backend'  => 'rest_sanitize_boolean',
-			'matomo_url'              => 'trailingslashit',
-			'matomo_site_id'          => 'absint',
-			'matomo_token'            => 'sanitize_text_field',
-			'views_api'               => 'sanitize_text_field',
-			'views_years'             => 'absint',
-			'trending_days'           => 'absint',
-			'views_interval'          => 'absint',
-			'ad_label'                => 'sanitize_text_field',
-			'header'                  => 'trim',
-			'footer'                  => 'trim',
+			'ad_mode'                     => 'sanitize_text_field',
+			'gam_domain'                  => 'maipub_get_url_host',
+			'gam_network_code'            => 'absint',
+			'gam_hashed_domain'           => 'sanitize_text_field',
+			'gam_sellers_id'              => 'sanitize_text_field',
+			'gam_sellers_name'            => 'sanitize_text_field',
+			'gam_targets'                 => 'sanitize_text_field',
+			'sourcepoint_property_id'     => 'absint',
+			'sourcepoint_msps_message_id' => 'absint',
+			'sourcepoint_tcf_message_id'  => 'absint',
+			'category'                    => 'sanitize_text_field',
+			'amazon_uam_enabled'          => 'rest_sanitize_boolean',
+			'matomo_enabled_global'       => 'rest_sanitize_boolean',
+			'matomo_enabled'              => 'rest_sanitize_boolean',
+			'matomo_enabled_backend'      => 'rest_sanitize_boolean',
+			'matomo_url'                  => 'trailingslashit',
+			'matomo_site_id'              => 'absint',
+			'matomo_token'                => 'sanitize_text_field',
+			'views_api'                   => 'sanitize_text_field',
+			'views_years'                 => 'absint',
+			'trending_days'               => 'absint',
+			'views_interval'              => 'absint',
+			'ad_label'                    => 'sanitize_text_field',
+			'header'                      => 'trim',
+			'footer'                      => 'trim',
 		];
 
 		// Get an array of matching keys from $input.
@@ -539,10 +557,38 @@ class Mai_Publisher_Settings {
 	 * @return void
 	 */
 	function sourcepoint_property_id_callback() {
-		$property_id  = maipub_get_option( 'sourcepoint_property_id', false );
+		$id  = maipub_get_option( 'sourcepoint_property_id', false );
 
-		printf( '<input class="regular-text" type="text" name="mai_publisher[sourcepoint_property_id]" id="sourcepoint_property_id" value="%s">', $property_id );
+		printf( '<input class="regular-text" type="text" name="mai_publisher[sourcepoint_property_id]" id="sourcepoint_property_id" value="%s">', $id );
 		printf( '<p class="description">%s</p>', __( 'Adding a property ID here will automatically load the Sourcepoint scripts on pages with ads.', 'mai-publisher' ) );
+	}
+
+	/**
+	 * Setting callback.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	function sourcepoint_msps_message_id_callback() {
+		$id  = maipub_get_option( 'sourcepoint_msps_message_id', false );
+
+		printf( '<input class="regular-text" type="text" name="mai_publisher[sourcepoint_msps_message_id]" id="sourcepoint_msps_message_id" value="%s">', $id );
+		// printf( '<p class="description">%s</p>', __( 'Adding a property ID here will automatically load the Sourcepoint scripts on pages with ads.', 'mai-publisher' ) );
+	}
+
+	/**
+	 * Setting callback.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	function sourcepoint_tcf_message_id_callback() {
+		$id  = maipub_get_option( 'sourcepoint_tcf_message_id', false );
+
+		printf( '<input class="regular-text" type="text" name="mai_publisher[sourcepoint_tcf_message_id]" id="sourcepoint_tcf_message_id" value="%s">', $id );
+		// printf( '<p class="description">%s</p>', __( 'Adding a property ID here will automatically load the Sourcepoint scripts on pages with ads.', 'mai-publisher' ) );
 	}
 
 	/**

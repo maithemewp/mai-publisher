@@ -10,7 +10,9 @@ class Mai_Publisher_Output {
 	protected $domain_hashed;
 	protected $sellers_name;
 	protected $sellers_id;
-	protected $sourcepoint_id;
+	protected $sp_property_id;
+	protected $sp_tcf_id;
+	protected $sp_msps_id;
 	protected $locations;
 	protected $ads;
 	protected $grouped;
@@ -62,7 +64,9 @@ class Mai_Publisher_Output {
 		$this->domain_hashed   = (string) maipub_get_option( 'gam_hashed_domain' );
 		$this->sellers_name    = (string) maipub_get_option( 'gam_sellers_name' );
 		$this->sellers_id      = (string) maipub_get_option( 'gam_sellers_id' );
-		$this->sourcepoint_id  = (int) maipub_get_option( 'sourcepoint_property_id' );
+		$this->sp_property_id  = (int) maipub_get_option( 'sourcepoint_property_id' );
+		$this->sp_msps_id      = (int) maipub_get_option( 'sourcepoint_msps_message_id' );
+		$this->sp_tcf_id       = (int) maipub_get_option( 'sourcepoint_tcf_message_id' );
 		$this->locations       = maipub_get_locations();
 		$this->ads             = maipub_get_page_ads();
 		$this->grouped         = $this->get_grouped_ads( $this->ads );
@@ -275,8 +279,8 @@ class Mai_Publisher_Output {
 				'amazonUAM'   => maipub_get_option( 'amazon_uam_enabled' ),
 			];
 
-			// Add sourcepoint ID.
-			if ( $this->sourcepoint_id ) {
+			// If sourcepoint data.
+			if ( $this->sp_property_id && $this->sp_msps_id && $this->sp_tcf_id ) {
 				// Add sourcepoint scripts.
 				$scripts = array_merge( $scripts, $this->get_sourcepoint_scripts() );
 			}
@@ -910,7 +914,7 @@ class Mai_Publisher_Output {
 				config: {
 					accountId: 1970,
 					baseEndpoint: "https://cdn.privacy-mgmt.com",
-					propertyId: ' . (string) $this->sourcepoint_id . ',
+					propertyId: ' . (string) $this->sp_property_id . ',
 					usnat: { includeUspApi: true },
 					gdpr: { },
 					events: {
@@ -942,7 +946,7 @@ class Mai_Publisher_Output {
 								document.getElementById("pmLink").style.visibility="visible";
 								document.getElementById("pmLink").innerHTML= "Do Not Sell/Share My Personal Information";
 								document.getElementById("pmLink").onclick= function(){
-									window._sp_.usnat.loadPrivacyManagerModal( "1107077" );
+									window._sp_.usnat.loadPrivacyManagerModal( "' . $this->sp_msps_id . '" );
 								}
 							}
 							if((message_type == "gdpr") && (info.applies)){
@@ -950,7 +954,7 @@ class Mai_Publisher_Output {
 								document.getElementById("pmLink").style.visibility="visible";
 								document.getElementById("pmLink").innerHTML= "Privacy Preferences";
 								document.getElementById("pmLink").onclick= function(){
-									window._sp_.gdpr.loadPrivacyManagerModal( "1107071" );
+									window._sp_.gdpr.loadPrivacyManagerModal( "' . $this->sp_tcf_id . '" );
 								}
 							}
 						},
