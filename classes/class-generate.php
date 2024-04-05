@@ -23,7 +23,7 @@ class Mai_Publisher_Generate_Ads {
 		add_action( 'load-edit.php',                         [ $this, 'admin_notice' ] );
 		add_action( 'load-edit.php',                         [ $this, 'admin_notice_success' ] );
 		add_filter( 'post_row_actions',                      [ $this, 'content_import_link' ], 10, 2);
-		add_action( 'admin_post_maipub_generate_ads_action', [ $this, 'action' ] );
+		add_action( 'admin_post_maipub_generate_ads_action', [ $this, 'post_action' ] );
 	}
 
 	/**
@@ -142,7 +142,7 @@ class Mai_Publisher_Generate_Ads {
 	 *
 	 * @return void
 	 */
-	function action() {
+	function post_action() {
 		$referrer = check_admin_referer( 'maipub_generate_ads_action', 'maipub_generate_ads_nonce' );
 		$nonce    = isset( $_GET[ 'maipub_generate_ads_nonce' ] ) ? esc_html( $_GET[ 'maipub_generate_ads_nonce' ] ) : null;
 		$action   = isset( $_GET[ 'action' ] ) ? esc_html( $_GET[ 'action' ] ) : null;
