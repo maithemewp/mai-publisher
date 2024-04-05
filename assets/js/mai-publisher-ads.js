@@ -7,7 +7,7 @@ const adSlots      = [];
 const immediate    = [];
 const gamBase      = maiPubAdsVars.gamBase;
 const refreshKey   = 'refresh';
-const refreshValue = true;
+const refreshValue = maiPubAdsVars.targets.refresh;
 const refreshTime  = 30; // Time in seconds.
 const debug        = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb');
 
