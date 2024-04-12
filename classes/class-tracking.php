@@ -4,8 +4,9 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 class Mai_Publisher_Tracking {
-	private $user              = null;
-	private $user_email        = null;
+	private $user;
+	private $user_id;
+	private $user_email;
 	private $site_dimensions   = [];
 	private $global_dimensions = [];
 
@@ -57,13 +58,15 @@ class Mai_Publisher_Tracking {
 	 * @return void
 	 */
 	function get_vars() {
-		$vars           = [];
-		$this->user     = wp_get_current_user();
-		$site_url       = maipub_get_option( 'matomo_url', false );
-		$site_id        = maipub_get_option( 'matomo_site_id', false );
-		$matomo_enabled = maipub_get_option( 'matomo_enabled', false );
-		$matomo_enabled = $matomo_enabled && $site_url && $site_id;
-		$analytics      = [];
+		$vars             = [];
+		$this->user       = wp_get_current_user();
+		$this->user_id    = $this->user ? $this->user->ID : 0;
+		$this->user_email = $this->user ? $this->user->user_email : '';
+		$site_url         = maipub_get_option( 'matomo_url', false );
+		$site_id          = maipub_get_option( 'matomo_site_id', false );
+		$matomo_enabled   = maipub_get_option( 'matomo_enabled', false );
+		$matomo_enabled   = $matomo_enabled && $site_url && $site_id;
+		$analytics        = [];
 
 		// Handle site tracking vars.
 		if ( $matomo_enabled ) {
@@ -75,10 +78,12 @@ class Mai_Publisher_Tracking {
 				'toPush' => [],
 			];
 
-			if ( $this->user->ID ) {
-				$analytics['toPush'][] = [ 'setUserId', $this->user->user_email ];
+			// If user email, set it as setUserId.
+			if ( $this->user_email ) {
+				$analytics['toPush'][] = [ 'setUserId', $this->user_email ];
 			}
 
+			// If dimensions, set them.
 			if ( $dimensions ) {
 				foreach ( $dimensions as $index => $value ) {
 					$analytics['toPush'][] = [ 'setCustomDimension', $index, $value ];
@@ -251,7 +256,7 @@ class Mai_Publisher_Tracking {
 		 * @return string
 		 */
 		$name  = '';
-		$group = apply_filters( 'mai_publisher_group_name', $name, $this->user->ID, $args );
+		$group = apply_filters( 'mai_publisher_group_name', $name, $this->user_id, $args );
 		$group = trim( esc_html( $group ) );
 
 		if ( ! $group ) {
@@ -394,7 +399,7 @@ class Mai_Publisher_Tracking {
 	 * @return array
 	 */
 	function set_membership_plan_ids( $args ) {
-		$plan_ids = $this->get_membership_plan_ids( $this->user->ID );
+		$plan_ids = $this->get_membership_plan_ids( $this->user_id );
 
 		// Handles plan IDs.
 		if ( $plan_ids ) {
@@ -449,7 +454,7 @@ class Mai_Publisher_Tracking {
 	 * @return array
 	 */
 	function set_user_taxonomies( $args ) {
-		$taxonomies = $this->get_user_taxonomies( $this->user->ID );
+		$taxonomies = $this->get_user_taxonomies( $this->user_id );
 
 		// If taxonomies.
 		if ( $taxonomies ) {
