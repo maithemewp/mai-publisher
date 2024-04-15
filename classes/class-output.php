@@ -649,8 +649,11 @@ class Mai_Publisher_Output {
 		// Modify state.
 		$libxml_previous_state = libxml_use_internal_errors( true );
 
-		// Encode.
-		$html = mb_encode_numericentity( $html, [0x80, 0x10FFFF, 0, ~0], 'UTF-8' );
+		// We don't need this here since it's running so late, all of the content
+		// should already be encoded.
+		// This was causing issues because it's converting ALL entities,
+		// including stuff in data-attributes, etc.
+		// $html = mb_encode_numericentity( $html, [0x80, 0x10FFFF, 0, ~0], 'UTF-8' );
 
 		// Load the content in the document HTML.
 		$dom->loadHTML( $html );
@@ -675,7 +678,12 @@ class Mai_Publisher_Output {
 	 */
 	function dom_html( $dom ) {
 		$html = $dom->saveHTML();
-		$html = mb_convert_encoding( $html, 'UTF-8', 'HTML-ENTITIES' );
+
+		// We don't need this here since it's running so late, all of the content
+		// should already be encoded.
+		// This was causing issues because it's converting ALL entities,
+		// including stuff in data-attributes, etc.
+		// $html = mb_convert_encoding( $html, 'UTF-8', 'HTML-ENTITIES' );
 
 		return $html;
 	}
