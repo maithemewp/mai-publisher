@@ -285,20 +285,26 @@ class Mai_Publisher_Output {
 				$scripts = array_merge( $scripts, $this->get_sourcepoint_scripts() );
 			}
 
-			// Get script data.
-			$file = "assets/js/mai-publisher-ads{$this->suffix}.js";
-			$gpt  = $this->xpath->query( '//script[contains(@src, "https://securepubads.g.doubleclick.net/tag/js/gpt.js")]' );
+			// Load GPT.
+			$load_gpt = apply_filters( 'mai_publisher_load_gpt', true );
 
-			// If we have gpt, remove it.
-			if ( $gpt->length ) {
-				foreach ( $gpt as $gptNode ) {
-					// Remove.
-					$gptNode->parentNode->removeChild( $gptNode );
+			// If loading GPT from Mai Publisher.
+			if ( $load_gpt ) {
+				// Get script data.
+				$file = "assets/js/mai-publisher-ads{$this->suffix}.js";
+				$gpt  = $this->xpath->query( '//script[contains(@src, "https://securepubads.g.doubleclick.net/tag/js/gpt.js")]' );
+
+				// If we have gpt, remove it.
+				if ( $gpt->length ) {
+					foreach ( $gpt as $gptNode ) {
+						// Remove.
+						$gptNode->parentNode->removeChild( $gptNode );
+					}
 				}
-			}
 
-			// Add GPT.
-			$scripts[] = '<script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>'; // Google Ad Manager GPT.
+				// Add GPT.
+				$scripts[] = '<script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>'; // Google Ad Manager GPT.
+			}
 
 			// Add mai-publisher-ads scripts.
 			$scripts[] = sprintf( '<script>/* <![CDATA[ */%svar maiPubAdsVars = %s;%s/* ]]> */</script>', PHP_EOL, wp_json_encode( $localize ), PHP_EOL );
