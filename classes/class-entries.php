@@ -6,7 +6,7 @@ defined( 'ABSPATH' ) || die;
 class Mai_Publisher_Entries {
 	protected $page_ads;
 	protected $archive_ads;
-	protected $index;
+	protected $indexes;
 
 	/**
 	 * Construct the class.
@@ -74,7 +74,7 @@ class Mai_Publisher_Entries {
 	 */
 	function add_attributes( $attr, $context, $args ) {
 		// Sets/resets index consecutive grids/entries.
-		$this->index = 0;
+		$this->indexes[ $this->get_hash( $args['params']['args'] ) ] = 0;
 
 		// Bail if not valid entries.
 		if ( ! $this->validate_args( $args ) ) {
@@ -268,13 +268,14 @@ class Mai_Publisher_Entries {
 		$class   = [];
 		$style   = [];
 		$compare = null;
+		$hash    = $this->get_hash( $args );
 
 		// Build atts.
 		switch ( $ad['content_item'] ) {
 			// Get desktop rows and round up.
 			case 'rows':
 				$class[] = 'maipub-row';
-				$per_row = $this->index / (int) $ad['columns']['lg'];
+				$per_row = $this->indexes[ $hash ] / (int) $ad['columns']['lg'];
 				$compare = absint( ceil( $per_row ) );
 				break;
 			// Entries compares to the number of entries.
@@ -287,7 +288,7 @@ class Mai_Publisher_Entries {
 					$class[] = 'entry'; // This adds styling for the entry in Mai.
 				}
 
-				$compare = $this->index;
+				$compare = $this->indexes[ $hash ];
 				break;
 		}
 
@@ -342,8 +343,25 @@ class Mai_Publisher_Entries {
 	 * @return void
 	 */
 	function increment_index( $entry, $args ) {
+		// Get hash and set index.
+		$hash                   = $this->get_hash( $args );
+		$this->indexes[ $hash ] = isset( $this->indexes[ $hash ] ) ? $this->indexes[ $hash ] : 0;
+
 		// Increment index.
-		$this->index++;
+		$this->indexes[ $hash ]++;
+	}
+
+	/**
+	 * Gets a hash from args.
+	 *
+	 * @since TBD
+	 *
+	 * @param array $args The args to hash.
+	 *
+	 * @return string
+	 */
+	function get_hash( $args ) {
+		return md5( serialize( $args ) );
 	}
 
 	/**

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.7 (6/9/24)
+* Added: New `mai_publisher_load_gpt` filter to disable gpt from loading via the plugin.
+* Changed: Removed deprecated ad sizes from config.
+* Changed: Disable content encoded. It was causing issues, and we're relying on content being properly encoded while running this late.
+* Fixed: Compatibility issue with Mai Custom Content Areas when inserting a CCA and Mai Post Grid ads in archive entries.
+
 ## 1.6.6 (4/5/24)
 * Added: Integrates Sourcepoint.
 
