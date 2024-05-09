@@ -493,17 +493,17 @@ function maipub_validate_ad_conditions_archive( $args ) {
 	elseif ( is_post_type_archive() || maipub_is_shop_archive() ) {
 		// Bail if shop page and not showing here.
 		if ( maipub_is_shop_archive() ) {
-			if ( ! $args['types'] && ( ! in_array( '*', $args['types'] ) || ! in_array( 'product', $args['types'] ) ) ) {
+			$is_shop = in_array( '*', $args['types'] ) || in_array( 'product', $args['types'] );
+
+			if ( ! ( $args['types'] && $is_shop ) ) {
 				return [];
 			}
 		}
 		// Bail if not showing on this post type archive.
 		else {
-			global $wp_query;
+			$is_cpt = in_array( '*', $args['types'] ) || in_array( get_query_var( 'post_type' ), $args['types'] );
 
-			$post_type = isset( $wp_query->query['post_type'] ) ? $wp_query->query['post_type'] : '';
-
-			if ( ! $args['types'] && ( ! in_array( '*', $args['types'] ) || ! is_post_type_archive( $post_type ) ) ) {
+			if ( ! ( $args['types'] && $is_cpt ) ) {
 				return [];
 			}
 		}
