@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.6.8 (6/9/24)
+* Fixed: All Post Types setting for archive ads was not working correctly.
+
 ## 1.6.7 (6/9/24)
 * Added: New `mai_publisher_load_gpt` filter to disable gpt from loading via the plugin.
 * Changed: Removed deprecated ad sizes from config.
