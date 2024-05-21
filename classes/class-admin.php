@@ -236,7 +236,7 @@ class Mai_Publisher_Admin {
 		$choices      = maipub_get_location_choices();
 
 		// Bail if no locations.
-		if ( ! ( $global || ( $single && $singles ) || ( $archive && ( $archives || $taxonomies || $terms ) ) ) ) {
+		if ( ! ( $global || ( $single && ( $singles || $entries ) ) || ( $archive && ( $archives || $taxonomies || $terms ) ) ) ) {
 			echo '<strong class="mai-ad-status mai-ad-status__inactive">' . __( 'Inactive', 'mai-publisher' ) . '</strong><br>';
 			return;
 		}
