@@ -47,12 +47,13 @@ class Mai_Publisher_Ad_Block {
 	 *
 	 * @param array  $block      The block settings and attributes.
 	 * @param string $content    The block inner HTML (empty).
-	 * @param bool   $is_preview True during AJAX preview.
+	 * @param bool   $is_preview True during backend preview render.
 	 * @param int    $post_id    The post ID this block is saved to.
+	 * @param array  $context    The context provided to the block by the post or its parent block.
 	 *
 	 * @return void
 	 */
-	function render_block( $block, $content = '', $is_preview = false, $post_id = 0 ) {
+	function render_block( $block, $content, $is_preview, $post_id, $context ) {
 		$id   = get_field( 'id' );
 		$post = $id ? get_post( $id ) : false;
 

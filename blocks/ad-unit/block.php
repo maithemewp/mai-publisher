@@ -46,15 +46,17 @@ class Mai_Publisher_Ad_Unit_Block {
 	 *
 	 * @param array  $block      The block settings and attributes.
 	 * @param string $content    The block inner HTML (empty).
-	 * @param bool   $is_preview True during AJAX preview.
+	 * @param bool   $is_preview True during backend preview render.
 	 * @param int    $post_id    The post ID this block is saved to.
+	 * @param array  $context    The context provided to the block by the post or its parent block.
 	 *
 	 * @return void
 	 */
-	function render_block( $block, $content = '', $is_preview = false, $post_id = 0 ) {
+	function render_block( $block, $content, $is_preview, $post_id, $context ) {
 		maipub_do_ad_unit(
 			[
-				'preview'    => $is_preview,
+				// 'preview'    => $is_preview,
+				'preview'    => $this->is_preview( $is_preview ),
 				'id'         => get_field( 'id' ),
 				'type'       => get_field( 'type' ),
 				'position'   => get_field( 'position' ),
@@ -64,6 +66,35 @@ class Mai_Publisher_Ad_Unit_Block {
 				'label_hide' => get_field( 'label_hide' ),
 			]
 		);
+	}
+
+	/**
+	 * Checks if in preview mode.
+	 * Sometimes `$is_preview` was not working correctly when
+	 * an Mai GAM Ad Unit block was inside a Mai Ad block,
+	 * so this statically caches the result so re-rendering Mai Ad block
+	 * via ajax will still show the correct value if in the editor.
+	 *
+	 * @since TBD
+	 *
+	 * @link https://github.com/maithemewp/mai-publisher/issues/22
+	 *
+	 * @param bool $is_preview The current preview state.
+	 *
+	 * @return bool
+	 */
+	function is_preview( $is_preview ) {
+		static $cache = null;
+
+		if ( ! is_null( $cache ) ) {
+			return $cache;
+		}
+
+		global $pagenow;
+
+		$cache = $is_preview || 'admin-ajax.php' === $pagenow;
+
+		return $cache;
 	}
 
 	/**
