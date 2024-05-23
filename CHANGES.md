@@ -2,6 +2,7 @@
 
 ## 1.6.9 (5/23/24)
 * Changed: Ads are now centered (again) by default inside entries/rows.
+* Changed: Use `wptexturize()` instead of `mb_convert_encoding()`.
 * Fixed: Mai GAM Ad Unit block inside Mai Ad block not rendering correctly in the editor.
 * Fixed: Single ads showing as inactive in the back end when only set to show on specific posts/pages.
 
