@@ -354,7 +354,7 @@ class Mai_Publisher_Entries {
 	/**
 	 * Gets a hash from args.
 	 *
-	 * @since TBD
+	 * @since 1.6.7
 	 *
 	 * @param array $args The args to hash.
 	 *

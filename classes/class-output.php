@@ -913,7 +913,7 @@ class Mai_Publisher_Output {
 	/**
 	 * Get Sourcepoint scripts.
 	 *
-	 * @since TBD
+	 * @since 1.6.6
 	 *
 	 * @return string
 	 */
@@ -1010,7 +1010,7 @@ class Mai_Publisher_Output {
 	/**
 	 * Minify inline JS.
 	 *
-	 * @since TBD
+	 * @since 0.1.0
 	 *
 	 * @link https://gist.github.com/Rodrigo54/93169db48194d470188f
 	 *

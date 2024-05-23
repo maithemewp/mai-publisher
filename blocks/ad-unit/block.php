@@ -75,7 +75,7 @@ class Mai_Publisher_Ad_Unit_Block {
 	 * so this statically caches the result so re-rendering Mai Ad block
 	 * via ajax will still show the correct value if in the editor.
 	 *
-	 * @since TBD
+	 * @since 1.6.9
 	 *
 	 * @link https://github.com/maithemewp/mai-publisher/issues/22
 	 *
