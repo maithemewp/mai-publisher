@@ -1,9 +1,15 @@
 # Changelog
 
-## 1.6.8 (6/9/24)
+## 1.6.9 (5/23/24)
+* Changed: Ads are now centered (again) by default inside entries/rows.
+* Changed: Use `wptexturize()` instead of `mb_convert_encoding()`.
+* Fixed: Mai GAM Ad Unit block inside Mai Ad block not rendering correctly in the editor.
+* Fixed: Single ads showing as inactive in the back end when only set to show on specific posts/pages.
+
+## 1.6.8 (5/9/24)
 * Fixed: All Post Types setting for archive ads was not working correctly.
 
-## 1.6.7 (6/9/24)
+## 1.6.7 (5/9/24)
 * Added: New `mai_publisher_load_gpt` filter to disable gpt from loading via the plugin.
 * Changed: Removed deprecated ad sizes from config.
 * Changed: Disable content encoded. It was causing issues, and we're relying on content being properly encoded while running this late.

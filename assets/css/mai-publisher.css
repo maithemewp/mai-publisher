@@ -159,9 +159,7 @@
 
 .maipub-entry,
 .maipub-row {
-	--mai-ad-unit-justify-content: start;
 	--mai-ad-unit-margin-block: 0;
-	--mai-ad-unit-margin-inline: 0;
 }
 
 .mai-column:has(.mai-toc) {

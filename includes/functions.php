@@ -106,7 +106,8 @@ function maipub_get_dom_document( $html ) {
  */
 function maipub_get_dom_html( $dom ) {
 	$html = $dom->saveHTML();
-	$html = mb_convert_encoding( $html, 'UTF-8', 'HTML-ENTITIES' );
+	// $html = mb_convert_encoding( $html, 'UTF-8', 'HTML-ENTITIES' );
+	$html = wptexturize( $html );
 
 	return $html;
 }
