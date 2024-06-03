@@ -443,6 +443,26 @@ class Mai_Publisher_Ad_Field_Group {
 					'search' => __( 'Search Results', 'mai-publisher' ),
 				],
 			],
+			[
+				'key'       => 'maipub_scripts_tab',
+				'label'     => __( 'Scripts', 'mai-publisher' ),
+				'type'      => 'tab',
+				'placement' => 'top',
+			],
+			[
+				'label'        => __( 'Header scripts', 'mai-publisher' ),
+				'instructions' => __( 'Add any scripts that will be included in the <code>head</code> tag any time this Ad is displayed.', 'mai-publisher' ),
+				'key'          => 'maipub_header_scripts',
+				'name'         => 'maipub_header_scripts',
+				'type'         => 'textarea',
+			],
+			[
+				'label'        => __( 'Footer scripts', 'mai-publisher' ),
+				'instructions' => __( 'Add any scripts that will be included before the closing <code>body</code> tag any time this Ad is displayed.', 'mai-publisher' ),
+				'key'          => 'maipub_footer_scripts',
+				'name'         => 'maipub_footer_scripts',
+				'type'         => 'textarea',
+			],
 		];
 
 		return $fields;

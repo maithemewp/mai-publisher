@@ -104,7 +104,13 @@ class Mai_Publisher_Display {
 	 * @return void
 	 */
 	function header() {
-		$header = maipub_get_option( 'header' );
+		$header = trim( (string) maipub_get_option( 'header' ) );
+
+		foreach ( $this->ads as $ad ) {
+			if ( isset( $ad['header'] ) && $ad['header'] ) {
+				$header .= trim( (string) $ad['header'] );
+			}
+		}
 
 		if ( ! $header ) {
 			return;
@@ -121,7 +127,13 @@ class Mai_Publisher_Display {
 	 * @return void
 	 */
 	function footer() {
-		$footer = maipub_get_option( 'footer' );
+		$footer = trim( (string) maipub_get_option( 'footer' ) );
+
+		foreach ( $this->ads as $ad ) {
+			if ( isset( $ad['footer'] ) && $ad['footer'] ) {
+				$footer .= trim( (string) $ad['footer'] );
+			}
+		}
 
 		if ( ! $footer ) {
 			return;

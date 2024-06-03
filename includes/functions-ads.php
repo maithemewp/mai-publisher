@@ -158,6 +158,8 @@ function maipub_get_page_ads_data() {
 						'slug'     => $slug,
 						'location' => $global_location,
 						'content'  => $content,
+						'header'   => get_field( 'maipub_header_scripts' ),
+						'footer'   => get_field( 'maipub_footer_scripts' ),
 					]
 				);
 			}
@@ -169,6 +171,8 @@ function maipub_get_page_ads_data() {
 						'slug'                => $slug,
 						'location'            => $single_location,
 						'content'             => $content,
+						'header'              => get_field( 'maipub_header_scripts' ),
+						'footer'              => get_field( 'maipub_footer_scripts' ),
 						'content_location'    => get_field( 'maipub_single_content_location' ),
 						'content_count'       => get_field( 'maipub_single_content_count' ),
 						'comment_count'       => get_field( 'maipub_single_comment_count' ),
@@ -190,6 +194,8 @@ function maipub_get_page_ads_data() {
 						'slug'          => $slug,
 						'location'      => $archive_location,
 						'content'       => $content,
+						'header'        => get_field( 'maipub_header_scripts' ),
+						'footer'        => get_field( 'maipub_footer_scripts' ),
 						'content_count' => get_field( 'maipub_archive_content_count' ),
 						'content_item'  => get_field( 'maipub_archive_content_item' ),
 						'types'         => get_field( 'maipub_archive_types' ),
@@ -279,6 +285,8 @@ function maipub_validate_ad_conditions_global( $args ) {
 		'slug'     => '',
 		'location' => '',
 		'content'  => '',
+		'header'   => '',
+		'footer'   => '',
 	] );
 
 	// Sanitize.
@@ -287,6 +295,8 @@ function maipub_validate_ad_conditions_global( $args ) {
 		'slug'     => sanitize_key( $args['slug'] ),
 		'location' => esc_html( $args['location'] ),
 		'content'  => trim( maipub_get_processed_ad_content( $args['content'] ) ),
+		'header'   => $args['header'],
+		'footer'   => $args['footer'],
 	];
 
 	return $args;
@@ -313,6 +323,8 @@ function maipub_validate_ad_conditions_single( $args ) {
 		'slug'                => '',
 		'location'            => '',
 		'content'             => '',
+		'header'              => '',
+		'footer'              => '',
 		'content_location'    => 'after',
 		'content_count'       => 6,
 		'content_count'       => 5,
@@ -331,6 +343,8 @@ function maipub_validate_ad_conditions_single( $args ) {
 		'slug'                => sanitize_key( $args['slug'] ),
 		'location'            => esc_html( $args['location'] ),
 		'content'             => trim( $args['content'] ),
+		'header'              => $args['header'],
+		'footer'              => $args['footer'],
 		'content_location'    => esc_html( $args['content_location'] ),
 		'content_count'       => $args['content_count'] ? array_map( 'absint', explode( ',', (string) $args['content_count'] ) ) : [],
 		'comment_count'       => absint( $args['comment_count'] ),
@@ -458,6 +472,8 @@ function maipub_validate_ad_conditions_archive( $args ) {
 		'slug'          => '',
 		'location'      => '',
 		'content'       => '',
+		'header'        => '',
+		'footer'        => '',
 		'content_count' => '',
 		'content_item'  => 'rows',
 		'types'         => [],
@@ -473,6 +489,8 @@ function maipub_validate_ad_conditions_archive( $args ) {
 		'slug'          => sanitize_key( $args['slug'] ),
 		'location'      => esc_html( $args['location'] ),
 		'content'       => trim( $args['content'] ),
+		'header'        => $args['header'],
+		'footer'        => $args['footer'],
 		'content_count' => $args['content_count'] ? array_map( 'absint', explode( ',', (string) $args['content_count'] ) ) : [],
 		'content_item'  => $args['content_item'] ? sanitize_key( $args['content_item'] ) : 'rows',
 		'types'         => $args['types'] ? array_map( 'esc_html', (array) $args['types'] ) : [],
