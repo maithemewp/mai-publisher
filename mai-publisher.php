@@ -127,6 +127,7 @@ final class Mai_Publisher_Plugin {
 		// Blocks.
 		include MAI_PUBLISHER_DIR . 'blocks/ad/block.php';
 		include MAI_PUBLISHER_DIR . 'blocks/ad-unit/block.php';
+		include MAI_PUBLISHER_DIR . 'blocks/ad-unit-client/block.php';
 		include MAI_PUBLISHER_DIR . 'blocks/ad-video/block.php';
 		include MAI_PUBLISHER_DIR . 'blocks/analytics-tracker/block.php';
 
@@ -138,6 +139,7 @@ final class Mai_Publisher_Plugin {
 		new Mai_Publisher_Categories_Field_Group;
 		new Mai_Publisher_Generate_Ads;
 		new Mai_Publisher_Ad_Unit_Block;
+		new Mai_Publisher_Ad_Unit_Client_Block;
 		new Mai_Publisher_Ad_Video_Block;
 		new Mai_Publisher_Display;
 		new Mai_Publisher_Endpoint;

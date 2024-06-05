@@ -161,19 +161,23 @@ class Mai_Publisher_Output {
 		}
 
 		// Set vars and get all ad units.
-		$config     = maipub_get_config( 'ad_units' );
-		$ad_units   = $this->xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " mai-ad-unit ")]' );
-		$videos     = $this->xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " mai-ad-video ")]' );
-		$ads_count  = $ad_units->length;
+		$config_mai    = maipub_get_config( 'ad_units' );
+		$config_client = maipub_get_config( 'client' );
+		$config_client = isset( $config_client['ad_units'] ) ? $config_client['ad_units'] : [];
+		$ad_units      = $this->xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " mai-ad-unit ")]' );
+		$videos        = $this->xpath->query( '//div[contains(concat(" ", normalize-space(@class), " "), " mai-ad-video ")]' );
+		$ads_count     = $ad_units->length;
 
 		// Loop through ad units.
 		foreach ( $ad_units as $ad_unit ) {
 			// Build name from location and unit.
+			$context  = $ad_unit->getAttribute( 'data-context' );
 			$location = $ad_unit->getAttribute( 'data-al' );
 			$unit     = $ad_unit->getAttribute( 'data-unit' );
 			$slot     = $this->increment_string( $unit );
 			$name     = sprintf( 'mai-ad-%s-%s', $location, $unit );
 			$name     = $this->increment_string( $name );
+			$config   = 'client' === $context ? $config_client : $config_mai;
 
 			// Set slot as id.
 			$ad_unit->setAttribute( 'id', 'mai-ad-' . $slot );
@@ -224,13 +228,19 @@ class Mai_Publisher_Output {
 					$this->gam[ $slot ]['targets'] = array_merge( $this->gam[ $slot ]['targets'], maipub_sanitize_targets( $targets ) );
 				}
 
-				// Split testing.
+				// Get split testing.
 				$split_test = $ad_unit->getAttribute( 'data-st' );
 
 				// If split testing, add it.
 				if ( $split_test ) {
 					$this->gam[ $slot ]['splitTest'] = $split_test;
 				}
+
+				// Get context.
+				$context = $ad_unit->getAttribute( 'data-context' );
+
+				// Add context.
+				$this->gam[ $slot ]['context'] = $context ?: '';
 			}
 		}
 
@@ -253,7 +263,7 @@ class Mai_Publisher_Output {
 
 		// If we have gam domain and ads are active.
 		if ( $this->domain && $this->domain_hashed && $this->gam ) {
-			$gam_base = '';
+			$gam_base = $gam_base_client = '';
 
 			// Maybe disable MCM and use Network Code as base.
 			if ( defined( 'MAI_PUBLISHER_DISABLE_MCM' ) && MAI_PUBLISHER_DISABLE_MCM && $this->network_code ) {
@@ -267,16 +277,24 @@ class Mai_Publisher_Output {
 				}
 			}
 
-			// Finish gam base and localize.
+			// Finish gam base.
 			$gam_base .= "/$this->domain/";
+
+			// Set custom gam base.
+			if ( $this->network_code ) {
+				$gam_base_client = "/$this->network_code/";
+			}
+
+			// Localize data.
 			$localize  = [
-				'domain'      => $this->domain,
-				'sellersName' => $this->sellers_name,
-				'sellersId'   => $this->sellers_id,
-				'gamBase'     => $gam_base,
-				'ads'         => $this->gam,
-				'targets'     => $this->get_targets(),
-				'amazonUAM'   => maipub_get_option( 'amazon_uam_enabled' ),
+				'domain'        => $this->domain,
+				'sellersName'   => $this->sellers_name,
+				'sellersId'     => $this->sellers_id,
+				'gamBase'       => $gam_base,
+				'gamBaseClient' => $gam_base_client,
+				'ads'           => $this->gam,
+				'targets'       => $this->get_targets(),
+				'amazonUAM'     => maipub_get_option( 'amazon_uam_enabled' ),
 			];
 
 			// If sourcepoint data.

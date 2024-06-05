@@ -32,6 +32,7 @@ class Mai_Publisher_Ad_Unit {
 				'targets'    => '',
 				'label'      => '',
 				'label_hide' => '',
+				'context'    => '',
 			]
 		);
 
@@ -45,7 +46,9 @@ class Mai_Publisher_Ad_Unit {
 		$label_hide = (bool) sanitize_text_field( $args['label_hide'] );
 		$label      = $label ? $label : maipub_get_option( 'ad_label', false );
 		$label      = $label_hide ? '' : $label;
-		$ad_units   = maipub_get_config( 'ad_units' );
+		$context    = sanitize_text_field( $args['context'] );
+		$config     = maipub_get_config( $context );
+		$ad_units   = isset( $config['ad_units'] ) ? $config['ad_units'] : [];
 
 		// If previewing in editor and no ad selected, show placeholder.
 		if ( $is_preview && ! ( $id && isset( $ad_units[ $id ] ) ) ) {
@@ -164,6 +167,11 @@ class Mai_Publisher_Ad_Unit {
 		// Split testing.
 		if ( $split_test ) {
 			$inner_attr['data-st'] = esc_attr( $split_test );
+		}
+
+		// If context.
+		if ( $context ) {
+			$inner_attr['data-context'] = esc_attr( $context );
 		}
 
 		// Get spacer attributes string.

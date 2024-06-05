@@ -1,15 +1,16 @@
 window.googletag = window.googletag || {};
 googletag.cmd    = googletag.cmd || [];
 
-const ads          = maiPubAdsVars['ads'];
-const adSlotIds    = [];
-const adSlots      = [];
-const immediate    = [];
-const gamBase      = maiPubAdsVars.gamBase;
-const refreshKey   = 'refresh';
-const refreshValue = maiPubAdsVars.targets.refresh;
-const refreshTime  = 30; // Time in seconds.
-const debug        = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb');
+const ads           = maiPubAdsVars['ads'];
+const adSlotIds     = [];
+const adSlots       = [];
+const immediate     = [];
+const gamBase       = maiPubAdsVars.gamBase;
+const gamBaseClient = maiPubAdsVars.gamBaseClient;
+const refreshKey    = 'refresh';
+const refreshValue  = maiPubAdsVars.targets.refresh;
+const refreshTime   = 30; // Time in seconds.
+const debug         = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb');
 
 // Separate ATF and BTF slots.
 const { adSlotsATF, adSlotsBTF } = Object.entries(ads).reduce( ( acc, [ key, value ] ) => {
@@ -26,7 +27,7 @@ const { adSlotsATF, adSlotsBTF } = Object.entries(ads).reduce( ( acc, [ key, val
 
 // If debugging, log.
 if ( debug ) {
-	console.log( 'v42', 'debug:', debug );
+	console.log( 'v43', 'debug:', debug );
 }
 
 // Add to googletag items.
@@ -321,8 +322,11 @@ function maiPubDefineSlot( slug ) {
 	let toReturn = null;
 
 	googletag.cmd.push(() => {
+		// Get base from context.
+		const base = 'client' === ads[slug]['context'] ? gamBaseClient : gamBase;
+
 		// Define slot ID.
-		const slotId = gamBase + ads[slug]['id'];
+		const slotId = base + ads[slug]['id'];
 
 		// Define ad slot. googletag.defineSlot( "/1234567/sports", [728, 90], "div-1" );
 		const slot = googletag.defineSlot( slotId, ads[slug].sizes, 'mai-ad-' + slug );
@@ -415,6 +419,11 @@ function maiPubDisplaySlots( slots ) {
 				if ( 1 === ads[slug].sizes.length && 'fluid' === ads[slug].sizes[0] ) {
 					// Remove from slots array and skip.
 					// delete slots[slug];
+					return;
+				}
+
+				// Bail if it's a client ad.
+				if ( 'client' === ads[slug]['context'] ) {
 					return;
 				}
 
