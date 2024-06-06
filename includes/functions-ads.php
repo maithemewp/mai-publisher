@@ -4,34 +4,6 @@
 defined( 'ABSPATH' ) || die;
 
 /**
- * Returns the soon to be removed/deperecated ad units.
- *
- * @access private
- *
- * @since 0.23.0
- *
- * @return array
- */
-function maipub_get_legacy_ad_units() {
-	return [
-		'button'            => 'button',
-		'footer'            => 'footer',
-		'halfpage'          => 'halfpage',
-		'header'            => 'header',
-		'incontent'         => 'incontent',
-		'incontent-wide'    => 'incontent-wide',
-		'infeed'            => 'infeed',
-		'inrecipe'          => 'inrecipe',
-		'medium-rectangle'  => 'medium-rectangle',
-		'micro-bar'         => 'micro-bar',
-		'podcast-footer'    => 'podcast-footer',
-		'podcast-header'    => 'podcast-header',
-		'sponsored-sidebar' => 'sponsored-sidebar',
-		'sidebar'           => 'sidebar',
-	];
-}
-
-/**
  * Renders an ad unit.
  *
  * @access private

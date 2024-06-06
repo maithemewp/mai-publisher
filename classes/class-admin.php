@@ -366,7 +366,6 @@ class Mai_Publisher_Admin {
 	 */
 	function display_ad_data( $post_id ) {
 		$ad_units = maipub_get_config( 'ad_units' );
-		$legacy   = maipub_get_legacy_ad_units();
 		$post     = get_post( $post_id );
 		$data     = $this->get_ad_unit_data( $post->post_content );
 
@@ -382,13 +381,7 @@ class Mai_Publisher_Admin {
 
 			// If GAM ad unit.
 			if ( isset( $ad_units[ $slug ]['sizes'] ) ) {
-				$label = $slug;
-
-				if ( isset( $legacy[ $slug ] ) ) {
-					$label .= ' <span style="color:red;">' . __( '(legacy)', 'mai-publisher' ) . '</span>';
-				}
-
-				$sizes[] = '<strong>' . $label . '</strong>: ' . $this->format_sizes( $ad_units[ $slug ]['sizes'] );
+				$sizes[] = '<strong>' . $slug . '</strong>: ' . $this->format_sizes( $ad_units[ $slug ]['sizes'] );
 			}
 			// Not GAM, only video for now.
 			else {
