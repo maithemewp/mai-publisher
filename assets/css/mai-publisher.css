@@ -241,6 +241,7 @@
 	height: var(--maipub-placeholder-height, auto);
 	background: var(--color-alt);
 	font-size: 16px;
+	filter: brightness(0.95);
 }
 
 .maipub-placeholder__caption {
