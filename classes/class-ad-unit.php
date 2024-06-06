@@ -100,9 +100,21 @@ class Mai_Publisher_Ad_Unit {
 				$attr = ' style="padding:1em;"';
 
 				// Build text.
-				$mobile_text  = '<strong>' . __( 'Native', 'mai-publisher' ) . '</strong><br>' . $id;
-				$tablet_text  = '<strong>' . __( 'Native', 'mai-publisher' ) . '</strong><br>' . $id;
-				$desktop_text = '<strong>' . __( 'Native', 'mai-publisher' ) . '</strong><br>' . $id;
+				$mobile_text  = '<strong>' . __( 'Native', 'mai-publisher' ) . '</strong>';
+				$tablet_text  = '<strong>' . __( 'Native', 'mai-publisher' ) . '</strong>';
+				$desktop_text = '<strong>' . __( 'Native', 'mai-publisher' ) . '</strong>';
+
+				// If position, add it.
+				if ( $pos ) {
+					$mobile_text  .= ' ' . $pos;
+					$tablet_text  .= ' ' . $pos;
+					$desktop_text .= ' ' . $pos;
+				}
+
+				// Add the ad unit name.
+				$mobile_text  .= '<br>' . $id;
+				$tablet_text  .= '<br>' . $id;
+				$desktop_text .= '<br>' . $id;
 			}
 			// Standard display ad.
 			else {
@@ -120,9 +132,21 @@ class Mai_Publisher_Ad_Unit {
 				);
 
 				// Build text.
-				$mobile_text  = '<strong>' . implode( 'x', $mobile ) . '</strong>' . $br . $id;
-				$tablet_text  = '<strong>' . implode( 'x', $tablet ) . '</strong>' . $br . $id;
-				$desktop_text = '<strong>' . implode( 'x', $desktop ) . '</strong>' . $br . $id;
+				$mobile_text  = '<strong>' . implode( 'x', $mobile ) . '</strong>';
+				$tablet_text  = '<strong>' . implode( 'x', $tablet ) . '</strong>';
+				$desktop_text = '<strong>' . implode( 'x', $desktop ) . '</strong>';
+
+				// If position, add it.
+				if ( $pos ) {
+					$mobile_text  .= ' ' . $pos;
+					$tablet_text  .= ' ' . $pos;
+					$desktop_text .= ' ' . $pos;
+				}
+
+				// Add the ad unit name.
+				$mobile_text  .= $br . $id;
+				$tablet_text  .= $br . $id;
+				$desktop_text .= $br . $id;
 			}
 
 			// If targets, add them.
