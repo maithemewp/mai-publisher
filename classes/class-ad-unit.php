@@ -99,8 +99,6 @@ class Mai_Publisher_Ad_Unit {
 				$desktop_text .= '\n' . 'targets: ' . $targets;
 			}
 
-			ray( $mobile_text, $tablet_text, $desktop_text );
-
 			if ( 'native' === $id ) {
 				$inner .= sprintf( '<div style="display:grid;place-items:center;height:100%%;background:rgba(0,0,0,.05);border:2px dashed rgba(0,0,0,.25);"><h2 style="display:block;margin:0;padding:0;font-size:1.25em;">%s</h2></div>', __( 'Native Ad', 'mai-publisher' ) );
 			} else {
