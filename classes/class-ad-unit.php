@@ -112,9 +112,9 @@ class Mai_Publisher_Ad_Unit {
 				}
 
 				// Add the ad unit name.
-				$mobile_text  .= '<br>' . $id;
-				$tablet_text  .= '<br>' . $id;
-				$desktop_text .= '<br>' . $id;
+				$mobile_text  .= '<br>' . "<strong>$id<strong>";
+				$tablet_text  .= '<br>' . "<strong>$id<strong>";
+				$desktop_text .= '<br>' . "<strong>$id<strong>";
 			}
 			// Standard display ad.
 			else {
@@ -144,9 +144,9 @@ class Mai_Publisher_Ad_Unit {
 				}
 
 				// Add the ad unit name.
-				$mobile_text  .= $br . $id;
-				$tablet_text  .= $br . $id;
-				$desktop_text .= $br . $id;
+				$mobile_text  .= $br . "<strong>$id</strong>";
+				$tablet_text  .= $br . "<strong>$id</strong>";
+				$desktop_text .= $br . "<strong>$id</strong>";
 			}
 
 			// If targets, add them.
