@@ -543,6 +543,13 @@ function maipub_validate_ad_conditions_archive( $args ) {
 			return [];
 		}
 	}
+	// Author archive.
+	elseif ( is_author() ) {
+		// Bail if not set to show on author archives.
+		if ( ! ( $args['includes'] || in_array( 'author', $args['includes'] ) ) ) {
+			return [];
+		}
+	}
 	// Search results;
 	elseif ( is_search() ) {
 		// Bail if not set to show on search results.

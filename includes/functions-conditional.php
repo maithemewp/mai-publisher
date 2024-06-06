@@ -22,7 +22,7 @@ function maipub_is_singular() {
  * @return bool
  */
 function maipub_is_archive() {
-	return is_home() || is_post_type_archive() || is_category() || is_tag() || is_tax() || is_search() || maipub_is_product_archive();
+	return is_home() || is_post_type_archive() || is_category() || is_tag() || is_tax() || is_author() || is_search() || maipub_is_product_archive();
 }
 
 /**
