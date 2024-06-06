@@ -87,15 +87,29 @@ class Mai_Publisher_Ad_Unit {
 				$desktop = [ 300, 250 ];
 			}
 
+			// Build text.
+			$mobile_text  = implode( 'x', $mobile ) . '\nid: ' . $id;
+			$tablet_text  = implode( 'x', $tablet ) . '\nid: ' . $id;
+			$desktop_text = implode( 'x', $desktop ) . '\nid: ' . $id;
+
+			// If targets, add them.
+			if ( $targets ) {
+				$mobile_text  .= '\n' . 'targets: ' . $targets;
+				$tablet_text  .= '\n' . 'targets: ' . $targets;
+				$desktop_text .= '\n' . 'targets: ' . $targets;
+			}
+
+			ray( $mobile_text, $tablet_text, $desktop_text );
+
 			if ( 'native' === $id ) {
 				$inner .= sprintf( '<div style="display:grid;place-items:center;height:100%%;background:rgba(0,0,0,.05);border:2px dashed rgba(0,0,0,.25);"><h2 style="display:block;margin:0;padding:0;font-size:1.25em;">%s</h2></div>', __( 'Native Ad', 'mai-publisher' ) );
 			} else {
 				// Build inner HTML.
 				$inner .= '<picture>';
-					$inner .= sprintf( '<source srcset="https://placehold.co/%s" media="(max-width: 727px)">', implode( 'x', $mobile ) );
-					$inner .= sprintf( '<source srcset="https://placehold.co/%s" media="(min-width: 728px) and (max-width: 1023px)">', implode( 'x', $tablet ) );
-					$inner .= sprintf( '<source srcset="https://placehold.co/%s" media="(min-width: 1024px)">', implode( 'x', $desktop ) );
-					$inner .= sprintf( '<img src="https://placehold.co/%s">', implode( 'x', $desktop ) );
+					$inner .= sprintf( '<source srcset="https://placehold.co/%s?text=%s" media="(max-width: 727px)">', implode( 'x', $mobile ), urlencode( $mobile_text ) );
+					$inner .= sprintf( '<source srcset="https://placehold.co/%s?text=%s" media="(min-width: 728px) and (max-width: 1023px)">', implode( 'x', $tablet ), urlencode( $tablet_text ) );
+					$inner .= sprintf( '<source srcset="https://placehold.co/%s?text=%s" media="(min-width: 1024px)">', implode( 'x', $desktop ), urlencode( $desktop_text ) );
+					$inner .= sprintf( '<img src="https://placehold.co/%s?text=%s">', implode( 'x', $desktop ), urlencode( $desktop_text ) );
 				$inner .= '</picture>';
 			}
 		}
