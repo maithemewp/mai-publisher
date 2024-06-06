@@ -73,12 +73,13 @@ class Mai_Publisher_Ad_Unit {
 
 		// Build script.
 		if ( $is_preview || 'demo' === maipub_get_option( 'ad_mode', false ) ) {
-			$mobile       = end( $unit['sizes_mobile'] );  // Last should be the largest.
-			$tablet       = end( $unit['sizes_tablet'] );  // Last should be the largest.
-			$desktop      = end( $unit['sizes_desktop'] ); // Last should be the largest.
+			$mobile       = end( $unit['sizes_mobile'] );                      // Last should be the largest.
+			$tablet       = end( $unit['sizes_tablet'] );                      // Last should be the largest.
+			$desktop      = end( $unit['sizes_desktop'] );                     // Last should be the largest.
 			$mobile       = ! is_array( $mobile ) ? [ 300, 350 ] : $mobile;
 			$tablet       = ! is_array( $tablet ) ? [ 300, 350 ] : $tablet;
-			$desktop      = ! is_array( $desktop ) ? [ 300, 350 ] : $desktop;
+			$desktop      = ! is_array( $desktop ) ? [ 300, 350 ] : $desktop;  // Add pipe or break.
+			$br           = 'leaderboard-small' === $id ? ' | ' : '<br>';
 			$targets_text = '';
 
 			if ( 'sidebar' === $id ) {
@@ -118,9 +119,6 @@ class Mai_Publisher_Ad_Unit {
 			}
 			// Standard display ad.
 			else {
-				// Add pipe or break.
-				$br = 'leaderboard-small' === $id ? ' | ' : '<br>';
-
 				// Setup attr.
 				$attr = sprintf( ' style="--width-mobile:%s;--height-mobile:%s;--width-tablet:%s;--height-tablet:%s;--width-desktop:%s;--height-desktop:%s;"',
 					$mobile[0] . 'px',
