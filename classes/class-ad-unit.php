@@ -73,13 +73,13 @@ class Mai_Publisher_Ad_Unit {
 
 		// Build script.
 		if ( $is_preview || 'demo' === maipub_get_option( 'ad_mode', false ) ) {
-			$mobile  = end( $unit['sizes_mobile'] );  // Last should be the largest.
-			$tablet  = end( $unit['sizes_tablet'] );  // Last should be the largest.
-			$desktop = end( $unit['sizes_desktop'] ); // Last should be the largest.
-			$mobile  = ! is_array( $mobile ) ? [ 300, 350 ] : $mobile;
-			$tablet  = ! is_array( $tablet ) ? [ 300, 350 ] : $tablet;
-			$desktop = ! is_array( $desktop ) ? [ 300, 350 ] : $desktop;
-			$text    = '';
+			$mobile       = end( $unit['sizes_mobile'] );  // Last should be the largest.
+			$tablet       = end( $unit['sizes_tablet'] );  // Last should be the largest.
+			$desktop      = end( $unit['sizes_desktop'] ); // Last should be the largest.
+			$mobile       = ! is_array( $mobile ) ? [ 300, 350 ] : $mobile;
+			$tablet       = ! is_array( $tablet ) ? [ 300, 350 ] : $tablet;
+			$desktop      = ! is_array( $desktop ) ? [ 300, 350 ] : $desktop;
+			$targets_text = '';
 
 			if ( 'sidebar' === $id ) {
 				$mobile  = [ 300, 250 ];
@@ -87,29 +87,57 @@ class Mai_Publisher_Ad_Unit {
 				$desktop = [ 300, 250 ];
 			}
 
-			// Build text.
-			$mobile_text  = implode( 'x', $mobile ) . '\nid: ' . $id;
-			$tablet_text  = implode( 'x', $tablet ) . '\nid: ' . $id;
-			$desktop_text = implode( 'x', $desktop ) . '\nid: ' . $id;
+			// If targets, add them.
+			if ( $targets ) {
+				$targets_text  = explode( ',', $targets );
+				$targets_text  = array_map( 'trim', $targets_text );
+				$targets_text  = implode( ', ', $targets_text );
+			}
+
+			// If native.
+			if ( 'native' === $id ) {
+				// Setup attr.
+				$attr = ' style="padding:1em;"';
+
+				// Build text.
+				$mobile_text  = '<strong>' . __( 'Native', 'mai-publisher' ) . '</strong><br>' . $id;
+				$tablet_text  = '<strong>' . __( 'Native', 'mai-publisher' ) . '</strong><br>' . $id;
+				$desktop_text = '<strong>' . __( 'Native', 'mai-publisher' ) . '</strong><br>' . $id;
+			}
+			// Standard display ad.
+			else {
+				// Setup attr.
+				$attr = sprintf( ' style="--width-mobile:%s;--height-mobile:%s;--width-tablet:%s;--height-tablet:%s;--width-desktop:%s;--height-desktop:%s;"',
+					$mobile[0] . 'px',
+					$mobile[1] . 'px',
+					$tablet[0] . 'px',
+					$tablet[1] . 'px',
+					$desktop[0] . 'px',
+					$desktop[1] . 'px'
+				);
+
+				// Build text.
+				$mobile_text  = '<strong>' . implode( 'x', $mobile ) . '</strong>' . '<br>' . $id;
+				$tablet_text  = '<strong>' . implode( 'x', $tablet ) . '</strong>' . '<br>' . $id;
+				$desktop_text = '<strong>' . implode( 'x', $desktop ) . '</strong>' . '<br>' . $id;
+			}
 
 			// If targets, add them.
 			if ( $targets ) {
-				$mobile_text  .= '\n' . 'targets: ' . $targets;
-				$tablet_text  .= '\n' . 'targets: ' . $targets;
-				$desktop_text .= '\n' . 'targets: ' . $targets;
+				$targets_text  = explode( ',', $targets );
+				$targets_text  = array_map( 'trim', $targets_text );
+				$targets_text  = implode( ', ', $targets_text );
+				$mobile_text  .= '<br>' . $targets_text;
+				$tablet_text  .= '<br>' . $targets_text;
+				$desktop_text .= '<br>' . $targets_text;
 			}
 
-			if ( 'native' === $id ) {
-				$inner .= sprintf( '<div style="display:grid;place-items:center;height:100%%;background:rgba(0,0,0,.05);border:2px dashed rgba(0,0,0,.25);"><h2 style="display:block;margin:0;padding:0;font-size:1.25em;">%s</h2></div>', __( 'Native Ad', 'mai-publisher' ) );
-			} else {
-				// Build inner HTML.
-				$inner .= '<picture>';
-					$inner .= sprintf( '<source srcset="https://placehold.co/%s?text=%s" media="(max-width: 727px)">', implode( 'x', $mobile ), urlencode( $mobile_text ) );
-					$inner .= sprintf( '<source srcset="https://placehold.co/%s?text=%s" media="(min-width: 728px) and (max-width: 1023px)">', implode( 'x', $tablet ), urlencode( $tablet_text ) );
-					$inner .= sprintf( '<source srcset="https://placehold.co/%s?text=%s" media="(min-width: 1024px)">', implode( 'x', $desktop ), urlencode( $desktop_text ) );
-					$inner .= sprintf( '<img src="https://placehold.co/%s?text=%s">', implode( 'x', $desktop ), urlencode( $desktop_text ) );
-				$inner .= '</picture>';
-			}
+			// Build inner HTML.
+			$inner .= sprintf( '<div class="maipub-placeholder"%s>', $attr );
+				$inner .= sprintf( '<div class="maipub-placeholder__caption mobile">%s</div>', $mobile_text );
+				$inner .= sprintf( '<div class="maipub-placeholder__caption tablet">%s</div>', $tablet_text );
+				$inner .= sprintf( '<div class="maipub-placeholder__caption desktop">%s</div>', $desktop_text );
+			$inner .= '</div>';
 		}
 
 		// Start spacer attributes.
