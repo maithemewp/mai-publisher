@@ -237,10 +237,10 @@
 .maipub-placeholder {
 	display: grid;
 	place-items: center;
-	grid-template: 1fr;
 	width: var(--maipub-placeholder-width, auto);
 	height: var(--maipub-placeholder-height, auto);
 	background: var(--color-alt);
+	font-size: 16px;
 }
 
 .maipub-placeholder__caption {

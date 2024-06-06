@@ -106,6 +106,9 @@ class Mai_Publisher_Ad_Unit {
 			}
 			// Standard display ad.
 			else {
+				// Add pipe or break.
+				$br = 'leaderboard-small' === $id ? ' | ' : '<br>';
+
 				// Setup attr.
 				$attr = sprintf( ' style="--width-mobile:%s;--height-mobile:%s;--width-tablet:%s;--height-tablet:%s;--width-desktop:%s;--height-desktop:%s;"',
 					$mobile[0] . 'px',
@@ -117,9 +120,9 @@ class Mai_Publisher_Ad_Unit {
 				);
 
 				// Build text.
-				$mobile_text  = '<strong>' . implode( 'x', $mobile ) . '</strong>' . '<br>' . $id;
-				$tablet_text  = '<strong>' . implode( 'x', $tablet ) . '</strong>' . '<br>' . $id;
-				$desktop_text = '<strong>' . implode( 'x', $desktop ) . '</strong>' . '<br>' . $id;
+				$mobile_text  = '<strong>' . implode( 'x', $mobile ) . '</strong>' . $br . $id;
+				$tablet_text  = '<strong>' . implode( 'x', $tablet ) . '</strong>' . $br . $id;
+				$desktop_text = '<strong>' . implode( 'x', $desktop ) . '</strong>' . $br . $id;
 			}
 
 			// If targets, add them.
@@ -127,9 +130,9 @@ class Mai_Publisher_Ad_Unit {
 				$targets_text  = explode( ',', $targets );
 				$targets_text  = array_map( 'trim', $targets_text );
 				$targets_text  = implode( ', ', $targets_text );
-				$mobile_text  .= '<br>' . $targets_text;
-				$tablet_text  .= '<br>' . $targets_text;
-				$desktop_text .= '<br>' . $targets_text;
+				$mobile_text  .= $br . $targets_text;
+				$tablet_text  .= $br . $targets_text;
+				$desktop_text .= $br . $targets_text;
 			}
 
 			// Build inner HTML.
@@ -155,6 +158,11 @@ class Mai_Publisher_Ad_Unit {
 			'class'     => 'mai-ad-unit',
 			'data-unit' => $id,
 		];
+
+		// If context.
+		if ( $context ) {
+			$inner_attr['class'] .= ' mai-ad-unit-' . $context;
+		}
 
 		// Check if sticky.
 		$is_sticky = ! $is_preview && in_array( $pos, [ 'ts', 'bs' ] );
@@ -217,13 +225,15 @@ class Mai_Publisher_Ad_Unit {
 		// Get spacer attributes string.
 		if ( $is_sticky ) {
 			$spacer_attr = $is_preview ? maipub_build_attributes( $spacer_attr ) : ' ' . get_block_wrapper_attributes( $spacer_attr );
-			$spacer_attr = $is_preview ? str_replace( ' wp-block-acf-mai-ad-unit', '', $spacer_attr ) : $spacer_attr;
+			$spacer_attr = str_replace( ' wp-block-acf-mai-ad-unit-client', '', $spacer_attr );
+			$spacer_attr = str_replace( ' wp-block-acf-mai-ad-unit', '', $spacer_attr );
 		}
 
 		// Get attributes string.
 		$outer_attr = maipub_build_attributes( $outer_attr );
 		$inner_attr = $is_preview ? maipub_build_attributes( $inner_attr ) : ' ' . get_block_wrapper_attributes( $inner_attr );
-		$inner_attr = $is_preview ? str_replace( ' wp-block-acf-mai-ad-unit', '', $inner_attr ) : $inner_attr;
+		$inner_attr = str_replace( ' wp-block-acf-mai-ad-unit-client', '', $inner_attr );
+		$inner_attr = str_replace( ' wp-block-acf-mai-ad-unit', '', $inner_attr );
 
 		// Build HTML.
 		$html .= $is_sticky ? sprintf( '<div%s></div>', $spacer_attr ) : '';
