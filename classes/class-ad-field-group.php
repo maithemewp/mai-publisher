@@ -415,7 +415,7 @@ class Mai_Publisher_Ad_Field_Group {
 			],
 			[
 				'label'        => __( 'Term archives', 'mai-publisher' ),
-				'instructions' => __( 'Show on specific term archives.', 'mai-publisher' ),
+				'instructions' => __( 'Show on specific term archives regardless of post type and taxonomy conditions.', 'mai-publisher' ),
 				'key'          => 'maipub_archive_terms',
 				'name'         => 'maipub_archive_terms',
 				'type'         => 'select',
@@ -425,7 +425,7 @@ class Mai_Publisher_Ad_Field_Group {
 			],
 			[
 				'label'        => __( 'Exclude term archives', 'mai-publisher' ),
-				'instructions' => __( 'Hide on specific term archives.', 'mai-publisher' ),
+				'instructions' => __( 'Hide on specific term archives regardless of post type and taxonomy conditions.', 'mai-publisher' ),
 				'key'          => 'maipub_archive_exclude_terms',
 				'name'         => 'maipub_archive_exclude_terms',
 				'type'         => 'select',
@@ -440,6 +440,7 @@ class Mai_Publisher_Ad_Field_Group {
 				'name'         => 'maipub_archive_includes',
 				'type'         => 'checkbox',
 				'choices'      => [
+					'author' => __( 'Author Archives', 'mai-publisher' ),
 					'search' => __( 'Search Results', 'mai-publisher' ),
 				],
 			],
