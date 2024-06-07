@@ -232,6 +232,12 @@
 	--mai-ad-unit-label-color: white;
 }
 
+/* for nested light bg blocks inside dark bg. maybe overkill */
+.has-background,
+.has-light-background  {
+	--mai-ad-unit-label-color: initial;
+}
+
 .entry-wrap > .cnx-main-container {
 	margin-block: var(--spacing-md, 24px);
 	z-index: 9;
