@@ -261,6 +261,9 @@ class Mai_Publisher_Output {
 		$scripts  = [];
 		$position = null;
 
+		// Allow filtering of page GAM ads.
+		$this->gam = apply_filters( 'mai_publisher_gam_ads', $this->gam );
+
 		// If we have gam domain and ads are active.
 		if ( $this->domain && $this->domain_hashed && $this->gam ) {
 			$gam_base = $gam_base_client = '';
