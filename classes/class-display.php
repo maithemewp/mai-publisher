@@ -22,8 +22,17 @@ class Mai_Publisher_Display {
 	 * @return void
 	 */
 	function hooks() {
+		add_action( 'acf/init',       [ $this, 'register_styles' ] );
 		add_action( 'admin_bar_menu', [ $this, 'add_admin_bar_item' ], 9999 );
 		add_action( 'get_header',     [ $this, 'maybe_run' ] );
+	}
+
+
+	function register_styles() {
+		$suffix = maipub_get_suffix();
+		$file   = "assets/css/mai-publisher{$suffix}.css";
+
+		wp_register_style( 'mai-publisher', maipub_get_file_data( $file, 'url' ), [], maipub_get_file_data( $file, 'version' ) );
 	}
 
 	/**
@@ -90,10 +99,7 @@ class Mai_Publisher_Display {
 			return;
 		}
 
-		$suffix = maipub_get_suffix();
-		$file   = "assets/css/mai-publisher{$suffix}.css";
-
-		wp_enqueue_style( 'mai-publisher', maipub_get_file_data( $file, 'url' ), [], maipub_get_file_data( $file, 'version' ) );
+		wp_enqueue_style( 'mai-publisher' );
 	}
 
 	/**

@@ -6,7 +6,7 @@
 	"keywords": [ "ad", "publisher", "gam" ],
 	"icon": "media-code",
 	"textdomain": "mai-publisher",
-	"editorStyle": "file:../../assets/css/mai-publisher.css",
+	"editorStyle": "mai-publisher",
 	"acf": {
 		"mode": "preview"
 	},

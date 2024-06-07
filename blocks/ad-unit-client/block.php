@@ -3,6 +3,11 @@
 // Prevent direct file access.
 defined( 'ABSPATH' ) || die;
 
+/**
+ * Registers the Mai Ad Unit Client block.
+ *
+ * @since TBD
+ */
 class Mai_Publisher_Ad_Unit_Client_Block {
 	/**
 	 * Construct the class.

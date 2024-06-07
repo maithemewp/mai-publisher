@@ -524,6 +524,7 @@ function maipub_get_file_data( $file, $key = '' ) {
 		return $cache[ $file ];
 	}
 
+	$cache          = is_array( $cache ) ? $cache : [];
 	$file_path      = MAI_PUBLISHER_DIR . $file;
 	$file_url       = MAI_PUBLISHER_URL . $file;
 	$version        = MAI_PUBLISHER_VERSION . '.' . date( 'njYHi', filemtime( $file_path ) );
