@@ -227,6 +227,11 @@
 }
 
 /* Mai Engine specific but easier to add here */
+
+.has-dark-background  {
+	--mai-ad-unit-label-color: white;
+}
+
 .entry-wrap > .cnx-main-container {
 	margin-block: var(--spacing-md, 24px);
 	z-index: 9;
