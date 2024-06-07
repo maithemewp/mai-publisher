@@ -63,6 +63,10 @@ class Mai_Publisher_Ad_Fields {
 	 * @return array
 	 */
 	function load_content_types( $field ) {
+		if ( ! is_admin() ) {
+			return $field;
+		}
+
 		$field['choices'] = array_merge(
 			[ '*' => __( 'All Content Types', 'mai-publisher' ) ],
 			$this->get_post_type_choices()
@@ -81,6 +85,10 @@ class Mai_Publisher_Ad_Fields {
 	 * @return array
 	 */
 	function load_single_taxonomy( $field ) {
+		if ( ! is_admin() ) {
+			return $field;
+		}
+
 		$field['choices'] = $this->get_taxonomy_choices();
 
 		return $field;
@@ -96,6 +104,10 @@ class Mai_Publisher_Ad_Fields {
 	 * @return mixed
 	 */
 	function load_archive_post_types( $field ) {
+		if ( ! is_admin() ) {
+			return $field;
+		}
+
 		$post_types = $this->get_post_type_choices();
 
 		foreach ( $post_types as $name => $label ) {
@@ -126,6 +138,10 @@ class Mai_Publisher_Ad_Fields {
 	 * @return mixed
 	 */
 	function load_all_taxonomies( $field ) {
+		if ( ! is_admin() ) {
+			return $field;
+		}
+
 		$field['choices'] = array_merge(
 			[ '*' => __( 'All Taxonomies', 'mai-publisher' ) ],
 			$this->get_taxonomy_choices()
@@ -144,6 +160,10 @@ class Mai_Publisher_Ad_Fields {
 	 * @return mixed
 	 */
 	function load_all_terms( $field ) {
+		if ( ! is_admin() ) {
+			return $field;
+		}
+
 		$field['choices'] = [];
 		$taxonomies       = $this->get_taxonomies();
 
@@ -280,6 +300,10 @@ class Mai_Publisher_Ad_Fields {
 	 * @return mixed
 	 */
 	function load_single_terms( $field ) {
+		if ( ! is_admin() ) {
+			return $field;
+		}
+
 		$field = $this->load_terms( $field );
 
 		return $field;
@@ -296,6 +320,10 @@ class Mai_Publisher_Ad_Fields {
 	 * @return mixed
 	 */
 	function prepare_single_terms( $field ) {
+		if ( ! is_admin() ) {
+			return $field;
+		}
+
 		$field = $this->prepare_terms( $field );
 
 		return $field;
