@@ -228,14 +228,17 @@
 
 /* Mai Engine specific but easier to add here */
 
-.has-dark-background  {
-	--mai-ad-unit-label-color: white;
-}
-
-/* for nested light bg blocks inside dark bg. maybe overkill */
+/*
+for nested light bg blocks inside dark bg. maybe overkill.
+the order of these may affect things and cause issues when it's dark inside light, or vice-a-versa.
+*/
 .has-background,
 .has-light-background  {
 	--mai-ad-unit-label-color: initial;
+}
+
+.has-dark-background  {
+	--mai-ad-unit-label-color: white;
 }
 
 .entry-wrap > .cnx-main-container {
