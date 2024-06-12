@@ -248,9 +248,11 @@ document.addEventListener( 'DOMContentLoaded', function() {
 					return;
 				}
 
-				// If debugging, add border.
+				// If debugging, add inline styling.
 				if ( debug ) {
-					entry.target.style.border = '2px dashed red';
+					entry.target.style.border    = '2px dashed red';
+					entry.target.style.minWidth  = '300px';
+					entry.target.style.minHeight = '120px';
 				}
 
 				// Add to toLoad array.
