@@ -250,7 +250,7 @@ document.addEventListener( 'DOMContentLoaded', function() {
 
 				// If debugging, add inline styling.
 				if ( debug ) {
-					entry.target.style.border    = '2px dashed red';
+					entry.target.style.outline   = '2px dashed red';
 					entry.target.style.minWidth  = '300px';
 					entry.target.style.minHeight = '120px';
 				}
