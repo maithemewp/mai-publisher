@@ -902,7 +902,13 @@ class Mai_Publisher_Output {
 
 		// Content path.
 		if ( $path ) {
-			$targets['cp'] = wp_parse_url( $path, PHP_URL_PATH );
+			// Get path.
+			$cp = wp_parse_url( $path, PHP_URL_PATH );
+
+			// This was null in some scenarios like posts being shown on the homepage.
+			if ( $cp ) {
+				$targets['cp'] = $cp;
+			}
 		}
 
 		// Content type.
