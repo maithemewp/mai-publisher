@@ -59,6 +59,34 @@ function maipub_is_product_singular() {
 }
 
 /**
+ * Checks if currently editing a single post by post type.
+ *
+ * @since TBD
+ *
+ * @return bool
+ */
+function maipub_is_editor( $post_type = 'mai_ad' ) {
+	static $cache = null;
+
+	// If cache is set, return it.
+	if ( ! is_null( $cache ) ) {
+		return $cache;
+	}
+
+	// Start cache as false.
+	$cache = false;
+
+	// If in the back end.
+	if ( is_admin() ) {
+		// Check if editing a Mai Ad.
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		$cache  = ( $screen && $post_type === $screen->id ) || ( isset( $_REQUEST['post'] ) && $post_type === get_post_type( $_REQUEST['post'] ) );
+	}
+
+	return $cache;
+}
+
+/**
  * Check if a string contains at least one specified string.
  *
  * @since 0.1.0
