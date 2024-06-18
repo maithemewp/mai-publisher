@@ -349,7 +349,10 @@ class Mai_Publisher_Generate_Ads {
 			return $cache;
 		}
 
-		$cache = json_decode( file_get_contents( MAI_PUBLISHER_DIR . '/ads.json' ), true );
+		// Get ads, allow filtering, set cache.
+		$config = json_decode( file_get_contents( MAI_PUBLISHER_DIR . '/ads.json' ), true );
+		$config = apply_filters( 'mai_publisher_default_ads', $config );
+		$cache  = $config;
 
 		return $cache;
 	}
