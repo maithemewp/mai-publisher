@@ -3,7 +3,12 @@
 // Prevent direct file access.
 defined( 'ABSPATH' ) || die;
 
-class Mai_Publisher_Ad_Unit_Block {
+/**
+ * Registers the Mai Ad Unit Client block.
+ *
+ * @since TBD
+ */
+class Mai_Publisher_Ad_Unit_Client_Block {
 	/**
 	 * Construct the class.
 	 */
@@ -14,26 +19,30 @@ class Mai_Publisher_Ad_Unit_Block {
 	/**
 	 * Add hooks.
 	 *
-	 * @since 0.1.0
+	 * @since TBD
 	 *
 	 * @return void
 	 */
 	function hooks() {
-		add_action( 'acf/init',                             [ $this, 'register_block' ] );
-		add_action( 'acf/init',                             [ $this, 'register_field_group' ] );
-		add_filter( 'acf/load_field/key=maipub_ad_unit_id', [ $this, 'load_ad_unit_choices' ] );
+		add_action( 'acf/init',                                    [ $this, 'register_block' ] );
+		add_action( 'acf/init',                                    [ $this, 'register_field_group' ] );
+		add_filter( 'acf/load_field/key=maipub_ad_unit_client_id', [ $this, 'load_ad_unit_choices' ] );
 	}
 
 	/**
 	 * Registers block.
 	 *
-	 * @since 0.1.0
+	 * @since TBD
 	 *
 	 * @return void
 	 */
 	function register_block() {
+		$client  = (array) maipub_get_config( 'client' );
+		$label   = isset( $client['label'] ) ? (string) $client['label'] : 'Mai ' . __( 'Client', 'mai-publisher' );
+
 		register_block_type( __DIR__ . '/block.json',
 			[
+				'title'           => $label . ' ' . __( 'GAM Ad Unit', 'mai-publisher' ),
 				'render_callback' => [ $this, 'render_block' ],
 			]
 		);
@@ -42,7 +51,7 @@ class Mai_Publisher_Ad_Unit_Block {
 	/**
 	 * Callback function to render the block.
 	 *
-	 * @since 0.1.0
+	 * @since TBD
 	 *
 	 * @param array  $block      The block settings and attributes.
 	 * @param string $content    The block inner HTML (empty).
@@ -57,13 +66,11 @@ class Mai_Publisher_Ad_Unit_Block {
 			[
 				'preview'    => $this->is_preview( $is_preview ),
 				'id'         => get_field( 'id' ),
-				'type'       => get_field( 'type' ),
 				'position'   => get_field( 'position' ),
-				'split_test' => get_field( 'split_test' ),
 				'targets'    => get_field( 'targets' ),
 				'label'      => get_field( 'label' ),
 				'label_hide' => get_field( 'label_hide' ),
-				'context'    => '',
+				'context'    => 'client',
 			]
 		);
 	}
@@ -75,7 +82,7 @@ class Mai_Publisher_Ad_Unit_Block {
 	 * so this statically caches the result so re-rendering Mai Ad block
 	 * via ajax will still show the correct value if in the editor.
 	 *
-	 * @since 1.6.9
+	 * @since TBD
 	 *
 	 * @link https://github.com/maithemewp/mai-publisher/issues/22
 	 *
@@ -100,7 +107,7 @@ class Mai_Publisher_Ad_Unit_Block {
 	/**
 	 * Registers field group.
 	 *
-	 * @since 0.1.0
+	 * @since TBD
 	 *
 	 * @return void
 	 */
@@ -111,72 +118,43 @@ class Mai_Publisher_Ad_Unit_Block {
 
 		acf_add_local_field_group(
 			[
-				'key'      => 'maipub_ad_unit_block_field_group',
+				'key'      => 'maipub_ad_unit_client_block_field_group',
 				'title'    => __( 'Locations Settings', 'mai-publisher' ),
 				'fields'   =>[
 					[
 						'label'   => __( 'Ad unit', 'mai-publisher' ),
-						'key'     => 'maipub_ad_unit_id',
+						'key'     => 'maipub_ad_unit_client_id',
 						'name'    => 'id',
 						'type'    => 'select',
 						'choices' => [],
 					],
 					[
-						'label'   => __( 'Ad type', 'mai-publisher' ),
-						'key'     => 'maipub_ad_unit_type',
-						'name'    => 'type',
-						'type'    => 'select',
-						'choices' => [
-							''   => __( 'Not set', 'mai-publisher' ),
-							'sp' => __( 'Sponsorship', 'mai-publisher' ),
-							'st' => __( 'Standard', 'mai-publisher' ),
-							'h'  => __( 'House', 'mai-publisher' ),
-							'nt' => __( 'Native Top', 'mai-publisher' ),
-							'nl' => __( 'Native Left', 'mai-publisher' ),
-							'nr' => __( 'Native Right', 'mai-publisher' ),
-							'nv' => __( 'Native Video', 'mai-publisher' ),
-						],
-					],
-					[
 						'label'   => __( 'Ad Position', 'mai-publisher' ),
-						'key'     => 'maipub_ad_unit_position',
+						'key'     => 'maipub_ad_unit_client_position',
 						'name'    => 'position',
 						'type'    => 'select',
 						'choices' => [
 							''     => __( 'Not set', 'mai-publisher' ),
 							'atf'  => __( 'Above the Fold', 'mai-publisher' ),
 							'btf'  => __( 'Below the Fold', 'mai-publisher' ),
-							'vs'   => __( 'Sticky Vertical', 'mai-publisher' ),
-							'ts'   => __( 'Sticky Top Horizontal', 'mai-publisher' ),
-							'bs'   => __( 'Sticky Bottom Horizontal', 'mai-publisher' ),
-						],
-					],
-					[
-						'label'   => __( 'Split Testing', 'mai-publisher' ),
-						'key'     => 'maipub_ad_unit_split_test',
-						'name'    => 'split_test',
-						'type'    => 'select',
-						'choices' => [
-							''     => __( 'Not set', 'mai-publisher' ),
-							'rand' => __( 'Random (0-99)', 'mai-publisher' ),
 						],
 					],
 					[
 						'label'        => __( 'Key/Value Pairs', 'mai-publisher' ),
 						'instructions' => __( 'Comma-separated key value pairs. Example: a=b, d=f', 'mai-publisher' ),
-						'key'          => 'maipub_ad_unit_targets',
+						'key'          => 'maipub_ad_unit_client_targets',
 						'name'         => 'targets',
 						'type'         => 'text',
 					],
 					[
 						'label'             => __( 'Label override', 'mai-publisher' ),
-						'key'               => 'maipub_ad_unit_label',
+						'key'               => 'maipub_ad_unit_client_label',
 						'name'              => 'label',
 						'type'              => 'text',
 						'conditional_logic' => [
 							[
 								[
-									'field'    => 'maipub_ad_unit_label_hide',
+									'field'    => 'maipub_ad_unit_client_label_hide',
 									'operator' => '!=',
 									'value'    => '1',
 								],
@@ -185,7 +163,7 @@ class Mai_Publisher_Ad_Unit_Block {
 					],
 					[
 						'message' => __( 'Hide label', 'mai-publisher' ),
-						'key'     => 'maipub_ad_unit_label_hide',
+						'key'     => 'maipub_ad_unit_client_label_hide',
 						'name'    => 'label_hide',
 						'type'    => 'true_false',
 					],
@@ -195,7 +173,7 @@ class Mai_Publisher_Ad_Unit_Block {
 						[
 							'param'    => 'block',
 							'operator' => '==',
-							'value'    => 'acf/mai-ad-unit',
+							'value'    => 'acf/mai-ad-unit-client',
 						],
 					],
 				],
@@ -206,7 +184,7 @@ class Mai_Publisher_Ad_Unit_Block {
 	/**
 	 * Loads ad unit choices.
 	 *
-	 * @since 0.1.0
+	 * @since TBD
 	 *
 	 * @param array $field The field data.
 	 *
@@ -218,7 +196,8 @@ class Mai_Publisher_Ad_Unit_Block {
 		}
 
 		$choices = [ '' => __( 'None', 'mai-publisher' ) ];
-		$units   = (array) maipub_get_config( 'ad_units' );
+		$client  = (array) maipub_get_config( 'client' );
+		$units   = isset( $client['ad_units'] ) ? (array) $client['ad_units'] : [];
 
 		foreach ( $units as $slug => $unit ) {
 			$choices[ $slug ] = $slug;

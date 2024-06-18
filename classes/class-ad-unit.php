@@ -32,6 +32,7 @@ class Mai_Publisher_Ad_Unit {
 				'targets'    => '',
 				'label'      => '',
 				'label_hide' => '',
+				'context'    => '',
 			]
 		);
 
@@ -45,7 +46,9 @@ class Mai_Publisher_Ad_Unit {
 		$label_hide = (bool) sanitize_text_field( $args['label_hide'] );
 		$label      = $label ? $label : maipub_get_option( 'ad_label', false );
 		$label      = $label_hide ? '' : $label;
-		$ad_units   = maipub_get_config( 'ad_units' );
+		$context    = sanitize_text_field( $args['context'] );
+		$config     = maipub_get_config( $context );
+		$ad_units   = isset( $config['ad_units'] ) ? $config['ad_units'] : [];
 
 		// If previewing in editor and no ad selected, show placeholder.
 		if ( $is_preview && ! ( $id && isset( $ad_units[ $id ] ) ) ) {
@@ -70,13 +73,14 @@ class Mai_Publisher_Ad_Unit {
 
 		// Build script.
 		if ( $is_preview || 'demo' === maipub_get_option( 'ad_mode', false ) ) {
-			$mobile  = end( $unit['sizes_mobile'] );  // Last should be the largest.
-			$tablet  = end( $unit['sizes_tablet'] );  // Last should be the largest.
-			$desktop = end( $unit['sizes_desktop'] ); // Last should be the largest.
-			$mobile  = ! is_array( $mobile ) ? [ 300, 350 ] : $mobile;
-			$tablet  = ! is_array( $tablet ) ? [ 300, 350 ] : $tablet;
-			$desktop = ! is_array( $desktop ) ? [ 300, 350 ] : $desktop;
-			$text    = '';
+			$mobile       = end( $unit['sizes_mobile'] );                      // Last should be the largest.
+			$tablet       = end( $unit['sizes_tablet'] );                      // Last should be the largest.
+			$desktop      = end( $unit['sizes_desktop'] );                     // Last should be the largest.
+			$mobile       = ! is_array( $mobile ) ? [ 300, 350 ] : $mobile;
+			$tablet       = ! is_array( $tablet ) ? [ 300, 350 ] : $tablet;
+			$desktop      = ! is_array( $desktop ) ? [ 300, 350 ] : $desktop;  // Add pipe or break.
+			$br           = 'leaderboard-small' === $id ? ' | ' : '<br>';
+			$targets_text = '';
 
 			if ( 'sidebar' === $id ) {
 				$mobile  = [ 300, 250 ];
@@ -84,17 +88,81 @@ class Mai_Publisher_Ad_Unit {
 				$desktop = [ 300, 250 ];
 			}
 
-			if ( 'native' === $id ) {
-				$inner .= sprintf( '<div style="display:grid;place-items:center;height:100%%;background:rgba(0,0,0,.05);border:2px dashed rgba(0,0,0,.25);"><h2 style="display:block;margin:0;padding:0;font-size:1.25em;">%s</h2></div>', __( 'Native Ad', 'mai-publisher' ) );
-			} else {
-				// Build inner HTML.
-				$inner .= '<picture>';
-					$inner .= sprintf( '<source srcset="https://placehold.co/%s" media="(max-width: 727px)">', implode( 'x', $mobile ) );
-					$inner .= sprintf( '<source srcset="https://placehold.co/%s" media="(min-width: 728px) and (max-width: 1023px)">', implode( 'x', $tablet ) );
-					$inner .= sprintf( '<source srcset="https://placehold.co/%s" media="(min-width: 1024px)">', implode( 'x', $desktop ) );
-					$inner .= sprintf( '<img src="https://placehold.co/%s">', implode( 'x', $desktop ) );
-				$inner .= '</picture>';
+			// If targets, add them.
+			if ( $targets ) {
+				$targets_text  = explode( ',', $targets );
+				$targets_text  = array_map( 'trim', $targets_text );
+				$targets_text  = implode( ', ', $targets_text );
 			}
+
+			// If native.
+			if ( 'native' === $id ) {
+				// Setup attr.
+				$attr = ' style="padding:1em;"';
+
+				// Build text.
+				$mobile_text  = '<strong>' . __( 'Native', 'mai-publisher' ) . '</strong>';
+				$tablet_text  = '<strong>' . __( 'Native', 'mai-publisher' ) . '</strong>';
+				$desktop_text = '<strong>' . __( 'Native', 'mai-publisher' ) . '</strong>';
+
+				// If position, add it.
+				if ( $pos ) {
+					$mobile_text  .= ' ' . $pos;
+					$tablet_text  .= ' ' . $pos;
+					$desktop_text .= ' ' . $pos;
+				}
+
+				// Add the ad unit name.
+				$mobile_text  .= '<br>' . "<strong>$id<strong>";
+				$tablet_text  .= '<br>' . "<strong>$id<strong>";
+				$desktop_text .= '<br>' . "<strong>$id<strong>";
+			}
+			// Standard display ad.
+			else {
+				// Setup attr.
+				$attr = sprintf( ' style="--width-mobile:%s;--height-mobile:%s;--width-tablet:%s;--height-tablet:%s;--width-desktop:%s;--height-desktop:%s;"',
+					$mobile[0] . 'px',
+					$mobile[1] . 'px',
+					$tablet[0] . 'px',
+					$tablet[1] . 'px',
+					$desktop[0] . 'px',
+					$desktop[1] . 'px'
+				);
+
+				// Build text.
+				$mobile_text  = '<strong>' . implode( 'x', $mobile ) . '</strong>';
+				$tablet_text  = '<strong>' . implode( 'x', $tablet ) . '</strong>';
+				$desktop_text = '<strong>' . implode( 'x', $desktop ) . '</strong>';
+
+				// If position, add it.
+				if ( $pos ) {
+					$mobile_text  .= ' ' . $pos;
+					$tablet_text  .= ' ' . $pos;
+					$desktop_text .= ' ' . $pos;
+				}
+
+				// Add the ad unit name.
+				$mobile_text  .= $br . "<strong>$id</strong>";
+				$tablet_text  .= $br . "<strong>$id</strong>";
+				$desktop_text .= $br . "<strong>$id</strong>";
+			}
+
+			// If targets, add them.
+			if ( $targets ) {
+				$targets_text  = explode( ',', $targets );
+				$targets_text  = array_map( 'trim', $targets_text );
+				$targets_text  = implode( ', ', $targets_text );
+				$mobile_text  .= $br . $targets_text;
+				$tablet_text  .= $br . $targets_text;
+				$desktop_text .= $br . $targets_text;
+			}
+
+			// Build inner HTML.
+			$inner .= sprintf( '<div class="maipub-placeholder"%s>', $attr );
+				$inner .= sprintf( '<div class="maipub-placeholder__caption mobile">%s</div>', $mobile_text );
+				$inner .= sprintf( '<div class="maipub-placeholder__caption tablet">%s</div>', $tablet_text );
+				$inner .= sprintf( '<div class="maipub-placeholder__caption desktop">%s</div>', $desktop_text );
+			$inner .= '</div>';
 		}
 
 		// Start spacer attributes.
@@ -112,6 +180,11 @@ class Mai_Publisher_Ad_Unit {
 			'class'     => 'mai-ad-unit',
 			'data-unit' => $id,
 		];
+
+		// If context.
+		if ( $context ) {
+			$inner_attr['class'] .= ' mai-ad-unit-' . $context;
+		}
 
 		// Check if sticky.
 		$is_sticky = ! $is_preview && in_array( $pos, [ 'ts', 'bs' ] );
@@ -166,16 +239,23 @@ class Mai_Publisher_Ad_Unit {
 			$inner_attr['data-st'] = esc_attr( $split_test );
 		}
 
+		// If context.
+		if ( $context ) {
+			$inner_attr['data-context'] = esc_attr( $context );
+		}
+
 		// Get spacer attributes string.
 		if ( $is_sticky ) {
 			$spacer_attr = $is_preview ? maipub_build_attributes( $spacer_attr ) : ' ' . get_block_wrapper_attributes( $spacer_attr );
-			$spacer_attr = $is_preview ? str_replace( ' wp-block-acf-mai-ad-unit', '', $spacer_attr ) : $spacer_attr;
+			$spacer_attr = str_replace( ' wp-block-acf-mai-ad-unit-client', '', $spacer_attr );
+			$spacer_attr = str_replace( ' wp-block-acf-mai-ad-unit', '', $spacer_attr );
 		}
 
 		// Get attributes string.
 		$outer_attr = maipub_build_attributes( $outer_attr );
 		$inner_attr = $is_preview ? maipub_build_attributes( $inner_attr ) : ' ' . get_block_wrapper_attributes( $inner_attr );
-		$inner_attr = $is_preview ? str_replace( ' wp-block-acf-mai-ad-unit', '', $inner_attr ) : $inner_attr;
+		$inner_attr = str_replace( ' wp-block-acf-mai-ad-unit-client', '', $inner_attr );
+		$inner_attr = str_replace( ' wp-block-acf-mai-ad-unit', '', $inner_attr );
 
 		// Build HTML.
 		$html .= $is_sticky ? sprintf( '<div%s></div>', $spacer_attr ) : '';

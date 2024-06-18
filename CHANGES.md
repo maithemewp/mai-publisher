@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.7.0 (6/18/24)
+* Added: New Mai Client GAM Ad Unit block.
+* Added: Header/Footer scripts fields per ad.
+* Added: Author archive support.
+* Added: More data and info into ad placeholders.
+* Added: New `mai_publisher_gam_ads` filter to modify GAM ads data on-the-fly.
+* Added: New `mai_publisher_default_ads` filter to modify the default ads form ads.json.
+* Changed: Now the GAM Hashed Domain is built off the GAM Domain instead of the home url.
+* Changed: Ad placeholders are now fixed width to help debug wrongly sized ads.
+* Changed: Update dependencies.
+* Changed: Remove the rest of the legacy ad code.
+* Changed: Better styling for ads when in debug mode.
+* Fixed: Only run ad block field filters in the back end or when doing ajax.
+* Fixed: Better handling of front page when it's set to display posts.
+
 ## 1.6.9 (5/23/24)
 * Changed: Ads are now centered (again) by default inside entries/rows.
 * Changed: Use `wptexturize()` instead of `mb_convert_encoding()`.

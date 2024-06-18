@@ -192,23 +192,16 @@ class Mai_Publisher_Entries {
 	 * @return string
 	 */
 	function get_archive_ads( $args ) {
-		// Set index.
-		static $i = -1;
-		$i++;
-
-		// Bail if no more archive ads or missing args.
-		if ( ! ( isset( $this->archive_ads[ $i ] ) && isset( $args['params']['args'] ) ) ) {
-			return;
-		}
-
-		// Override args.
+		// Start HTML and override args.
+		$html = '';
 		$args = $args['params']['args'];
 
-		// Build ad array.
-		$ad            = $this->archive_ads[ $i ];
-		$ad['columns'] = mai_get_breakpoint_columns( $args );
+		foreach ( $this->archive_ads as $ad ) {
+			$ad['columns'] = mai_get_breakpoint_columns( $args );
+			$html         .= $this->get_ads( $ad, $args );
+		}
 
-		return $this->get_ads( $ad, $args );
+		return $html;
 	}
 
 	/**

@@ -22,7 +22,7 @@ function maipub_is_singular() {
  * @return bool
  */
 function maipub_is_archive() {
-	return is_home() || is_post_type_archive() || is_category() || is_tag() || is_tax() || is_search() || maipub_is_product_archive();
+	return is_home() || is_post_type_archive() || is_category() || is_tag() || is_tax() || is_author() || is_search() || maipub_is_product_archive();
 }
 
 /**
@@ -56,6 +56,34 @@ function maipub_is_product_archive() {
  */
 function maipub_is_product_singular() {
 	return class_exists( 'WooCommerce' ) && is_product();
+}
+
+/**
+ * Checks if currently editing a single post by post type.
+ *
+ * @since TBD
+ *
+ * @return bool
+ */
+function maipub_is_editor( $post_type = 'mai_ad' ) {
+	static $cache = null;
+
+	// If cache is set, return it.
+	if ( ! is_null( $cache ) ) {
+		return $cache;
+	}
+
+	// Start cache as false.
+	$cache = false;
+
+	// If in the back end.
+	if ( is_admin() ) {
+		// Check if editing a Mai Ad.
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		$cache  = ( $screen && $post_type === $screen->id ) || ( isset( $_REQUEST['post'] ) && $post_type === get_post_type( $_REQUEST['post'] ) );
+	}
+
+	return $cache;
 }
 
 /**

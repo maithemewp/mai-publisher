@@ -1,7 +1,7 @@
 {
-	"name": "acf/mai-ad-unit",
-	"title": "Mai GAM Ad Unit",
-	"description": "Displays an ad unit.",
+	"name": "acf/mai-ad-unit-client",
+	"title": "Mai Client GAM Ad Unit",
+	"description": "Displays a client ad unit.",
 	"category": "widgets",
 	"keywords": [ "ad", "publisher", "gam" ],
 	"icon": "media-code",
@@ -12,11 +12,6 @@
 	},
 	"supports": {
 		"anchor": false,
-		"align": false,
-		"color": {
-			"text": false,
-			"background": true,
-			"link": false
-		}
+		"align": false
 	}
 }

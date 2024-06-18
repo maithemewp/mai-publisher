@@ -129,18 +129,17 @@ function maipub_get_content_group() {
 function maipub_get_content_type() {
 	$type = 'ot';
 
+	// Home page.
+	if ( is_front_page() ) {
+		$type = 'hp';
+	}
 	// Blog page.
-	if ( is_home() ) {
+	elseif ( is_home() ) {
 		$type = 'bp';
 	}
 	// Single page.
 	elseif ( is_singular( 'page' ) ) {
 		$type = 'pa';
-
-		// Home page.
-		if ( is_front_page() ) {
-			$type = 'hp';
-		}
 	}
 	// Single post.
 	elseif ( is_singular( 'post' ) ) {
@@ -355,8 +354,26 @@ function maipub_get_current_page( $key = '' ) {
 		'iabct' => '',   // IAB content taxonomy ID.
 	];
 
+	// Homepage.
+	if ( is_front_page() ) {
+		$data['type'] = 'page';
+		$data['name'] = 'Home';
+		$data['id']   = 0;
+		$data['url']  = get_home_url();
+	}
+	// Post type archive. `is_front_page()` is already accounted for.
+	elseif ( is_home() ) {
+		$object = get_post_type_object( 'post' );
+
+		if ( $object ) {
+			$post_id      = get_option( 'page_on_front' ) ? absint( get_option( 'page_for_posts' ) ) : 0;
+			$data['name'] = $object->label; // Plural name.
+			$data['id']   = $post_id;
+			$data['url']  = $post_id ? get_permalink( $post_id ) : get_home_url();
+		}
+	}
 	// Single post.
-	if ( is_singular() ) {
+	elseif ( is_singular() ) {
 		$object = get_post_type_object( get_post_type() );
 
 		if ( $object ) {
@@ -364,17 +381,6 @@ function maipub_get_current_page( $key = '' ) {
 			$data['name'] = $object->labels->singular_name; // Singular name.
 			$data['id']   = get_the_ID();
 			$data['url']  = get_permalink();
-		}
-	}
-	// Post type archive.
-	elseif ( is_home() ) {
-		$object = get_post_type_object( 'post' );
-
-		if ( $object ) {
-			$post_id      = absint( get_option( 'page_for_posts' ) );
-			$data['name'] = $object->label; // Plural name.
-			$data['id']   = $post_id;
-			$data['url']  = $post_id ? get_permalink( $post_id ) : get_home_url();
 		}
 	}
 	// Custom post type archive.

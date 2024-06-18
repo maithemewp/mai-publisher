@@ -420,6 +420,11 @@ class Mai_Publisher_Settings {
 			}
 		}
 
+		// If gam_hashed_domain is empty, and we have a gam_domain value, set gam_hashed_domain to an encoded version of gam_domain.
+		if ( empty( $input['gam_hashed_domain'] ) && ! empty( $input['gam_domain'] ) ) {
+			$input['gam_hashed_domain'] = maipub_encode( $input['gam_domain'], 14 );
+		}
+
 		return $input;
 	}
 

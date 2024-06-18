@@ -22,8 +22,17 @@ class Mai_Publisher_Display {
 	 * @return void
 	 */
 	function hooks() {
+		add_action( 'acf/init',       [ $this, 'register_styles' ] );
 		add_action( 'admin_bar_menu', [ $this, 'add_admin_bar_item' ], 9999 );
 		add_action( 'get_header',     [ $this, 'maybe_run' ] );
+	}
+
+
+	function register_styles() {
+		$suffix = maipub_get_suffix();
+		$file   = "assets/css/mai-publisher{$suffix}.css";
+
+		wp_register_style( 'mai-publisher', maipub_get_file_data( $file, 'url' ), [], maipub_get_file_data( $file, 'version' ) );
 	}
 
 	/**
@@ -90,10 +99,7 @@ class Mai_Publisher_Display {
 			return;
 		}
 
-		$suffix = maipub_get_suffix();
-		$file   = "assets/css/mai-publisher{$suffix}.css";
-
-		wp_enqueue_style( 'mai-publisher', maipub_get_file_data( $file, 'url' ), [], maipub_get_file_data( $file, 'version' ) );
+		wp_enqueue_style( 'mai-publisher' );
 	}
 
 	/**
@@ -104,7 +110,13 @@ class Mai_Publisher_Display {
 	 * @return void
 	 */
 	function header() {
-		$header = maipub_get_option( 'header' );
+		$header = trim( (string) maipub_get_option( 'header' ) );
+
+		foreach ( $this->ads as $ad ) {
+			if ( isset( $ad['header'] ) && $ad['header'] ) {
+				$header .= trim( (string) $ad['header'] );
+			}
+		}
 
 		if ( ! $header ) {
 			return;
@@ -121,7 +133,13 @@ class Mai_Publisher_Display {
 	 * @return void
 	 */
 	function footer() {
-		$footer = maipub_get_option( 'footer' );
+		$footer = trim( (string) maipub_get_option( 'footer' ) );
+
+		foreach ( $this->ads as $ad ) {
+			if ( isset( $ad['footer'] ) && $ad['footer'] ) {
+				$footer .= trim( (string) $ad['footer'] );
+			}
+		}
 
 		if ( ! $footer ) {
 			return;

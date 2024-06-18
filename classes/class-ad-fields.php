@@ -21,6 +21,9 @@ class Mai_Publisher_Ad_Fields {
 	 */
 	function hooks() {
 		add_action( 'acf/render_field/key=maipub_global_tab',          [ $this, 'admin_css' ] );
+		add_filter( 'acf/load_field/key=maipub_global_location',       [ $this, 'load_global_locations' ] );
+		add_filter( 'acf/load_field/key=maipub_single_location',       [ $this, 'load_single_locations' ] );
+		add_filter( 'acf/load_field/key=maipub_archive_location',      [ $this, 'load_archive_locations' ] );
 		add_filter( 'acf/load_field/key=maipub_single_types',          [ $this, 'load_content_types' ] );
 		add_filter( 'acf/load_field/key=maipub_single_taxonomy',       [ $this, 'load_single_taxonomy' ] );
 		add_filter( 'acf/load_field/key=maipub_archive_types',         [ $this, 'load_archive_post_types' ] );
@@ -52,6 +55,62 @@ class Mai_Publisher_Ad_Fields {
 		</style>';
 	}
 
+	/**
+	 * Loads global locations.
+	 *
+	 * @since TBD
+	 *
+	 * @param array $field The field data.
+	 *
+	 * @return array
+	 */
+	function load_global_locations( $field ) {
+		if ( ! ( maipub_is_editor() || wp_doing_ajax() ) ) {
+			return $field;
+		}
+
+		$field['choices'] = maipub_get_location_choices( 'global' );
+
+		return $field;
+	}
+
+	/**
+	 * Loads singular locations.
+	 *
+	 * @since TBD
+	 *
+	 * @param array $field The field data.
+	 *
+	 * @return array
+	 */
+	function load_single_locations( $field ) {
+		if ( ! ( maipub_is_editor() || wp_doing_ajax() ) ) {
+			return $field;
+		}
+
+		$field['choices'] = maipub_get_location_choices( 'single' );
+
+		return $field;
+	}
+
+	/**
+	 * Loads archive locations.
+	 *
+	 * @since TBD
+	 *
+	 * @param array $field The field data.
+	 *
+	 * @return array
+	 */
+	function load_archive_locations( $field ) {
+		if ( ! ( maipub_is_editor() || wp_doing_ajax() ) ) {
+			return $field;
+		}
+
+		$field['choices'] = maipub_get_location_choices( 'archive' );
+
+		return $field;
+	}
 
 	/**
 	 * Loads singular content types.
@@ -63,10 +122,26 @@ class Mai_Publisher_Ad_Fields {
 	 * @return array
 	 */
 	function load_content_types( $field ) {
+		if ( ! ( maipub_is_editor() || wp_doing_ajax() ) ) {
+			return $field;
+		}
+
+		// Set static cache.
+		static $choices = null;
+
+		// Check cache.
+		if ( ! is_null( $choices ) ) {
+			$field['choices'] = $choices;
+
+			return $field;
+		}
+
 		$field['choices'] = array_merge(
 			[ '*' => __( 'All Content Types', 'mai-publisher' ) ],
 			$this->get_post_type_choices()
 		);
+
+		$choices = $field['choices'];
 
 		return $field;
 	}
@@ -81,7 +156,22 @@ class Mai_Publisher_Ad_Fields {
 	 * @return array
 	 */
 	function load_single_taxonomy( $field ) {
-		$field['choices'] = $this->get_taxonomy_choices();
+		if ( ! ( maipub_is_editor() || wp_doing_ajax() ) ) {
+			return $field;
+		}
+
+		// Set static cache.
+		static $choices = null;
+
+		// Check cache.
+		if ( ! is_null( $choices ) ) {
+			$field['choices'] = $choices;
+
+			return $field;
+		}
+
+		$choices          = $this->get_taxonomy_choices();
+		$field['choices'] = $choices;
 
 		return $field;
 	}
@@ -96,6 +186,20 @@ class Mai_Publisher_Ad_Fields {
 	 * @return mixed
 	 */
 	function load_archive_post_types( $field ) {
+		if ( ! ( maipub_is_editor() || wp_doing_ajax() ) ) {
+			return $field;
+		}
+
+		// Set static cache.
+		static $choices = null;
+
+		// Check cache.
+		if ( ! is_null( $choices ) ) {
+			$field['choices'] = $choices;
+
+			return $field;
+		}
+
 		$post_types = $this->get_post_type_choices();
 
 		foreach ( $post_types as $name => $label ) {
@@ -113,6 +217,8 @@ class Mai_Publisher_Ad_Fields {
 			$post_types
 		);
 
+		$choices = $field['choices'];
+
 		return $field;
 	}
 
@@ -126,10 +232,26 @@ class Mai_Publisher_Ad_Fields {
 	 * @return mixed
 	 */
 	function load_all_taxonomies( $field ) {
-		$field['choices'] = array_merge(
+		if ( ! ( maipub_is_editor() || wp_doing_ajax() ) ) {
+			return $field;
+		}
+
+		// Set static cache.
+		static $choices = null;
+
+		// Check cache.
+		if ( ! is_null( $choices ) ) {
+			$field['choices'] = $choices;
+
+			return $field;
+		}
+
+		$choices = array_merge(
 			[ '*' => __( 'All Taxonomies', 'mai-publisher' ) ],
 			$this->get_taxonomy_choices()
 		);
+
+		$field['choices'] = $choices;
 
 		return $field;
 	}
@@ -144,7 +266,13 @@ class Mai_Publisher_Ad_Fields {
 	 * @return mixed
 	 */
 	function load_all_terms( $field ) {
+		if ( ! ( maipub_is_editor() || wp_doing_ajax() ) ) {
+			return $field;
+		}
+
+		// Set vars.
 		$field['choices'] = [];
+		$number           = isset( $_POST['s'] ) && $_POST['s'] ? 0 : 50;
 		$taxonomies       = $this->get_taxonomies();
 
 		foreach( $taxonomies as $taxonomy ) {
@@ -152,6 +280,8 @@ class Mai_Publisher_Ad_Fields {
 				[
 					'taxonomy'   => $taxonomy,
 					'hide_empty' => false,
+					'fields'     => 'id=>name',
+					'number'     => $number, // No limit when searching, otherwise 100 per taxonomy.
 				]
 			);
 
@@ -159,8 +289,14 @@ class Mai_Publisher_Ad_Fields {
 				continue;
 			}
 
-			$optgroup                      = sprintf( '%s (%s)', get_taxonomy( $taxonomy )->label, $taxonomy );
-			$field['choices'][ $optgroup ] = wp_list_pluck( $terms, 'name', 'term_id' );
+			// Add taxonomy name to term name, and add to choices.
+			foreach ( $terms as $term_id => $name ) {
+				$field['choices'][ $term_id ] = "$name ($taxonomy)";
+			}
+
+			// Old optgroup method. Doesn't work when ajax => 1 in field settings.
+			// $optgroup                      = sprintf( '%s (%s)', get_taxonomy( $taxonomy )->label, $taxonomy );
+			// $field['choices'][ $optgroup ] = $terms;
 		}
 
 		return $field;
@@ -280,6 +416,10 @@ class Mai_Publisher_Ad_Fields {
 	 * @return mixed
 	 */
 	function load_single_terms( $field ) {
+		if ( ! ( maipub_is_editor() || wp_doing_ajax() ) ) {
+			return $field;
+		}
+
 		$field = $this->load_terms( $field );
 
 		return $field;
@@ -296,6 +436,10 @@ class Mai_Publisher_Ad_Fields {
 	 * @return mixed
 	 */
 	function prepare_single_terms( $field ) {
+		if ( ! ( maipub_is_editor() || wp_doing_ajax() ) ) {
+			return $field;
+		}
+
 		$field = $this->prepare_terms( $field );
 
 		return $field;
@@ -312,7 +456,7 @@ class Mai_Publisher_Ad_Fields {
 	 * @return mixed
 	 */
 	function load_terms( $field ) {
-		if ( ! is_admin() ) {
+		if ( ! ( maipub_is_editor() || wp_doing_ajax() ) ) {
 			return $field;
 		}
 
@@ -341,7 +485,7 @@ class Mai_Publisher_Ad_Fields {
 	 * @return mixed
 	 */
 	function prepare_terms( $field ) {
-		if ( ! is_admin() ) {
+		if ( ! ( maipub_is_editor() || wp_doing_ajax() ) ) {
 			return $field;
 		}
 
@@ -381,6 +525,7 @@ class Mai_Publisher_Ad_Fields {
 			$taxonomy,
 			[
 				'hide_empty' => false,
+				'fields'     => 'id=>name',
 			]
 		);
 
@@ -388,13 +533,10 @@ class Mai_Publisher_Ad_Fields {
 			return $choices;
 		}
 
-		foreach ( $terms as $term ) {
-			$choices[ $term->term_id ] = $term->name;
-		}
+		$choices = $terms;
 
 		return $choices;
 	}
-
 
 	/**
 	 * Gets an ACF request, checking nonce and value.

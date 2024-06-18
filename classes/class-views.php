@@ -113,6 +113,10 @@ class Mai_Publisher_Views {
 	 * @return array
 	 */
 	function add_trending_choice( $field ) {
+		if ( ! is_admin() ) {
+			return $field;
+		}
+
 		$field['choices'][ 'trending' ] = __( 'Trending', 'mai-publisher' ) . ' (Mai Publisher)';
 
 		return $field;
@@ -128,6 +132,10 @@ class Mai_Publisher_Views {
 	 * @return array
 	 */
 	function add_views_choice( $field ) {
+		if ( ! is_admin() ) {
+			return $field;
+		}
+
 		$field['choices'] = array_merge( [ 'views' => __( 'Views', 'mai-publisher' ) . ' (Mai Publisher)' ], $field['choices'] );
 
 		return $field;
@@ -144,6 +152,10 @@ class Mai_Publisher_Views {
 	 * @return array
 	 */
 	function add_show_conditional_logic( $field ) {
+		if ( ! is_admin() ) {
+			return $field;
+		}
+
 		$conditions = [];
 
 		foreach ( $field['conditional_logic'] as $index => $values ) {
@@ -172,6 +184,10 @@ class Mai_Publisher_Views {
 	 * @return array
 	 */
 	function add_hide_conditional_logic( $field ) {
+		if ( ! is_admin() ) {
+			return $field;
+		}
+
 		$key = false !== strpos( $field['key'], '_tax_' ) ? 'mai_grid_block_tax_query_by' : 'mai_grid_block_query_by';
 
 		$field['conditional_logic'][] = [

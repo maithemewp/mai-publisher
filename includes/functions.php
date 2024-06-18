@@ -37,15 +37,16 @@ function maipub_get_processed_content( $content ) {
 	global $wp_embed;
 
 	$blocks  = has_blocks( $content );
-	$content = $wp_embed->autoembed( $content );           // WP runs priority 8.
-	$content = $wp_embed->run_shortcode( $content );       // WP runs priority 8.
-	$content = $blocks ? do_blocks( $content ) : $content; // WP runs priority 9.
-	$content = wptexturize( $content );                    // WP runs priority 10.
-	$content = ! $blocks ? wpautop( $content ) : $content; // WP runs priority 10.
-	$content = shortcode_unautop( $content );              // WP runs priority 10.
-	$content = function_exists( 'wp_filter_content_tags' ) ? wp_filter_content_tags( $content ) : wp_make_content_images_responsive( $content ); // WP runs priority 10. WP 5.5 with fallback.
-	$content = do_shortcode( $content );                   // WP runs priority 11.
-	$content = convert_smilies( $content );                // WP runs priority 20.
+	$content = $wp_embed->autoembed( $content );            // WP runs priority 8.
+	$content = $wp_embed->run_shortcode( $content );        // WP runs priority 8.
+	$content = $blocks ? do_blocks( $content ) : $content;  // WP runs priority 9.
+	$content = wptexturize( $content );                     // WP runs priority 10.
+	$content = ! $blocks ? wpautop( $content ) : $content;  // WP runs priority 10.
+	$content = shortcode_unautop( $content );               // WP runs priority 10.
+	$content = do_shortcode( $content );                    // WP runs priority 11.
+	$content = wp_filter_content_tags( $content );          // WP runs priority 12.
+	$content = convert_smilies( $content );                 // WP runs priority 20.
+	$content = str_replace( ']]>', ']]&gt;', $content );
 
 	return $content;
 }
@@ -353,6 +354,9 @@ function maipub_get_config( $sub_config = '' ) {
 
 	if ( ! is_array( $config ) ) {
 		$config = require MAI_PUBLISHER_DIR . '/config.php';
+
+		// Allow filtering.
+		$config = apply_filters( 'mai_publisher_config', $config );
 	}
 
 	if ( $sub_config ) {
@@ -520,6 +524,7 @@ function maipub_get_file_data( $file, $key = '' ) {
 		return $cache[ $file ];
 	}
 
+	$cache          = is_array( $cache ) ? $cache : [];
 	$file_path      = MAI_PUBLISHER_DIR . $file;
 	$file_url       = MAI_PUBLISHER_URL . $file;
 	$version        = MAI_PUBLISHER_VERSION . '.' . date( 'njYHi', filemtime( $file_path ) );

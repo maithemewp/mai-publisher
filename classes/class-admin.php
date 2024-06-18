@@ -230,13 +230,13 @@ class Mai_Publisher_Admin {
 		$entries      = get_post_meta( $post_id, 'maipub_single_entries', true );
 		$archive      = get_post_meta( $post_id, 'maipub_archive_location', true );
 		$archives     = get_post_meta( $post_id, 'maipub_archive_types', true );
-		$archive_misc = get_post_meta( $post_id, 'maipub_archive_includes', true );
 		$taxonomies   = get_post_meta( $post_id, 'maipub_archive_taxonomies', true );
 		$terms        = get_post_meta( $post_id, 'maipub_archive_terms', true );
+		$archive_misc = get_post_meta( $post_id, 'maipub_archive_includes', true );
 		$choices      = maipub_get_location_choices();
 
 		// Bail if no locations.
-		if ( ! ( $global || ( $single && ( $singles || $entries ) ) || ( $archive && ( $archives || $taxonomies || $terms ) ) ) ) {
+		if ( ! ( $global || ( $single && ( $singles || $entries ) ) || ( $archive && ( $archives || $taxonomies || $terms || $archive_misc ) ) ) ) {
 			echo '<strong class="mai-ad-status mai-ad-status__inactive">' . __( 'Inactive', 'mai-publisher' ) . '</strong><br>';
 			return;
 		}
@@ -293,7 +293,7 @@ class Mai_Publisher_Admin {
 		}
 
 		// Archives.
-		if ( $archive && ( $archives || $taxonomies || $terms ) ) {
+		if ( $archive && ( $archives || $taxonomies || $terms || $archive_misc ) ) {
 			$array = [];
 
 			if ( $archives ) {
@@ -334,6 +334,19 @@ class Mai_Publisher_Admin {
 				}
 			}
 
+			if ( $archive_misc ) {
+				foreach ( $archive_misc as $misc ) {
+					switch ( $misc ) {
+						case 'author':
+							$array[] = __( 'Authors', 'mai-publisher' );
+						break;
+						case 'search':
+							$array[] = __( 'Search Results', 'mai-publisher' );
+						break;
+					}
+				}
+			}
+
 			if ( $array ) {
 				$html .= sprintf( '%s (%s) -- %s', __( 'Archives', 'mai-publisher' ), $choices['archive'][ $archive ], implode( ' | ', $array ) ) . '<br>';
 			}
@@ -353,7 +366,6 @@ class Mai_Publisher_Admin {
 	 */
 	function display_ad_data( $post_id ) {
 		$ad_units = maipub_get_config( 'ad_units' );
-		$legacy   = maipub_get_legacy_ad_units();
 		$post     = get_post( $post_id );
 		$data     = $this->get_ad_unit_data( $post->post_content );
 
@@ -369,13 +381,7 @@ class Mai_Publisher_Admin {
 
 			// If GAM ad unit.
 			if ( isset( $ad_units[ $slug ]['sizes'] ) ) {
-				$label = $slug;
-
-				if ( isset( $legacy[ $slug ] ) ) {
-					$label .= ' <span style="color:red;">' . __( '(legacy)', 'mai-publisher' ) . '</span>';
-				}
-
-				$sizes[] = '<strong>' . $label . '</strong>: ' . $this->format_sizes( $ad_units[ $slug ]['sizes'] );
+				$sizes[] = '<strong>' . $slug . '</strong>: ' . $this->format_sizes( $ad_units[ $slug ]['sizes'] );
 			}
 			// Not GAM, only video for now.
 			else {
@@ -417,7 +423,7 @@ class Mai_Publisher_Admin {
 		$videos      = $videos ? $videos['choices'] : [];
 
 		foreach ( $blocks as $block ) {
-			if ( 'acf/mai-ad-unit' === $block['blockName'] && isset( $block['attrs']['data']['id'] ) && ! empty( $block['attrs']['data']['id'] ) ) {
+			if ( in_array( $block['blockName'], [ 'acf/mai-ad-unit', 'acf/mai-ad-unit-client' ] ) && isset( $block['attrs']['data']['id'] ) && ! empty( $block['attrs']['data']['id'] ) ) {
 				$array            = [];
 				$array['slug']    = $block['attrs']['data']['id'];
 				$array['targets'] = [];

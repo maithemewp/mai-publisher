@@ -227,7 +227,76 @@
 }
 
 /* Mai Engine specific but easier to add here */
+
+/*
+for nested light bg blocks inside dark bg. maybe overkill.
+the order of these may affect things and cause issues when it's dark inside light, or vice-a-versa.
+*/
+.has-background,
+.has-light-background  {
+	--mai-ad-unit-label-color: initial;
+}
+
+.has-dark-background  {
+	--mai-ad-unit-label-color: white;
+}
+
 .entry-wrap > .cnx-main-container {
 	margin-block: var(--spacing-md, 24px);
 	z-index: 9;
+}
+
+/* Placeholders */
+
+.maipub-placeholder {
+	display: grid;
+	place-items: center;
+	width: var(--maipub-placeholder-width, auto);
+	height: var(--maipub-placeholder-height, auto);
+	background: var(--color-alt);
+	font-size: 16px;
+	filter: brightness(0.95);
+}
+
+.maipub-placeholder__caption {
+	display: none;
+	line-height: 1.3;
+	text-align: center;
+	opacity: 0.75;
+}
+
+@media only screen and (max-width: 727px) {
+
+	.maipub-placeholder {
+		--maipub-placeholder-width: var(--width-mobile);
+		--maipub-placeholder-height: var(--height-mobile);
+	}
+
+	.maipub-placeholder__caption.mobile {
+		display: block;
+	}
+}
+
+@media only screen and (min-width: 728px) and (max-width: 1023px) {
+
+	.maipub-placeholder {
+		--maipub-placeholder-width: var(--width-tablet);
+		--maipub-placeholder-height: var(--height-tablet);
+	}
+
+	.maipub-placeholder__caption.tablet {
+		display: block;
+	}
+}
+
+@media only screen and (min-width: 1024px) {
+
+	.maipub-placeholder {
+		--maipub-placeholder-width: var(--width-desktop);
+		--maipub-placeholder-height: var(--height-desktop);
+	}
+
+	.maipub-placeholder__caption.desktop {
+		display: block;
+	}
 }
