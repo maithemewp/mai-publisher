@@ -28,8 +28,10 @@ class Mai_Publisher_Ad_Fields {
 		add_filter( 'acf/load_field/key=maipub_single_taxonomy',          [ $this, 'load_single_taxonomy' ] );
 		add_filter( 'acf/load_field/key=maipub_archive_types',            [ $this, 'load_archive_post_types' ] );
 		add_filter( 'acf/load_field/key=maipub_archive_taxonomies',       [ $this, 'load_all_taxonomies' ] );
-		add_filter( 'acf/prepare_field/key=maipub_archive_terms',         [ $this, 'load_all_terms' ] );
-		add_filter( 'acf/prepare_field/key=maipub_archive_exclude_terms', [ $this, 'load_all_terms' ] );
+		add_filter( 'acf/load_field/key=maipub_archive_terms',            [ $this, 'load_all_terms' ] );
+		add_filter( 'acf/load_field/key=maipub_archive_exclude_terms',    [ $this, 'load_all_terms' ] );
+		add_filter( 'acf/prepare_field/key=maipub_archive_terms',         [ $this, 'load_saved_terms' ] );
+		add_filter( 'acf/prepare_field/key=maipub_archive_exclude_terms', [ $this, 'load_saved_terms' ] );
 		add_filter( 'acf/load_field/key=maipub_single_terms',             [ $this, 'load_single_terms' ] );
 		add_filter( 'acf/prepare_field/key=maipub_single_terms',          [ $this, 'prepare_single_terms' ] );
 	}
@@ -297,6 +299,23 @@ class Mai_Publisher_Ad_Fields {
 			// Old optgroup method. Doesn't work when ajax => 1 in field settings.
 			// $optgroup                      = sprintf( '%s (%s)', get_taxonomy( $taxonomy )->label, $taxonomy );
 			// $field['choices'][ $optgroup ] = $terms;
+		}
+
+		return $field;
+	}
+
+	/**
+	 * Makes sure saved terms are loaded as choices.
+	 *
+	 * @since TBD
+	 *
+	 * @param array $field The ACF field array.
+	 *
+	 * @return mixed
+	 */
+	function load_saved_terms( $field ) {
+		if ( ! ( maipub_is_editor() || wp_doing_ajax() ) ) {
+			return $field;
 		}
 
 		// If we have a value, make sure those terms are loaded by default.
