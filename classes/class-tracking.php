@@ -311,8 +311,8 @@ class Mai_Publisher_Tracking {
 	 * @return array
 	 */
 	function set_site_dimension_8() {
-		$content  = '';
-		$range    = false;
+		$content = '';
+		$range   = false;
 
 		// If single post, add the content.
 		if ( is_singular() ) {
