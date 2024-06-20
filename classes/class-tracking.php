@@ -311,12 +311,14 @@ class Mai_Publisher_Tracking {
 	 * @return array
 	 */
 	function set_site_dimension_8() {
-		$range   = false;
-		$content = '';
+		$content  = '';
+		$range    = false;
 
+		// If single post, add the content.
 		if ( is_singular() ) {
 			$content .= get_post_field( 'post_content', get_the_ID() );
 		}
+
 		// Get ads from Mai Archive Pages.
 		elseif ( function_exists( 'maiap_get_archive_page' ) ) {
 			$pages = [
@@ -333,12 +335,17 @@ class Mai_Publisher_Tracking {
 			}
 		}
 
+		// Bail if no content.
 		if ( ! $content ) {
 			return;
 		}
 
-		$content = maipub_get_processed_content( $content );
-		$count   = str_word_count( strip_tags( $content ) );
+		// Strip shortcodes, html tags, and count words.
+		// Can't process content because it parses blocks and throws off
+		// things like Mai Post Grid that counts displayed posts IDs.
+		$content = strip_shortcodes( $content );
+		$content = wp_strip_all_tags( $content );
+		$count   = str_word_count( $content );
 		$ranges  = [
 			[ 0, 499 ],
 			[ 500, 999 ],
