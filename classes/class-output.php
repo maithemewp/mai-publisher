@@ -324,7 +324,7 @@ class Mai_Publisher_Output {
 				}
 
 				// Add GPT.
-				$scripts[] = '<script async src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>'; // Google Ad Manager GPT.
+				$scripts[] = '<script async id="mai-publisher-gpt" src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>'; // Google Ad Manager GPT.
 			}
 
 			// Add mai-publisher-ads scripts.
@@ -348,7 +348,8 @@ class Mai_Publisher_Output {
 
 		// Handle scripts.
 		if ( $scripts ) {
-			$position = $position ?: $this->xpath->query( '//head/link' )->item(0);
+			// $scripts  = array_reverse( $scripts ); // Reverse when displaying 'after' something. Leave as-is when it's 'before'.
+			$position = $position ?: $this->xpath->query( '//head/title' )->item(0);
 
 			// Insert scripts.
 			foreach ( $scripts as $script ) {
@@ -1007,7 +1008,7 @@ class Mai_Publisher_Output {
 			}
 		</script>';
 
-		$scripts[] = '<script src="https://cdn.privacy-mgmt.com/unified/wrapperMessagingWithoutDetection.js" async></script>';
+		$scripts[] = '<script async src="https://cdn.privacy-mgmt.com/unified/wrapperMessagingWithoutDetection.js"></script>';
 
 		return $scripts;
 	}
