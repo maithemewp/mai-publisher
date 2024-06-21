@@ -738,8 +738,10 @@ class Mai_Publisher_Output {
 			return;
 		}
 
-		// Reverse the array if prepending, so they end up in the right order.
-		if ( 'prepend' === $action ) {
+		// Reverse the array if displaying after or prepending, so they end up in the right order.
+		// After would put each element directly after the target, so they would end up in reverse order.
+		// Prepend would put each element directly before the first child of the target, so they would end up in reverse order.
+		if ( in_array( $action, [ 'after', 'prepend' ] ) ) {
 			$insert = array_reverse( $insert );
 		}
 
