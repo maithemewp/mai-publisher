@@ -1,7 +1,13 @@
 # Changelog
 
 ## 1.7.1 (6/26/24)
+* Changed: Added `mai-publisher-gpt` id to gpt.js script tag for easier debugging when viewing webpage source code.
+* Changed: No longer parsing shortcodes, embeds, and dynamic blocks getting word count for dimension 8.
+* Changed: Reorder Sourcepoint settings for consistency with their portal settings.
+* Fixed: Node order was reveresed when loading after an element in the DOM.
+* Fixed: Better handling of current page ID when not using static pages for Posts/Homepage.
 * Fixed: Some select fields were unable to be cleared.
+* Fixed: Terms saved in archive include/exclude terms were not always loaded in the field when refreshing.
 
 ## 1.7.0 (6/18/24)
 * Added: New Mai Client GAM Ad Unit block.
