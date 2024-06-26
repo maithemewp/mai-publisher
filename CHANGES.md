@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.7.1 (6/26/24)
+* Fixed: Some select fields were unable to be cleared.
+
 ## 1.7.0 (6/18/24)
 * Added: New Mai Client GAM Ad Unit block.
 * Added: Header/Footer scripts fields per ad.
