@@ -358,7 +358,8 @@ function maipub_get_current_page( $key = '' ) {
 	if ( is_front_page() ) {
 		$data['type'] = 'page';
 		$data['name'] = 'Home';
-		$data['id']   = 0;
+		// $data['id']   = 0;
+		$data['id']   = get_option( 'page_on_front' ) ? absint( get_option( 'page_on_front' ) ) : 0;
 		$data['url']  = get_home_url();
 	}
 	// Post type archive. `is_front_page()` is already accounted for.
@@ -366,7 +367,7 @@ function maipub_get_current_page( $key = '' ) {
 		$object = get_post_type_object( 'post' );
 
 		if ( $object ) {
-			$post_id      = get_option( 'page_on_front' ) ? absint( get_option( 'page_for_posts' ) ) : 0;
+			$post_id      = get_option( 'page_for_posts' ) ? absint( get_option( 'page_for_posts' ) ) : 0;
 			$data['name'] = $object->label; // Plural name.
 			$data['id']   = $post_id;
 			$data['url']  = $post_id ? get_permalink( $post_id ) : get_home_url();
@@ -441,24 +442,7 @@ function maipub_get_current_page( $key = '' ) {
  * @return int
  */
 function maipub_get_current_page_id() {
-	static $post_id = null;
-
-	if ( ! is_null( $post_id ) ) {
-		return $post_id;
-	}
-
-	$post_id = 0;
-
-	// Get post ID.
-	if ( maipub_is_singular() ) {
-		$post_id = get_the_ID();
-	} elseif ( is_home() && ! is_front_page() ) {
-		$post_id = get_option( 'page_for_posts' );
-	} elseif ( maipub_is_shop_archive() ) {
-		$post_id = get_option( 'woocommerce_shop_page_id' );
-	}
-
-	return $post_id;
+	return maipub_get_current_page( 'id' );
 }
 
 /**

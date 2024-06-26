@@ -231,17 +231,17 @@ class Mai_Publisher_Settings {
 		);
 
 		add_settings_field(
-			'sourcepoint_msps_message_id', // id
-			__( 'Sourcepoint MSPS Message ID', 'mai-publisher' ), // title
-			[ $this, 'sourcepoint_msps_message_id_callback' ], // callback
+			'sourcepoint_tcf_message_id', // id
+			__( 'Sourcepoint TCF Message ID', 'mai-publisher' ), // title
+			[ $this, 'sourcepoint_tcf_message_id_callback' ], // callback
 			'mai-publisher-section', // page
 			'maipub_settings' // section
 		);
 
 		add_settings_field(
-			'sourcepoint_tcf_message_id', // id
-			__( 'Sourcepoint TCF Message ID', 'mai-publisher' ), // title
-			[ $this, 'sourcepoint_tcf_message_id_callback' ], // callback
+			'sourcepoint_msps_message_id', // id
+			__( 'Sourcepoint MSPS Message ID', 'mai-publisher' ), // title
+			[ $this, 'sourcepoint_msps_message_id_callback' ], // callback
 			'mai-publisher-section', // page
 			'maipub_settings' // section
 		);
@@ -575,10 +575,10 @@ class Mai_Publisher_Settings {
 	 *
 	 * @return void
 	 */
-	function sourcepoint_msps_message_id_callback() {
-		$id  = maipub_get_option( 'sourcepoint_msps_message_id', false );
+	function sourcepoint_tcf_message_id_callback() {
+		$id  = maipub_get_option( 'sourcepoint_tcf_message_id', false );
 
-		printf( '<input class="regular-text" type="text" name="mai_publisher[sourcepoint_msps_message_id]" id="sourcepoint_msps_message_id" value="%s">', $id );
+		printf( '<input class="regular-text" type="text" name="mai_publisher[sourcepoint_tcf_message_id]" id="sourcepoint_tcf_message_id" value="%s">', $id );
 		// printf( '<p class="description">%s</p>', __( 'Adding a property ID here will automatically load the Sourcepoint scripts on pages with ads.', 'mai-publisher' ) );
 	}
 
@@ -589,10 +589,10 @@ class Mai_Publisher_Settings {
 	 *
 	 * @return void
 	 */
-	function sourcepoint_tcf_message_id_callback() {
-		$id  = maipub_get_option( 'sourcepoint_tcf_message_id', false );
+	function sourcepoint_msps_message_id_callback() {
+		$id  = maipub_get_option( 'sourcepoint_msps_message_id', false );
 
-		printf( '<input class="regular-text" type="text" name="mai_publisher[sourcepoint_tcf_message_id]" id="sourcepoint_tcf_message_id" value="%s">', $id );
+		printf( '<input class="regular-text" type="text" name="mai_publisher[sourcepoint_msps_message_id]" id="sourcepoint_msps_message_id" value="%s">', $id );
 		// printf( '<p class="description">%s</p>', __( 'Adding a property ID here will automatically load the Sourcepoint scripts on pages with ads.', 'mai-publisher' ) );
 	}
 
