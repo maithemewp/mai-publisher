@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.7.2 (6/26/24)
+* Added: New `mai_publisher_options` filter to modify options/settings on the fly.
+
 ## 1.7.1 (6/26/24)
 * Changed: Added `mai-publisher-gpt` id to gpt.js script tag for easier debugging when viewing webpage source code.
 * Changed: No longer parsing shortcodes, embeds, and dynamic blocks getting word count for dimension 8.

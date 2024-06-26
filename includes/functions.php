@@ -390,6 +390,7 @@ function maipub_get_option( $option, $fallback = true ) {
  * Gets all option values.
  *
  * @since 0.1.0
+ * @since 1.7.2 Added filter.
  *
  * @return array
  */
@@ -400,7 +401,11 @@ function maipub_get_options() {
 		return $options;
 	}
 
-	return (array) get_option( 'mai_publisher', [] );
+	// Get and filter options.
+	$options = (array) get_option( 'mai_publisher', [] );
+	$options = apply_filters( 'mai_publisher_options', $options );
+
+	return $options;
 }
 
 /**

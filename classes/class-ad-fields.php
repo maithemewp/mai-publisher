@@ -60,7 +60,7 @@ class Mai_Publisher_Ad_Fields {
 	/**
 	 * Loads global locations.
 	 *
-	 * @since TBD
+	 * @since 1.7.0
 	 *
 	 * @param array $field The field data.
 	 *
@@ -79,7 +79,7 @@ class Mai_Publisher_Ad_Fields {
 	/**
 	 * Loads singular locations.
 	 *
-	 * @since TBD
+	 * @since 1.7.0
 	 *
 	 * @param array $field The field data.
 	 *
@@ -98,7 +98,7 @@ class Mai_Publisher_Ad_Fields {
 	/**
 	 * Loads archive locations.
 	 *
-	 * @since TBD
+	 * @since 1.7.0
 	 *
 	 * @param array $field The field data.
 	 *
@@ -307,7 +307,7 @@ class Mai_Publisher_Ad_Fields {
 	/**
 	 * Makes sure saved terms are loaded as choices.
 	 *
-	 * @since TBD
+	 * @since 1.7.0
 	 *
 	 * @param array $field The ACF field array.
 	 *
