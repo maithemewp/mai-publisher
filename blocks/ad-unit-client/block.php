@@ -6,7 +6,7 @@ defined( 'ABSPATH' ) || die;
 /**
  * Registers the Mai Ad Unit Client block.
  *
- * @since TBD
+ * @since 1.7.0
  */
 class Mai_Publisher_Ad_Unit_Client_Block {
 	/**
@@ -19,7 +19,7 @@ class Mai_Publisher_Ad_Unit_Client_Block {
 	/**
 	 * Add hooks.
 	 *
-	 * @since TBD
+	 * @since 1.7.0
 	 *
 	 * @return void
 	 */
@@ -32,7 +32,7 @@ class Mai_Publisher_Ad_Unit_Client_Block {
 	/**
 	 * Registers block.
 	 *
-	 * @since TBD
+	 * @since 1.7.0
 	 *
 	 * @return void
 	 */
@@ -51,7 +51,7 @@ class Mai_Publisher_Ad_Unit_Client_Block {
 	/**
 	 * Callback function to render the block.
 	 *
-	 * @since TBD
+	 * @since 1.7.0
 	 *
 	 * @param array  $block      The block settings and attributes.
 	 * @param string $content    The block inner HTML (empty).
@@ -82,7 +82,7 @@ class Mai_Publisher_Ad_Unit_Client_Block {
 	 * so this statically caches the result so re-rendering Mai Ad block
 	 * via ajax will still show the correct value if in the editor.
 	 *
-	 * @since TBD
+	 * @since 1.7.0
 	 *
 	 * @link https://github.com/maithemewp/mai-publisher/issues/22
 	 *
@@ -107,7 +107,7 @@ class Mai_Publisher_Ad_Unit_Client_Block {
 	/**
 	 * Registers field group.
 	 *
-	 * @since TBD
+	 * @since 1.7.0
 	 *
 	 * @return void
 	 */
@@ -184,7 +184,7 @@ class Mai_Publisher_Ad_Unit_Client_Block {
 	/**
 	 * Loads ad unit choices.
 	 *
-	 * @since TBD
+	 * @since 1.7.0
 	 *
 	 * @param array $field The field data.
 	 *

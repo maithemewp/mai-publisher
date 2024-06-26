@@ -61,7 +61,7 @@ function maipub_is_product_singular() {
 /**
  * Checks if currently editing a single post by post type.
  *
- * @since TBD
+ * @since 1.7.0
  *
  * @return bool
  */
