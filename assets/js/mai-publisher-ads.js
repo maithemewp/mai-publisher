@@ -361,17 +361,6 @@ function maiPubDefineSlot( slug ) {
  * @param {array} slots The defined slots.
  */
 function maiPubDisplaySlots( slots ) {
-	// // Loop through and register.
-	// slots.forEach( slot => {
-	// 	// If debugging, log.
-	// 	if ( log ) { console.log( 'display(): ', slot.getSlotElementId() ); }
-
-	// 	// Register the ad slot.
-	// 	// An ad will not be fetched until refresh is called,
-	// 	// due to the disableInitialLoad() method being called earlier.
-	// 	googletag.display( slot.getSlotElementId() );
-	// });
-
 	// Enable services.
 	// This needs to run after defineSlot() but before display()/refresh().
 	// If we did this in maiPubDefineSlot() it would run for every single slot, instead of batches.
