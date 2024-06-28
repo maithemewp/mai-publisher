@@ -8,13 +8,12 @@ const gamBase       = maiPubAdsVars.gamBase;
 const gamBaseClient = maiPubAdsVars.gamBaseClient;
 const refreshKey    = 'refresh';
 const refreshValue  = maiPubAdsVars.targets.refresh;
-const refreshTime   = 30;                                                                                      // Time in seconds.
+const refreshTime   = 30; // Time in seconds.
 const debug         = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb');
-// const log           = debug;
-const log           = true;
+const log           = debug;
 
 // If debugging, log.
-if ( log ) { console.log( 'v153' ); }
+if ( log ) { console.log( 'v154' ); }
 
 // Add to googletag items.
 googletag.cmd.push(() => {
@@ -362,17 +361,6 @@ function maiPubDefineSlot( slug ) {
  * @param {array} slots The defined slots.
  */
 function maiPubDisplaySlots( slots ) {
-	// // Loop through and register.
-	// slots.forEach( slot => {
-	// 	// If debugging, log.
-	// 	if ( log ) { console.log( 'display(): ', slot.getSlotElementId() ); }
-
-	// 	// Register the ad slot.
-	// 	// An ad will not be fetched until refresh is called,
-	// 	// due to the disableInitialLoad() method being called earlier.
-	// 	googletag.display( slot.getSlotElementId() );
-	// });
-
 	// Enable services.
 	// This needs to run after defineSlot() but before display()/refresh().
 	// If we did this in maiPubDefineSlot() it would run for every single slot, instead of batches.
