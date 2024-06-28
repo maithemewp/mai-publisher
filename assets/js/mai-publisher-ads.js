@@ -8,13 +8,12 @@ const gamBase       = maiPubAdsVars.gamBase;
 const gamBaseClient = maiPubAdsVars.gamBaseClient;
 const refreshKey    = 'refresh';
 const refreshValue  = maiPubAdsVars.targets.refresh;
-const refreshTime   = 30;                                                                                      // Time in seconds.
+const refreshTime   = 30; // Time in seconds.
 const debug         = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb');
-// const log           = debug;
-const log           = true;
+const log           = debug;
 
 // If debugging, log.
-if ( log ) { console.log( 'v153' ); }
+if ( log ) { console.log( 'v154' ); }
 
 // Add to googletag items.
 googletag.cmd.push(() => {
