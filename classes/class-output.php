@@ -298,6 +298,7 @@ class Mai_Publisher_Output {
 				'ads'           => $this->gam,
 				'targets'       => $this->get_targets(),
 				'amazonUAM'     => maipub_get_option( 'amazon_uam_enabled' ),
+				'loadDelay'     => maipub_get_option( 'load_delay' ),
 			];
 
 			// If sourcepoint data.
@@ -960,7 +961,7 @@ class Mai_Publisher_Output {
 					baseEndpoint: "https://cdn.privacy-mgmt.com",
 					propertyId: ' . (string) $this->sp_property_id . ',
 					usnat: { includeUspApi: true },
-					gdpr: { },
+					gdpr: {},
 					events: {
 						onMessageChoiceSelect: function() {
 							console.log( "[event] onMessageChoiceSelect", arguments );

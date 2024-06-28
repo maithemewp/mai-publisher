@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.8.0 (6/28/24)
+* Added: New load delay setting to move event from `DOMContentLoaded` to window `load`, with a timed delay. This is for testing with CMP's like Sourcepoint.
+
 ## 1.7.2 (6/26/24)
 * Added: New `mai_publisher_options` filter to modify options/settings on the fly.
 

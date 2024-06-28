@@ -247,6 +247,14 @@ class Mai_Publisher_Settings {
 		);
 
 		add_settings_field(
+			'load_delay', // id
+			__( 'Add load delay', 'mai-publisher' ), // title
+			[ $this, 'load_delay_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings' // section
+		);
+
+		add_settings_field(
 			'category', // id
 			__( 'Sitewide Category', 'mai-publisher' ), // title
 			[ $this, 'category_callback' ], // callback
@@ -391,6 +399,7 @@ class Mai_Publisher_Settings {
 			'sourcepoint_property_id'     => 'absint',
 			'sourcepoint_msps_message_id' => 'absint',
 			'sourcepoint_tcf_message_id'  => 'absint',
+			'load_delay'                  => 'absint',
 			'category'                    => 'sanitize_text_field',
 			'amazon_uam_enabled'          => 'rest_sanitize_boolean',
 			'matomo_enabled_global'       => 'rest_sanitize_boolean',
@@ -594,6 +603,20 @@ class Mai_Publisher_Settings {
 
 		printf( '<input class="regular-text" type="text" name="mai_publisher[sourcepoint_msps_message_id]" id="sourcepoint_msps_message_id" value="%s">', $id );
 		// printf( '<p class="description">%s</p>', __( 'Adding a property ID here will automatically load the Sourcepoint scripts on pages with ads.', 'mai-publisher' ) );
+	}
+
+	/**
+	 * Setting callback.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	function load_delay_callback() {
+		$delay  = maipub_get_option( 'load_delay', false );
+
+		printf( '<input class="regular-text" type="number" name="mai_publisher[load_delay]" id="load_delay" value="%s">', absint( $delay ) );
+		printf( '<p class="description">%s</p>', __( 'Add a delay in ms (1000ms = 1s). A value here will also move the event from DOMContentLoaded to window load. Leave empty for no delay.', 'mai-publisher' ) );
 	}
 
 	/**
