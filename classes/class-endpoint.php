@@ -54,6 +54,7 @@ class Mai_Publisher_Endpoint {
 			'gam_targets'            => (string) maipub_get_option( 'gam_targets', false ),
 			'category'               => (string) maipub_get_option( 'category', false ),
 			'amazon_uam_enabled'     => (bool) maipub_get_option( 'amazon_uam_enabled', false ),
+			'load_delay'             => (int) maipub_get_option( 'load_delay', false ),
 			'matomo_enabled_global'  => (bool) maipub_get_option( 'matomo_enabled_global', false ),
 			'matomo_enabled'         => (bool) maipub_get_option( 'matomo_enabled', false ),
 			'matomo_url'             => (string) maipub_get_option( 'matomo_url', false ),

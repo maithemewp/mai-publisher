@@ -682,7 +682,8 @@ class Mai_Publisher_Output {
 		// should already be encoded.
 		// This was causing issues because it's converting ALL entities,
 		// including stuff in data-attributes, etc.
-		// $html = mb_encode_numericentity( $html, [0x80, 0x10FFFF, 0, ~0], 'UTF-8' );
+		$html = function_exists( 'mai_convert_quotes' ) ? mai_convert_quotes( $html ) : $html;
+		$html = mb_encode_numericentity( $html, [0x80, 0x10FFFF, 0, ~0], 'UTF-8' );
 
 		// Load the content in the document HTML.
 		$dom->loadHTML( $html );
@@ -712,7 +713,7 @@ class Mai_Publisher_Output {
 		// should already be encoded.
 		// This was causing issues because it's converting ALL entities,
 		// including stuff in data-attributes, etc.
-		// $html = mb_convert_encoding( $html, 'UTF-8', 'HTML-ENTITIES' );
+		$html = mb_convert_encoding( $html, 'UTF-8', 'HTML-ENTITIES' );
 
 		return $html;
 	}
