@@ -951,67 +951,70 @@ class Mai_Publisher_Output {
 	 */
 	function get_sourcepoint_scripts() {
 		$scripts   = [];
-		$scripts[] = '<script>"use strict";function _typeof(t){return(_typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(t){return typeof t}:function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":typeof t})(t)}!function(){var t=function(){for(var t,e,o=[],n=window,r=n;r;){try{if(r.frames.__tcfapiLocator){t=r;break}}catch(a){}if(r===n.top)break;r=r.parent}t||(!function t(){var e=n.document,o=!!n.frames.__tcfapiLocator;if(!o){if(e.body){var r=e.createElement("iframe");r.style.cssText="display:none",r.name="__tcfapiLocator",e.body.appendChild(r)}else setTimeout(t,5)}return!o}(),n.__tcfapi=function(){for(var t=arguments.length,n=Array(t),r=0;r<t;r++)n[r]=arguments[r];if(!n.length)return o;"setGdprApplies"===n[0]?n.length>3&&2===parseInt(n[1],10)&&"boolean"==typeof n[3]&&(e=n[3],"function"==typeof n[2]&&n[2]("set",!0)):"ping"===n[0]?"function"==typeof n[2]&&n[2]({gdprApplies:e,cmpLoaded:!1,cmpStatus:"stub"}):o.push(n)},n.addEventListener("message",function(t){var e="string"==typeof t.data,o={};if(e)try{o=JSON.parse(t.data)}catch(n){}else o=t.data;var r="object"===_typeof(o)&&null!==o?o.__tcfapiCall:null;r&&window.__tcfapi(r.command,r.version,function(o,n){var a={__tcfapiReturn:{returnValue:o,success:n,callId:r.callId}};t&&t.source&&t.source.postMessage&&t.source.postMessage(e?JSON.stringify(a):a,"*")},r.parameter)},!1))};"undefined"!=typeof module?module.exports=t:t()}();</script>';
-		$scripts[] = '<script>window.__gpp_addFrame=function(e){if(!window.frames[e]){if(document.body){var t=document.createElement("iframe");t.style.cssText="display:none",t.name=e,document.body.appendChild(t)}else window.setTimeout(window.__gpp_addFrame,10,e)}},window.__gpp_stub=function(){var e=arguments;if(__gpp.queue=__gpp.queue||[],__gpp.events=__gpp.events||[],!e.length||1==e.length&&"queue"==e[0])return __gpp.queue;if(1!=e.length||"events"!=e[0]){__gpp.events;var t=e[0],s=e.length>1?e[1]:null,a=e.length>2?e[2]:null;if("ping"===t)s({gppVersion:"1.1",cmpStatus:"stub",cmpDisplayStatus:"hidden",signalStatus:"not ready",supportedAPIs:["2:tcfeuv2","5:tcfcav1","6:uspv1","7:usnatv1","8:uscav1","9:usvav1","10:uscov1","11:usutv1","12:usctv1"],cmpId:0,sectionList:[],applicableSections:[],gppString:"",parsedSections:{}},!0);else if("addEventListener"===t){"lastId"in __gpp||(__gpp.lastId=0),__gpp.lastId++;var n=__gpp.lastId;__gpp.events.push({id:n,callback:s,parameter:a}),s({eventName:"listenerRegistered",listenerId:n,data:!0,pingData:{gppVersion:"1.1",cmpStatus:"stub",cmpDisplayStatus:"hidden",signalStatus:"not ready",supportedAPIs:["2:tcfeuv2","5:tcfcav1","6:uspv1","7:usnatv1","8:uscav1","9:usvav1","10:uscov1","11:usutv1","12:usctv1"],cmpId:0,sectionList:[],applicableSections:[],gppString:"",parsedSections:{}}},!0)}else if("removeEventListener"===t){for(var p=!1,i=0;i<__gpp.events.length;i++)if(__gpp.events[i].id==a){__gpp.events.splice(i,1),p=!0;break}s({eventName:"listenerRemoved",listenerId:a,data:p,pingData:{gppVersion:"1.1",cmpStatus:"stub",cmpDisplayStatus:"hidden",signalStatus:"not ready",supportedAPIs:["2:tcfeuv2","5:tcfcav1","6:uspv1","7:usnatv1","8:uscav1","9:usvav1","10:uscov1","11:usutv1","12:usctv1"],cmpId:0,sectionList:[],applicableSections:[],gppString:"",parsedSections:{}}},!0)}else"hasSection"===t?s(!1,!0):"getSection"===t||"getField"===t?s(null,!0):__gpp.queue.push([].slice.apply(e))}},window.__gpp_msghandler=function(e){var t="string"==typeof e.data;try{var s=t?JSON.parse(e.data):e.data}catch(a){s=null}if("object"==typeof s&&null!==s&&"__gppCall"in s){var n=s.__gppCall;window.__gpp(n.command,function(s,a){var p={__gppReturn:{returnValue:s,success:a,callId:n.callId}};e.source.postMessage(t?JSON.stringify(p):p,"*")},"parameter"in n?n.parameter:null,"version"in n?n.version:"1.1")}},"__gpp"in window&&"function"==typeof window.__gpp||(window.__gpp=window.__gpp_stub,window.addEventListener("message",window.__gpp_msghandler,!1),window.__gpp_addFrame("__gppLocator"));</script>';
-		$scripts[] = '<script>!function(){var a=window,e=document;function t(e){var t="string"==typeof e.data;try{var n=t?JSON.parse(e.data):e.data;if(n.__cmpCall){var p=n.__cmpCall;a.__uspapi(p.command,p.parameter,function(a,n){var r={__cmpReturn:{returnValue:a,success:n,callId:p.callId}};e.source.postMessage(t?JSON.stringify(r):r,"*")})}}catch(r){}}!function t(){if(!a.frames.__uspapiLocator){if(e.body){var n=e.body,p=e.createElement("iframe");p.style.cssText="display:none",p.name="__uspapiLocator",n.appendChild(p)}else setTimeout(t,5)}}(),"function"!=typeof __uspapi&&(a.__uspapi=function a(){var e=arguments;if(__uspapi.a=__uspapi.a||[],!e.length)return __uspapi.a;"ping"===e[0]?e[2]({gdprAppliesGlobally:!1,cmpLoaded:!1},!0):__uspapi.a.push([].slice.apply(e))},__uspapi.msgHandler=t,a.addEventListener("message",t,!1))}();</script>';
-		$scripts[] = '<script>
-			window._sp_queue = [];
-			window._sp_ = {
-				config: {
-					accountId: 1970,
-					baseEndpoint: "https://cdn.privacy-mgmt.com",
-					propertyId: ' . (string) $this->sp_property_id . ',
-					usnat: { includeUspApi: true },
-					gdpr: {},
-					events: {
-						onMessageChoiceSelect: function() {
-							console.log( "[event] onMessageChoiceSelect", arguments );
-						},
-						onMessageReady: function() {
-							console.log( "[event] onMessageReady", arguments );
-						},
-						onMessageChoiceError: function() {
-							console.log( "[event] onMessageChoiceError", arguments );
-						},
-						onPrivacyManagerAction: function() {
-							console.log( "[event] onPrivacyManagerAction", arguments );
-						},
-						onPMCancel: function() {
-							console.log( "[event] onPMCancel", arguments );
-						},
-						onMessageReceiveData: function() {
-							console.log( "[event] onMessageReceiveData", arguments );
-						},
-						onSPPMObjectReady: function() {
-							console.log( "[event] onSPPMObjectReady", arguments );
-						},
-						onConsentReady: function (message_type, uuid, string, info) {
-							console.log( "[event] onConsentReady", arguments );
-							if((message_type == "usnat") && (info.applies)){
-								/* code to insert the USNAT footer link */
-								document.getElementById("pmLink").style.visibility="visible";
-								document.getElementById("pmLink").innerHTML= "Do Not Sell/Share My Personal Information";
-								document.getElementById("pmLink").onclick= function(){
-									window._sp_.usnat.loadPrivacyManagerModal( "' . $this->sp_msps_id . '" );
-								}
-							}
-							if((message_type == "gdpr") && (info.applies)){
-								/* code to insert the GDPR footer link */
-								document.getElementById("pmLink").style.visibility="visible";
-								document.getElementById("pmLink").innerHTML= "Privacy Preferences";
-								document.getElementById("pmLink").onclick= function(){
-									window._sp_.gdpr.loadPrivacyManagerModal( "' . $this->sp_tcf_id . '" );
-								}
-							}
-						},
-						onError: function() {
-							console.log( "[event] onError", arguments );
-						},
-					}
-				}
-			}
-		</script>';
+		// $scripts[] = '<script>"use strict";function _typeof(t){return(_typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(t){return typeof t}:function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":typeof t})(t)}!function(){var t=function(){for(var t,e,o=[],n=window,r=n;r;){try{if(r.frames.__tcfapiLocator){t=r;break}}catch(a){}if(r===n.top)break;r=r.parent}t||(!function t(){var e=n.document,o=!!n.frames.__tcfapiLocator;if(!o){if(e.body){var r=e.createElement("iframe");r.style.cssText="display:none",r.name="__tcfapiLocator",e.body.appendChild(r)}else setTimeout(t,5)}return!o}(),n.__tcfapi=function(){for(var t=arguments.length,n=Array(t),r=0;r<t;r++)n[r]=arguments[r];if(!n.length)return o;"setGdprApplies"===n[0]?n.length>3&&2===parseInt(n[1],10)&&"boolean"==typeof n[3]&&(e=n[3],"function"==typeof n[2]&&n[2]("set",!0)):"ping"===n[0]?"function"==typeof n[2]&&n[2]({gdprApplies:e,cmpLoaded:!1,cmpStatus:"stub"}):o.push(n)},n.addEventListener("message",function(t){var e="string"==typeof t.data,o={};if(e)try{o=JSON.parse(t.data)}catch(n){}else o=t.data;var r="object"===_typeof(o)&&null!==o?o.__tcfapiCall:null;r&&window.__tcfapi(r.command,r.version,function(o,n){var a={__tcfapiReturn:{returnValue:o,success:n,callId:r.callId}};t&&t.source&&t.source.postMessage&&t.source.postMessage(e?JSON.stringify(a):a,"*")},r.parameter)},!1))};"undefined"!=typeof module?module.exports=t:t()}();</script>';
+		// $scripts[] = '<script>window.__gpp_addFrame=function(e){if(!window.frames[e]){if(document.body){var t=document.createElement("iframe");t.style.cssText="display:none",t.name=e,document.body.appendChild(t)}else window.setTimeout(window.__gpp_addFrame,10,e)}},window.__gpp_stub=function(){var e=arguments;if(__gpp.queue=__gpp.queue||[],__gpp.events=__gpp.events||[],!e.length||1==e.length&&"queue"==e[0])return __gpp.queue;if(1!=e.length||"events"!=e[0]){__gpp.events;var t=e[0],s=e.length>1?e[1]:null,a=e.length>2?e[2]:null;if("ping"===t)s({gppVersion:"1.1",cmpStatus:"stub",cmpDisplayStatus:"hidden",signalStatus:"not ready",supportedAPIs:["2:tcfeuv2","5:tcfcav1","6:uspv1","7:usnatv1","8:uscav1","9:usvav1","10:uscov1","11:usutv1","12:usctv1"],cmpId:0,sectionList:[],applicableSections:[],gppString:"",parsedSections:{}},!0);else if("addEventListener"===t){"lastId"in __gpp||(__gpp.lastId=0),__gpp.lastId++;var n=__gpp.lastId;__gpp.events.push({id:n,callback:s,parameter:a}),s({eventName:"listenerRegistered",listenerId:n,data:!0,pingData:{gppVersion:"1.1",cmpStatus:"stub",cmpDisplayStatus:"hidden",signalStatus:"not ready",supportedAPIs:["2:tcfeuv2","5:tcfcav1","6:uspv1","7:usnatv1","8:uscav1","9:usvav1","10:uscov1","11:usutv1","12:usctv1"],cmpId:0,sectionList:[],applicableSections:[],gppString:"",parsedSections:{}}},!0)}else if("removeEventListener"===t){for(var p=!1,i=0;i<__gpp.events.length;i++)if(__gpp.events[i].id==a){__gpp.events.splice(i,1),p=!0;break}s({eventName:"listenerRemoved",listenerId:a,data:p,pingData:{gppVersion:"1.1",cmpStatus:"stub",cmpDisplayStatus:"hidden",signalStatus:"not ready",supportedAPIs:["2:tcfeuv2","5:tcfcav1","6:uspv1","7:usnatv1","8:uscav1","9:usvav1","10:uscov1","11:usutv1","12:usctv1"],cmpId:0,sectionList:[],applicableSections:[],gppString:"",parsedSections:{}}},!0)}else"hasSection"===t?s(!1,!0):"getSection"===t||"getField"===t?s(null,!0):__gpp.queue.push([].slice.apply(e))}},window.__gpp_msghandler=function(e){var t="string"==typeof e.data;try{var s=t?JSON.parse(e.data):e.data}catch(a){s=null}if("object"==typeof s&&null!==s&&"__gppCall"in s){var n=s.__gppCall;window.__gpp(n.command,function(s,a){var p={__gppReturn:{returnValue:s,success:a,callId:n.callId}};e.source.postMessage(t?JSON.stringify(p):p,"*")},"parameter"in n?n.parameter:null,"version"in n?n.version:"1.1")}},"__gpp"in window&&"function"==typeof window.__gpp||(window.__gpp=window.__gpp_stub,window.addEventListener("message",window.__gpp_msghandler,!1),window.__gpp_addFrame("__gppLocator"));</script>';
+		// $scripts[] = '<script>!function(){var a=window,e=document;function t(e){var t="string"==typeof e.data;try{var n=t?JSON.parse(e.data):e.data;if(n.__cmpCall){var p=n.__cmpCall;a.__uspapi(p.command,p.parameter,function(a,n){var r={__cmpReturn:{returnValue:a,success:n,callId:p.callId}};e.source.postMessage(t?JSON.stringify(r):r,"*")})}}catch(r){}}!function t(){if(!a.frames.__uspapiLocator){if(e.body){var n=e.body,p=e.createElement("iframe");p.style.cssText="display:none",p.name="__uspapiLocator",n.appendChild(p)}else setTimeout(t,5)}}(),"function"!=typeof __uspapi&&(a.__uspapi=function a(){var e=arguments;if(__uspapi.a=__uspapi.a||[],!e.length)return __uspapi.a;"ping"===e[0]?e[2]({gdprAppliesGlobally:!1,cmpLoaded:!1},!0):__uspapi.a.push([].slice.apply(e))},__uspapi.msgHandler=t,a.addEventListener("message",t,!1))}();</script>';
+		// $scripts[] = '<script>
+		// 	window._sp_queue = [];
+		// 	window._sp_ = {
+		// 		config: {
+		// 			accountId: 1970,
+		// 			baseEndpoint: "https://cdn.privacy-mgmt.com",
+		// 			propertyId: ' . (string) $this->sp_property_id . ',
+		// 			usnat: { includeUspApi: true },
+		// 			gdpr: {},
+		// 			events: {
+		// 				onMessageChoiceSelect: function() {
+		// 					console.log( "[event] onMessageChoiceSelect", arguments );
+		// 				},
+		// 				onMessageReady: function() {
+		// 					console.log( "[event] onMessageReady", arguments );
+		// 				},
+		// 				onMessageChoiceError: function() {
+		// 					console.log( "[event] onMessageChoiceError", arguments );
+		// 				},
+		// 				onPrivacyManagerAction: function() {
+		// 					console.log( "[event] onPrivacyManagerAction", arguments );
+		// 				},
+		// 				onPMCancel: function() {
+		// 					console.log( "[event] onPMCancel", arguments );
+		// 				},
+		// 				onMessageReceiveData: function() {
+		// 					console.log( "[event] onMessageReceiveData", arguments );
+		// 				},
+		// 				onSPPMObjectReady: function() {
+		// 					console.log( "[event] onSPPMObjectReady", arguments );
+		// 				},
+		// 				onConsentReady: function (message_type, uuid, string, info) {
+		// 					console.log( "[event] onConsentReady", arguments );
+		// 					if((message_type == "usnat") && (info.applies)){
+		// 						/* code to insert the USNAT footer link */
+		// 						document.getElementById("pmLink").style.visibility="visible";
+		// 						document.getElementById("pmLink").innerHTML= "Do Not Sell/Share My Personal Information";
+		// 						document.getElementById("pmLink").onclick= function(){
+		// 							window._sp_.usnat.loadPrivacyManagerModal( "' . $this->sp_msps_id . '" );
+		// 						}
+		// 					}
+		// 					if((message_type == "gdpr") && (info.applies)){
+		// 						/* code to insert the GDPR footer link */
+		// 						document.getElementById("pmLink").style.visibility="visible";
+		// 						document.getElementById("pmLink").innerHTML= "Privacy Preferences";
+		// 						document.getElementById("pmLink").onclick= function(){
+		// 							window._sp_.gdpr.loadPrivacyManagerModal( "' . $this->sp_tcf_id . '" );
+		// 						}
+		// 					}
+		// 				},
+		// 				onError: function() {
+		// 					console.log( "[event] onError", arguments );
+		// 				},
+		// 			}
+		// 		}
+		// 	}
+		// </script>';
 
+		$scripts[] = '<script>"use strict";function _typeof(t){return(_typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(t){return typeof t}:function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":typeof t})(t)}!function(){var t=function(){var t,e,o=[],n=window,r=n;for(;r;){try{if(r.frames.__tcfapiLocator){t=r;break}}catch(t){}if(r===n.top)break;r=r.parent}t||(!function t(){var e=n.document,o=!!n.frames.__tcfapiLocator;if(!o)if(e.body){var r=e.createElement("iframe");r.style.cssText="display:none",r.name="__tcfapiLocator",e.body.appendChild(r)}else setTimeout(t,5);return!o}(),n.__tcfapi=function(){for(var t=arguments.length,n=new Array(t),r=0;r<t;r++)n[r]=arguments[r];if(!n.length)return o;"setGdprApplies"===n[0]?n.length>3&&2===parseInt(n[1],10)&&"boolean"==typeof n[3]&&(e=n[3],"function"==typeof n[2]&&n[2]("set",!0)):"ping"===n[0]?"function"==typeof n[2]&&n[2]({gdprApplies:e,cmpLoaded:!1,cmpStatus:"stub"}):o.push(n)},n.addEventListener("message",(function(t){var e="string"==typeof t.data,o={};if(e)try{o=JSON.parse(t.data)}catch(t){}else o=t.data;var n="object"===_typeof(o)&&null!==o?o.__tcfapiCall:null;n&&window.__tcfapi(n.command,n.version,(function(o,r){var a={__tcfapiReturn:{returnValue:o,success:r,callId:n.callId}};t&&t.source&&t.source.postMessage&&t.source.postMessage(e?JSON.stringify(a):a,"*")}),n.parameter)}),!1))};"undefined"!=typeof module?module.exports=t:t()}();</script>';
+		$scripts[] = '<script>(function () { var e = false; var c = window; var t = document; function r() { if (!c.frames["__uspapiLocator"]) { if (t.body) { var a = t.body; var e = t.createElement("iframe"); e.style.cssText = "display:none"; e.name = "__uspapiLocator"; a.appendChild(e) } else { setTimeout(r, 5) } } } r(); function p() { var a = arguments; __uspapi.a = __uspapi.a || []; if (!a.length) { return __uspapi.a } else if (a[0] === "ping") { a[2]({ gdprAppliesGlobally: e, cmpLoaded: false }, true) } else { __uspapi.a.push([].slice.apply(a)) } } function l(t) { var r = typeof t.data === "string"; try { var a = r ? JSON.parse(t.data) : t.data; if (a.__cmpCall) { var n = a.__cmpCall; c.__uspapi(n.command, n.parameter, function (a, e) { var c = { __cmpReturn: { returnValue: a, success: e, callId: n.callId } }; t.source.postMessage(r ? JSON.stringify(c) : c, "*") }) } } catch (a) { } } if (typeof __uspapi !== "function") { c.__uspapi = p; __uspapi.msgHandler = l; c.addEventListener("message", l, false) } })();</script>';
+		$scripts[] = '<script>window.__gpp_addFrame=function(e){if(!window.frames[e])if(document.body){var t=document.createElement("iframe");t.style.cssText="display:none",t.name=e,document.body.appendChild(t)}else window.setTimeout(window.__gpp_addFrame,10,e)},window.__gpp_stub=function(){var e=arguments;if(__gpp.queue=__gpp.queue||[],__gpp.events=__gpp.events||[],!e.length||1==e.length&&"queue"==e[0])return __gpp.queue;if(1==e.length&&"events"==e[0])return __gpp.events;var t=e[0],p=e.length>1?e[1]:null,s=e.length>2?e[2]:null;if("ping"===t)p({gppVersion:"1.1",cmpStatus:"stub",cmpDisplayStatus:"hidden",signalStatus:"not ready",supportedAPIs:["2:tcfeuv2","5:tcfcav1","6:uspv1","7:usnatv1","8:uscav1","9:usvav1","10:uscov1","11:usutv1","12:usctv1"],cmpId:0,sectionList:[],applicableSections:[],gppString:"",parsedSections:{}},!0);else if("addEventListener"===t){"lastId"in __gpp||(__gpp.lastId=0),__gpp.lastId++;var n=__gpp.lastId;__gpp.events.push({id:n,callback:p,parameter:s}),p({eventName:"listenerRegistered",listenerId:n,data:!0,pingData:{gppVersion:"1.1",cmpStatus:"stub",cmpDisplayStatus:"hidden",signalStatus:"not ready",supportedAPIs:["2:tcfeuv2","5:tcfcav1","6:uspv1","7:usnatv1","8:uscav1","9:usvav1","10:uscov1","11:usutv1","12:usctv1"],cmpId:0,sectionList:[],applicableSections:[],gppString:"",parsedSections:{}}},!0)}else if("removeEventListener"===t){for(var a=!1,i=0;i<__gpp.events.length;i++)if(__gpp.events[i].id==s){__gpp.events.splice(i,1),a=!0;break}p({eventName:"listenerRemoved",listenerId:s,data:a,pingData:{gppVersion:"1.1",cmpStatus:"stub",cmpDisplayStatus:"hidden",signalStatus:"not ready",supportedAPIs:["2:tcfeuv2","5:tcfcav1","6:uspv1","7:usnatv1","8:uscav1","9:usvav1","10:uscov1","11:usutv1","12:usctv1"],cmpId:0,sectionList:[],applicableSections:[],gppString:"",parsedSections:{}}},!0)}else"hasSection"===t?p(!1,!0):"getSection"===t||"getField"===t?p(null,!0):__gpp.queue.push([].slice.apply(e))},window.__gpp_msghandler=function(e){var t="string"==typeof e.data;try{var p=t?JSON.parse(e.data):e.data}catch(e){p=null}if("object"==typeof p&&null!==p&&"__gppCall"in p){var s=p.__gppCall;window.__gpp(s.command,(function(p,n){var a={__gppReturn:{returnValue:p,success:n,callId:s.callId}};e.source.postMessage(t?JSON.stringify(a):a,"*")}),"parameter"in s?s.parameter:null,"version"in s?s.version:"1.1")}},"__gpp"in window&&"function"==typeof window.__gpp||(window.__gpp=window.__gpp_stub,window.addEventListener("message",window.__gpp_msghandler,!1),window.__gpp_addFrame("__gppLocator"));</script>';
 		$scripts[] = '<script async src="https://cdn.privacy-mgmt.com/unified/wrapperMessagingWithoutDetection.js"></script>';
 
 		return $scripts;
