@@ -359,7 +359,7 @@ class Mai_Publisher_Output {
 		// Check if any of the original scripts contain connatix.
 		foreach ( $og_scripts as $og_script ) {
 			if ( str_contains( $og_script, '//capi.connatix.com' ) ) {
-				$has_connatix  = true;
+				$has_connatix = true;
 				break;
 			}
 		}
