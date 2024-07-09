@@ -347,10 +347,22 @@ class Mai_Publisher_Output {
 		}
 
 		// Check connatix. This checks the context of the script to see if it contains the connatix domain.
-		$connatix = $this->xpath->query( "//script[contains(text(), 'https://capi.connatix.com')]" );
+		// We removed this when we started using the placeholder method.
+		// $connatix = $this->xpath->query( "//script[contains(text(), 'https://capi.connatix.com')]" );
 
-		// Temporary filters for TPS.
-		$load_connatix = apply_filters( 'mai_publisher_load_connatix', $connatix->length ? true : false );
+		// Start with no connatix.
+		$has_connatix = false;
+
+		// Check if any of the original scripts contain connatix.
+		foreach ( $og_scripts as $og_script ) {
+			if ( str_contains( $og_script, '//capi.connatix.com' ) ) {
+				$has_connatix = true;
+				break;
+			}
+		}
+
+		// Filter to force connatix.
+		$load_connatix = apply_filters( 'mai_publisher_load_connatix', $has_connatix );
 
 		// If we have connatix ads.
 		if ( $load_connatix ) {
