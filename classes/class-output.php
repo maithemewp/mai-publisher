@@ -132,6 +132,10 @@ class Mai_Publisher_Output {
 			return $buffer;
 		}
 
+		// Allow filtering of scripts to preconnect and preload.
+		$preconnects = [];
+		$preloads    = [];
+
 		// Load GPT.
 		$load_gpt = apply_filters( 'mai_publisher_load_gpt', true );
 
@@ -327,12 +331,15 @@ class Mai_Publisher_Output {
 
 			// If sourcepoint data.
 			if ( $this->sp_property_id && $this->sp_msps_id && $this->sp_tcf_id ) {
-				// Add sourcepoint scripts.
-				$scripts = array_merge( $scripts, $this->get_sourcepoint_scripts() );
+				// Preconnect and add sourcepoint scripts.
+				$preconnects[] = '<link rel="preconnect" href="https://cdn.privacy-mgmt.com">';
+				$scripts       = array_merge( $scripts, $this->get_sourcepoint_scripts() );
 			}
 
 			// If loading GPT from Mai Publisher.
 			if ( $load_gpt ) {
+				$preconnects[] = '<link rel="preconnect" href="https://securepubads.g.doubleclick.net">';
+
 				// Add GPT.
 				$scripts[] = '<script async id="mai-publisher-gpt" src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>'; // Google Ad Manager GPT.
 			}
@@ -352,7 +359,7 @@ class Mai_Publisher_Output {
 		// Check if any of the original scripts contain connatix.
 		foreach ( $og_scripts as $og_script ) {
 			if ( str_contains( $og_script, '//capi.connatix.com' ) ) {
-				$has_connatix = true;
+				$has_connatix  = true;
 				break;
 			}
 		}
@@ -362,20 +369,38 @@ class Mai_Publisher_Output {
 
 		// If we have connatix ads.
 		if ( $load_connatix ) {
-			$scripts[] = "<script id=\"mai-publisher-connatix\">!function(n){if(!window.cnx){window.cnx={},window.cnx.cmd=[];var t=n.createElement('iframe');t.src='javascript:false'; t.display='none',t.onload=function(){var n=t.contentWindow.document,c=n.createElement('script');c.src='//cd.connatix.com/connatix.player.js?cid=db8b4096-c769-48da-a4c5-9fbc9ec753f0',c.setAttribute('async','1'),c.setAttribute('type','text/javascript'),n.body.appendChild(c)},n.head.appendChild(t)}}(document);</script>";
+			$preconnects[] = '<link rel="preconnect" href="https://capi.connatix.com">';
+			$scripts[]     = "<script id=\"mai-publisher-connatix\">!function(n){if(!window.cnx){window.cnx={},window.cnx.cmd=[];var t=n.createElement('iframe');t.src='javascript:false'; t.display='none',t.onload=function(){var n=t.contentWindow.document,c=n.createElement('script');c.src='//cd.connatix.com/connatix.player.js?cid=db8b4096-c769-48da-a4c5-9fbc9ec753f0',c.setAttribute('async','1'),c.setAttribute('type','text/javascript'),n.body.appendChild(c)},n.head.appendChild(t)}}(document);</script>";
 		}
 
 		// Allow filtering the scripts.
-		$scripts = apply_filters( 'mai_publisher_header_scripts', $scripts );
+		$preconnects = apply_filters( 'mai_publisher_preconnect_scripts', $preconnects );
+		$preloads    = apply_filters( 'mai_publisher_preload_scripts', $preloads );
+		$scripts     = apply_filters( 'mai_publisher_header_scripts', $scripts );
 
 		// Handle scripts.
-		if ( $scripts ) {
-			// $scripts  = array_reverse( $scripts ); // Reverse when displaying 'after' something. Leave as-is when it's 'before'.
+		if ( $preconnects || $preloads || $scripts ) {
 			$position = $position ?: $this->xpath->query( '//head/title' )->item(0);
 
+			// Insert preconnects.
+			if ( $preconnects ) {
+				foreach ( $preconnects as $preconnect ) {
+					$this->insert_nodes( $preconnect, $position, 'before' );
+				}
+			}
+
+			// Insert preloads.
+			if ( $preloads ) {
+				foreach ( $preloads as $preload ) {
+					$this->insert_nodes( $preload, $position, 'before' );
+				}
+			}
+
 			// Insert scripts.
-			foreach ( $scripts as $script ) {
-				$this->insert_nodes( $script, $position, 'before' );
+			if ( $scripts ) {
+				foreach ( $scripts as $script ) {
+					$this->insert_nodes( $script, $position, 'before' );
+				}
 			}
 		}
 
