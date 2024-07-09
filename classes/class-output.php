@@ -132,6 +132,19 @@ class Mai_Publisher_Output {
 			return $buffer;
 		}
 
+		// Extract all script tags and replace them with placeholders.
+		// Ninja Forms surfaced an issue where HTML in the script was getting encode
+		// or slashed/unslashed or something and was stopping the forms from loading.
+		preg_match_all( '/<script\b[^>]*>.*?<\/script>/is', $buffer, $matches );
+
+		// Get the script tags.
+		$og_scripts = isset( $matches[0] ) ? $matches[0] : [];
+
+		// Replace script tags with placeholders.
+		foreach ( $og_scripts as $index => $og_script ) {
+			$buffer = str_replace( $og_script, "<!--maipub_script_placeholder_$index-->", $buffer );
+		}
+
 		// Setup dom and xpath.
 		$this->dom   = $this->dom_document( $buffer );
 		$this->xpath = new DOMXPath( $this->dom );
@@ -367,6 +380,11 @@ class Mai_Publisher_Output {
 		// Remove closing tags that are added by DOMDocument.
 		$buffer = str_replace( '</source>', '', $buffer );
 		$buffer = str_replace( '</img>', '', $buffer );
+
+		// Reinsert the scripts at their original positions.
+		foreach ( $og_scripts as $index => $og_script ) {
+			$buffer = str_replace( "<!--maipub_script_placeholder_$index-->", $og_script, $buffer );
+		}
 
 		// Allow filtering all of the HTML.
 		$buffer = apply_filters( 'mai_publisher_html', $buffer );
@@ -673,17 +691,14 @@ class Mai_Publisher_Output {
 	 */
 	function dom_document( $html ) {
 		// Create the new document.
-		$dom = new DOMDocument();
+		$dom = new DOMDocument( '1.0', 'UTF-8' );
 
 		// Modify state.
 		$libxml_previous_state = libxml_use_internal_errors( true );
 
-		// We don't need this here since it's running so late, all of the content
-		// should already be encoded.
-		// This was causing issues because it's converting ALL entities,
-		// including stuff in data-attributes, etc.
+		// Encode.
 		$html = function_exists( 'mai_convert_quotes' ) ? mai_convert_quotes( $html ) : $html;
-		$html = mb_encode_numericentity( $html, [0x80, 0x10FFFF, 0, ~0], 'UTF-8' );
+		$html = mb_encode_numericentity( $html, [0x80, 0x10FFFF, 0, ~0], 'UTF-8' ); // Final encoding before processing.
 
 		// Load the content in the document HTML.
 		$dom->loadHTML( $html );
@@ -707,13 +722,9 @@ class Mai_Publisher_Output {
 	 * @return string
 	 */
 	function dom_html( $dom ) {
+		// Save and decode.
 		$html = $dom->saveHTML();
-
-		// We don't need this here since it's running so late, all of the content
-		// should already be encoded.
-		// This was causing issues because it's converting ALL entities,
-		// including stuff in data-attributes, etc.
-		$html = mb_convert_encoding( $html, 'UTF-8', 'HTML-ENTITIES' );
+		$html = html_entity_decode( $html, ENT_QUOTES | ENT_HTML5, 'UTF-8' ); // Decode to curly quotes.
 
 		return $html;
 	}
