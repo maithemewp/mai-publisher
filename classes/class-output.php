@@ -132,6 +132,9 @@ class Mai_Publisher_Output {
 			return $buffer;
 		}
 
+		// Load GPT.
+		$load_gpt = apply_filters( 'mai_publisher_load_gpt', true );
+
 		// Extract all script tags and replace them with placeholders.
 		// Ninja Forms surfaced an issue where HTML in the script was getting encode
 		// or slashed/unslashed or something and was stopping the forms from loading.
@@ -142,6 +145,13 @@ class Mai_Publisher_Output {
 
 		// Replace script tags with placeholders.
 		foreach ( $og_scripts as $index => $og_script ) {
+			// If loading GPT, and this is the original GPT script, remove it from the array and skip adding placeholder.
+			if ( $load_gpt && str_contains( $og_script, 'https://securepubads.g.doubleclick.net/tag/js/gpt.js' ) ) {
+				unset( $og_scripts[ $index ] );
+				continue;
+			}
+
+			// Add placeholder.
 			$buffer = str_replace( $og_script, "<!--maipub_script_placeholder_$index-->", $buffer );
 		}
 
@@ -301,8 +311,9 @@ class Mai_Publisher_Output {
 				$gam_base_client = "/$this->network_code/";
 			}
 
-			// Localize data.
-			$localize  = [
+			// Get script location and localize.
+			$file     = "assets/js/mai-publisher-ads{$this->suffix}.js";
+			$localize = [
 				'domain'        => $this->domain,
 				'sellersName'   => $this->sellers_name,
 				'sellersId'     => $this->sellers_id,
@@ -320,23 +331,8 @@ class Mai_Publisher_Output {
 				$scripts = array_merge( $scripts, $this->get_sourcepoint_scripts() );
 			}
 
-			// Load GPT.
-			$load_gpt = apply_filters( 'mai_publisher_load_gpt', true );
-
 			// If loading GPT from Mai Publisher.
 			if ( $load_gpt ) {
-				// Get script data.
-				$file = "assets/js/mai-publisher-ads{$this->suffix}.js";
-				$gpt  = $this->xpath->query( '//script[contains(@src, "https://securepubads.g.doubleclick.net/tag/js/gpt.js")]' );
-
-				// If we have gpt, remove it.
-				if ( $gpt->length ) {
-					foreach ( $gpt as $gptNode ) {
-						// Remove.
-						$gptNode->parentNode->removeChild( $gptNode );
-					}
-				}
-
 				// Add GPT.
 				$scripts[] = '<script async id="mai-publisher-gpt" src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>'; // Google Ad Manager GPT.
 			}
