@@ -156,7 +156,7 @@ class Mai_Publisher_Output {
 			}
 
 			// Add placeholder.
-			$buffer = str_replace( $og_script, "<!--maipub_script_placeholder_$index-->", $buffer );
+			$buffer = str_replace( $og_script, sprintf( '<script id="maipub_script_placeholder_%s"></script>', $index ), $buffer );
 		}
 
 		// Setup dom and xpath.
@@ -284,9 +284,8 @@ class Mai_Publisher_Output {
 			$video->setAttribute( 'data-track-content', '' );
 		}
 
-		// Set vars.
-		$scripts  = [];
-		$position = null;
+		// Start scripts.
+		$scripts = [];
 
 		// Allow filtering of page GAM ads.
 		$this->gam = apply_filters( 'mai_publisher_gam_ads', $this->gam );
@@ -365,6 +364,7 @@ class Mai_Publisher_Output {
 		}
 
 		// Filter to force connatix.
+		// $load_connatix = apply_filters( 'mai_publisher_load_connatix', $connatix->length );
 		$load_connatix = apply_filters( 'mai_publisher_load_connatix', $has_connatix );
 
 		// If we have connatix ads.
@@ -380,26 +380,34 @@ class Mai_Publisher_Output {
 
 		// Handle scripts.
 		if ( $preconnects || $preloads || $scripts ) {
-			$position = $position ?: $this->xpath->query( '//head/title' )->item(0);
+			// Get the title element in the head.
+			$position = $this->xpath->query( '//head/title' )->item(0);
+			$action   = 'before';
+
+			// If no title in head, prepend to head.
+			if ( ! $position ) {
+				$position = $this->xpath->query( '//head' )->item(0);
+				$action   = 'prepend';
+			}
 
 			// Insert preconnects.
 			if ( $preconnects ) {
 				foreach ( $preconnects as $preconnect ) {
-					$this->insert_nodes( $preconnect, $position, 'before' );
+					$this->insert_nodes( $preconnect, $position, $action );
 				}
 			}
 
 			// Insert preloads.
 			if ( $preloads ) {
 				foreach ( $preloads as $preload ) {
-					$this->insert_nodes( $preload, $position, 'before' );
+					$this->insert_nodes( $preload, $position, $action );
 				}
 			}
 
 			// Insert scripts.
 			if ( $scripts ) {
 				foreach ( $scripts as $script ) {
-					$this->insert_nodes( $script, $position, 'before' );
+					$this->insert_nodes( $script, $position, $action );
 				}
 			}
 		}
@@ -416,7 +424,7 @@ class Mai_Publisher_Output {
 
 		// Reinsert the scripts at their original positions.
 		foreach ( $og_scripts as $index => $og_script ) {
-			$buffer = str_replace( "<!--maipub_script_placeholder_$index-->", $og_script, $buffer );
+			$buffer = str_replace( sprintf( '<script id="maipub_script_placeholder_%s"></script>', $index ), $og_script, $buffer );
 		}
 
 		// Allow filtering all of the HTML.
@@ -526,6 +534,9 @@ class Mai_Publisher_Output {
 			$item       = 0;
 			$tmp_counts = array_flip( $ad['content_count'] );
 
+			// Encode.
+			$ad['content'] = $this->encode( $ad['content'] );
+
 			// Loop through elements.
 			foreach ( $elements as $element ) {
 				$item++;
@@ -586,6 +597,9 @@ class Mai_Publisher_Output {
 			if ( ! $ad['content'] ) {
 				continue;
 			}
+
+			// Encode.
+			$ad['content'] = $this->encode( $ad['content'] );
 
 			// Loop through containers.
 			foreach ( $lists as $list ) {
@@ -665,6 +679,9 @@ class Mai_Publisher_Output {
 					}
 				}
 
+				// Encode.
+				$ad['content'] = $this->encode( $ad['content'] );
+
 				// Insert the ad.
 				$this->insert_nodes( $ad['content'], $sidebar, $action );
 			}
@@ -705,6 +722,9 @@ class Mai_Publisher_Output {
 					continue;
 				}
 
+				// Encode.
+				$ad['content'] = $this->encode( $ad['content'] );
+
 				// Insert the ad into the dom.
 				$this->insert_nodes( $ad['content'], $comment, 'after' );
 			}
@@ -729,10 +749,6 @@ class Mai_Publisher_Output {
 		// Modify state.
 		$libxml_previous_state = libxml_use_internal_errors( true );
 
-		// Encode.
-		$html = function_exists( 'mai_convert_quotes' ) ? mai_convert_quotes( $html ) : $html;
-		$html = mb_encode_numericentity( $html, [0x80, 0x10FFFF, 0, ~0], 'UTF-8' ); // Final encoding before processing.
-
 		// Load the content in the document HTML.
 		$dom->loadHTML( $html );
 
@@ -746,7 +762,7 @@ class Mai_Publisher_Output {
 	}
 
 	/**
-	 * Saves HTML from DOMDocument and decode entities.
+	 * Saves HTML from DOMDocument.
 	 *
 	 * @since 1.1.0
 	 *
@@ -755,11 +771,20 @@ class Mai_Publisher_Output {
 	 * @return string
 	 */
 	function dom_html( $dom ) {
-		// Save and decode.
-		$html = $dom->saveHTML();
-		$html = html_entity_decode( $html, ENT_QUOTES | ENT_HTML5, 'UTF-8' ); // Decode to curly quotes.
+		return $dom->saveHTML();
+	}
 
-		return $html;
+	/**
+	 * Encodes a string.
+	 *
+	 * @since TBD
+	 *
+	 * @param string $string
+	 *
+	 * @return string
+	 */
+	function encode( $string ) {
+		return mb_encode_numericentity( $string, [0x80, 0x10FFFF, 0, ~0], 'UTF-8' );
 	}
 
 	/**
@@ -1018,42 +1043,55 @@ class Mai_Publisher_Output {
 					gdpr: {},
 					events: {
 						onMessageChoiceSelect: function() {
-							console.log( "[event] onMessageChoiceSelect", arguments );
+							// console.log( "[event] onMessageChoiceSelect", arguments );
 						},
 						onMessageReady: function() {
-							console.log( "[event] onMessageReady", arguments );
+							// console.log( "[event] onMessageReady", arguments );
 						},
 						onMessageChoiceError: function() {
-							console.log( "[event] onMessageChoiceError", arguments );
+							// console.log( "[event] onMessageChoiceError", arguments );
 						},
 						onPrivacyManagerAction: function() {
-							console.log( "[event] onPrivacyManagerAction", arguments );
+							// console.log( "[event] onPrivacyManagerAction", arguments );
 						},
 						onPMCancel: function() {
-							console.log( "[event] onPMCancel", arguments );
+							// console.log( "[event] onPMCancel", arguments );
 						},
 						onMessageReceiveData: function() {
-							console.log( "[event] onMessageReceiveData", arguments );
+							// console.log( "[event] onMessageReceiveData", arguments );
 						},
 						onSPPMObjectReady: function() {
-							console.log( "[event] onSPPMObjectReady", arguments );
+							// console.log( "[event] onSPPMObjectReady", arguments );
 						},
 						onConsentReady: function (message_type, uuid, string, info) {
 							console.log( "[event] onConsentReady", arguments );
-							if((message_type == "usnat") && (info.applies)){
-								/* code to insert the USNAT footer link */
-								document.getElementById("pmLink").style.visibility="visible";
-								document.getElementById("pmLink").innerHTML= "Do Not Sell/Share My Personal Information";
-								document.getElementById("pmLink").onclick= function(){
-									window._sp_.usnat.loadPrivacyManagerModal( "' . $this->sp_msps_id . '" );
-								}
+
+							if ( "loading" === document.readyState ) {
+								document.addEventListener( "DOMContentLoaded", maiPubOnConsentReady );
+							} else {
+								maiPubOnConsentReady();
 							}
-							if((message_type == "gdpr") && (info.applies)){
-								/* code to insert the GDPR footer link */
-								document.getElementById("pmLink").style.visibility="visible";
-								document.getElementById("pmLink").innerHTML= "Privacy Preferences";
-								document.getElementById("pmLink").onclick= function(){
-									window._sp_.gdpr.loadPrivacyManagerModal( "' . $this->sp_tcf_id . '" );
+
+							function maiPubOnConsentReady() {
+								const pmLink = document.getElementById("pmLink");
+
+								if ( pmLink && info.applies ) {
+									if( "usnat" == message_type ){
+										/* code to insert the USNAT footer link */
+										pmLink.style.visibility="visible";
+										pmLink.innerHTML= "Do Not Sell/Share My Personal Information";
+										pmLink.addEventListener("click", function(){
+											window._sp_.usnat.loadPrivacyManagerModal( "' . $this->sp_msps_id . '" );
+										});
+									}
+									if( "gdpr" == message_type ){
+										/* code to insert the GDPR footer link */
+										pmLink.style.visibility="visible";
+										pmLink.innerHTML= "Privacy Preferences";
+										pmLink.addEventListener("click", function(){
+											window._sp_.gdpr.loadPrivacyManagerModal( "' . $this->sp_tcf_id . '" );
+										});
+									}
 								}
 							}
 						},
