@@ -3,6 +3,8 @@
 ## 1.9.0 (7/9/24)
 * Added: Now preconnecting gpt, sourcepoint, and connatix when they are loaded.
 * Changed: New Sourcepoint stub files.
+* Changed: Removed `maipub_get_processed_ad_content()` function.
+* Changed: Encode and process ad content on the fly, just as it's rendered.
 * Fixed: Do not include scripts when manipulating the DOM via DOMDocument. This makes sure HTML or special characters inside scripts are skipped. This fixes Ninja Forms not loading as well as other potential issues.
 * Fixed: Safer handling of WooCommerce Memberships plans, including only checking when user is logged in.
 * Fixed: Wrong variable name was throwing error when using Cool Stuff video from Conntatix.
