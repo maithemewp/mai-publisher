@@ -175,8 +175,7 @@ googletag.cmd.push(() => {
 
 		// Log when a slot response is received.
 		googletag.pubads().addEventListener( 'slotResponseReceived', (event) => {
-			console.log( 'received:', event.slot.getSlotElementId(), event.slot.getResponseInformation() );
-
+			console.log( 'received:', event.slot.getSlotElementId() );
 		});
 
 		// Log when a slot ID is rendered.
