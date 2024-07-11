@@ -170,17 +170,17 @@ googletag.cmd.push(() => {
 	if ( log ) {
 		// Log when a slot ID is fetched.
 		googletag.pubads().addEventListener( 'slotRequested', (event) => {
-			console.log( 'fetched:', event.slot.getSlotElementId() );
+			console.log( 'requested:', event.slot.getSlotElementId() );
 		});
 
 		// Log when a slot response is received.
 		googletag.pubads().addEventListener( 'slotResponseReceived', (event) => {
-			console.log( 'received:', event.slot.getSlotElementId() );
+			console.log( 'response:', event.slot.getSlotElementId(), event.isEmpty ? 'empty' : 'filled' );
 		});
 
 		// Log when a slot ID is rendered.
 		googletag.pubads().addEventListener( 'slotOnload', (event) => {
-			console.log( 'rendered:', event.slot.getSlotElementId() );
+			console.log( 'loaded:', event.slot.getSlotElementId() );
 		});
 
 		// Log when a slot ID visibility changed.
