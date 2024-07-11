@@ -24,7 +24,6 @@ function maipub_get_processed_content( $content ) {
 	global $wp_embed;
 
 	$blocks  = has_blocks( $content );
-	$content = mb_encode_numericentity( $content, [0x80, 0x10FFFF, 0, ~0], 'UTF-8' ); // Encoding to prevent double decoding.
 	$content = $wp_embed->autoembed( $content );            // WP runs priority 8.
 	$content = $wp_embed->run_shortcode( $content );        // WP runs priority 8.
 	$content = $blocks ? do_blocks( $content ) : $content;  // WP runs priority 9.
@@ -56,6 +55,9 @@ function maipub_get_dom_document( $html ) {
 
 	// Modify state.
 	$libxml_previous_state = libxml_use_internal_errors( true );
+
+	// Encode.
+	$html = mb_encode_numericentity( $html, [0x80, 0x10FFFF, 0, ~0], 'UTF-8' );
 
 	// Load the content in the document HTML.
 	$dom->loadHTML( "<div>$html</div>" );

@@ -534,9 +534,6 @@ class Mai_Publisher_Output {
 			$item       = 0;
 			$tmp_counts = array_flip( $ad['content_count'] );
 
-			// Encode.
-			$ad['content'] = $this->encode( $ad['content'] );
-
 			// Loop through elements.
 			foreach ( $elements as $element ) {
 				$item++;
@@ -597,9 +594,6 @@ class Mai_Publisher_Output {
 			if ( ! $ad['content'] ) {
 				continue;
 			}
-
-			// Encode.
-			$ad['content'] = $this->encode( $ad['content'] );
 
 			// Loop through containers.
 			foreach ( $lists as $list ) {
@@ -679,9 +673,6 @@ class Mai_Publisher_Output {
 					}
 				}
 
-				// Encode.
-				$ad['content'] = $this->encode( $ad['content'] );
-
 				// Insert the ad.
 				$this->insert_nodes( $ad['content'], $sidebar, $action );
 			}
@@ -722,9 +713,6 @@ class Mai_Publisher_Output {
 					continue;
 				}
 
-				// Encode.
-				$ad['content'] = $this->encode( $ad['content'] );
-
 				// Insert the ad into the dom.
 				$this->insert_nodes( $ad['content'], $comment, 'after' );
 			}
@@ -749,6 +737,9 @@ class Mai_Publisher_Output {
 		// Modify state.
 		$libxml_previous_state = libxml_use_internal_errors( true );
 
+		// Encode.
+		$html = mb_encode_numericentity( $html, [0x80, 0x10FFFF, 0, ~0], 'UTF-8' );
+
 		// Load the content in the document HTML.
 		$dom->loadHTML( $html );
 
@@ -772,19 +763,6 @@ class Mai_Publisher_Output {
 	 */
 	function dom_html( $dom ) {
 		return $dom->saveHTML();
-	}
-
-	/**
-	 * Encodes a string.
-	 *
-	 * @since TBD
-	 *
-	 * @param string $string
-	 *
-	 * @return string
-	 */
-	function encode( $string ) {
-		return mb_encode_numericentity( $string, [0x80, 0x10FFFF, 0, ~0], 'UTF-8' );
 	}
 
 	/**

@@ -199,7 +199,8 @@ function maipub_add_attributes( $content, $name ) {
 		return $content;
 	}
 
-	$dom      = maipub_get_dom_document( $content );
+	$dom = maipub_get_dom_document( $content );
+
 	$children = $dom->childNodes;
 
 	// Bail if no nodes.
