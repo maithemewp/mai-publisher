@@ -177,12 +177,12 @@ googletag.cmd.push(() => {
 		googletag.pubads().addEventListener( 'slotResponseReceived', (event) => {
 			const slot       = event.slot;
 			const renderInfo = {
-				slotId: slot.getSlotElementId(),
 				adUnitPath: slot.getAdUnitPath(),
-				size: event.size,
 				creativeId: event.creativeId,
+				isEmpty: event.isEmpty,
 				lineItemId: event.lineItemId,
-				isEmpty: event.isEmpty
+				size: event.size,
+				slotId: slot.getSlotElementId(),
 			};
 
 			console.log( 'response:', event.slot.getSlotElementId(), renderInfo );
