@@ -175,8 +175,9 @@ googletag.cmd.push(() => {
 
 		// Log when a slot response is received.
 		googletag.pubads().addEventListener( 'slotResponseReceived', (event) => {
+			const slot       = event.slot;
 			const renderInfo = {
-				slotId: slotId,
+				slotId: slot.getSlotElementId(),
 				adUnitPath: slot.getAdUnitPath(),
 				size: event.size,
 				creativeId: event.creativeId,
