@@ -175,7 +175,16 @@ googletag.cmd.push(() => {
 
 		// Log when a slot response is received.
 		googletag.pubads().addEventListener( 'slotResponseReceived', (event) => {
-			console.log( 'response:', event.slot.getSlotElementId(), event.isEmpty ? 'empty' : 'filled' );
+			const renderInfo = {
+				slotId: slotId,
+				adUnitPath: slot.getAdUnitPath(),
+				size: event.size,
+				creativeId: event.creativeId,
+				lineItemId: event.lineItemId,
+				isEmpty: event.isEmpty
+			};
+
+			console.log( 'response:', event.slot.getSlotElementId(), renderInfo );
 		});
 
 		// Log when a slot ID is rendered.
