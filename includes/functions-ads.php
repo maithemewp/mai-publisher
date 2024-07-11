@@ -55,6 +55,9 @@ function maipub_get_page_ads() {
 				continue;
 			}
 
+			// Process content.
+			$args['content'] = maipub_get_processed_content( $args['content'] );
+
 			// Set location targets. Manually added ads are handled in `class-display.php`.
 			$args['content'] = maipub_add_location_attributes( $args['content'], $args['location'] );
 
