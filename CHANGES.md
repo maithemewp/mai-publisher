@@ -1,6 +1,7 @@
 # Changelog
 
 ## 1.9.0 (7/9/24)
+* Added: New global setting to enable console logging.
 * Added: Now preconnecting gpt, sourcepoint, and connatix when they are loaded.
 * Changed: New Sourcepoint stub files.
 * Changed: Removed `maipub_get_processed_ad_content()` function.

@@ -9,11 +9,11 @@ const gamBaseClient = maiPubAdsVars.gamBaseClient;
 const refreshKey    = 'refresh';
 const refreshValue  = maiPubAdsVars.targets.refresh;
 const refreshTime   = 30; // Time in seconds.
-const debug         = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb');
+const debug         = maiPubAdsVars.debug || window.location.search.includes('dfpdeb') || window.location.search.includes('maideb');
 const log           = debug;
 
 // If debugging, log.
-if ( log ) { console.log( 'v154' ); }
+if ( log ) { console.log( 'v156' ); }
 
 // Add to googletag items.
 googletag.cmd.push(() => {
@@ -175,7 +175,22 @@ googletag.cmd.push(() => {
 
 		// Log when a slot response is received.
 		googletag.pubads().addEventListener( 'slotResponseReceived', (event) => {
-			console.log( 'received:', event.slot.getSlotElementId(), event.slot.getResponseInformation(), event );
+			// console.log( 'received:', event.slot.getSlotElementId(), event.slot.getResponseInformation(), event );
+			const slot       = event.slot;
+			const renderInfo = {
+				slotId: slot.getSlotElementId(),
+				adUnitPath: slot.getAdUnitPath(),
+				isEmpty: event.isEmpty,
+				size: event.size,
+				creativeId: event.creativeId,
+				lineItemId: event.lineItemId,
+			};
+
+			console.log( 'received:', renderInfo );
+
+			if ( event.isEmpty ) {
+				console.warn( 'Slot is empty after rendering:', renderInfo.slotId );
+			}
 		});
 
 		// Log when a slot ID is rendered.
@@ -530,7 +545,7 @@ function maiPubDisplaySlots( slots ) {
  */
 function maiPubRefreshSlots( slots ) {
 	if ( maiPubAdsVars.amazonUAM ) {
-		console.log( 'setDisplayBids via apstag', slots );
+		if ( log ) { console.log( 'setDisplayBids via apstag', slots ); }
 		apstag.setDisplayBids();
 	}
 
