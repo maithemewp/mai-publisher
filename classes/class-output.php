@@ -137,23 +137,28 @@ class Mai_Publisher_Output {
 		$preloads    = [];
 
 		// Load GPT.
-		$load_gpt = apply_filters( 'mai_publisher_load_gpt', true );
+		// $load_gpt = apply_filters( 'mai_publisher_load_gpt', true );
+
+		// Extract all script tags where the id starts with "tmpl-nf".
+		// Ninja Forms surfaced an issue where HTML in the script was getting encode
+		// or slashed/unslashed or something and was stopping the forms from loading.
+		preg_match_all( '/<script\b[^>]*id="tmpl-nf.*?".*?>.*?<\/script>/is', $buffer, $matches );
 
 		// Extract all script tags and replace them with placeholders.
 		// Ninja Forms surfaced an issue where HTML in the script was getting encode
 		// or slashed/unslashed or something and was stopping the forms from loading.
-		preg_match_all( '/<script\b[^>]*>.*?<\/script>/is', $buffer, $matches );
+		// preg_match_all( '/<script\b[^>]*>.*?<\/script>/is', $buffer, $matches );
 
 		// Get the script tags.
 		$og_scripts = isset( $matches[0] ) ? $matches[0] : [];
 
 		// Replace script tags with placeholders.
 		foreach ( $og_scripts as $index => $og_script ) {
-			// If loading GPT, and this is the original GPT script, remove it from the array and skip adding placeholder.
-			if ( $load_gpt && str_contains( $og_script, 'https://securepubads.g.doubleclick.net/tag/js/gpt.js' ) ) {
-				unset( $og_scripts[ $index ] );
-				continue;
-			}
+			// // If loading GPT, and this is the original GPT script, remove it from the array and skip adding placeholder.
+			// if ( $load_gpt && str_contains( $og_script, 'https://securepubads.g.doubleclick.net/tag/js/gpt.js' ) ) {
+			// 	unset( $og_scripts[ $index ] );
+			// 	continue;
+			// }
 
 			// Add placeholder.
 			$buffer = str_replace( $og_script, sprintf( '<script id="maipub_script_placeholder_%s"></script>', $index ), $buffer );
@@ -335,8 +340,23 @@ class Mai_Publisher_Output {
 				$scripts       = array_merge( $scripts, $this->get_sourcepoint_scripts() );
 			}
 
+			// Load GPT.
+			$load_gpt = apply_filters( 'mai_publisher_load_gpt', true );
+
 			// If loading GPT from Mai Publisher.
 			if ( $load_gpt ) {
+				// Check for existing GPT script.
+				$gpt = $this->xpath->query( '//script[contains(@src, "https://securepubads.g.doubleclick.net/tag/js/gpt.js")]' );
+
+				// If we have gpt, remove it.
+				if ( $gpt->length ) {
+					foreach ( $gpt as $gptNode ) {
+						// Remove.
+						$gptNode->parentNode->removeChild( $gptNode );
+					}
+				}
+
+				// Add preconnect.
 				$preconnects[] = '<link rel="preconnect" href="https://securepubads.g.doubleclick.net">';
 
 				// Add GPT.
@@ -350,22 +370,22 @@ class Mai_Publisher_Output {
 
 		// Check connatix. This checks the context of the script to see if it contains the connatix domain.
 		// We removed this when we started using the placeholder method.
-		// $connatix = $this->xpath->query( "//script[contains(text(), 'https://capi.connatix.com')]" );
+		$connatix = $this->xpath->query( "//script[contains(text(), 'https://capi.connatix.com')]" );
 
-		// Start with no connatix.
-		$has_connatix = false;
+		// // Start with no connatix.
+		// $has_connatix = false;
 
-		// Check if any of the original scripts contain connatix.
-		foreach ( $og_scripts as $og_script ) {
-			if ( str_contains( $og_script, '//capi.connatix.com' ) ) {
-				$has_connatix = true;
-				break;
-			}
-		}
+		// // Check if any of the original scripts contain connatix.
+		// foreach ( $og_scripts as $og_script ) {
+		// 	if ( str_contains( $og_script, '//capi.connatix.com' ) ) {
+		// 		$has_connatix = true;
+		// 		break;
+		// 	}
+		// }
 
 		// Filter to force connatix.
-		// $load_connatix = apply_filters( 'mai_publisher_load_connatix', $connatix->length );
-		$load_connatix = apply_filters( 'mai_publisher_load_connatix', $has_connatix );
+		$load_connatix = apply_filters( 'mai_publisher_load_connatix', $connatix->length );
+		// $load_connatix = apply_filters( 'mai_publisher_load_connatix', $has_connatix );
 
 		// If we have connatix ads.
 		if ( $load_connatix ) {
