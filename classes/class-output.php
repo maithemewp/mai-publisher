@@ -136,17 +136,10 @@ class Mai_Publisher_Output {
 		$preconnects = [];
 		$preloads    = [];
 
-		// Load GPT.
-		// $load_gpt = apply_filters( 'mai_publisher_load_gpt', true );
-
 		// Extract all script tags where the id starts with "tmpl-nf".
 		// Ninja Forms surfaced an issue where HTML in the script was getting encode
 		// or slashed/unslashed or something and was stopping the forms from loading.
 		preg_match_all( '/<script\b[^>]*id="tmpl-nf.*?".*?>.*?<\/script>/is', $buffer, $matches );
-
-		// Extract all script tags and replace them with placeholders.
-		// Ninja Forms surfaced an issue where HTML in the script was getting encode
-		// or slashed/unslashed or something and was stopping the forms from loading.
 		// preg_match_all( '/<script\b[^>]*>.*?<\/script>/is', $buffer, $matches );
 
 		// Get the script tags.
@@ -154,13 +147,6 @@ class Mai_Publisher_Output {
 
 		// Replace script tags with placeholders.
 		foreach ( $og_scripts as $index => $og_script ) {
-			// // If loading GPT, and this is the original GPT script, remove it from the array and skip adding placeholder.
-			// if ( $load_gpt && str_contains( $og_script, 'https://securepubads.g.doubleclick.net/tag/js/gpt.js' ) ) {
-			// 	unset( $og_scripts[ $index ] );
-			// 	continue;
-			// }
-
-			// Add placeholder.
 			$buffer = str_replace( $og_script, sprintf( '<script id="maipub_script_placeholder_%s"></script>', $index ), $buffer );
 		}
 
