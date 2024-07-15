@@ -13,7 +13,7 @@ const debug         = maiPubAdsVars.debug || window.location.search.includes('df
 const log           = debug;
 
 // If debugging, log.
-if ( log ) { console.log( 'v156' ); }
+maiPubLog( 'v156' );
 
 // Add to googletag items.
 googletag.cmd.push(() => {
@@ -103,7 +103,7 @@ googletag.cmd.push(() => {
 		// Set timeout to refresh ads for current visible ads.
 		timeoutIds[slotId] = setTimeout(() => {
 			// If debugging, log.
-			if ( log ) { console.log( 'refreshed via impressionViewable:', slotId ); }
+			maiPubLog( 'refreshed via impressionViewable:', slotId );
 
 			// Refresh the slot(s).
 			maiPubRefreshSlots( [slot] );
@@ -160,7 +160,7 @@ googletag.cmd.push(() => {
 		}
 
 		// If debugging, log.
-		if ( log ) { console.log( 'refreshed via slotVisibilityChanged:', slotId ); }
+		maiPubLog( 'refreshed via slotVisibilityChanged:', slotId );
 
 		// Refresh the slot(s).
 		maiPubRefreshSlots( [slot] );
@@ -195,7 +195,7 @@ googletag.cmd.push(() => {
 
 		// Log when a slot ID visibility changed.
 		// googletag.pubads().addEventListener( 'slotVisibilityChanged', (event) => {
-		// 	if ( log ) { console.log( 'changed:', event.slot.getSlotElementId(), `${event.inViewPercentage}%` ); }
+		// 	maiPubLog( 'changed:', event.slot.getSlotElementId(), `${event.inViewPercentage}%` );
 		// });
 	}
 }); // End `googletag.cmd.push`.
@@ -302,7 +302,7 @@ function maiPubDefineSlot( slug ) {
 	const slot = googletag.defineSlot( slotId, ads[slug].sizes, 'mai-ad-' + slug );
 
 	// If debugging, log.
-	if ( log ) { console.log( 'defineSlot(): ', slug ); }
+	maiPubLog( 'defineSlot(): ', slug );
 
 	// Register the ad slot.
 	// An ad will not be fetched until refresh is called,
@@ -310,7 +310,7 @@ function maiPubDefineSlot( slug ) {
 	googletag.display( 'mai-ad-' + slug );
 
 	// If debugging, log.
-	if ( log ) { console.log( 'display(): ', 'mai-ad-' + slug ); }
+	maiPubLog( 'display(): ', 'mai-ad-' + slug );
 
 	// Add slot to our array.
 	adSlotIds.push( slotId );
@@ -319,7 +319,7 @@ function maiPubDefineSlot( slug ) {
 	// If amazon is enalbed and ads[slug].sizes only contains a single size named 'fluid'.
 	if ( maiPubAdsVars.amazonUAM && 1 === ads[slug].sizes.length && 'fluid' === ads[slug].sizes[0] ) {
 		// If debugging, log.
-		if ( log ) { console.log( 'disabled safeframe: ', slot.getSlotElementId() ); }
+		maiPubLog( 'disabled safeframe: ', slot.getSlotElementId() );
 
 		// Disabled SafeFrame for this slot.
 		slot.setForceSafeFrame( false );
@@ -485,7 +485,7 @@ function maiPubDisplaySlots( slots ) {
 				if ( requestManager.dmBidsReceived ) {
 					sendAdserverRequest();
 
-					if ( log ) { console.log( 'refresh() with amazon fetch', slots ); }
+					maiPubLog( 'refresh() with amazon fetch', slots );
 				}
 			});
 		}
@@ -498,7 +498,7 @@ function maiPubDisplaySlots( slots ) {
 			if ( requestManager.dmBidsReceived ) {
 				sendAdserverRequest();
 
-				if ( log ) { console.log( 'refresh() without amazon slots to fetch', slots ); }
+				maiPubLog( 'refresh() without amazon slots to fetch', slots );
 			}
 		}
 	}
@@ -517,14 +517,14 @@ function maiPubDisplaySlots( slots ) {
 			sendAdserverRequest();
 		}
 
-		if ( log ) { console.log( 'refresh() with GAM', slots ); }
+		maiPubLog( 'refresh() with GAM', slots );
 	}
 
 	// Start the failsafe timeout.
 	setTimeout( function() {
 		// Log if no adserver request has been sent.
 		if ( ! requestManager.adserverRequestSent ) {
-			if ( log ) { console.log( 'refresh() with failsafe timeout', slots ); }
+			maiPubLog( 'refresh() with failsafe timeout', slots );
 		}
 
 		// Maybe send request.
@@ -540,10 +540,31 @@ function maiPubDisplaySlots( slots ) {
  */
 function maiPubRefreshSlots( slots ) {
 	if ( maiPubAdsVars.amazonUAM ) {
-		if ( log ) { console.log( 'setDisplayBids via apstag', slots ); }
+		maiPubLog( 'setDisplayBids via apstag', slots );
 		apstag.setDisplayBids();
 	}
 
 	// googletag.pubads().refresh( slots );
 	googletag.pubads().refresh( slots, { changeCorrelator: false } );
+
+	// Do we need to display() here again?
+
+	// Timeer doesn't seem to reset?
+}
+
+/**
+ * Log if debugging.
+ *
+ * @param {mixed} mixed The data to log.
+ */
+function maiPubLog( ...mixed ) {
+	if ( ! log ) {
+		return;
+	}
+
+	// Get current time in readable format.
+	const now = new Date().toLocaleTimeString( 'en-US', { hour12: true } );
+
+	// Log.
+	console.log( mixed, now );
 }
