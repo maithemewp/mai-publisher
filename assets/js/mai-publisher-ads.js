@@ -241,8 +241,11 @@ function maiPubDOMContentLoaded() {
 
 	// Define ATF ads.
 	adsATF.forEach( adATF => {
+		// Get slug.
+		const slug = adATF.getAttribute( 'id' ).replace( 'mai-ad-', '' );
+
 		// Add to toloadATF array.
-		toloadATF.push( maiPubDefineSlot( adATF.getAttribute( 'id' ).replace( 'mai-ad-', '' ) ) );
+		toloadATF.push( maiPubDefineSlot( slug ) );
 
 		// If debugging, add inline styling.
 		if ( debug ) {
