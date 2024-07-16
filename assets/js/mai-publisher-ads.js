@@ -150,17 +150,17 @@ googletag.cmd.push(() => {
 	if ( log ) {
 		// Log when a slot is requested/fetched.
 		googletag.pubads().addEventListener( 'slotRequested', (event) => {
-			console.log( 'slotRequested:', event.slot.getSlotElementId() );
+			console.log( 'slotRequested: ' + event.slot.getSlotElementId() );
 		});
 
 		// Log when a slot response is received.
 		googletag.pubads().addEventListener( 'slotResponseReceived', (event) => {
-			console.log( 'slotResponseReceived:', event.slot.getSlotElementId() );
+			console.log( 'slotResponseReceived: ' + event.slot.getSlotElementId() );
 		});
 
 		// Log when a slot was loaded.
 		googletag.pubads().addEventListener( 'slotOnload', (event) => {
-			console.log( 'slotOnload:', event.slot.getSlotElementId() );
+			console.log( 'slotOnload: ' + event.slot.getSlotElementId() );
 		});
 
 		// Log when slot render has ended, regardless of whether ad was empty or not.
@@ -175,7 +175,7 @@ googletag.cmd.push(() => {
 				slotId: slot.getSlotElementId(),
 			};
 
-			console.log( 'slotRenderEnded:', event.slot.getSlotElementId(), renderInfo );
+			console.log( 'slotRenderEnded: ' + event.slot.getSlotElementId(), renderInfo );
 		});
 
 		// Log when a slot ID visibility changed.

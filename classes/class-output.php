@@ -352,7 +352,7 @@ class Mai_Publisher_Output {
 
 			// Add mai-publisher-ads scripts.
 			$scripts[] = sprintf( '<script>/* <![CDATA[ */%svar maiPubAdsVars = %s;%s/* ]]> */</script>', PHP_EOL, wp_json_encode( $localize ), PHP_EOL );
-			$scripts[] = sprintf( '<script async id="mai-publisher-ads" src="%s?ver=%s"></script>', maipub_get_file_data( $file, 'url' ), maipub_get_file_data( $file, 'version' ) ); // Initial testing showed async broke ads.
+			$scripts[] = sprintf( '<script async id="mai-publisher-ads" src="%s?ver=%s"></script>', maipub_get_file_data( $file, 'url' ), maipub_get_file_data( $file, 'version' ) );
 		}
 
 		// Check connatix. This checks the context of the script to see if it contains the connatix domain.
