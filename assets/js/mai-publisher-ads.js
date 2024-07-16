@@ -1,20 +1,23 @@
 window.googletag = window.googletag || {};
 googletag.cmd    = googletag.cmd || [];
 
-const ads           = maiPubAdsVars['ads'];
-const adSlotIds     = [];
-const adSlots       = [];
-const gamBase       = maiPubAdsVars.gamBase;
-const gamBaseClient = maiPubAdsVars.gamBaseClient;
-const refreshKey    = 'refresh';
-const refreshValue  = maiPubAdsVars.targets.refresh;
-const refreshTime   = 30;                                                                                      // Time in seconds.
-const debug         = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb');
-const log           = maiPubAdsVars.debug;
-let   timestamp     = Date.now();
+const ads              = maiPubAdsVars['ads'];
+const adSlotIds        = [];
+const adSlots          = [];
+const gamBase          = maiPubAdsVars.gamBase;
+const gamBaseClient    = maiPubAdsVars.gamBaseClient;
+const refreshKey       = 'refresh';
+const refreshValue     = maiPubAdsVars.targets.refresh;
+const refreshTime      = 30; // Time in seconds.
+const loadTimes        = {};
+const currentlyVisible = {};
+const timeoutIds       = {};
+const debug            = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb');
+const log              = maiPubAdsVars.debug;
+let   timestamp        = Date.now();
 
 // If debugging, log.
-maiPubLog( 'v167' );
+maiPubLog( 'v168' );
 
 // Add to googletag items.
 googletag.cmd.push(() => {
@@ -92,12 +95,10 @@ googletag.cmd.push(() => {
 			setTimeout( maiPubDOMContentLoaded, maiPubAdsVars.loadDelay );
 		});
 	}
+}); // End `googletag.cmd.push`.
 
-	// Set currently visible ads and timeout ids objects.
-	const loadTimes        = {};
-	const currentlyVisible = {};
-	const timeoutIds       = {};
-
+// Add to googletag items.
+googletag.cmd.push(() => {
 	/**
 	 * Set 30 refresh when an ad is in view.
 	 */
@@ -212,10 +213,39 @@ googletag.cmd.push(() => {
  * DOMContentLoaded and IntersectionObserver handler.
  */
 function maiPubDOMContentLoaded() {
-	// Select all atf and btf ads and create an IntersectionObserver.
+	// Select all atf and btf ads.
 	const toloadATF = [];
 	const adsATF    = document.querySelectorAll( '.mai-ad-unit[data-ap="atf"], .mai-ad-unit[data-ap="bs"]' );
 	const adsBTF    = document.querySelectorAll( '.mai-ad-unit:not([data-ap="atf"]):not([data-ap="bs"])' );
+
+	// Add to queue, so they don't step on each other.
+	googletag.cmd.push(() => {
+		// Define ATF ads.
+		adsATF.forEach( adATF => {
+			// Get slug.
+			const slug = adATF.getAttribute( 'id' ).replace( 'mai-ad-', '' );
+
+			// Add to toloadATF array.
+			toloadATF.push( maiPubDefineSlot( slug ) );
+
+			// If debugging, add inline styling.
+			if ( debug ) {
+				adATF.style.outline   = '2px dashed limegreen';
+				adATF.style.minWidth  = '300px';
+				adATF.style.minHeight = '90px';
+
+				// Add data-label attribute of slug.
+				adATF.setAttribute( 'data-label', slug );
+			}
+		});
+
+		// Display ATF ads.
+		if ( toloadATF.length ) {
+			maiPubDisplaySlots( toloadATF );
+		}
+	});
+
+	// Create the IntersectionObserver.
 	const observer  = new IntersectionObserver( (entries, observer) => {
 		let toLoadBTF = [];
 
@@ -264,30 +294,6 @@ function maiPubDOMContentLoaded() {
 		rootMargin: '600px 0px 600px 0px', // Trigger when the top of the element is X away from each part of the viewport.
 		threshold: 0 // No threshold needed.
 	});
-
-	// Define ATF ads.
-	adsATF.forEach( adATF => {
-		// Get slug.
-		const slug = adATF.getAttribute( 'id' ).replace( 'mai-ad-', '' );
-
-		// Add to toloadATF array.
-		toloadATF.push( maiPubDefineSlot( slug ) );
-
-		// If debugging, add inline styling.
-		if ( debug ) {
-			adATF.style.outline   = '2px dashed limegreen';
-			adATF.style.minWidth  = '300px';
-			adATF.style.minHeight = '90px';
-
-			// Add data-label attribute of slug.
-			adATF.setAttribute( 'data-label', slug );
-		}
-	});
-
-	// Display ATF ads.
-	if ( toloadATF.length ) {
-		maiPubDisplaySlots( toloadATF );
-	}
 
 	// Observe each BTF ad.
 	adsBTF.forEach( adBTF => {
