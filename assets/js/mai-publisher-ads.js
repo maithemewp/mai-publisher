@@ -147,7 +147,7 @@ googletag.cmd.push(() => {
 	});
 
 	// If debugging, set listeners to log.
-	if ( log ) {
+	if ( debug || log ) {
 		// Log when a slot is requested/fetched.
 		googletag.pubads().addEventListener( 'slotRequested', (event) => {
 			maiPubLog( 'slotRequested: ' + event.slot.getSlotElementId().replace( 'mai-ad-', '' ) );
@@ -210,6 +210,9 @@ function maiPubDOMContentLoaded() {
 				entry.target.style.outline   = '2px dashed red';
 				entry.target.style.minWidth  = '300px';
 				entry.target.style.minHeight = '90px';
+
+				// Add data-label attribute of slug.
+				entry.target.setAttribute( 'data-label', slug );
 			}
 
 			// Add to toLoad array.
@@ -521,16 +524,12 @@ function maiPubIsRefreshable( slot ) {
  */
 function maiPubRefreshSlots( slots ) {
 	if ( maiPubAdsVars.amazonUAM ) {
-		maiPubLog( 'setDisplayBids via apstag', slots );
+		maiPubLog( 'setDisplayBids via apstag: ' + slots.map( slot => slot.getSlotElementId() ).join( ', ' ) );
 		apstag.setDisplayBids();
 	}
 
 	// googletag.pubads().refresh( slots );
 	googletag.pubads().refresh( slots, { changeCorrelator: false } );
-
-	// Do we need to display() here again?
-
-	// Timeer doesn't seem to reset?
 }
 
 /**
