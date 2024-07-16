@@ -265,32 +265,29 @@ function maiPubDOMContentLoaded() {
 		threshold: 0 // No threshold needed.
 	});
 
-	// Add to queue, so they don't step on each other.
-	googletag.cmd.push(() => {
-		// Define ATF ads.
-		adsATF.forEach( adATF => {
-			// Get slug.
-			const slug = adATF.getAttribute( 'id' ).replace( 'mai-ad-', '' );
+	// Define ATF ads.
+	adsATF.forEach( adATF => {
+		// Get slug.
+		const slug = adATF.getAttribute( 'id' ).replace( 'mai-ad-', '' );
 
-			// Add to toloadATF array.
-			toloadATF.push( maiPubDefineSlot( slug ) );
+		// Add to toloadATF array.
+		toloadATF.push( maiPubDefineSlot( slug ) );
 
-			// If debugging, add inline styling.
-			if ( debug ) {
-				adATF.style.outline   = '2px dashed limegreen';
-				adATF.style.minWidth  = '300px';
-				adATF.style.minHeight = '90px';
+		// If debugging, add inline styling.
+		if ( debug ) {
+			adATF.style.outline   = '2px dashed limegreen';
+			adATF.style.minWidth  = '300px';
+			adATF.style.minHeight = '90px';
 
-				// Add data-label attribute of slug.
-				adATF.setAttribute( 'data-label', slug );
-			}
-		});
-
-		// Display ATF ads.
-		if ( toloadATF.length ) {
-			maiPubDisplaySlots( toloadATF );
+			// Add data-label attribute of slug.
+			adATF.setAttribute( 'data-label', slug );
 		}
 	});
+
+	// Display ATF ads.
+	if ( toloadATF.length ) {
+		maiPubDisplaySlots( toloadATF );
+	}
 
 	// Observe each BTF ad.
 	adsBTF.forEach( adBTF => {
