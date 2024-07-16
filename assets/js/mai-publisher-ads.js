@@ -553,9 +553,11 @@ function maiPubLog( ...mixed ) {
 	}
 
 	// Set log variables.
-	let   first   = true;
-	let   last    = null;
-	const timer   = 'maipub ';
+	let first = true;
+	let last  = null;
+	let timer = 'maipub ';
+
+	// Set times.
 	const now     = new Date().toLocaleTimeString( 'en-US', { hour12: true } );
 	const current = new Date().getTime();
 
