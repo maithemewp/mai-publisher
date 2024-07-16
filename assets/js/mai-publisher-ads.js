@@ -140,7 +140,7 @@ googletag.cmd.push(() => {
 		}
 
 		// If debugging, log.
-		maiPubLog( 'refreshed via slotVisibilityChanged: ' + slotId );
+		maiPubLog( 'refreshed via slotVisibilityChanged: ' + slotId.replace( 'mai-ad-', '' ) );
 
 		// Refresh the slot(s).
 		maiPubRefreshSlots( [slot] );
