@@ -14,7 +14,7 @@ const log           = maiPubAdsVars.debug;
 let   timestamp     = Date.now();
 
 // If debugging, log.
-maiPubLog( 'v164' );
+maiPubLog( 'v165' );
 
 // Add to googletag items.
 googletag.cmd.push(() => {
@@ -50,6 +50,28 @@ googletag.cmd.push(() => {
 		 * Disable debugging via `apstag.debug('disableConsole')`.
 		 */
 		!function(a9,a,p,s,t,A,g){if(a[a9])return;function q(c,r){a[a9]._Q.push([c,r])}a[a9]={init:function(){q("i",arguments)},fetchBids:function(){q("f",arguments)},setDisplayBids:function(){},targetingKeys:function(){return[]},_Q:[]};A=p.createElement(s);A.async=!0;A.src=t;g=p.getElementsByTagName(s)[0];g.parentNode.insertBefore(A,g)}("apstag",window,document,"script","//c.amazon-adsystem.com/aax2/apstag.js");
+
+		// Initialize apstag.
+		apstag.init({
+			pubID: '79166f25-5776-4c3e-9537-abad9a584b43', // BB.
+			adServer: 'googletag',
+			// bidTimeout: prebidTimeout,
+			// us_privacy: '-1', // https://ams.amazon.com/webpublisher/uam/docs/web-integration-documentation/integration-guide/uam-ccpa.html?source=menu
+			// @link https://ams.amazon.com/webpublisher/uam/docs/reference/api-reference.html#configschain
+			schain: {
+				complete: 1, // Integer 1 or 0 indicating if all preceding nodes are complete.
+				ver: '1.0', // Version of the spec used.
+				nodes: [
+					{
+						asi: 'bizbudding.com', // Populate with the canonical domain of the advertising system where the seller.JSON file is hosted.
+						sid: maiPubAdsVars.sellersId, // The identifier associated with the seller or reseller account within your advertising system.
+						hp: 1, // 1 or 0, whether this node is involved in the payment flow.
+						name: maiPubAdsVars.sellersName, // Name of the company paid for inventory under seller ID (optional).
+						domain: maiPubAdsVars.domain, // Business domain of this node (optional).
+					}
+				]
+			}
+		});
 	}
 
 	// If no delay, run on DOMContentLoaded.
@@ -424,28 +446,6 @@ function maiPubDisplaySlots( slots ) {
 				slotName: gamBase + ads[slug]['id'],
 				sizes: ads[slug].sizes,
 			});
-		});
-
-		// Initialize apstag and have apstag set bids on the googletag slots when they are returned to the page.
-		apstag.init({
-			pubID: '79166f25-5776-4c3e-9537-abad9a584b43', // BB.
-			adServer: 'googletag',
-			// bidTimeout: prebidTimeout,
-			// us_privacy: '-1', // https://ams.amazon.com/webpublisher/uam/docs/web-integration-documentation/integration-guide/uam-ccpa.html?source=menu
-			// @link https://ams.amazon.com/webpublisher/uam/docs/reference/api-reference.html#configschain
-			schain: {
-				complete: 1, // Integer 1 or 0 indicating if all preceding nodes are complete.
-				ver: '1.0', // Version of the spec used.
-				nodes: [
-					{
-						asi: 'bizbudding.com', // Populate with the canonical domain of the advertising system where the seller.JSON file is hosted.
-						sid: maiPubAdsVars.sellersId, // The identifier associated with the seller or reseller account within your advertising system.
-						hp: 1, // 1 or 0, whether this node is involved in the payment flow.
-						name: maiPubAdsVars.sellersName, // Name of the company paid for inventory under seller ID (optional).
-						domain: maiPubAdsVars.domain, // Business domain of this node (optional).
-					}
-				]
-			}
 		});
 
 		// If we have uadSlots.
