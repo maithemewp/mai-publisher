@@ -190,10 +190,11 @@ googletag.cmd.push(() => {
  */
 function maiPubDOMContentLoaded() {
 	// Select all atf and btf ads and create an IntersectionObserver.
-	const adsATF   = document.querySelectorAll( '.mai-ad-unit[data-ap="atf"], .mai-ad-unit[data-ap="bs"]' );
-	const adsBTF   = document.querySelectorAll( '.mai-ad-unit:not([data-ap="atf"]):not([data-ap="bs"])' );
-	const observer = new IntersectionObserver( (entries, observer) => {
-		let toLoad = [];
+	const toloadATF = [];
+	const adsATF    = document.querySelectorAll( '.mai-ad-unit[data-ap="atf"], .mai-ad-unit[data-ap="bs"]' );
+	const adsBTF    = document.querySelectorAll( '.mai-ad-unit:not([data-ap="atf"]):not([data-ap="bs"])' );
+	const observer  = new IntersectionObserver( (entries, observer) => {
+		let toLoadBTF = [];
 
 		// Loop through the entries.
 		entries.forEach( entry => {
@@ -215,43 +216,49 @@ function maiPubDOMContentLoaded() {
 				entry.target.setAttribute( 'data-label', slug );
 			}
 
-			// Add to toLoad array.
-			toLoad.push( slug );
+			// Add to toLoadBTF array.
+			toLoadBTF.push( slug );
 
 			// Unobserve. GAM event listener will handle refreshes.
 			observer.unobserve( entry.target );
 		}); // End entries loop.
 
 		// Bail if no slots to load.
-		if ( ! toLoad.length ) {
+		if ( ! toLoadBTF.length ) {
 			return;
 		}
 
 		// Define and display all slots in view.
-		maiPubDisplaySlots( toLoad.map( slug => maiPubDefineSlot( slug ) ) );
+		maiPubDisplaySlots( toLoadBTF.map( slug => maiPubDefineSlot( slug ) ) );
 
-		// Clear toLoad array.
-		toLoad = [];
+		// Clear toLoadBTF array.
+		toLoadBTF = [];
 	}, {
 		root: null, // Use the viewport as the root.
 		rootMargin: '600px 0px 600px 0px', // Trigger when the top of the element is X away from each part of the viewport.
 		threshold: 0 // No threshold needed.
 	});
 
-	// Define and display ATF ads.
+	// Define ATF ads.
 	adsATF.forEach( adATF => {
-		const slug = adATF.getAttribute( 'id' ).replace( 'mai-ad-', '' );
-
-		maiPubDisplaySlots( [ maiPubDefineSlot( slug ) ] );
+		// Add to toloadATF array.
+		toloadATF.push( maiPubDefineSlot( adATF.getAttribute( 'id' ).replace( 'mai-ad-', '' ) ) );
 
 		// If debugging, add inline styling.
 		if ( debug ) {
-			const adEl = document.getElementById( 'mai-ad-' + slug );
-			adEl.style.outline   = '2px dashed limegreen';
-			adEl.style.minWidth  = '300px';
-			adEl.style.minHeight = '90px';
+			adATF.style.outline   = '2px dashed limegreen';
+			adATF.style.minWidth  = '300px';
+			adATF.style.minHeight = '90px';
+
+			// Add data-label attribute of slug.
+			entry.target.setAttribute( 'data-label', slug );
 		}
 	});
+
+	// Display ATF ads.
+	if ( toloadATF.length ) {
+		maiPubDisplaySlots( toloadATF );
+	}
 
 	// Observe each BTF ad.
 	adsBTF.forEach( adBTF => {
