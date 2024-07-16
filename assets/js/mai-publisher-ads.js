@@ -13,7 +13,7 @@ const debug         = window.location.search.includes('dfpdeb') || window.locati
 const log           = maiPubAdsVars.debug;
 
 // If debugging, log.
-maiPubLog( 'v162' );
+maiPubLog( 'v163' );
 
 // Add to googletag items.
 googletag.cmd.push(() => {
@@ -93,7 +93,7 @@ googletag.cmd.push(() => {
 		// Set timeout to refresh ads for current visible ads.
 		timeoutIds[slotId] = setTimeout(() => {
 			// If debugging, log.
-			maiPubLog( 'refreshed via impressionViewable:', slotId );
+			maiPubLog( 'refreshed via impressionViewable: ' + slotId );
 
 			// Refresh the slot(s).
 			maiPubRefreshSlots( [slot] );
@@ -140,7 +140,7 @@ googletag.cmd.push(() => {
 		}
 
 		// If debugging, log.
-		maiPubLog( 'refreshed via slotVisibilityChanged:', slotId );
+		maiPubLog( 'refreshed via slotVisibilityChanged: ' + slotId );
 
 		// Refresh the slot(s).
 		maiPubRefreshSlots( [slot] );
@@ -237,7 +237,7 @@ function maiPubDOMContentLoaded() {
 
 	// Define and display ATF ads.
 	adsATF.forEach( adATF => {
-		const slug = adATF.getAttribute('id').replace( 'mai-ad-', '' );
+		const slug = adATF.getAttribute( 'id' ).replace( 'mai-ad-', '' );
 
 		maiPubDisplaySlots( [ maiPubDefineSlot( slug ) ] );
 
@@ -273,16 +273,13 @@ function maiPubDefineSlot( slug ) {
 	// Define ad slot. googletag.defineSlot( "/1234567/sports", [728, 90], "div-1" );
 	const slot = googletag.defineSlot( slotId, ads[slug].sizes, 'mai-ad-' + slug );
 
-	// If debugging, log.
-	maiPubLog( 'defineSlot(): ', slug );
-
 	// Register the ad slot.
 	// An ad will not be fetched until refresh is called,
 	// due to the disableInitialLoad() method being called earlier.
 	googletag.display( 'mai-ad-' + slug );
 
 	// If debugging, log.
-	maiPubLog( 'display(): ', 'mai-ad-' + slug );
+	maiPubLog( 'defineSlot() & display(): ' + slug );
 
 	// Add slot to our array.
 	adSlotIds.push( slotId );
@@ -291,7 +288,7 @@ function maiPubDefineSlot( slug ) {
 	// If amazon is enalbed and ads[slug].sizes only contains a single size named 'fluid'.
 	if ( maiPubAdsVars.amazonUAM && 1 === ads[slug].sizes.length && 'fluid' === ads[slug].sizes[0] ) {
 		// If debugging, log.
-		maiPubLog( 'disabled safeframe: ', slot.getSlotElementId() );
+		maiPubLog( 'disabled safeframe: ' + slot.getSlotElementId() );
 
 		// Disabled SafeFrame for this slot.
 		slot.setForceSafeFrame( false );
