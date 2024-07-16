@@ -543,9 +543,6 @@ function maiPubLog( ...mixed ) {
 		return;
 	}
 
-	// If mixed only has 1 item in the array, log that item value, not the array.
-	mixed =  1 === mixed.length ? mixed = mixed.shift() : mixed;
-
 	// Get current time in readable format.
 	const now = new Date().toLocaleTimeString( 'en-US', { hour12: true } );
 
