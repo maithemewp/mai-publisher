@@ -95,10 +95,7 @@ googletag.cmd.push(() => {
 			setTimeout( maiPubDOMContentLoaded, maiPubAdsVars.loadDelay );
 		});
 	}
-}); // End `googletag.cmd.push`.
 
-// Add to googletag items.
-googletag.cmd.push(() => {
 	/**
 	 * Set 30 refresh when an ad is in view.
 	 */
@@ -578,6 +575,6 @@ function maiPubLog( ...mixed ) {
 		timer += current - timestamp + 'ms';
 	}
 
-	// Log.
-	console.log( timer + ' ' + now, mixed );
+	// Log the combined message.
+	console.log( `${timer} ${now}`, mixed );
 }
