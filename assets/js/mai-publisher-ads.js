@@ -546,5 +546,5 @@ function maiPubLog( ...mixed ) {
 	const now = new Date().toLocaleTimeString( 'en-US', { hour12: true } );
 
 	// Log.
-	console.log( now, mixed );
+	console.log( 'maipub ' + now, mixed );
 }
