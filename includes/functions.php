@@ -4,19 +4,6 @@
 defined( 'ABSPATH' ) || die;
 
 /**
- * Gets processed content.
- *
- * @since 0.1.0
- *
- * @param string $content
- *
- * @return string
- */
-function maipub_get_processed_ad_content( $content ) {
-	return do_blocks( $content );
-}
-
-/**
  * Get processed content.
  * Take from mai_get_processed_content() in Mai Engine.
  *
@@ -107,8 +94,6 @@ function maipub_get_dom_document( $html ) {
  */
 function maipub_get_dom_html( $dom ) {
 	$html = $dom->saveHTML();
-	// $html = mb_convert_encoding( $html, 'UTF-8', 'HTML-ENTITIES' );
-	$html = wptexturize( $html );
 
 	return $html;
 }
@@ -451,9 +436,10 @@ function maipub_get_default_options() {
 		'sourcepoint_property_id'     => '',
 		'sourcepoint_msps_message_id' => '',
 		'sourcepoint_tcf_message_id'  => '',
-		'load_delay'                  => '',
 		'category'                    => '',
 		'amazon_uam_enabled'          => 0,
+		'load_delay'                  => '',
+		'debug_enabled'               => 0,
 		'matomo_enabled_global'       => defined( 'MAI_PUBLISHER_MATOMO_ENABLED_GLOBAL' ) ? MAI_PUBLISHER_MATOMO_ENABLED_GLOBAL : 0,
 		'matomo_enabled'              => defined( 'MAI_PUBLISHER_MATOMO_ENABLED' ) ? MAI_PUBLISHER_MATOMO_ENABLED : 0,
 		'matomo_enabled_backend'      => defined( 'MAI_PUBLISHER_MATOMO_ENABLED_BACKEND' ) ? MAI_PUBLISHER_MATOMO_ENABLED_BACKEND : 0,

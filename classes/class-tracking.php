@@ -436,12 +436,12 @@ class Mai_Publisher_Tracking {
 		$cache[ $user_id ] = [];
 
 		// Bail if Woo Memberships is not active.
-		if ( ! ( class_exists( 'WooCommerce' ) && function_exists( 'wc_memberships_get_user_memberships' ) ) ) {
+		if ( ! ( is_user_logged_in( $user_id ) && class_exists( 'WooCommerce' ) && function_exists( 'wc_memberships_get_user_memberships' ) ) ) {
 			return $cache[ $user_id ];
 		}
 
 		// Get active memberships.
-		$memberships = wc_memberships_get_user_memberships( $user_id, array( 'status' => 'active' ) );
+		$memberships = wc_memberships_get_user_memberships( $user_id, [ 'status' => [ 'active', 'complimentary' ] ] );
 
 		if ( $memberships ) {
 			// Get active membership IDs.

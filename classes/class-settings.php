@@ -130,6 +130,13 @@ class Mai_Publisher_Settings {
 		);
 
 		add_settings_section(
+			'maipub_settings_debug', // id
+			'', // title
+			[ $this, 'maipub_section_debug' ], // callback
+			'mai-publisher-section' // page
+		);
+
+		add_settings_section(
 			'maipub_settings_matomo', // id
 			'', // title
 			[ $this, 'maipub_section_matomo' ], // callback
@@ -247,14 +254,6 @@ class Mai_Publisher_Settings {
 		);
 
 		add_settings_field(
-			'load_delay', // id
-			__( 'Add load delay', 'mai-publisher' ), // title
-			[ $this, 'load_delay_callback' ], // callback
-			'mai-publisher-section', // page
-			'maipub_settings' // section
-		);
-
-		add_settings_field(
 			'category', // id
 			__( 'Sitewide Category', 'mai-publisher' ), // title
 			[ $this, 'category_callback' ], // callback
@@ -268,6 +267,26 @@ class Mai_Publisher_Settings {
 			[ $this, 'amazon_uam_enabled_callback' ], // callback
 			'mai-publisher-section', // page
 			'maipub_settings' // section
+		);
+
+		/**
+		 * Debugging
+		 */
+
+		add_settings_field(
+			'load_delay', // id
+			__( 'Ad load delay', 'mai-publisher' ), // title
+			[ $this, 'load_delay_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings_debug' // section
+		);
+
+		add_settings_field(
+			'debug_enabled', // id
+			__( 'Ad Debugging', 'mai-publisher' ), // title
+			[ $this, 'debug_enabled_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings_debug' // section
 		);
 
 		/**
@@ -400,6 +419,7 @@ class Mai_Publisher_Settings {
 			'sourcepoint_msps_message_id' => 'absint',
 			'sourcepoint_tcf_message_id'  => 'absint',
 			'load_delay'                  => 'absint',
+			'debug_enabled'               => 'rest_sanitize_boolean',
 			'category'                    => 'sanitize_text_field',
 			'amazon_uam_enabled'          => 'rest_sanitize_boolean',
 			'matomo_enabled_global'       => 'rest_sanitize_boolean',
@@ -446,6 +466,10 @@ class Mai_Publisher_Settings {
 	 */
 	function maipub_section_info() {
 		printf( '<h3 class="heading-tab"><span class="heading-tab__text">%s</span></h3>', __( 'Ads', 'mai-publisher' ) );
+	}
+
+	function maipub_section_debug() {
+		printf( '<h3 class="heading-tab"><span class="heading-tab__text">%s</span></h3>', __( 'Debugging', 'mai-publisher' ) );
 	}
 
 	function maipub_section_matomo() {
@@ -608,20 +632,6 @@ class Mai_Publisher_Settings {
 	/**
 	 * Setting callback.
 	 *
-	 * @since TBD
-	 *
-	 * @return void
-	 */
-	function load_delay_callback() {
-		$delay  = maipub_get_option( 'load_delay', false );
-
-		printf( '<input class="regular-text" type="number" name="mai_publisher[load_delay]" id="load_delay" value="%s">', absint( $delay ) );
-		printf( '<p class="description">%s</p>', __( 'Add a delay in ms (1000ms = 1s). A value here will also move the event from DOMContentLoaded to window load. Leave empty for no delay.', 'mai-publisher' ) );
-	}
-
-	/**
-	 * Setting callback.
-	 *
 	 * @since 0.1.0
 	 *
 	 * @return void
@@ -654,6 +664,37 @@ class Mai_Publisher_Settings {
 			'<input type="checkbox" name="mai_publisher[amazon_uam_enabled]" id="amazon_uam_enabled" %s> <label for="amazon_uam_enabled">%s</label>',
 			$value ? ' checked' : '',
 			__( 'Enable Amazon UAM bids for ads', 'mai-publisher' )
+		);
+	}
+
+	/**
+	 * Setting callback.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return void
+	 */
+	function load_delay_callback() {
+		$delay  = maipub_get_option( 'load_delay', false );
+
+		printf( '<input class="regular-text" type="number" name="mai_publisher[load_delay]" id="load_delay" value="%s">', absint( $delay ) );
+		printf( '<p class="description">%s</p>', __( 'Add a delay in ms (1000ms = 1s). A value here will also move the event from DOMContentLoaded to window load. Leave empty for no delay.', 'mai-publisher' ) );
+	}
+
+	/**
+	 * Setting callback.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return void
+	 */
+	function debug_enabled_callback() {
+		$value = (bool) maipub_get_option( 'debug_enabled', false );
+
+		printf(
+			'<input type="checkbox" name="mai_publisher[debug_enabled]" id="debug_enabled" %s> <label for="debug_enabled">%s</label>',
+			$value ? ' checked' : '',
+			__( 'Enable console logging for this website.', 'mai-publisher' )
 		);
 	}
 

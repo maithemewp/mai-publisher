@@ -202,7 +202,7 @@ class Mai_Publisher_Display {
 			 * @return string
 			 */
 			add_action( $this->locations[ $args['location'] ]['hook'], function() use ( $args, $priority ) {
-				echo maipub_get_processed_ad_content( $args['content'] );
+				echo maipub_get_processed_content( $args['content'] );
 			}, $priority );
 		}
 	}

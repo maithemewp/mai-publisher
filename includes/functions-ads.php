@@ -55,6 +55,9 @@ function maipub_get_page_ads() {
 				continue;
 			}
 
+			// Process content.
+			$args['content'] = maipub_get_processed_content( $args['content'] );
+
 			// Set location targets. Manually added ads are handled in `class-display.php`.
 			$args['content'] = maipub_add_location_attributes( $args['content'], $args['location'] );
 
@@ -266,7 +269,7 @@ function maipub_validate_ad_conditions_global( $args ) {
 		'id'       => absint( $args['id'] ),
 		'slug'     => sanitize_key( $args['slug'] ),
 		'location' => esc_html( $args['location'] ),
-		'content'  => trim( maipub_get_processed_ad_content( $args['content'] ) ),
+		'content'  => trim( $args['content'] ),
 		'header'   => $args['header'],
 		'footer'   => $args['footer'],
 	];
@@ -417,9 +420,6 @@ function maipub_validate_ad_conditions_single( $args ) {
 		}
 	}
 
-	// Process content.
-	$args['content'] = maipub_get_processed_ad_content( $args['content'] );
-
 	return $args;
 }
 
@@ -529,9 +529,6 @@ function maipub_validate_ad_conditions_archive( $args ) {
 			return [];
 		}
 	}
-
-	// Process content.
-	$args['content'] = maipub_get_processed_ad_content( $args['content'] );
 
 	return $args;
 }

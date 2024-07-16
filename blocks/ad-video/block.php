@@ -84,7 +84,7 @@ class Mai_Publisher_Ad_Video_Block {
 				$attr['class']     .= ' mai-connatix';
 				$attr['style']      = '--mai-connatix-aspect-ratio:8/3;';
 				$attr['data-unit']  = 'coolstuff';
-				$html               = '<script id="af853f8b9afa4c828dc709c0715055b2">(new Image()).src = "https://capi.connatix.com/tr/si?token=d98b3dc2-bc10-43cf-b1b9-bd2c68c9615b&cid=db8b4096-c769-48da-a4c5-9fbc9ec753f0"; cnx.cmd.push(function() { cnx({ playerId: "d98b3dc2-bc10-43cf-b1b9-bd2c68c9615b" }).render("af853f8b9afa4c828dc709c0715055b2"); });</script>';
+				$return             = '<script id="af853f8b9afa4c828dc709c0715055b2">(new Image()).src = "https://capi.connatix.com/tr/si?token=d98b3dc2-bc10-43cf-b1b9-bd2c68c9615b&cid=db8b4096-c769-48da-a4c5-9fbc9ec753f0"; cnx.cmd.push(function() { cnx({ playerId: "d98b3dc2-bc10-43cf-b1b9-bd2c68c9615b" }).render("af853f8b9afa4c828dc709c0715055b2"); });</script>';
 			break;
 			// This Day In History.
 			case '6f704650-514c-4dc1-8481-8a75bbfb2eea':

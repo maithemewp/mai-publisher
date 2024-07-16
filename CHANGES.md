@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.9.0 (7/16/24)
+* Added: New global setting to enable console logging.
+* Added: Now preconnecting gpt, sourcepoint, and connatix when they are loaded.
+* Changed: New Sourcepoint stub files.
+* Changed: Removed `maipub_get_processed_ad_content()` function.
+* Changed: Encode and process ad content on the fly, just as it's rendered.
+* Fixed: Do not include Ninja Forms scripts when manipulating the DOM via DOMDocument. This makes sure HTML or special characters inside scripts are skipped. This fixes Ninja Forms not loading.
+* Fixed: Safer handling of WooCommerce Memberships plans, including only checking when user is logged in.
+* Fixed: Wrong variable name was throwing error when using Cool Stuff video from Conntatix.
+
 ## 1.8.0 (6/28/24)
 * Added: New load delay setting to move event from `DOMContentLoaded` to window `load`, with a timed delay. This is for testing with CMP's like Sourcepoint.
 

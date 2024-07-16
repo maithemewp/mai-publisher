@@ -132,6 +132,24 @@ class Mai_Publisher_Output {
 			return $buffer;
 		}
 
+		// Allow filtering of scripts to preconnect and preload.
+		$preconnects = [];
+		$preloads    = [];
+
+		// Extract all script tags where the id starts with "tmpl-nf".
+		// Ninja Forms surfaced an issue where HTML in the script was getting encode
+		// or slashed/unslashed or something and was stopping the forms from loading.
+		preg_match_all( '/<script\b[^>]*id="tmpl-nf.*?".*?>.*?<\/script>/is', $buffer, $matches );
+		// preg_match_all( '/<script\b[^>]*>.*?<\/script>/is', $buffer, $matches );
+
+		// Get the script tags.
+		$og_scripts = isset( $matches[0] ) ? $matches[0] : [];
+
+		// Replace script tags with placeholders.
+		foreach ( $og_scripts as $index => $og_script ) {
+			$buffer = str_replace( $og_script, sprintf( '<script id="maipub_script_placeholder_%s"></script>', $index ), $buffer );
+		}
+
 		// Setup dom and xpath.
 		$this->dom   = $this->dom_document( $buffer );
 		$this->xpath = new DOMXPath( $this->dom );
@@ -257,9 +275,8 @@ class Mai_Publisher_Output {
 			$video->setAttribute( 'data-track-content', '' );
 		}
 
-		// Set vars.
-		$scripts  = [];
-		$position = null;
+		// Start scripts.
+		$scripts = [];
 
 		// Allow filtering of page GAM ads.
 		$this->gam = apply_filters( 'mai_publisher_gam_ads', $this->gam );
@@ -288,8 +305,9 @@ class Mai_Publisher_Output {
 				$gam_base_client = "/$this->network_code/";
 			}
 
-			// Localize data.
-			$localize  = [
+			// Get script location and localize.
+			$file     = "assets/js/mai-publisher-ads{$this->suffix}.js";
+			$localize = [
 				'domain'        => $this->domain,
 				'sellersName'   => $this->sellers_name,
 				'sellersId'     => $this->sellers_id,
@@ -299,12 +317,14 @@ class Mai_Publisher_Output {
 				'targets'       => $this->get_targets(),
 				'amazonUAM'     => maipub_get_option( 'amazon_uam_enabled' ),
 				'loadDelay'     => maipub_get_option( 'load_delay' ),
+				'debug'         => maipub_get_option( 'debug_enabled' ),
 			];
 
 			// If sourcepoint data.
 			if ( $this->sp_property_id && $this->sp_msps_id && $this->sp_tcf_id ) {
-				// Add sourcepoint scripts.
-				$scripts = array_merge( $scripts, $this->get_sourcepoint_scripts() );
+				// Preconnect and add sourcepoint scripts.
+				$preconnects[] = '<link rel="preconnect" href="https://cdn.privacy-mgmt.com">';
+				$scripts       = array_merge( $scripts, $this->get_sourcepoint_scripts( $localize['debug'] ) );
 			}
 
 			// Load GPT.
@@ -312,9 +332,8 @@ class Mai_Publisher_Output {
 
 			// If loading GPT from Mai Publisher.
 			if ( $load_gpt ) {
-				// Get script data.
-				$file = "assets/js/mai-publisher-ads{$this->suffix}.js";
-				$gpt  = $this->xpath->query( '//script[contains(@src, "https://securepubads.g.doubleclick.net/tag/js/gpt.js")]' );
+				// Check for existing GPT script.
+				$gpt = $this->xpath->query( '//script[contains(@src, "https://securepubads.g.doubleclick.net/tag/js/gpt.js")]' );
 
 				// If we have gpt, remove it.
 				if ( $gpt->length ) {
@@ -324,37 +343,79 @@ class Mai_Publisher_Output {
 					}
 				}
 
+				// Add preconnect.
+				$preconnects[] = '<link rel="preconnect" href="https://securepubads.g.doubleclick.net">';
+
 				// Add GPT.
 				$scripts[] = '<script async id="mai-publisher-gpt" src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>'; // Google Ad Manager GPT.
 			}
 
 			// Add mai-publisher-ads scripts.
 			$scripts[] = sprintf( '<script>/* <![CDATA[ */%svar maiPubAdsVars = %s;%s/* ]]> */</script>', PHP_EOL, wp_json_encode( $localize ), PHP_EOL );
-			$scripts[] = sprintf( '<script async id="mai-publisher-ads" src="%s?ver=%s"></script>', maipub_get_file_data( $file, 'url' ), maipub_get_file_data( $file, 'version' ) ); // Initial testing showed async broke ads.
+			$scripts[] = sprintf( '<script async id="mai-publisher-ads" src="%s?ver=%s"></script>', maipub_get_file_data( $file, 'url' ), maipub_get_file_data( $file, 'version' ) );
 		}
 
 		// Check connatix. This checks the context of the script to see if it contains the connatix domain.
+		// We removed this when we started using the placeholder method.
 		$connatix = $this->xpath->query( "//script[contains(text(), 'https://capi.connatix.com')]" );
 
-		// Temporary filters for TPS.
-		$load_connatix = apply_filters( 'mai_publisher_load_connatix', $connatix->length ? true : false );
+		// // Start with no connatix.
+		// $has_connatix = false;
+
+		// // Check if any of the original scripts contain connatix.
+		// foreach ( $og_scripts as $og_script ) {
+		// 	if ( str_contains( $og_script, '//capi.connatix.com' ) ) {
+		// 		$has_connatix = true;
+		// 		break;
+		// 	}
+		// }
+
+		// Filter to force connatix.
+		$load_connatix = apply_filters( 'mai_publisher_load_connatix', $connatix->length );
+		// $load_connatix = apply_filters( 'mai_publisher_load_connatix', $has_connatix );
 
 		// If we have connatix ads.
 		if ( $load_connatix ) {
-			$scripts[] = "<script id=\"mai-publisher-connatix\">!function(n){if(!window.cnx){window.cnx={},window.cnx.cmd=[];var t=n.createElement('iframe');t.src='javascript:false'; t.display='none',t.onload=function(){var n=t.contentWindow.document,c=n.createElement('script');c.src='//cd.connatix.com/connatix.player.js?cid=db8b4096-c769-48da-a4c5-9fbc9ec753f0',c.setAttribute('async','1'),c.setAttribute('type','text/javascript'),n.body.appendChild(c)},n.head.appendChild(t)}}(document);</script>";
+			$preconnects[] = '<link rel="preconnect" href="https://capi.connatix.com">';
+			$scripts[]     = "<script id=\"mai-publisher-connatix\">!function(n){if(!window.cnx){window.cnx={},window.cnx.cmd=[];var t=n.createElement('iframe');t.src='javascript:false'; t.display='none',t.onload=function(){var n=t.contentWindow.document,c=n.createElement('script');c.src='//cd.connatix.com/connatix.player.js?cid=db8b4096-c769-48da-a4c5-9fbc9ec753f0',c.setAttribute('async','1'),c.setAttribute('type','text/javascript'),n.body.appendChild(c)},n.head.appendChild(t)}}(document);</script>";
 		}
 
 		// Allow filtering the scripts.
-		$scripts = apply_filters( 'mai_publisher_header_scripts', $scripts );
+		$preconnects = apply_filters( 'mai_publisher_preconnect_scripts', $preconnects );
+		$preloads    = apply_filters( 'mai_publisher_preload_scripts', $preloads );
+		$scripts     = apply_filters( 'mai_publisher_header_scripts', $scripts );
 
 		// Handle scripts.
-		if ( $scripts ) {
-			// $scripts  = array_reverse( $scripts ); // Reverse when displaying 'after' something. Leave as-is when it's 'before'.
-			$position = $position ?: $this->xpath->query( '//head/title' )->item(0);
+		if ( $preconnects || $preloads || $scripts ) {
+			// Get the title element in the head.
+			$position = $this->xpath->query( '//head/title' )->item(0);
+			$action   = 'before';
+
+			// If no title in head, prepend to head.
+			if ( ! $position ) {
+				$position = $this->xpath->query( '//head' )->item(0);
+				$action   = 'prepend';
+			}
+
+			// Insert preconnects.
+			if ( $preconnects ) {
+				foreach ( $preconnects as $preconnect ) {
+					$this->insert_nodes( $preconnect, $position, $action );
+				}
+			}
+
+			// Insert preloads.
+			if ( $preloads ) {
+				foreach ( $preloads as $preload ) {
+					$this->insert_nodes( $preload, $position, $action );
+				}
+			}
 
 			// Insert scripts.
-			foreach ( $scripts as $script ) {
-				$this->insert_nodes( $script, $position, 'before' );
+			if ( $scripts ) {
+				foreach ( $scripts as $script ) {
+					$this->insert_nodes( $script, $position, $action );
+				}
 			}
 		}
 
@@ -367,6 +428,11 @@ class Mai_Publisher_Output {
 		// Remove closing tags that are added by DOMDocument.
 		$buffer = str_replace( '</source>', '', $buffer );
 		$buffer = str_replace( '</img>', '', $buffer );
+
+		// Reinsert the scripts at their original positions.
+		foreach ( $og_scripts as $index => $og_script ) {
+			$buffer = str_replace( sprintf( '<script id="maipub_script_placeholder_%s"></script>', $index ), $og_script, $buffer );
+		}
 
 		// Allow filtering all of the HTML.
 		$buffer = apply_filters( 'mai_publisher_html', $buffer );
@@ -673,16 +739,13 @@ class Mai_Publisher_Output {
 	 */
 	function dom_document( $html ) {
 		// Create the new document.
-		$dom = new DOMDocument();
+		$dom = new DOMDocument( '1.0', 'UTF-8' );
 
 		// Modify state.
 		$libxml_previous_state = libxml_use_internal_errors( true );
 
-		// We don't need this here since it's running so late, all of the content
-		// should already be encoded.
-		// This was causing issues because it's converting ALL entities,
-		// including stuff in data-attributes, etc.
-		// $html = mb_encode_numericentity( $html, [0x80, 0x10FFFF, 0, ~0], 'UTF-8' );
+		// Encode.
+		$html = mb_encode_numericentity( $html, [0x80, 0x10FFFF, 0, ~0], 'UTF-8' );
 
 		// Load the content in the document HTML.
 		$dom->loadHTML( $html );
@@ -697,7 +760,7 @@ class Mai_Publisher_Output {
 	}
 
 	/**
-	 * Saves HTML from DOMDocument and decode entities.
+	 * Saves HTML from DOMDocument.
 	 *
 	 * @since 1.1.0
 	 *
@@ -706,15 +769,7 @@ class Mai_Publisher_Output {
 	 * @return string
 	 */
 	function dom_html( $dom ) {
-		$html = $dom->saveHTML();
-
-		// We don't need this here since it's running so late, all of the content
-		// should already be encoded.
-		// This was causing issues because it's converting ALL entities,
-		// including stuff in data-attributes, etc.
-		// $html = mb_convert_encoding( $html, 'UTF-8', 'HTML-ENTITIES' );
-
-		return $html;
+		return $dom->saveHTML();
 	}
 
 	/**
@@ -948,11 +1003,10 @@ class Mai_Publisher_Output {
 	 *
 	 * @return string
 	 */
-	function get_sourcepoint_scripts() {
-		$scripts   = [];
-		$scripts[] = '<script>"use strict";function _typeof(t){return(_typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(t){return typeof t}:function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":typeof t})(t)}!function(){var t=function(){for(var t,e,o=[],n=window,r=n;r;){try{if(r.frames.__tcfapiLocator){t=r;break}}catch(a){}if(r===n.top)break;r=r.parent}t||(!function t(){var e=n.document,o=!!n.frames.__tcfapiLocator;if(!o){if(e.body){var r=e.createElement("iframe");r.style.cssText="display:none",r.name="__tcfapiLocator",e.body.appendChild(r)}else setTimeout(t,5)}return!o}(),n.__tcfapi=function(){for(var t=arguments.length,n=Array(t),r=0;r<t;r++)n[r]=arguments[r];if(!n.length)return o;"setGdprApplies"===n[0]?n.length>3&&2===parseInt(n[1],10)&&"boolean"==typeof n[3]&&(e=n[3],"function"==typeof n[2]&&n[2]("set",!0)):"ping"===n[0]?"function"==typeof n[2]&&n[2]({gdprApplies:e,cmpLoaded:!1,cmpStatus:"stub"}):o.push(n)},n.addEventListener("message",function(t){var e="string"==typeof t.data,o={};if(e)try{o=JSON.parse(t.data)}catch(n){}else o=t.data;var r="object"===_typeof(o)&&null!==o?o.__tcfapiCall:null;r&&window.__tcfapi(r.command,r.version,function(o,n){var a={__tcfapiReturn:{returnValue:o,success:n,callId:r.callId}};t&&t.source&&t.source.postMessage&&t.source.postMessage(e?JSON.stringify(a):a,"*")},r.parameter)},!1))};"undefined"!=typeof module?module.exports=t:t()}();</script>';
-		$scripts[] = '<script>window.__gpp_addFrame=function(e){if(!window.frames[e]){if(document.body){var t=document.createElement("iframe");t.style.cssText="display:none",t.name=e,document.body.appendChild(t)}else window.setTimeout(window.__gpp_addFrame,10,e)}},window.__gpp_stub=function(){var e=arguments;if(__gpp.queue=__gpp.queue||[],__gpp.events=__gpp.events||[],!e.length||1==e.length&&"queue"==e[0])return __gpp.queue;if(1!=e.length||"events"!=e[0]){__gpp.events;var t=e[0],s=e.length>1?e[1]:null,a=e.length>2?e[2]:null;if("ping"===t)s({gppVersion:"1.1",cmpStatus:"stub",cmpDisplayStatus:"hidden",signalStatus:"not ready",supportedAPIs:["2:tcfeuv2","5:tcfcav1","6:uspv1","7:usnatv1","8:uscav1","9:usvav1","10:uscov1","11:usutv1","12:usctv1"],cmpId:0,sectionList:[],applicableSections:[],gppString:"",parsedSections:{}},!0);else if("addEventListener"===t){"lastId"in __gpp||(__gpp.lastId=0),__gpp.lastId++;var n=__gpp.lastId;__gpp.events.push({id:n,callback:s,parameter:a}),s({eventName:"listenerRegistered",listenerId:n,data:!0,pingData:{gppVersion:"1.1",cmpStatus:"stub",cmpDisplayStatus:"hidden",signalStatus:"not ready",supportedAPIs:["2:tcfeuv2","5:tcfcav1","6:uspv1","7:usnatv1","8:uscav1","9:usvav1","10:uscov1","11:usutv1","12:usctv1"],cmpId:0,sectionList:[],applicableSections:[],gppString:"",parsedSections:{}}},!0)}else if("removeEventListener"===t){for(var p=!1,i=0;i<__gpp.events.length;i++)if(__gpp.events[i].id==a){__gpp.events.splice(i,1),p=!0;break}s({eventName:"listenerRemoved",listenerId:a,data:p,pingData:{gppVersion:"1.1",cmpStatus:"stub",cmpDisplayStatus:"hidden",signalStatus:"not ready",supportedAPIs:["2:tcfeuv2","5:tcfcav1","6:uspv1","7:usnatv1","8:uscav1","9:usvav1","10:uscov1","11:usutv1","12:usctv1"],cmpId:0,sectionList:[],applicableSections:[],gppString:"",parsedSections:{}}},!0)}else"hasSection"===t?s(!1,!0):"getSection"===t||"getField"===t?s(null,!0):__gpp.queue.push([].slice.apply(e))}},window.__gpp_msghandler=function(e){var t="string"==typeof e.data;try{var s=t?JSON.parse(e.data):e.data}catch(a){s=null}if("object"==typeof s&&null!==s&&"__gppCall"in s){var n=s.__gppCall;window.__gpp(n.command,function(s,a){var p={__gppReturn:{returnValue:s,success:a,callId:n.callId}};e.source.postMessage(t?JSON.stringify(p):p,"*")},"parameter"in n?n.parameter:null,"version"in n?n.version:"1.1")}},"__gpp"in window&&"function"==typeof window.__gpp||(window.__gpp=window.__gpp_stub,window.addEventListener("message",window.__gpp_msghandler,!1),window.__gpp_addFrame("__gppLocator"));</script>';
-		$scripts[] = '<script>!function(){var a=window,e=document;function t(e){var t="string"==typeof e.data;try{var n=t?JSON.parse(e.data):e.data;if(n.__cmpCall){var p=n.__cmpCall;a.__uspapi(p.command,p.parameter,function(a,n){var r={__cmpReturn:{returnValue:a,success:n,callId:p.callId}};e.source.postMessage(t?JSON.stringify(r):r,"*")})}}catch(r){}}!function t(){if(!a.frames.__uspapiLocator){if(e.body){var n=e.body,p=e.createElement("iframe");p.style.cssText="display:none",p.name="__uspapiLocator",n.appendChild(p)}else setTimeout(t,5)}}(),"function"!=typeof __uspapi&&(a.__uspapi=function a(){var e=arguments;if(__uspapi.a=__uspapi.a||[],!e.length)return __uspapi.a;"ping"===e[0]?e[2]({gdprAppliesGlobally:!1,cmpLoaded:!1},!0):__uspapi.a.push([].slice.apply(e))},__uspapi.msgHandler=t,a.addEventListener("message",t,!1))}();</script>';
+	function get_sourcepoint_scripts( $debug ) {
+		$scripts[] = '<script>"use strict";function _typeof(t){return(_typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(t){return typeof t}:function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":typeof t})(t)}!function(){var t=function(){var t,e,o=[],n=window,r=n;for(;r;){try{if(r.frames.__tcfapiLocator){t=r;break}}catch(t){}if(r===n.top)break;r=r.parent}t||(!function t(){var e=n.document,o=!!n.frames.__tcfapiLocator;if(!o)if(e.body){var r=e.createElement("iframe");r.style.cssText="display:none",r.name="__tcfapiLocator",e.body.appendChild(r)}else setTimeout(t,5);return!o}(),n.__tcfapi=function(){for(var t=arguments.length,n=new Array(t),r=0;r<t;r++)n[r]=arguments[r];if(!n.length)return o;"setGdprApplies"===n[0]?n.length>3&&2===parseInt(n[1],10)&&"boolean"==typeof n[3]&&(e=n[3],"function"==typeof n[2]&&n[2]("set",!0)):"ping"===n[0]?"function"==typeof n[2]&&n[2]({gdprApplies:e,cmpLoaded:!1,cmpStatus:"stub"}):o.push(n)},n.addEventListener("message",(function(t){var e="string"==typeof t.data,o={};if(e)try{o=JSON.parse(t.data)}catch(t){}else o=t.data;var n="object"===_typeof(o)&&null!==o?o.__tcfapiCall:null;n&&window.__tcfapi(n.command,n.version,(function(o,r){var a={__tcfapiReturn:{returnValue:o,success:r,callId:n.callId}};t&&t.source&&t.source.postMessage&&t.source.postMessage(e?JSON.stringify(a):a,"*")}),n.parameter)}),!1))};"undefined"!=typeof module?module.exports=t:t()}();</script>';
+		$scripts[] = '<script>(function () { var e = false; var c = window; var t = document; function r() { if (!c.frames["__uspapiLocator"]) { if (t.body) { var a = t.body; var e = t.createElement("iframe"); e.style.cssText = "display:none"; e.name = "__uspapiLocator"; a.appendChild(e) } else { setTimeout(r, 5) } } } r(); function p() { var a = arguments; __uspapi.a = __uspapi.a || []; if (!a.length) { return __uspapi.a } else if (a[0] === "ping") { a[2]({ gdprAppliesGlobally: e, cmpLoaded: false }, true) } else { __uspapi.a.push([].slice.apply(a)) } } function l(t) { var r = typeof t.data === "string"; try { var a = r ? JSON.parse(t.data) : t.data; if (a.__cmpCall) { var n = a.__cmpCall; c.__uspapi(n.command, n.parameter, function (a, e) { var c = { __cmpReturn: { returnValue: a, success: e, callId: n.callId } }; t.source.postMessage(r ? JSON.stringify(c) : c, "*") }) } } catch (a) { } } if (typeof __uspapi !== "function") { c.__uspapi = p; __uspapi.msgHandler = l; c.addEventListener("message", l, false) } })();</script>';
+		$scripts[] = '<script>window.__gpp_addFrame=function(e){if(!window.frames[e])if(document.body){var t=document.createElement("iframe");t.style.cssText="display:none",t.name=e,document.body.appendChild(t)}else window.setTimeout(window.__gpp_addFrame,10,e)},window.__gpp_stub=function(){var e=arguments;if(__gpp.queue=__gpp.queue||[],__gpp.events=__gpp.events||[],!e.length||1==e.length&&"queue"==e[0])return __gpp.queue;if(1==e.length&&"events"==e[0])return __gpp.events;var t=e[0],p=e.length>1?e[1]:null,s=e.length>2?e[2]:null;if("ping"===t)p({gppVersion:"1.1",cmpStatus:"stub",cmpDisplayStatus:"hidden",signalStatus:"not ready",supportedAPIs:["2:tcfeuv2","5:tcfcav1","6:uspv1","7:usnatv1","8:uscav1","9:usvav1","10:uscov1","11:usutv1","12:usctv1"],cmpId:0,sectionList:[],applicableSections:[],gppString:"",parsedSections:{}},!0);else if("addEventListener"===t){"lastId"in __gpp||(__gpp.lastId=0),__gpp.lastId++;var n=__gpp.lastId;__gpp.events.push({id:n,callback:p,parameter:s}),p({eventName:"listenerRegistered",listenerId:n,data:!0,pingData:{gppVersion:"1.1",cmpStatus:"stub",cmpDisplayStatus:"hidden",signalStatus:"not ready",supportedAPIs:["2:tcfeuv2","5:tcfcav1","6:uspv1","7:usnatv1","8:uscav1","9:usvav1","10:uscov1","11:usutv1","12:usctv1"],cmpId:0,sectionList:[],applicableSections:[],gppString:"",parsedSections:{}}},!0)}else if("removeEventListener"===t){for(var a=!1,i=0;i<__gpp.events.length;i++)if(__gpp.events[i].id==s){__gpp.events.splice(i,1),a=!0;break}p({eventName:"listenerRemoved",listenerId:s,data:a,pingData:{gppVersion:"1.1",cmpStatus:"stub",cmpDisplayStatus:"hidden",signalStatus:"not ready",supportedAPIs:["2:tcfeuv2","5:tcfcav1","6:uspv1","7:usnatv1","8:uscav1","9:usvav1","10:uscov1","11:usutv1","12:usctv1"],cmpId:0,sectionList:[],applicableSections:[],gppString:"",parsedSections:{}}},!0)}else"hasSection"===t?p(!1,!0):"getSection"===t||"getField"===t?p(null,!0):__gpp.queue.push([].slice.apply(e))},window.__gpp_msghandler=function(e){var t="string"==typeof e.data;try{var p=t?JSON.parse(e.data):e.data}catch(e){p=null}if("object"==typeof p&&null!==p&&"__gppCall"in p){var s=p.__gppCall;window.__gpp(s.command,(function(p,n){var a={__gppReturn:{returnValue:p,success:n,callId:s.callId}};e.source.postMessage(t?JSON.stringify(a):a,"*")}),"parameter"in s?s.parameter:null,"version"in s?s.version:"1.1")}},"__gpp"in window&&"function"==typeof window.__gpp||(window.__gpp=window.__gpp_stub,window.addEventListener("message",window.__gpp_msghandler,!1),window.__gpp_addFrame("__gppLocator"));</script>';
 		$scripts[] = '<script>
 			window._sp_queue = [];
 			window._sp_ = {
@@ -962,51 +1016,7 @@ class Mai_Publisher_Output {
 					propertyId: ' . (string) $this->sp_property_id . ',
 					usnat: { includeUspApi: true },
 					gdpr: {},
-					events: {
-						onMessageChoiceSelect: function() {
-							console.log( "[event] onMessageChoiceSelect", arguments );
-						},
-						onMessageReady: function() {
-							console.log( "[event] onMessageReady", arguments );
-						},
-						onMessageChoiceError: function() {
-							console.log( "[event] onMessageChoiceError", arguments );
-						},
-						onPrivacyManagerAction: function() {
-							console.log( "[event] onPrivacyManagerAction", arguments );
-						},
-						onPMCancel: function() {
-							console.log( "[event] onPMCancel", arguments );
-						},
-						onMessageReceiveData: function() {
-							console.log( "[event] onMessageReceiveData", arguments );
-						},
-						onSPPMObjectReady: function() {
-							console.log( "[event] onSPPMObjectReady", arguments );
-						},
-						onConsentReady: function (message_type, uuid, string, info) {
-							console.log( "[event] onConsentReady", arguments );
-							if((message_type == "usnat") && (info.applies)){
-								/* code to insert the USNAT footer link */
-								document.getElementById("pmLink").style.visibility="visible";
-								document.getElementById("pmLink").innerHTML= "Do Not Sell/Share My Personal Information";
-								document.getElementById("pmLink").onclick= function(){
-									window._sp_.usnat.loadPrivacyManagerModal( "' . $this->sp_msps_id . '" );
-								}
-							}
-							if((message_type == "gdpr") && (info.applies)){
-								/* code to insert the GDPR footer link */
-								document.getElementById("pmLink").style.visibility="visible";
-								document.getElementById("pmLink").innerHTML= "Privacy Preferences";
-								document.getElementById("pmLink").onclick= function(){
-									window._sp_.gdpr.loadPrivacyManagerModal( "' . $this->sp_tcf_id . '" );
-								}
-							}
-						},
-						onError: function() {
-							console.log( "[event] onError", arguments );
-						},
-					}
+					events: {' . $this->get_sourcepoint_events( $debug ) . '}
 				}
 			}
 		</script>';
@@ -1014,6 +1024,84 @@ class Mai_Publisher_Output {
 		$scripts[] = '<script async src="https://cdn.privacy-mgmt.com/unified/wrapperMessagingWithoutDetection.js"></script>';
 
 		return $scripts;
+	}
+
+	/**
+	 * Get Sourcepoint events.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return string
+	 */
+	function get_sourcepoint_events( $debug ) {
+		// Start events string.
+		$events = '';
+
+		// If debugging, add logs.
+		if ( $debug ) {
+			$events .= 'onMessageChoiceSelect: function() {
+				console.log( "[event] onMessageChoiceSelect", arguments );
+			},
+			onMessageReady: function() {
+				console.log( "[event] onMessageReady", arguments );
+			},
+			onMessageChoiceError: function() {
+				console.log( "[event] onMessageChoiceError", arguments );
+			},
+			onPrivacyManagerAction: function() {
+				console.log( "[event] onPrivacyManagerAction", arguments );
+			},
+			onPMCancel: function() {
+				console.log( "[event] onPMCancel", arguments );
+			},
+			onMessageReceiveData: function() {
+				console.log( "[event] onMessageReceiveData", arguments );
+			},
+			onSPPMObjectReady: function() {
+				console.log( "[event] onSPPMObjectReady", arguments );
+			},';
+		}
+
+			// Add consent ready event.
+			$events .= 'onConsentReady: function (message_type, uuid, string, info) {';
+
+			if ( $debug ) {
+				$events .= 'console.log( "[event] onConsentReady", arguments );';
+			}
+
+			// Handler.
+			$events .= 'if ( "loading" === document.readyState ) {
+				document.addEventListener( "DOMContentLoaded", maiPubOnConsentReady );
+			} else {
+				maiPubOnConsentReady();
+			}
+
+			function maiPubOnConsentReady() {
+				const pmLink = document.getElementById("pmLink");
+
+				if ( pmLink && info.applies ) {
+					if( "usnat" == message_type ){
+						pmLink.style.visibility="visible";
+						pmLink.innerHTML= "Do Not Sell/Share My Personal Information";
+						pmLink.addEventListener("click", function(){
+							window._sp_.usnat.loadPrivacyManagerModal( "' . $this->sp_msps_id . '" );
+						});
+					}
+					if( "gdpr" == message_type ){
+						pmLink.style.visibility="visible";
+						pmLink.innerHTML= "Privacy Preferences";
+						pmLink.addEventListener("click", function(){
+							window._sp_.gdpr.loadPrivacyManagerModal( "' . $this->sp_tcf_id . '" );
+						});
+					}
+				}
+			}
+		},
+		onError: function() {
+			console.log( "[event] onError", arguments );
+		},';
+
+		return $events;
 	}
 
 	/**
