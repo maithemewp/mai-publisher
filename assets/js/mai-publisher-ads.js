@@ -11,8 +11,7 @@ const refreshValue  = maiPubAdsVars.targets.refresh;
 const refreshTime   = 30;                                                                                      // Time in seconds.
 const debug         = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb');
 const log           = maiPubAdsVars.debug;
-let   firstLog      = true;
-let   lastLog       = null;
+const timestamp     = Date.now();
 
 // If debugging, log.
 maiPubLog( 'v163' );
@@ -563,17 +562,17 @@ function maiPubLog( ...mixed ) {
 
 	// If first, start.
 	if ( firstLog ) {
-		timer    += 'start';
-		firstLog  = false;
+		timer += 'start';
+		firstLog   = false;
 	}
 	// Not first, add time since.
 	else {
-		timer += current - lastLog + 'ms';
+		timer += current - timestamp + 'ms';
 	}
 
 	// Log.
 	console.log( timer + ' ' + now, mixed );
 
 	// Set last log time.
-	lastLog = current;
+	timestamp = current;
 }
