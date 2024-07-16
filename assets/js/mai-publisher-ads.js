@@ -244,7 +244,7 @@ function maiPubDOMContentLoaded() {
 		// If debugging, add inline styling.
 		if ( debug ) {
 			const adEl = document.getElementById( 'mai-ad-' + slug );
-			adEl.style.outline   = '2px dashed purple';
+			adEl.style.outline   = '2px dashed limegreen';
 			adEl.style.minWidth  = '300px';
 			adEl.style.minHeight = '120px';
 		}
