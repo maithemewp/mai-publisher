@@ -9,11 +9,11 @@ const gamBaseClient = maiPubAdsVars.gamBaseClient;
 const refreshKey    = 'refresh';
 const refreshValue  = maiPubAdsVars.targets.refresh;
 const refreshTime   = 30; // Time in seconds.
-const debug         = maiPubAdsVars.debug || window.location.search.includes('dfpdeb') || window.location.search.includes('maideb');
-const log           = debug;
+const debug         = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb');
+const log           = maiPubAdsVars.debug;
 
 // If debugging, log.
-maiPubLog( 'v156' );
+maiPubLog( 'v161' );
 
 // Add to googletag items.
 googletag.cmd.push(() => {
@@ -82,18 +82,8 @@ googletag.cmd.push(() => {
 		const slot   = event.slot;
 		const slotId = slot.getSlotElementId();
 
-		// Bail if no slot.
-		if ( ! slot ) {
-			return;
-		}
-
-		// Bail if not a mai ad defined here.
-		if ( ! adSlotIds.includes( slot.getAdUnitPath() ) ) {
-			return;
-		}
-
-		// Bail if not refreshing.
-		if ( ! Boolean( slot.getTargeting( refreshKey ).shift() ) ) {
+		// Bail if not a refreshable slot.
+		if ( ! maiPubIsRefreshable( slot ) ) {
 			return;
 		}
 
@@ -120,18 +110,8 @@ googletag.cmd.push(() => {
 		const slotId = slot.getSlotElementId();
 		const inView = event.inViewPercentage > 5;
 
-		// Bail if no slot.
-		if ( ! slot ) {
-			return;
-		}
-
-		// Bail if not a mai ad defined here.
-		if ( ! adSlotIds.includes( slot.getAdUnitPath() ) ) {
-			return;
-		}
-
-		// Bail if not refreshing.
-		if ( ! Boolean( slot.getTargeting( refreshKey ).shift() ) ) {
+		// Bail if not a refreshable slot.
+		if ( ! maiPubIsRefreshable( slot ) ) {
 			return;
 		}
 
@@ -168,13 +148,23 @@ googletag.cmd.push(() => {
 
 	// If debugging, set listeners to log.
 	if ( log ) {
-		// Log when a slot ID is fetched.
+		// Log when a slot is requested/fetched.
 		googletag.pubads().addEventListener( 'slotRequested', (event) => {
-			console.log( 'requested:', event.slot.getSlotElementId() );
+			console.log( 'slotRequested:', event.slot.getSlotElementId() );
 		});
 
 		// Log when a slot response is received.
 		googletag.pubads().addEventListener( 'slotResponseReceived', (event) => {
+			console.log( 'slotResponseReceived:', event.slot.getSlotElementId() );
+		});
+
+		// Log when a slot was loaded.
+		googletag.pubads().addEventListener( 'slotOnload', (event) => {
+			console.log( 'slotOnload:', event.slot.getSlotElementId() );
+		});
+
+		// Log when slot render has ended, regardless of whether ad was empty or not.
+		googletag.pubads().addEventListener( 'slotRenderEnded', (event) => {
 			const slot       = event.slot;
 			const renderInfo = {
 				adUnitPath: slot.getAdUnitPath(),
@@ -185,12 +175,7 @@ googletag.cmd.push(() => {
 				slotId: slot.getSlotElementId(),
 			};
 
-			console.log( 'response:', event.slot.getSlotElementId(), renderInfo );
-		});
-
-		// Log when a slot ID is rendered.
-		googletag.pubads().addEventListener( 'slotOnload', (event) => {
-			console.log( 'loaded:', event.slot.getSlotElementId() );
+			console.log( 'slotRenderEnded:', event.slot.getSlotElementId(), renderInfo );
 		});
 
 		// Log when a slot ID visibility changed.
@@ -534,6 +519,18 @@ function maiPubDisplaySlots( slots ) {
 }
 
 /**
+ * Check if a slot is refreshable.
+ * Checks if we have a defined mai ad slot that has targetting set to refresh.
+ *
+ * @param {object} slot The ad slot.
+ *
+ * @return {boolean} True if refreshable.
+ */
+function maiPubIsRefreshable( slot ) {
+	return slot && adSlotIds.includes( slot.getAdUnitPath() ) && Boolean( slot.getTargeting( refreshKey ).shift() );
+}
+
+/**
  * Refreshes slots.
  *
  * @param {array} slots The defined slots.
@@ -558,7 +555,7 @@ function maiPubRefreshSlots( slots ) {
  * @param {mixed} mixed The data to log.
  */
 function maiPubLog( ...mixed ) {
-	if ( ! log ) {
+	if ( ! ( debug || log ) ) {
 		return;
 	}
 
