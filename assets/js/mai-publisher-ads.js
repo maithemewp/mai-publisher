@@ -150,17 +150,17 @@ googletag.cmd.push(() => {
 	if ( log ) {
 		// Log when a slot is requested/fetched.
 		googletag.pubads().addEventListener( 'slotRequested', (event) => {
-			console.log( 'slotRequested: ' + event.slot.getSlotElementId() );
+			maiPubLog( 'slotRequested: ' + event.slot.getSlotElementId().replace( 'mai-ad-', '' ) );
 		});
 
 		// Log when a slot response is received.
 		googletag.pubads().addEventListener( 'slotResponseReceived', (event) => {
-			console.log( 'slotResponseReceived: ' + event.slot.getSlotElementId() );
+			maiPubLog( 'slotResponseReceived: ' + event.slot.getSlotElementId().replace( 'mai-ad-', '' ) );
 		});
 
 		// Log when a slot was loaded.
 		googletag.pubads().addEventListener( 'slotOnload', (event) => {
-			console.log( 'slotOnload: ' + event.slot.getSlotElementId() );
+			maiPubLog( 'slotOnload: ' + event.slot.getSlotElementId().replace( 'mai-ad-', '' ) );
 		});
 
 		// Log when slot render has ended, regardless of whether ad was empty or not.
@@ -175,7 +175,7 @@ googletag.cmd.push(() => {
 				slotId: slot.getSlotElementId(),
 			};
 
-			console.log( 'slotRenderEnded: ' + event.slot.getSlotElementId(), renderInfo );
+			maiPubLog( 'slotRenderEnded: ' + event.slot.getSlotElementId().replace( 'mai-ad-', '' ), renderInfo );
 		});
 
 		// Log when a slot ID visibility changed.
@@ -209,7 +209,7 @@ function maiPubDOMContentLoaded() {
 			if ( debug ) {
 				entry.target.style.outline   = '2px dashed red';
 				entry.target.style.minWidth  = '300px';
-				entry.target.style.minHeight = '120px';
+				entry.target.style.minHeight = '90px';
 			}
 
 			// Add to toLoad array.
@@ -246,7 +246,7 @@ function maiPubDOMContentLoaded() {
 			const adEl = document.getElementById( 'mai-ad-' + slug );
 			adEl.style.outline   = '2px dashed limegreen';
 			adEl.style.minWidth  = '300px';
-			adEl.style.minHeight = '120px';
+			adEl.style.minHeight = '90px';
 		}
 	});
 
@@ -285,14 +285,14 @@ function maiPubDefineSlot( slug ) {
 	adSlotIds.push( slotId );
 	adSlots.push( slot );
 
-	// If amazon is enalbed and ads[slug].sizes only contains a single size named 'fluid'.
-	if ( maiPubAdsVars.amazonUAM && 1 === ads[slug].sizes.length && 'fluid' === ads[slug].sizes[0] ) {
-		// If debugging, log.
-		maiPubLog( 'disabled safeframe: ' + slot.getSlotElementId() );
+	// If amazon is enabled and ads[slug].sizes only contains a single size named 'fluid'.
+	// if ( maiPubAdsVars.amazonUAM && 1 === ads[slug].sizes.length && 'fluid' === ads[slug].sizes[0] ) {
+	// 	// If debugging, log.
+	// 	maiPubLog( 'disabled safeframe: ' + slot.getSlotElementId() );
 
-		// Disabled SafeFrame for this slot.
-		slot.setForceSafeFrame( false );
-	}
+	// 	// Disabled SafeFrame for this slot.
+	// 	slot.setForceSafeFrame( false );
+	// }
 
 	// Set refresh targeting.
 	slot.setTargeting( refreshKey, refreshValue );
