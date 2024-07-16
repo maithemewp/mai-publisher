@@ -8,9 +8,11 @@ const gamBase       = maiPubAdsVars.gamBase;
 const gamBaseClient = maiPubAdsVars.gamBaseClient;
 const refreshKey    = 'refresh';
 const refreshValue  = maiPubAdsVars.targets.refresh;
-const refreshTime   = 30; // Time in seconds.
+const refreshTime   = 30;                                                                                      // Time in seconds.
 const debug         = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb');
 const log           = maiPubAdsVars.debug;
+let   firstLog      = true;
+let   lastLog       = null;
 
 // If debugging, log.
 maiPubLog( 'v163' );
@@ -553,31 +555,25 @@ function maiPubLog( ...mixed ) {
 	}
 
 	// Set log variables.
-	let first = true;
-	let last  = null;
+	let timer = 'maipub ';
 
-	// Return function, to keep log variables from resetting.
-	return function( mixed ) {
-		let timer = 'maipub ';
+	// Set times.
+	const now     = new Date().toLocaleTimeString( 'en-US', { hour12: true } );
+	const current = new Date().getTime();
 
-		// Set times.
-		const now     = new Date().toLocaleTimeString( 'en-US', { hour12: true } );
-		const current = new Date().getTime();
+	// If first, start.
+	if ( firstLog ) {
+		timer    += 'start';
+		firstLog  = false;
+	}
+	// Not first, add time since.
+	else {
+		timer += current - lastLog + 'ms';
+	}
 
-		// If first, start.
-		if ( first ) {
-			timer += 'start';
-			first  = false;
-		}
-		// Not first, add time since.
-		else {
-			timer += current - last + 'ms';
-		}
+	// Log.
+	console.log( timer + ' ' + now, mixed );
 
-		// Log.
-		console.log( timer + ' ' + now, mixed );
-
-		// Set last log time.
-		lastLogTime = current;
-	};
+	// Set last log time.
+	lastLog = current;
 }
