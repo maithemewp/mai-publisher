@@ -14,7 +14,7 @@ const log           = maiPubAdsVars.debug;
 let   timestamp     = Date.now();
 
 // If debugging, log.
-maiPubLog( 'v163' );
+maiPubLog( 'v164' );
 
 // Add to googletag items.
 googletag.cmd.push(() => {
@@ -557,8 +557,8 @@ function maiPubLog( ...mixed ) {
 	let timer = 'maipub ';
 
 	// Set times.
+	const current = Date.now();
 	const now     = new Date().toLocaleTimeString( 'en-US', { hour12: true } );
-	const current = new Date().getTime();
 
 	// If first, start.
 	if ( timestamp === current ) {
@@ -571,7 +571,4 @@ function maiPubLog( ...mixed ) {
 
 	// Log.
 	console.log( timer + ' ' + now, mixed );
-
-	// Set last log time.
-	timestamp = current;
 }
