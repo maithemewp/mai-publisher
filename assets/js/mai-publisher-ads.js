@@ -561,9 +561,8 @@ function maiPubLog( ...mixed ) {
 	const current = new Date().getTime();
 
 	// If first, start.
-	if ( firstLog ) {
+	if ( timestamp === current ) {
 		timer += 'start';
-		firstLog   = false;
 	}
 	// Not first, add time since.
 	else {
