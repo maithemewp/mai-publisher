@@ -14,7 +14,7 @@ const log           = maiPubAdsVars.debug;
 let   timestamp     = Date.now();
 
 // If debugging, log.
-maiPubLog( 'v165' );
+maiPubLog( 'v167' );
 
 // Add to googletag items.
 googletag.cmd.push(() => {
@@ -251,8 +251,11 @@ function maiPubDOMContentLoaded() {
 			return;
 		}
 
-		// Define and display all slots in view.
-		maiPubDisplaySlots( toLoadBTF.map( slug => maiPubDefineSlot( slug ) ) );
+		// Add to queue, so they don't step on each other.
+		googletag.cmd.push(() => {
+			// Define and display all slots in view.
+			maiPubDisplaySlots( toLoadBTF.map( slug => maiPubDefineSlot( slug ) ) );
+		});
 
 		// Clear toLoadBTF array.
 		toLoadBTF = [];
@@ -262,29 +265,32 @@ function maiPubDOMContentLoaded() {
 		threshold: 0 // No threshold needed.
 	});
 
-	// Define ATF ads.
-	adsATF.forEach( adATF => {
-		// Get slug.
-		const slug = adATF.getAttribute( 'id' ).replace( 'mai-ad-', '' );
+	// Add to queue, so they don't step on each other.
+	googletag.cmd.push(() => {
+		// Define ATF ads.
+		adsATF.forEach( adATF => {
+			// Get slug.
+			const slug = adATF.getAttribute( 'id' ).replace( 'mai-ad-', '' );
 
-		// Add to toloadATF array.
-		toloadATF.push( maiPubDefineSlot( slug ) );
+			// Add to toloadATF array.
+			toloadATF.push( maiPubDefineSlot( slug ) );
 
-		// If debugging, add inline styling.
-		if ( debug ) {
-			adATF.style.outline   = '2px dashed limegreen';
-			adATF.style.minWidth  = '300px';
-			adATF.style.minHeight = '90px';
+			// If debugging, add inline styling.
+			if ( debug ) {
+				adATF.style.outline   = '2px dashed limegreen';
+				adATF.style.minWidth  = '300px';
+				adATF.style.minHeight = '90px';
 
-			// Add data-label attribute of slug.
-			adATF.setAttribute( 'data-label', slug );
+				// Add data-label attribute of slug.
+				adATF.setAttribute( 'data-label', slug );
+			}
+		});
+
+		// Display ATF ads.
+		if ( toloadATF.length ) {
+			maiPubDisplaySlots( toloadATF );
 		}
 	});
-
-	// Display ATF ads.
-	if ( toloadATF.length ) {
-		maiPubDisplaySlots( toloadATF );
-	}
 
 	// Observe each BTF ad.
 	adsBTF.forEach( adBTF => {
