@@ -454,7 +454,7 @@ function maiPubDisplaySlots( slots ) {
 				if ( requestManager.dmBidsReceived ) {
 					sendAdserverRequest();
 
-					maiPubLog( 'refresh() with amazon fetch', uadSlots.map( slot => slot.slotID.replace( 'mai-ad-', '' ) ).join( ', ' ) );
+					maiPubLog( 'refresh() with amazon fetch: ' + uadSlots.map( slot => slot.slotID.replace( 'mai-ad-', '' ) ).join( ', ' ) );
 				}
 			});
 		}
@@ -467,7 +467,7 @@ function maiPubDisplaySlots( slots ) {
 			if ( requestManager.dmBidsReceived ) {
 				sendAdserverRequest();
 
-				maiPubLog( 'refresh() without amazon slots to fetch', slots.map( slot => slot.getSlotElementId() ).join( ', ' ) );
+				maiPubLog( 'refresh() without amazon slots to fetch: ' + slots.map( slot => slot.getSlotElementId() ).join( ', ' ) );
 			}
 		}
 	}
@@ -486,14 +486,14 @@ function maiPubDisplaySlots( slots ) {
 			sendAdserverRequest();
 		}
 
-		maiPubLog( 'refresh() with GAM', slots.map( slot => slot.getSlotElementId() ).join( ', ' ) );
+		maiPubLog( 'refresh() with GAM:' + slots.map( slot => slot.getSlotElementId() ).join( ', ' ) );
 	}
 
 	// Start the failsafe timeout.
 	setTimeout( function() {
 		// Log if no adserver request has been sent.
 		if ( ! requestManager.adserverRequestSent ) {
-			maiPubLog( 'refresh() with failsafe timeout', slots.map( slot => slot.getSlotElementId() ).join( ', ' ) );
+			maiPubLog( 'refresh() with failsafe timeout: ' + slots.map( slot => slot.getSlotElementId() ).join( ', ' ) );
 		}
 
 		// Maybe send request.
