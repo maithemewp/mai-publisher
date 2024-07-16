@@ -13,7 +13,7 @@ const debug         = window.location.search.includes('dfpdeb') || window.locati
 const log           = maiPubAdsVars.debug;
 
 // If debugging, log.
-maiPubLog( 'v161' );
+maiPubLog( 'v162' );
 
 // Add to googletag items.
 googletag.cmd.push(() => {
@@ -189,25 +189,9 @@ googletag.cmd.push(() => {
  * DOMContentLoaded and IntersectionObserver handler.
  */
 function maiPubDOMContentLoaded() {
-	// Separate ATF and BTF slots from passed ads.
-	const { adSlotsATF, adSlotsBTF } = Object.entries(ads).reduce( ( acc, [ key, value ] ) => {
-		// If above the fold or bottom sticky.
-		if ( 'atf' === value.targets.ap || 'bs' === value.targets.ap ) {
-			acc.adSlotsATF[ key ] = value;
-		} else {
-			acc.adSlotsBTF[ key ] = value;
-		}
-
-		return acc;
-
-	}, { adSlotsATF: {}, adSlotsBTF: {} });
-
-	// Define and display ATF ads.
-	Object.keys( adSlotsATF ).forEach( slug => {
-		maiPubDisplaySlots( [ maiPubDefineSlot( slug ) ] );
-	});
-
-	// Create the IntersectionObserver.
+	// Select all atf and btf ads and create an IntersectionObserver.
+	const adsATF   = document.querySelectorAll( '.mai-ad-unit[data-ap="atf"], .mai-ad-unit[data-ap="bs"]' );
+	const adsBTF   = document.querySelectorAll( '.mai-ad-unit:not([data-ap="atf"]):not([data-ap="bs"])' );
 	const observer = new IntersectionObserver( (entries, observer) => {
 		let toLoad = [];
 
@@ -218,17 +202,8 @@ function maiPubDOMContentLoaded() {
 				return;
 			}
 
-			// Get slot from adSlotsBTF.
-			const slug    = entry.target.getAttribute('id').replace( 'mai-ad-', '' );
-			const slotBTF = adSlotsBTF[slug];
-
-			// If not in adSlotsBTF.
-			if ( undefined === slotBTF ) {
-				// Unobserve.
-				observer.unobserve( entry.target );
-				// Skip.
-				return;
-			}
+			// Get slug.
+			const slug = entry.target.getAttribute( 'id' ).replace( 'mai-ad-', '' );
 
 			// If debugging, add inline styling.
 			if ( debug ) {
@@ -260,12 +235,24 @@ function maiPubDOMContentLoaded() {
 		threshold: 0 // No threshold needed.
 	});
 
-	// Select all non-atf and non-bs ad units.
-	const adUnits = document.querySelectorAll( '.mai-ad-unit:not([data-ap="atf"]):not([data-ap="bs"])' );
+	// Define and display ATF ads.
+	adsATF.forEach( adATF => {
+		const slug = adATF.getAttribute('id').replace( 'mai-ad-', '' );
 
-	// Observe each element.
-	adUnits.forEach( adUnit => {
-		observer.observe( adUnit );
+		maiPubDisplaySlots( [ maiPubDefineSlot( slug ) ] );
+
+		// If debugging, add inline styling.
+		if ( debug ) {
+			const adEl = document.getElementById( 'mai-ad-' + slug );
+			adEl.style.outline   = '2px dashed purple';
+			adEl.style.minWidth  = '300px';
+			adEl.style.minHeight = '120px';
+		}
+	});
+
+	// Observe each BTF ad.
+	adsBTF.forEach( adBTF => {
+		observer.observe( adBTF );
 	});
 }
 
