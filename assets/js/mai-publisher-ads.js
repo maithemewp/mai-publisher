@@ -251,7 +251,7 @@ function maiPubDOMContentLoaded() {
 			adATF.style.minHeight = '90px';
 
 			// Add data-label attribute of slug.
-			entry.target.setAttribute( 'data-label', slug );
+			adATF.setAttribute( 'data-label', slug );
 		}
 	});
 
@@ -550,8 +550,28 @@ function maiPubLog( ...mixed ) {
 	}
 
 	// Get current time in readable format.
-	const now = new Date().toLocaleTimeString( 'en-US', { hour12: true } );
 
-	// Log.
-	console.log( 'maipub ' + now, mixed );
+
+	// Set log variables.
+	let first = true;
+	let last  = null;
+
+	return function( mixed ) {
+		const timer   = 'maipub ';
+		const now     = new Date().toLocaleTimeString( 'en-US', { hour12: true } );
+		const current = new Date().getTime();
+
+		if ( first ) {
+			timer += 'start';
+			first  = false;
+		} else {
+			timer += current - last + 'ms';
+		}
+
+		// Log.
+		console.log( timer + ' ' + now, mixed );
+
+		// Set last log time.
+		lastLogTime = current;
+	};
 }
