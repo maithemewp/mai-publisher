@@ -555,25 +555,29 @@ function maiPubLog( ...mixed ) {
 	// Set log variables.
 	let first = true;
 	let last  = null;
-	let timer = 'maipub ';
 
-	// Set times.
-	const now     = new Date().toLocaleTimeString( 'en-US', { hour12: true } );
-	const current = new Date().getTime();
+	// Return function, to keep log variables from resetting.
+	return function( mixed ) {
+		let timer = 'maipub ';
 
-	// If first, start.
-	if ( first ) {
-		timer += 'start';
-		first  = false;
-	}
-	// Not first, add time since.
-	else {
-		timer += current - last + 'ms';
-	}
+		// Set times.
+		const now     = new Date().toLocaleTimeString( 'en-US', { hour12: true } );
+		const current = new Date().getTime();
 
-	// Log.
-	console.log( timer + ' ' + now, mixed );
+		// If first, start.
+		if ( first ) {
+			timer += 'start';
+			first  = false;
+		}
+		// Not first, add time since.
+		else {
+			timer += current - last + 'ms';
+		}
 
-	// Set last log time.
-	lastLogTime = current;
+		// Log.
+		console.log( timer + ' ' + now, mixed );
+
+		// Set last log time.
+		lastLogTime = current;
+	};
 }
