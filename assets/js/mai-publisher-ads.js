@@ -11,7 +11,7 @@ const refreshValue  = maiPubAdsVars.targets.refresh;
 const refreshTime   = 30;                                                                                      // Time in seconds.
 const debug         = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb');
 const log           = maiPubAdsVars.debug;
-const timestamp     = Date.now();
+let   timestamp     = Date.now();
 
 // If debugging, log.
 maiPubLog( 'v163' );
