@@ -17,7 +17,7 @@ const log              = maiPubAdsVars.debug;
 let   timestamp        = Date.now();
 
 // If debugging, log.
-maiPubLog( 'v168' );
+maiPubLog( 'v172' );
 
 // Add to googletag items.
 googletag.cmd.push(() => {
@@ -171,32 +171,22 @@ googletag.cmd.push(() => {
 	if ( debug || log ) {
 		// Log when a slot is requested/fetched.
 		googletag.pubads().addEventListener( 'slotRequested', (event) => {
-			maiPubLog( 'slotRequested: ' + event.slot.getSlotElementId().replace( 'mai-ad-', '' ) );
+			maiPubLog( 'slotRequested: ' + event.slot.getSlotElementId().replace( 'mai-ad-', '' ), event );
 		});
 
 		// Log when a slot response is received.
 		googletag.pubads().addEventListener( 'slotResponseReceived', (event) => {
-			maiPubLog( 'slotResponseReceived: ' + event.slot.getSlotElementId().replace( 'mai-ad-', '' ) );
+			maiPubLog( 'slotResponseReceived: ' + event.slot.getSlotElementId().replace( 'mai-ad-', '' ), event );
 		});
 
 		// Log when a slot was loaded.
 		googletag.pubads().addEventListener( 'slotOnload', (event) => {
-			maiPubLog( 'slotOnload: ' + event.slot.getSlotElementId().replace( 'mai-ad-', '' ) );
+			maiPubLog( 'slotOnload: ' + event.slot.getSlotElementId().replace( 'mai-ad-', '' ), event );
 		});
 
 		// Log when slot render has ended, regardless of whether ad was empty or not.
 		googletag.pubads().addEventListener( 'slotRenderEnded', (event) => {
-			const slot       = event.slot;
-			const renderInfo = {
-				adUnitPath: slot.getAdUnitPath(),
-				creativeId: event.creativeId,
-				isEmpty: event.isEmpty,
-				lineItemId: event.lineItemId,
-				size: event.size,
-				slotId: slot.getSlotElementId(),
-			};
-
-			maiPubLog( 'slotRenderEnded: ' + event.slot.getSlotElementId().replace( 'mai-ad-', '' ), renderInfo );
+			maiPubLog( 'slotRenderEnded: ' + event.slot.getSlotElementId().replace( 'mai-ad-', '' ), event );
 		});
 
 		// Log when a slot ID visibility changed.

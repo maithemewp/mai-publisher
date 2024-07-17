@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.9.1 (7/17/24)
+* Changed: Log full event in console when debugging.
+
 ## 1.9.0 (7/16/24)
 * Added: New global setting to enable console logging.
 * Added: Now preconnecting gpt, sourcepoint, and connatix when they are loaded.
