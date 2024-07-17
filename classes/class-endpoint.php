@@ -53,6 +53,7 @@ class Mai_Publisher_Endpoint {
 			'gam_sellers_name'      => (string) maipub_get_option( 'gam_sellers_name', false ),
 			'gam_targets'           => (string) maipub_get_option( 'gam_targets', false ),
 			'category'              => (string) maipub_get_option( 'category', false ),
+			'magnite_enabled'       => (bool) maipub_get_option( 'magnite_enabled', false ),
 			'amazon_uam_enabled'    => (bool) maipub_get_option( 'amazon_uam_enabled', false ),
 			'load_delay'            => (int) maipub_get_option( 'load_delay', false ),
 			'debug_enabled'         => (bool) maipub_get_option( 'debug_enabled', false ),

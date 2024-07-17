@@ -315,6 +315,7 @@ class Mai_Publisher_Output {
 				'gamBaseClient' => $gam_base_client,
 				'ads'           => $this->gam,
 				'targets'       => $this->get_targets(),
+				'magnite'       => maipub_get_option( 'magnite_enabled' ),
 				'amazonUAM'     => maipub_get_option( 'amazon_uam_enabled' ),
 				'loadDelay'     => maipub_get_option( 'load_delay' ),
 				'debug'         => maipub_get_option( 'debug_enabled' ),
@@ -326,6 +327,9 @@ class Mai_Publisher_Output {
 				$preconnects[] = '<link rel="preconnect" href="https://cdn.privacy-mgmt.com">';
 				$scripts       = array_merge( $scripts, $this->get_sourcepoint_scripts( $localize['debug'] ) );
 			}
+
+			// Magnite.
+			$scripts[] = '<script async src = "https://micro.rubiconproject.com/prebid/dynamic/23744.js">';
 
 			// Load GPT.
 			$load_gpt = apply_filters( 'mai_publisher_load_gpt', true );

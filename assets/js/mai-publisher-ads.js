@@ -1,6 +1,9 @@
+// define global PBJS and GPT libraries
+window.pbjs      = window.pbjs || { que: [] };
 window.googletag = window.googletag || {};
 googletag.cmd    = googletag.cmd || [];
 
+// Define global variables.
 const ads              = maiPubAdsVars['ads'];
 const adSlotIds        = [];
 const adSlots          = [];
@@ -12,12 +15,45 @@ const refreshTime      = 30; // Time in seconds.
 const loadTimes        = {};
 const currentlyVisible = {};
 const timeoutIds       = {};
+const fallbackTimeout  = 3500; // Set global failsafe timeout ~500ms after DM UI bidder timeout.
 const debug            = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb');
 const log              = maiPubAdsVars.debug;
 let   timestamp        = Date.now();
 
 // If debugging, log.
 maiPubLog( 'v172' );
+
+// If using Amazon UAM bids, add it. No need to wait for googletag to be loaded.
+if ( maiPubAdsVars.amazonUAM ) {
+	/**
+	 * Amazon UAD.
+	 * Debug via `apstag.debug('enableConsole')`.
+	 * Disable debugging via `apstag.debug('disableConsole')`.
+	 */
+	!function(a9,a,p,s,t,A,g){if(a[a9])return;function q(c,r){a[a9]._Q.push([c,r])}a[a9]={init:function(){q("i",arguments)},fetchBids:function(){q("f",arguments)},setDisplayBids:function(){},targetingKeys:function(){return[]},_Q:[]};A=p.createElement(s);A.async=!0;A.src=t;g=p.getElementsByTagName(s)[0];g.parentNode.insertBefore(A,g)}("apstag",window,document,"script","//c.amazon-adsystem.com/aax2/apstag.js");
+
+	// Initialize apstag.
+	apstag.init({
+		pubID: '79166f25-5776-4c3e-9537-abad9a584b43', // BB.
+		adServer: 'googletag',
+		// bidTimeout: prebidTimeout,
+		// us_privacy: '-1', // https://ams.amazon.com/webpublisher/uam/docs/web-integration-documentation/integration-guide/uam-ccpa.html?source=menu
+		// @link https://ams.amazon.com/webpublisher/uam/docs/reference/api-reference.html#configschain
+		schain: {
+			complete: 1, // Integer 1 or 0 indicating if all preceding nodes are complete.
+			ver: '1.0', // Version of the spec used.
+			nodes: [
+				{
+					asi: 'bizbudding.com', // Populate with the canonical domain of the advertising system where the seller.JSON file is hosted.
+					sid: maiPubAdsVars.sellersId, // The identifier associated with the seller or reseller account within your advertising system.
+					hp: 1, // 1 or 0, whether this node is involved in the payment flow.
+					name: maiPubAdsVars.sellersName, // Name of the company paid for inventory under seller ID (optional).
+					domain: maiPubAdsVars.domain, // Business domain of this node (optional).
+				}
+			]
+		}
+	});
+}
 
 // Add to googletag items.
 googletag.cmd.push(() => {
@@ -42,40 +78,8 @@ googletag.cmd.push(() => {
 	googletag.pubads().disableInitialLoad(); // Disable initial load for header bidding.
 	googletag.pubads().enableSingleRequest();
 
-	// // Enable services.
-	// googletag.enableServices();
-
-	// If using Amazon UAM bids, add it.
-	if ( maiPubAdsVars.amazonUAM ) {
-		/**
-		 * Amazon UAD.
-		 * Debug via `apstag.debug('enableConsole')`.
-		 * Disable debugging via `apstag.debug('disableConsole')`.
-		 */
-		!function(a9,a,p,s,t,A,g){if(a[a9])return;function q(c,r){a[a9]._Q.push([c,r])}a[a9]={init:function(){q("i",arguments)},fetchBids:function(){q("f",arguments)},setDisplayBids:function(){},targetingKeys:function(){return[]},_Q:[]};A=p.createElement(s);A.async=!0;A.src=t;g=p.getElementsByTagName(s)[0];g.parentNode.insertBefore(A,g)}("apstag",window,document,"script","//c.amazon-adsystem.com/aax2/apstag.js");
-
-		// Initialize apstag.
-		apstag.init({
-			pubID: '79166f25-5776-4c3e-9537-abad9a584b43', // BB.
-			adServer: 'googletag',
-			// bidTimeout: prebidTimeout,
-			// us_privacy: '-1', // https://ams.amazon.com/webpublisher/uam/docs/web-integration-documentation/integration-guide/uam-ccpa.html?source=menu
-			// @link https://ams.amazon.com/webpublisher/uam/docs/reference/api-reference.html#configschain
-			schain: {
-				complete: 1, // Integer 1 or 0 indicating if all preceding nodes are complete.
-				ver: '1.0', // Version of the spec used.
-				nodes: [
-					{
-						asi: 'bizbudding.com', // Populate with the canonical domain of the advertising system where the seller.JSON file is hosted.
-						sid: maiPubAdsVars.sellersId, // The identifier associated with the seller or reseller account within your advertising system.
-						hp: 1, // 1 or 0, whether this node is involved in the payment flow.
-						name: maiPubAdsVars.sellersName, // Name of the company paid for inventory under seller ID (optional).
-						domain: maiPubAdsVars.domain, // Business domain of this node (optional).
-					}
-				]
-			}
-		});
-	}
+	// Enable services.
+	googletag.enableServices();
 
 	// If no delay, run on DOMContentLoaded.
 	if ( ! maiPubAdsVars.loadDelay ) {
@@ -317,15 +321,6 @@ function maiPubDefineSlot( slug ) {
 	adSlotIds.push( slotId );
 	adSlots.push( slot );
 
-	// If amazon is enabled and ads[slug].sizes only contains a single size named 'fluid'.
-	// if ( maiPubAdsVars.amazonUAM && 1 === ads[slug].sizes.length && 'fluid' === ads[slug].sizes[0] ) {
-	// 	// If debugging, log.
-	// 	maiPubLog( 'disabled safeframe: ' + slot.getSlotElementId() );
-
-	// 	// Disabled SafeFrame for this slot.
-	// 	slot.setForceSafeFrame( false );
-	// }
-
 	// Set refresh targeting.
 	slot.setTargeting( refreshKey, refreshValue );
 
@@ -367,23 +362,19 @@ function maiPubDefineSlot( slug ) {
  * Display slots.
  * The requestManager logic take from Magnite docs.
  *
- * @link https://help.magnite.com/help/web-integration-guide#parallel-header-bidding-integrations
- *
  * @param {array} slots The defined slots.
  */
 function maiPubDisplaySlots( slots ) {
 	// Enable services.
 	// This needs to run after defineSlot() but before display()/refresh().
 	// If we did this in maiPubDefineSlot() it would run for every single slot, instead of batches.
-	googletag.enableServices();
-
-	// Set global failsafe timeout ~500ms after DM UI bidder timeout.
-	const fallbackTimeout = 3500;
+	// NM, changed this when Magnites docs show it how we had it. Via: https://help.magnite.com/help/web-integration-guide
+	// googletag.enableServices();
 
 	// Object to manage each request state.
 	const requestManager = {
 		adserverRequestSent: false,
-		dmBidsReceived: true, // This is true for now, intil we implement Prebid.js/Magnite.
+		dmBidsReceived: false,
 		apsBidsReceived: false,
 	};
 
@@ -399,21 +390,28 @@ function maiPubDisplaySlots( slots ) {
 		}
 	}
 
-	// // Request bids through DM.
-	// pbjs.que.push( function() {
-	// 	pbjs.rp.requestBids( {
-	// 		gptSlotObjects: slots,
-	// 		callback: function() {
-	// 			pbjs.setTargetingForGPTAsync();
+	// Handle Magnite/DM bids.
+	if ( maiPubAdsVars.magnite ) {
+		pbjs.que.push( function() {
+			pbjs.rp.requestBids( {
+				gptSlotObjects: slots,
+				callback: function() {
+					pbjs.setTargetingForGPTAsync();
 
-	// 			requestManager.dmBidsReceived = true;
+					requestManager.dmBidsReceived = true;
 
-	// 			if ( requestManager.apsBidsReceived ) {
-	// 				sendAdserverRequest();
-	// 			}
-	// 		}
-	// 	});
-	// });
+					if ( requestManager.apsBidsReceived ) {
+						sendAdserverRequest();
+					}
+				}
+			});
+		});
+	}
+	// No magnite.
+	else {
+		// Set the magnite demand manager request manager to true.
+		requestManager.dmBidsReceived = true;
+	}
 
 	// Handle Amazon UAM bids.
 	if ( maiPubAdsVars.amazonUAM ) {
@@ -488,7 +486,7 @@ function maiPubDisplaySlots( slots ) {
 			return;
 		}
 
-		// Set the request manager to true.
+		// Set the amazon request manager to true.
 		requestManager.apsBidsReceived = true;
 
 		// If we have all bids, send the adserver request.
