@@ -17,7 +17,7 @@ const log              = maiPubAdsVars.debug;
 let   timestamp        = Date.now();
 
 // If debugging, log.
-maiPubLog( 'v169' );
+maiPubLog( 'v172' );
 
 // Add to googletag items.
 googletag.cmd.push(() => {
@@ -171,40 +171,22 @@ googletag.cmd.push(() => {
 	if ( debug || log ) {
 		// Log when a slot is requested/fetched.
 		googletag.pubads().addEventListener( 'slotRequested', (event) => {
-			maiPubLog( 'slotRequested: ' + event.slot.getSlotElementId().replace( 'mai-ad-', '' ) );
+			maiPubLog( 'slotRequested: ' + event.slot.getSlotElementId().replace( 'mai-ad-', '' ), event );
 		});
 
 		// Log when a slot response is received.
 		googletag.pubads().addEventListener( 'slotResponseReceived', (event) => {
-			maiPubLog( 'slotResponseReceived: ' + event.slot.getSlotElementId().replace( 'mai-ad-', '' ) );
+			maiPubLog( 'slotResponseReceived: ' + event.slot.getSlotElementId().replace( 'mai-ad-', '' ), event );
 		});
 
 		// Log when a slot was loaded.
 		googletag.pubads().addEventListener( 'slotOnload', (event) => {
-			maiPubLog( 'slotOnload: ' + event.slot.getSlotElementId().replace( 'mai-ad-', '' ) );
+			maiPubLog( 'slotOnload: ' + event.slot.getSlotElementId().replace( 'mai-ad-', '' ), event );
 		});
 
 		// Log when slot render has ended, regardless of whether ad was empty or not.
 		googletag.pubads().addEventListener( 'slotRenderEnded', (event) => {
-			const elId = event.slot.getSlotElementId();
-			const info = {
-				advertiserId: event.advertiserId,
-				campaignId: event.campaignId,
-				companyIds: event.companyIds,
-				creativeId: event.creativeId,
-				creativeTemplateId: event.creativeTemplateId,
-				isBackfill: event.isBackfill,
-				isEmpty: event.isEmpty,
-				labelIds: event.labelIds,
-				lineItemId: event.lineItemId,
-				size: event.size,
-				slotContentChanged: event.slotContentChanged,
-				sourceAgnosticCreativeId: event.sourceAgnosticCreativeId,
-				sourceAgnosticLineItemId: event.sourceAgnosticLineItemId,
-				yieldGroupIds: event.yieldGroupIds,
-			};
-
-			maiPubLog( 'slotRenderEnded: ' + elId.replace( 'mai-ad-', '' ), event, info );
+			maiPubLog( 'slotRenderEnded: ' + event.slot.getSlotElementId().replace( 'mai-ad-', '' ), event );
 		});
 
 		// Log when a slot ID visibility changed.
