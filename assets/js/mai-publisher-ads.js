@@ -204,7 +204,7 @@ googletag.cmd.push(() => {
 				yieldGroupIds: event.yieldGroupIds,
 			};
 
-			maiPubLog( 'slotRenderEnded: ' + elId.replace( 'mai-ad-', '' ), info );
+			maiPubLog( 'slotRenderEnded: ' + elId.replace( 'mai-ad-', '' ), event, info );
 		});
 
 		// Log when a slot ID visibility changed.
