@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.9.2 (TBD)
+* Changed: Load apstag right away if it’s enabled. No need to wait for googletag.
+
 ## 1.9.1 (7/17/24)
 * Changed: Log full event in console when debugging.
 
