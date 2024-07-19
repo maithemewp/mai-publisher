@@ -93,11 +93,26 @@ function maipub_get_page_ads_data() {
 		'archive' => [],
 	];
 
-	// Get post ID.
-	$page_id = maipub_get_current_page_id();
+	// Get data.
+	$page       = maipub_get_current_page();
+	$page_id    = isset( $page['id'] ) ? $page['id'] : 0;
+	$visibility = [];
 
-	// Check visibility.
-	$visibility = $page_id ? get_post_meta( $page_id, 'maipub_visibility', true ) : false;
+	// If type.
+	if ( $page_id && isset( $page['type'] ) && $page['type'] ) {
+		// Get visibility.
+		switch ( $page['type'] ) {
+			case 'page':
+			case 'post':
+				$visibility = (array) get_post_meta( $page_id, 'maipub_visibility', true );
+			break;
+			case 'term':
+				$visibility = (array) get_term_meta( $page_id, 'maipub_visibility', true );
+			break;
+			default:
+				$visibility = [];
+		}
+	}
 
 	// Bail if hidding all ads.
 	if ( $visibility && in_array( 'all', $visibility ) ) {
@@ -187,13 +202,25 @@ function maipub_get_page_ads_data() {
 	wp_reset_postdata();
 
 	// Now that we have data, maybe check visibility for incontent ads.
-	if ( maipub_is_singular() && $visibility && in_array( 'incontent', $visibility ) ) {
-		foreach ( $ads['single'] as $index => $values ) {
-			if ( 'content' !== $values['location'] ) {
-				continue;
-			}
+	if ( $visibility && in_array( 'incontent', $visibility ) ) {
+		if ( maipub_is_singular() ) {
+			foreach ( $ads['single'] as $index => $values ) {
+				if ( 'content' !== $values['location'] ) {
+					continue;
+				}
 
-			unset( $ads['single'][ $index ] );
+				unset( $ads['single'][ $index ] );
+			}
+		}
+
+		if ( is_category() || is_tag() || is_tax() ) {
+			foreach ( $ads['archive'] as $index => $values ) {
+				if ( 'content' !== $values['location'] ) {
+					continue;
+				}
+
+				unset( $ads['archive'][ $index ] );
+			}
 		}
 	}
 
