@@ -17,7 +17,7 @@ const log              = maiPubAdsVars.debug;
 let   timestamp        = Date.now();
 
 // If debugging, log.
-maiPubLog( 'v174' );
+maiPubLog( 'v192' );
 
 // If using Amazon UAM bids, add it. No need to wait for googletag to be loaded.
 if ( maiPubAdsVars.amazonUAM ) {
@@ -196,10 +196,23 @@ googletag.cmd.push(() => {
 			return;
 		}
 
-		console.log( 'maipub2 slotRenderEnded!!', ads[slug] );
+		// // If debugging, log.
+		// maiPubLog( 'maipub backfilling with: ' + ads[slug]['backfill'], document.getElementById( slotId ).id );
 
-		// Define and display the main plugin ad.
-		// maiPubDisplaySlots( [maiPubDefineSlot( slug )] );
+		// // Set the ID to the backfill ID and define/display the backfill ad.
+		// document.getElementById( slotId ).id = ads[slug]['backfillId'];
+
+		// // Define and display the main plugin ad.
+		// maiPubDisplaySlots( [ maiPubDefineSlot( ads[slug]['backfill'] ) ] );
+
+		// // If debugging, log.
+		// maiPubLog( 'maipub destroying: ' + slug );
+
+		// // Unset ads[slug].
+		// // delete ads[slug];
+
+		// // Destroy the empty slot.
+		// googletag.destroySlots( [ event.slot ] );
 	});
 
 	// If debugging, set listeners to log.
@@ -332,7 +345,7 @@ function maiPubDefineSlot( slug ) {
 	let toReturn = null;
 
 	// Get base from context.
-	const base = 'client' === ads[slug]['context'] ? gamBaseClient : gamBase;
+	const base = ads?.[slug]?.['context'] && 'client' === ads[slug]['context'] ? gamBaseClient : gamBase;
 
 	// Define slot ID.
 	const slotId = base + ads[slug]['id'];
@@ -467,7 +480,7 @@ function maiPubDisplaySlots( slots ) {
 			}
 
 			// Bail if it's a client ad.
-			if ( 'client' === ads[slug]['context'] ) {
+			if ( ads?.[slug]?.['context'] && 'client' === ads[slug]['context'] ) {
 				return;
 			}
 

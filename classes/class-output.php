@@ -263,11 +263,17 @@ class Mai_Publisher_Output {
 					$this->gam[ $slot ]['context'] = $context;
 				}
 
-				// Add backfill and backfill id.
-				if ( $backfill ) {
-					$this->gam[ $slot ]['backfill']   = $backfill;
-					$this->gam[ $slot ]['backfillId'] = 'mai-ad-' . $this->increment_string( $backfill );
-				}
+				// // Add backfill and backfill id.
+				// if ( $backfill && isset( $config_mai[ $backfill ] ) ) {
+				// 	$this->gam[ $slot ]['backfill']   = [
+				// 		'id'           => $backfill,
+				// 		'elId'         => 'mai-ad-' . $this->increment_string( $backfill ),
+				// 		'sizes'        => $config_mai[ $backfill ]['sizes'],
+				// 		'sizesDesktop' => $config_mai[ $backfill ]['sizes_desktop'],
+				// 		'sizesTablet'  => $config_mai[ $backfill ]['sizes_tablet'],
+				// 		'sizesMobile'  => $config_mai[ $backfill ]['sizes_mobile'],
+				// 	];
+				// }
 			}
 		}
 
