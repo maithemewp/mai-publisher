@@ -33,6 +33,7 @@ class Mai_Publisher_Ad_Unit {
 				'label'      => '',
 				'label_hide' => '',
 				'context'    => '',
+				'backfill'   => '',
 			]
 		);
 
@@ -47,6 +48,7 @@ class Mai_Publisher_Ad_Unit {
 		$label      = $label ? $label : maipub_get_option( 'ad_label', false );
 		$label      = $label_hide ? '' : $label;
 		$context    = sanitize_text_field( $args['context'] );
+		$backfill   = sanitize_text_field( $args['backfill'] );
 		$config     = maipub_get_config( $context );
 		$ad_units   = isset( $config['ad_units'] ) ? $config['ad_units'] : [];
 
@@ -242,6 +244,11 @@ class Mai_Publisher_Ad_Unit {
 		// If context.
 		if ( $context ) {
 			$inner_attr['data-context'] = esc_attr( $context );
+		}
+
+		// If backfill.
+		if ( $backfill ) {
+			$inner_attr['data-backfill'] = esc_attr( $backfill );
 		}
 
 		// Get spacer attributes string.

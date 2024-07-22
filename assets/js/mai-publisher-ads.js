@@ -17,7 +17,7 @@ const log              = maiPubAdsVars.debug;
 let   timestamp        = Date.now();
 
 // If debugging, log.
-maiPubLog( 'v172' );
+maiPubLog( 'v174' );
 
 // If using Amazon UAM bids, add it. No need to wait for googletag to be loaded.
 if ( maiPubAdsVars.amazonUAM ) {
@@ -165,6 +165,41 @@ googletag.cmd.push(() => {
 
 		// Refresh the slot(s).
 		maiPubRefreshSlots( [slot] );
+	});
+
+	/**
+	 * Checks if this is a client GAM ad and not the main plugin MCM ad,
+	 * if it's a client ad and isEmpty, try to load the main plugin ad.
+	 */
+	googletag.pubads().addEventListener( 'slotRenderEnded', (event) => {
+		// Bail if slot is not empty.
+		// if ( ! event.isEmpty ) {
+		// 	return;
+		// }
+
+		// Bail if not one of our slots.
+		if ( ! maiPubIsMaiSlot( event.slot ) ) {
+			return;
+		}
+
+		// Get slug from slot ID.
+		const slotId = event.slot.getSlotElementId();
+		const slug   = slotId.replace( 'mai-ad-', '' );
+
+		// Bail if it's not a client ad.
+		if ( 'client' !== ads[slug]['context'] ) {
+			return;
+		}
+
+		// Bail if no backfill ad with a backfill id.
+		if ( ! ( ads?.[slug]?.['backfill'] && ads?.[slug]?.['backfillId'] ) ) {
+			return;
+		}
+
+		console.log( 'maipub2 slotRenderEnded!', ads[slug] );
+
+		// Define and display the main plugin ad.
+		// maiPubDisplaySlots( [maiPubDefineSlot( slug )] );
 	});
 
 	// If debugging, set listeners to log.
@@ -513,6 +548,18 @@ function maiPubDisplaySlots( slots ) {
 }
 
 /**
+ * Check if a slot is a defined mai ad slot.
+ * Checks if the ad slot ID is in our array of ad slot IDs.
+ *
+ * @param {object} slot The ad slot.
+ *
+ * @return {boolean} True if a mai ad slot.
+ */
+function maiPubIsMaiSlot( slot ) {
+	return slot && adSlotIds.includes( slot.getAdUnitPath() );
+}
+
+/**
  * Check if a slot is refreshable.
  * Checks if we have a defined mai ad slot that has targetting set to refresh.
  *
@@ -521,7 +568,7 @@ function maiPubDisplaySlots( slots ) {
  * @return {boolean} True if refreshable.
  */
 function maiPubIsRefreshable( slot ) {
-	return slot && adSlotIds.includes( slot.getAdUnitPath() ) && Boolean( slot.getTargeting( refreshKey ).shift() );
+	return maiPubIsMaiSlot( slot ) && Boolean( slot.getTargeting( refreshKey ).shift() );
 }
 
 /**

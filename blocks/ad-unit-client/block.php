@@ -37,8 +37,8 @@ class Mai_Publisher_Ad_Unit_Client_Block {
 	 * @return void
 	 */
 	function register_block() {
-		$client  = (array) maipub_get_config( 'client' );
-		$label   = isset( $client['label'] ) ? (string) $client['label'] : 'Mai ' . __( 'Client', 'mai-publisher' );
+		$client = (array) maipub_get_config( 'client' );
+		$label  = isset( $client['label'] ) ? (string) $client['label'] : 'Mai ' . __( 'Client', 'mai-publisher' );
 
 		register_block_type( __DIR__ . '/block.json',
 			[

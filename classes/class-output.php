@@ -254,11 +254,20 @@ class Mai_Publisher_Output {
 					$this->gam[ $slot ]['splitTest'] = $split_test;
 				}
 
-				// Get context.
-				$context = $ad_unit->getAttribute( 'data-context' );
+				// Get context and backfill.
+				$context  = $ad_unit->getAttribute( 'data-context' );
+				$backfill = $ad_unit->getAttribute( 'data-backfill' );
 
 				// Add context.
-				$this->gam[ $slot ]['context'] = $context ?: '';
+				if ( $context ) {
+					$this->gam[ $slot ]['context'] = $context;
+				}
+
+				// Add backfill and backfill id.
+				if ( $backfill ) {
+					$this->gam[ $slot ]['backfill']   = $backfill;
+					$this->gam[ $slot ]['backfillId'] = 'mai-ad-' . $this->increment_string( $backfill );
+				}
 			}
 		}
 
