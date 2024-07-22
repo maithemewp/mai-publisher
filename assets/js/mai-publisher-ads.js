@@ -173,9 +173,9 @@ googletag.cmd.push(() => {
 	 */
 	googletag.pubads().addEventListener( 'slotRenderEnded', (event) => {
 		// Bail if slot is not empty.
-		// if ( ! event.isEmpty ) {
-		// 	return;
-		// }
+		if ( ! event.isEmpty ) {
+			return;
+		}
 
 		// Bail if not one of our slots.
 		if ( ! maiPubIsMaiSlot( event.slot ) ) {
@@ -196,7 +196,7 @@ googletag.cmd.push(() => {
 			return;
 		}
 
-		console.log( 'maipub2 slotRenderEnded!', ads[slug] );
+		console.log( 'maipub2 slotRenderEnded!!', ads[slug] );
 
 		// Define and display the main plugin ad.
 		// maiPubDisplaySlots( [maiPubDefineSlot( slug )] );
