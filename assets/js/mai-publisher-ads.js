@@ -17,7 +17,7 @@ const log              = maiPubAdsVars.debug;
 let   timestamp        = Date.now();
 
 // If debugging, log.
-maiPubLog( 'v192' );
+maiPubLog( 'v195' );
 
 // If using Amazon UAM bids, add it. No need to wait for googletag to be loaded.
 if ( maiPubAdsVars.amazonUAM ) {
@@ -111,6 +111,11 @@ googletag.cmd.push(() => {
 		// Set first load to current time.
 		loadTimes[slotId] = Date.now();
 
+		// Clear timeout if it exists.
+		if ( timeoutIds[slotId] ) {
+			clearTimeout( timeoutIds[slotId] );
+		}
+
 		// Set timeout to refresh ads for current visible ads.
 		timeoutIds[slotId] = setTimeout(() => {
 			// If debugging, log.
@@ -156,7 +161,7 @@ googletag.cmd.push(() => {
 		}
 
 		// Bail if loadTimes is undefined, or it hasn't been n seconds (in milliseconds).
-		if ( 'undefined' === typeof loadTimes[slotId] || ( loadTimes[slotId] && Date.now() - loadTimes[slotId] < refreshTime * 1000 ) ) {
+		if ( ! loadTimes?.[slotId] || ( loadTimes[slotId] && Date.now() - loadTimes[slotId] < refreshTime * 1000 ) ) {
 			return;
 		}
 
@@ -548,7 +553,7 @@ function maiPubDisplaySlots( slots ) {
 	}
 
 	// Start the failsafe timeout.
-	setTimeout( function() {
+	setTimeout(() => {
 		// Log if no adserver request has been sent.
 		if ( ! requestManager.adserverRequestSent ) {
 			maiPubLog( 'refresh() with failsafe timeout: ' + slots.map( slot => slot.getSlotElementId() ).join( ', ' ) );
