@@ -180,7 +180,8 @@ class Mai_Publisher_Ad_Unit {
 		// Start ad attributes.
 		$inner_attr = [
 			'class'     => 'mai-ad-unit',
-			'data-unit' => sanitize_html_class( $id ),
+			'data-unit' => $id,
+			// 'data-unit' => sanitize_html_class( $id ),
 		];
 
 		// If context.

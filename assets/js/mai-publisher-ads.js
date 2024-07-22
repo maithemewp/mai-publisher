@@ -17,7 +17,7 @@ const log              = maiPubAdsVars.debug;
 let   timestamp        = Date.now();
 
 // If debugging, log.
-maiPubLog( 'v195' );
+maiPubLog( 'v198' );
 
 // If using Amazon UAM bids, add it. No need to wait for googletag to be loaded.
 if ( maiPubAdsVars.amazonUAM ) {
@@ -518,6 +518,16 @@ function maiPubDisplaySlots( slots ) {
 					sendAdserverRequest();
 
 					maiPubLog( 'refresh() with amazon fetch: ' + uadSlots.map( slot => slot.slotID.replace( 'mai-ad-', '' ) ).join( ', ' ) );
+				}
+
+				// Log if debugging.
+				if ( debug || log ) {
+					// Check bid responses for errors.
+					bids.forEach((bid) => {
+						if ( bid.error ) {
+							maiPubLog( 'apstag.fetchBids error:', bid );
+						}
+					});
 				}
 			});
 		}
