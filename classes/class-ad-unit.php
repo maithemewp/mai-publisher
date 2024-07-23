@@ -46,7 +46,7 @@ class Mai_Publisher_Ad_Unit {
 		$split_test = sanitize_text_field( $args['split_test'] );
 		$targets    = sanitize_text_field( $args['targets'] );
 		$label      = sanitize_text_field( $args['label'] );
-		$label_hide = (bool) sanitize_text_field( $args['label_hide'] ) && ( ! $is_preview && ( $logging || $debug ) );
+		$label_hide = (bool) sanitize_text_field( $args['label_hide'] ) || ( ! $is_preview && ( $logging || $debug ) );
 		$label      = $label ? $label : maipub_get_option( 'ad_label', false );
 		$label      = $label_hide ? '' : $label;
 		$backfill   = sanitize_text_field( $args['backfill'] );
@@ -318,6 +318,7 @@ class Mai_Publisher_Ad_Unit {
 			$width  = 0;
 			$height = 0;
 
+			// Find largest width and height.
 			foreach ( $item as $size ) {
 				if ( $size[0] > $width ) {
 					$width = $size[0];
