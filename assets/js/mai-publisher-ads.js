@@ -285,7 +285,7 @@ function maiPubDOMContentLoaded() {
 
 	// Create the IntersectionObserver.
 	const observer  = new IntersectionObserver( (entries, observer) => {
-		let toLoadBTF = [];
+		const toLoadBTF = [];
 
 		// Loop through the entries.
 		entries.forEach( entry => {
@@ -322,9 +322,6 @@ function maiPubDOMContentLoaded() {
 			// Define and display all slots in view.
 			maiPubDisplaySlots( toLoadBTF.map( slug => maiPubDefineSlot( slug ) ) );
 		});
-
-		// Clear toLoadBTF array.
-		toLoadBTF = [];
 	}, {
 		root: null, // Use the viewport as the root.
 		rootMargin: '600px 0px 600px 0px', // Trigger when the top of the element is X away from each part of the viewport.
@@ -350,6 +347,19 @@ function maiPubDefineSlot( slug ) {
 
 	// Define slot ID.
 	const slotId = base + ads[slug]['id'];
+
+	// Get slot element ID.
+	const slotElId = 'mai-ad-' + slug;
+
+	// Check for existing slot.
+	const existingSlot = adSlots.find( slot => slotElId == slot.getSlotElementId() );
+
+	// If existing, return it.
+	if ( existingSlot ) {
+		maiPubLog( 'Slot already defined: ' + slotElId );
+
+		return existingSlot;
+	}
 
 	// Define ad slot. googletag.defineSlot( "/1234567/sports", [728, 90], "div-1" );
 	const slot = googletag.defineSlot( slotId, ads[slug].sizes, 'mai-ad-' + slug );
