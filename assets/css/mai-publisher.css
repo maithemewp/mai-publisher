@@ -21,13 +21,8 @@
 }
 
 .mai-ad-unit-spacer,
-.mai-ad-unit-container:not(:empty) {
+.mai-ad-unit:not(:empty) {
 	min-height: var(--mai-ad-unit-height, 90px);
-}
-
-.mai-ad-unit {
-	position: sticky;
-	top: var(--mai-ad-scroll-margin-top, var(--scroll-margin-top, 0px));
 }
 
 .mai-ad-unit[data-label]:not(:empty)::before {
@@ -62,7 +57,7 @@
 @media only screen and (max-width: 727px) {
 
 	.mai-ad-unit-spacer,
-	.mai-ad-unit-container {
+	.mai-ad-unit {
 		--mai-ad-unit-height: var(--mai-ad-unit-height-sm, 90px);
 	}
 }
@@ -70,7 +65,7 @@
 @media only screen and (min-width: 728px) and (max-width: 1023px) {
 
 	.mai-ad-unit-spacer,
-	.mai-ad-unit-container {
+	.mai-ad-unit {
 		--mai-ad-unit-height: var(--mai-ad-unit-height-md, 90px);
 	}
 }
@@ -78,9 +73,15 @@
 @media only screen and (min-width: 1024px) {
 
 	.mai-ad-unit-spacer,
-	.mai-ad-unit-container {
+	.mai-ad-unit {
 		--mai-ad-unit-height: var(--mai-ad-unit-height-lg, 90px);
 	}
+}
+
+/* Default to sticky ad inside. */
+.mai-ad-unit > * {
+	position: sticky;
+	top: var(--mai-ad-scroll-margin-top, var(--scroll-margin-top, 0px));
 }
 
 .mai-ad-unit-sticky {
