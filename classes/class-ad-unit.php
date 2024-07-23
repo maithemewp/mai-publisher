@@ -47,8 +47,8 @@ class Mai_Publisher_Ad_Unit {
 		$label_hide = (bool) sanitize_text_field( $args['label_hide'] );
 		$label      = $label ? $label : maipub_get_option( 'ad_label', false );
 		$label      = $label_hide ? '' : $label;
-		$context    = sanitize_text_field( $args['context'] );
 		$backfill   = sanitize_text_field( $args['backfill'] );
+		$context    = sanitize_text_field( $args['context'] );
 		$config     = maipub_get_config( $context );
 		$ad_units   = isset( $config['ad_units'] ) ? $config['ad_units'] : [];
 
@@ -345,22 +345,14 @@ class Mai_Publisher_Ad_Unit {
 	function get_styles( $sizes ) {
 		$styles = '';
 
-		// Build width.
+		// Build width and height.
 		foreach ( $sizes as $break => $values ) {
-			if ( ! ( $values && is_array( $values ) ) ) {
+			if ( ! ( $values && is_array( $values ) && isset( $values[0] ) && isset( $values[1] ) ) ) {
 				continue;
 			}
 
-			$styles .= sprintf( '--mai-ad-unit-max-width-%s:%spx;', $break, $values[0] );
-		}
-
-		// Build aspect-ratio.
-		foreach ( $sizes as $break => $values ) {
-			if ( ! ( $values && is_array( $values ) ) ) {
-				continue;
-			}
-
-			$styles .= sprintf( '--mai-ad-unit-aspect-ratio-%s:%s/%s;', $break, $values[0], $values[1] );
+			$styles .= sprintf( '--mai-ad-unit-width-%s:%spx;', $break, $values[0] );
+			$styles .= sprintf( '--mai-ad-unit-height-%s:%spx;', $break, $values[1] );
 		}
 
 		return $styles;

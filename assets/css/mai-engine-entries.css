@@ -2,10 +2,10 @@
 	flex: 1 1 100%;
 }
 
-.maipub-entry {
-	--mai-ad-unit-aspect-ratio-width: var(--entry-image-link-max-width);
-	--mai-ad-unit-aspect-ratio: var(--aspect-ratio);
-}
+/* .maipub-entry { */
+	/* --mai-ad-unit-aspect-ratio-width: var(--entry-image-link-max-width); */
+	/* --mai-ad-unit-aspect-ratio: var(--aspect-ratio); */
+/* } */
 
 .maipub-entry:not(.entry) {
 	display: grid;
