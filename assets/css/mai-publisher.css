@@ -24,7 +24,9 @@
 	display: flex;
 	justify-content: var(--mai-ad-unit-justify-content, center);
 	align-items: var(--mai-ad-unit-align-items, center);
+	max-width: var(--mai-ad-unit-width, initial);
 	margin-inline: var(--mai-ad-unit-margin-inline, auto);
+	/* background: repeating-conic-gradient(rgba(0, 0, 0, 0.03) 0% 25%, transparent 0% 50%) 0 / 20px 20px; */
 }
 
 .mai-ad-unit-debug[data-label]::before,
@@ -79,12 +81,6 @@
 		--mai-ad-unit-width: var(--mai-ad-unit-width-lg, 0px);
 		--mai-ad-unit-height: var(--mai-ad-unit-height-lg, 90px);
 	}
-}
-
-.mai-ad-unit-debug,
-.mai-ad-unit-log {
-	width: 100%;
-	max-width: var(--mai-ad-unit-width, 300px);
 }
 
 /* Default to sticky ad inside. */
