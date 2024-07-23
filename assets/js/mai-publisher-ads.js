@@ -270,9 +270,7 @@ function maiPubDOMContentLoaded() {
 
 			// If debugging, add inline styling.
 			if ( debug ) {
-				adATF.style.outline   = '2px dashed limegreen';
-				adATF.style.minWidth  = '300px';
-				adATF.style.minHeight = '90px';
+				adATF.style.outline = '2px dashed limegreen';
 
 				// Add data-label attribute of slug.
 				adATF.setAttribute( 'data-label', slug );
@@ -301,9 +299,7 @@ function maiPubDOMContentLoaded() {
 
 			// If debugging, add inline styling.
 			if ( debug ) {
-				entry.target.style.outline   = '2px dashed red';
-				entry.target.style.minWidth  = '300px';
-				entry.target.style.minHeight = '90px';
+				entry.target.style.outline = '2px dashed red';
 
 				// Add data-label attribute of slug.
 				entry.target.setAttribute( 'data-label', slug );
