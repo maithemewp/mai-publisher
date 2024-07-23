@@ -315,31 +315,21 @@ class Mai_Publisher_Ad_Unit {
 				continue;
 			}
 
-			$largest_width = 0;
-			$height        = 0;
+			$width  = 0;
+			$height = 0;
 
-			// Check for largest width and height.
-			foreach ( $item as $subitem ) {
-				// Bail if not array, mostly for fluid.
-				if ( ! is_array( $subitem ) ) {
-					continue;
+			foreach ( $item as $size ) {
+				if ( $size[0] > $width ) {
+					$width = $size[0];
 				}
 
-				$width = $subitem[0];
-
-				if ( $width > $largest_width ) {
-					$largest_width = $width;
-					$height        = $subitem[1];
+				if ( $size[1] > $height ) {
+					$height = $size[1];
 				}
-			}
-
-			// Bail if we don't have at least a width.
-			if ( ! $largest_width ) {
-				continue;
 			}
 
 			// Set sizes.
-			$sizes[ $key ] = array( $largest_width, $height );
+			$sizes[ $key ] = [ $width, $height ];
 		}
 
 		return $sizes;
