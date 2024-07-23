@@ -83,7 +83,8 @@
 
 .mai-ad-unit-debug,
 .mai-ad-unit-log {
-	min-width: var(--mai-ad-unit-width, 300px);
+	width: 100%;
+	max-width: var(--mai-ad-unit-width, 300px);
 }
 
 /* Default to sticky ad inside. */
