@@ -38,13 +38,15 @@ class Mai_Publisher_Ad_Unit {
 		);
 
 		$is_preview = (bool) $args['preview'];
+		$logging    = (bool) maipub_get_option( 'ad_debug', false );
+		$debug      = isset( $_GET['dfpdeb'] ) || isset( $_GET['maideb'] );
 		$id         = sanitize_text_field( $args['id'] );
 		$type       = sanitize_text_field( $args['type'] );
 		$pos        = sanitize_text_field( $args['position'] );
 		$split_test = sanitize_text_field( $args['split_test'] );
 		$targets    = sanitize_text_field( $args['targets'] );
 		$label      = sanitize_text_field( $args['label'] );
-		$label_hide = (bool) sanitize_text_field( $args['label_hide'] );
+		$label_hide = (bool) sanitize_text_field( $args['label_hide'] ) && ( ! $is_preview && ( $logging || $debug ) );
 		$label      = $label ? $label : maipub_get_option( 'ad_label', false );
 		$label      = $label_hide ? '' : $label;
 		$backfill   = sanitize_text_field( $args['backfill'] );
@@ -250,6 +252,16 @@ class Mai_Publisher_Ad_Unit {
 		// If backfill.
 		if ( $backfill ) {
 			$inner_attr['data-backfill'] = esc_attr( $backfill );
+		}
+
+		// If logging.
+		if ( $logging ) {
+			$inner_attr['class'] .= ' mai-ad-unit-log';
+		}
+
+		// If debug.
+		if ( $debug ) {
+			$inner_attr['class'] .= ' mai-ad-unit-debug';
 		}
 
 		// Get spacer attributes string.

@@ -29,6 +29,8 @@
 	position: relative;
 }
 
+.mai-ad-unit-debug[data-label]::before,
+.mai-ad-unit-log[data-label]::before,
 .mai-ad-unit[data-label]:not(:empty)::before {
 	display: block;
 	width: 100%;
@@ -50,10 +52,6 @@
 	flex: 1 1 100%;
 }
 
-.mai-ad-unit-container.mai-ad-unit-native::before {
-	display: none;
-}
-
 .mai-ad-unit[data-unit="native"] {
 	width: 100%;
 }
@@ -62,6 +60,7 @@
 
 	.mai-ad-unit-spacer,
 	.mai-ad-unit {
+		--mai-ad-unit-width: var(--mai-ad-unit-width-sm, 0px);
 		--mai-ad-unit-height: var(--mai-ad-unit-height-sm, 90px);
 	}
 }
@@ -70,6 +69,7 @@
 
 	.mai-ad-unit-spacer,
 	.mai-ad-unit {
+		--mai-ad-unit-width: var(--mai-ad-unit-width-md, 0px);
 		--mai-ad-unit-height: var(--mai-ad-unit-height-md, 90px);
 	}
 }
@@ -78,8 +78,14 @@
 
 	.mai-ad-unit-spacer,
 	.mai-ad-unit {
+		--mai-ad-unit-width: var(--mai-ad-unit-width-lg, 0px);
 		--mai-ad-unit-height: var(--mai-ad-unit-height-lg, 90px);
 	}
+}
+
+.mai-ad-unit-debug,
+.mai-ad-unit-log {
+	min-width: var(--mai-ad-unit-width, 300px);
 }
 
 /* Default to sticky ad inside. */
@@ -102,10 +108,6 @@
 
 .mai-ad-unit-sticky-footer {
 	bottom: 0;
-}
-
-.mai-ad-unit-sticky .mai-ad-unit[data-label]::before {
-	display: none;
 }
 
 .mai-ad-unit-sticky .mai-ad-unit::after {
