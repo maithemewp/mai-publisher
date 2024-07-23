@@ -91,7 +91,7 @@ googletag.cmd.push(() => {
 	// Delayed on window load.
 	else {
 		// On window load.
-		window.addEventListener( 'load', function() {
+		window.addEventListener( 'load', () => {
 			setTimeout( maiPubDOMContentLoaded, maiPubAdsVars.loadDelay );
 		});
 	}
@@ -99,7 +99,7 @@ googletag.cmd.push(() => {
 	/**
 	 * Set 30 refresh when an ad is in view.
 	 */
-	googletag.pubads().addEventListener( 'impressionViewable', function( event ) {
+	googletag.pubads().addEventListener( 'impressionViewable', (event) => {
 		const slot   = event.slot;
 		const slotId = slot.getSlotElementId();
 
@@ -476,32 +476,24 @@ function maiPubDisplaySlots( slots ) {
 
 	// Handle Amazon UAM bids.
 	if ( maiPubAdsVars.amazonUAM ) {
-		const uadSlots = [];
+		// Filter out ads[slug].sizes that only contain a single size named 'fluid'. This was throwing an error in amazon.
+		// Filter out client ads.
+		const uadSlots = slots
+			.filter( slot => {
+				const slug = slot.getSlotElementId().replace( 'mai-ad-', '' );
 
-		// Loop through slots.
-		slots.forEach( slot => {
-			// Get slug from slot ID.
-			const slug = slot.getSlotElementId().replace( 'mai-ad-', '' );
+				return ! ( 1 === ads[slug].sizes.length && 'fluid' === ads[slug].sizes[0] ) && 'client' !== ads[slug]['context'];
+			})
+			.map( slot => {
+				const elId = slot.getSlotElementId();
+				const slug = elId.replace( 'mai-ad-', '' );
 
-			// Skip if ads[slug].sizes only contains a single size named 'fluid'. This was throwing an error in amazon.
-			if ( 1 === ads[slug].sizes.length && 'fluid' === ads[slug].sizes[0] ) {
-				// Remove from slots array and skip.
-				// delete slots[slug];
-				return;
-			}
-
-			// Bail if it's a client ad.
-			if ( ads?.[slug]?.['context'] && 'client' === ads[slug]['context'] ) {
-				return;
-			}
-
-			// Add slot to array for UAD.
-			uadSlots.push({
-				slotID: 'mai-ad-' + slug,
-				slotName: gamBase + ads[slug]['id'],
-				sizes: ads[slug].sizes,
+				return {
+					slotID: elId,
+					slotName: gamBase + ads[slug]['id'],
+					sizes: ads[slug].sizes,
+				};
 			});
-		});
 
 		// If we have uadSlots.
 		if ( uadSlots.length ) {
