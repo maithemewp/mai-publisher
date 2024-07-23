@@ -21,7 +21,7 @@
 }
 
 .mai-ad-unit-spacer,
-.mai-ad-unit:not(:empty) {
+.mai-ad-unit {
 	min-height: var(--mai-ad-unit-height, 90px);
 }
 
