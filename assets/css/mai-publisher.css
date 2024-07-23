@@ -1,9 +1,3 @@
-.mai-ad-unit-container {
-	display: flex;
-	justify-content: var(--mai-ad-unit-justify-content, center);
-	margin-inline: var(--mai-ad-unit-margin-inline, auto);
-}
-
 .mai-ad-unit-container:not([data-label]):not(:first-child) {
 	margin-block-start: var(--mai-ad-unit-margin-block, var(--spacing-md, 24px) 0);
 }
@@ -27,6 +21,10 @@
 
 .mai-ad-unit {
 	position: relative;
+	display: flex;
+	justify-content: var(--mai-ad-unit-justify-content, center);
+	align-items: var(--mai-ad-unit-align-items, center);
+	margin-inline: var(--mai-ad-unit-margin-inline, auto);
 }
 
 .mai-ad-unit-debug[data-label]::before,
@@ -215,6 +213,10 @@ the order of these may affect things and cause issues when it's dark inside ligh
 .entry-wrap > .cnx-main-container {
 	margin-block: var(--spacing-md, 24px);
 	z-index: 9;
+}
+
+.sidebar {
+	--mai-ad-unit-align-items: start;
 }
 
 /* Placeholders */
