@@ -25,6 +25,10 @@
 	min-height: var(--mai-ad-unit-height, 90px);
 }
 
+.mai-ad-unit {
+	position: relative;
+}
+
 .mai-ad-unit[data-label]:not(:empty)::before {
 	display: block;
 	width: 100%;
