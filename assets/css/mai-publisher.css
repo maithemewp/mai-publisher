@@ -1,18 +1,3 @@
-.mai-ad-unit-container {
-	display: flex;
-	justify-content: var(--mai-ad-unit-justify-content, center);
-	max-width: var(--mai-ad-unit-max-width);
-	margin-inline: var(--mai-ad-unit-margin-inline, auto);
-}
-
-.mai-ad-unit-container::before {
-	display: block;
-	width: 1px;
-	margin-left: -1px;
-	padding-bottom: calc(var(--mai-ad-unit-aspect-ratio-width, 100%) / (var(--mai-ad-unit-aspect-ratio)));
-	content: "";
-}
-
 .mai-ad-unit-container:not([data-label]):not(:first-child) {
 	margin-block-start: var(--mai-ad-unit-margin-block, var(--spacing-md, 24px) 0);
 }
@@ -29,10 +14,23 @@
 	--mai-ad-scroll-margin-top: calc(var(--scroll-margin-top, 2em) + 16px);
 }
 
+.mai-ad-unit-spacer,
 .mai-ad-unit {
-	position: relative;
+	min-height: var(--mai-ad-unit-height, 90px);
 }
 
+.mai-ad-unit {
+	position: relative;
+	display: flex;
+	justify-content: var(--mai-ad-unit-justify-content, center);
+	align-items: var(--mai-ad-unit-align-items, center);
+	max-width: var(--mai-ad-unit-width, initial);
+	margin-inline: var(--mai-ad-unit-margin-inline, auto);
+	/* background: repeating-conic-gradient(rgba(0, 0, 0, 0.03) 0% 25%, transparent 0% 50%) 0 / 20px 20px; */
+}
+
+.mai-ad-unit-debug[data-label]::before,
+.mai-ad-unit-log[data-label]::before,
 .mai-ad-unit[data-label]:not(:empty)::before {
 	display: block;
 	width: 100%;
@@ -51,12 +49,7 @@
 
 .mai-ad-unit-native {
 	width: 100%;
-	height: 100%; /* this was mostly for previews, does it break stuff? */
 	flex: 1 1 100%;
-}
-
-.mai-ad-unit-container.mai-ad-unit-native::before {
-	display: none;
 }
 
 .mai-ad-unit[data-unit="native"] {
@@ -66,57 +59,34 @@
 @media only screen and (max-width: 727px) {
 
 	.mai-ad-unit-spacer,
-	.mai-ad-unit-container {
-		--mai-ad-unit-max-width: var(--mai-ad-unit-max-width-sm, unset);
-		--mai-ad-unit-aspect-ratio: var(--mai-ad-unit-aspect-ratio-sm, unset);
+	.mai-ad-unit {
+		--mai-ad-unit-width: var(--mai-ad-unit-width-sm, 0px);
+		--mai-ad-unit-height: var(--mai-ad-unit-height-sm, 90px);
 	}
 }
 
 @media only screen and (min-width: 728px) and (max-width: 1023px) {
 
 	.mai-ad-unit-spacer,
-	.mai-ad-unit-container {
-		--mai-ad-unit-max-width: var(--mai-ad-unit-max-width-md, unset);
-		--mai-ad-unit-aspect-ratio: var(--mai-ad-unit-aspect-ratio-md, unset);
+	.mai-ad-unit {
+		--mai-ad-unit-width: var(--mai-ad-unit-width-md, 0px);
+		--mai-ad-unit-height: var(--mai-ad-unit-height-md, 90px);
 	}
 }
 
 @media only screen and (min-width: 1024px) {
 
 	.mai-ad-unit-spacer,
-	.mai-ad-unit-container {
-		--mai-ad-unit-max-width: var(--mai-ad-unit-max-width-lg, unset);
-		--mai-ad-unit-aspect-ratio: var(--mai-ad-unit-aspect-ratio-lg, unset);
+	.mai-ad-unit {
+		--mai-ad-unit-width: var(--mai-ad-unit-width-lg, 0px);
+		--mai-ad-unit-height: var(--mai-ad-unit-height-lg, 90px);
 	}
 }
 
-.mai-ad-unit-spacer {
-	position: relative;
-	display: flex;
-	width: 100%;
-	max-width: var(--mai-ad-unit-max-width);
-	margin-inline: auto;
-	/* overflow: hidden; */ /* Prevents ::after from overflowing container but breaks background color */
-}
-
-.mai-ad-unit-spacer::before {
-	display: block;
-	width: 1px;
-	margin-left: -1px;
-	padding-bottom: calc(100% / (var(--mai-ad-unit-aspect-ratio)));
-	content: "";
-}
-
-.mai-ad-unit-spacer::after {
-	display: block;
-	width: 100dvw;
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 50%;
-	transform: translateX(-50%);
-	background: inherit;
-	content: "";
+/* Default to sticky ad inside. */
+.mai-ad-unit > * {
+	position: sticky;
+	top: var(--mai-ad-scroll-margin-top, var(--scroll-margin-top, 0px));
 }
 
 .mai-ad-unit-sticky {
@@ -133,10 +103,6 @@
 
 .mai-ad-unit-sticky-footer {
 	bottom: 0;
-}
-
-.mai-ad-unit-sticky .mai-ad-unit[data-label]::before {
-	display: none;
 }
 
 .mai-ad-unit-sticky .mai-ad-unit::after {
@@ -244,6 +210,10 @@ the order of these may affect things and cause issues when it's dark inside ligh
 .entry-wrap > .cnx-main-container {
 	margin-block: var(--spacing-md, 24px);
 	z-index: 9;
+}
+
+.sidebar {
+	--mai-ad-unit-align-items: start;
 }
 
 /* Placeholders */

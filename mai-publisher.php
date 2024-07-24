@@ -4,7 +4,7 @@
  * Plugin Name:     Mai Publisher
  * Plugin URI:      https://bizbudding.com
  * Description:     Manage ads and more for websites in the Mai Publisher network.
- * Version:         1.9.1
+ * Version:         1.9.2-beta.4
  *
  * Author:          BizBudding
  * Author URI:      https://bizbudding.com
@@ -93,7 +93,7 @@ final class Mai_Publisher_Plugin {
 	private function setup_constants() {
 		// Plugin version.
 		if ( ! defined( 'MAI_PUBLISHER_VERSION' ) ) {
-			define( 'MAI_PUBLISHER_VERSION', '1.9.1' );
+			define( 'MAI_PUBLISHER_VERSION', '1.9.2-beta.4' );
 		}
 
 		// Plugin Folder Path.
@@ -166,6 +166,7 @@ final class Mai_Publisher_Plugin {
 			new Mai_Publisher_Settings;
 			new Mai_Publisher_Settings_Categories;
 			new Mai_Publisher_Settings_Ad_Units_Config;
+			// new Mai_Publisher_Settings_Ad_Txt;
 		}
 	}
 

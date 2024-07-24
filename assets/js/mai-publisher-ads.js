@@ -21,7 +21,7 @@ const log              = maiPubAdsVars.debug;
 let   timestamp        = Date.now();
 
 // If debugging, log.
-maiPubLog( 'v172' );
+maiPubLog( 'v199' );
 
 // If using Amazon UAM bids, add it. No need to wait for googletag to be loaded.
 if ( maiPubAdsVars.amazonUAM ) {
@@ -95,7 +95,7 @@ googletag.cmd.push(() => {
 	// Delayed on window load.
 	else {
 		// On window load.
-		window.addEventListener( 'load', function() {
+		window.addEventListener( 'load', () => {
 			setTimeout( maiPubDOMContentLoaded, maiPubAdsVars.loadDelay );
 		});
 	}
@@ -103,7 +103,7 @@ googletag.cmd.push(() => {
 	/**
 	 * Set 30 refresh when an ad is in view.
 	 */
-	googletag.pubads().addEventListener( 'impressionViewable', function( event ) {
+	googletag.pubads().addEventListener( 'impressionViewable', (event) => {
 		const slot   = event.slot;
 		const slotId = slot.getSlotElementId();
 
@@ -114,6 +114,11 @@ googletag.cmd.push(() => {
 
 		// Set first load to current time.
 		loadTimes[slotId] = Date.now();
+
+		// Clear timeout if it exists.
+		if ( timeoutIds[slotId] ) {
+			clearTimeout( timeoutIds[slotId] );
+		}
 
 		// Set timeout to refresh ads for current visible ads.
 		timeoutIds[slotId] = setTimeout(() => {
@@ -160,7 +165,7 @@ googletag.cmd.push(() => {
 		}
 
 		// Bail if loadTimes is undefined, or it hasn't been n seconds (in milliseconds).
-		if ( 'undefined' === typeof loadTimes[slotId] || ( loadTimes[slotId] && Date.now() - loadTimes[slotId] < refreshTime * 1000 ) ) {
+		if ( ! loadTimes?.[slotId] || ( loadTimes[slotId] && Date.now() - loadTimes[slotId] < refreshTime * 1000 ) ) {
 			return;
 		}
 
@@ -169,6 +174,54 @@ googletag.cmd.push(() => {
 
 		// Refresh the slot(s).
 		maiPubRefreshSlots( [slot] );
+	});
+
+	/**
+	 * Checks if this is a client GAM ad and not the main plugin MCM ad,
+	 * if it's a client ad and isEmpty, try to load the main plugin ad.
+	 */
+	googletag.pubads().addEventListener( 'slotRenderEnded', (event) => {
+		// Bail if slot is not empty.
+		if ( ! event.isEmpty ) {
+			return;
+		}
+
+		// Bail if not one of our slots.
+		if ( ! maiPubIsMaiSlot( event.slot ) ) {
+			return;
+		}
+
+		// Get slug from slot ID.
+		const slotId = event.slot.getSlotElementId();
+		const slug   = slotId.replace( 'mai-ad-', '' );
+
+		// Bail if it's not a client ad.
+		if ( 'client' !== ads[slug]['context'] ) {
+			return;
+		}
+
+		// Bail if no backfill ad with a backfill id.
+		if ( ! ( ads?.[slug]?.['backfill'] && ads?.[slug]?.['backfillId'] ) ) {
+			return;
+		}
+
+		// // If debugging, log.
+		// maiPubLog( 'maipub backfilling with: ' + ads[slug]['backfill'], document.getElementById( slotId ).id );
+
+		// // Set the ID to the backfill ID and define/display the backfill ad.
+		// document.getElementById( slotId ).id = ads[slug]['backfillId'];
+
+		// // Define and display the main plugin ad.
+		// maiPubDisplaySlots( [ maiPubDefineSlot( ads[slug]['backfill'] ) ] );
+
+		// // If debugging, log.
+		// maiPubLog( 'maipub destroying: ' + slug );
+
+		// // Unset ads[slug].
+		// // delete ads[slug];
+
+		// // Destroy the empty slot.
+		// googletag.destroySlots( [ event.slot ] );
 	});
 
 	// If debugging, set listeners to log.
@@ -221,9 +274,7 @@ function maiPubDOMContentLoaded() {
 
 			// If debugging, add inline styling.
 			if ( debug ) {
-				adATF.style.outline   = '2px dashed limegreen';
-				adATF.style.minWidth  = '300px';
-				adATF.style.minHeight = '90px';
+				adATF.style.outline = '2px dashed limegreen';
 
 				// Add data-label attribute of slug.
 				adATF.setAttribute( 'data-label', slug );
@@ -238,7 +289,7 @@ function maiPubDOMContentLoaded() {
 
 	// Create the IntersectionObserver.
 	const observer  = new IntersectionObserver( (entries, observer) => {
-		let toLoadBTF = [];
+		const toLoadBTF = [];
 
 		// Loop through the entries.
 		entries.forEach( entry => {
@@ -252,9 +303,7 @@ function maiPubDOMContentLoaded() {
 
 			// If debugging, add inline styling.
 			if ( debug ) {
-				entry.target.style.outline   = '2px dashed red';
-				entry.target.style.minWidth  = '300px';
-				entry.target.style.minHeight = '90px';
+				entry.target.style.outline = '2px dashed red';
 
 				// Add data-label attribute of slug.
 				entry.target.setAttribute( 'data-label', slug );
@@ -277,9 +326,6 @@ function maiPubDOMContentLoaded() {
 			// Define and display all slots in view.
 			maiPubDisplaySlots( toLoadBTF.map( slug => maiPubDefineSlot( slug ) ) );
 		});
-
-		// Clear toLoadBTF array.
-		toLoadBTF = [];
 	}, {
 		root: null, // Use the viewport as the root.
 		rootMargin: '600px 0px 600px 0px', // Trigger when the top of the element is X away from each part of the viewport.
@@ -301,10 +347,23 @@ function maiPubDefineSlot( slug ) {
 	let toReturn = null;
 
 	// Get base from context.
-	const base = 'client' === ads[slug]['context'] ? gamBaseClient : gamBase;
+	const base = ads?.[slug]?.['context'] && 'client' === ads[slug]['context'] ? gamBaseClient : gamBase;
 
 	// Define slot ID.
 	const slotId = base + ads[slug]['id'];
+
+	// Get slot element ID.
+	const slotElId = 'mai-ad-' + slug;
+
+	// Check for existing slot.
+	const existingSlot = adSlots.find( slot => slotElId == slot.getSlotElementId() );
+
+	// If existing, return it.
+	if ( existingSlot ) {
+		maiPubLog( 'Slot already defined: ' + slotElId );
+
+		return existingSlot;
+	}
 
 	// Define ad slot. googletag.defineSlot( "/1234567/sports", [728, 90], "div-1" );
 	const slot = googletag.defineSlot( slotId, ads[slug].sizes, 'mai-ad-' + slug );
@@ -320,6 +379,15 @@ function maiPubDefineSlot( slug ) {
 	// Add slot to our array.
 	adSlotIds.push( slotId );
 	adSlots.push( slot );
+
+	// If amazon is enabled and ads[slug].sizes only contains a single size named 'fluid'.
+	// if ( maiPubAdsVars.amazonUAM && 1 === ads[slug].sizes.length && 'fluid' === ads[slug].sizes[0] ) {
+	// 	// If debugging, log.
+	// 	maiPubLog( 'disabled safeframe: ' + slot.getSlotElementId() );
+
+	// 	// Disabled SafeFrame for this slot.
+	// 	slot.setForceSafeFrame( false );
+	// }
 
 	// Set refresh targeting.
 	slot.setTargeting( refreshKey, refreshValue );
@@ -361,6 +429,8 @@ function maiPubDefineSlot( slug ) {
 /**
  * Display slots.
  * The requestManager logic take from Magnite docs.
+ *
+ * @link https://help.magnite.com/help/web-integration-guide#parallel-header-bidding-integrations
  *
  * @param {array} slots The defined slots.
  */
@@ -415,32 +485,24 @@ function maiPubDisplaySlots( slots ) {
 
 	// Handle Amazon UAM bids.
 	if ( maiPubAdsVars.amazonUAM ) {
-		const uadSlots = [];
+		// Filter out ads[slug].sizes that only contain a single size named 'fluid'. This was throwing an error in amazon.
+		// Filter out client ads.
+		const uadSlots = slots
+			.filter( slot => {
+				const slug = slot.getSlotElementId().replace( 'mai-ad-', '' );
 
-		// Loop through slots.
-		slots.forEach( slot => {
-			// Get slug from slot ID.
-			const slug = slot.getSlotElementId().replace( 'mai-ad-', '' );
+				return ! ( 1 === ads[slug].sizes.length && 'fluid' === ads[slug].sizes[0] ) && 'client' !== ads[slug]['context'];
+			})
+			.map( slot => {
+				const elId = slot.getSlotElementId();
+				const slug = elId.replace( 'mai-ad-', '' );
 
-			// Skip if ads[slug].sizes only contains a single size named 'fluid'. This was throwing an error in amazon.
-			if ( 1 === ads[slug].sizes.length && 'fluid' === ads[slug].sizes[0] ) {
-				// Remove from slots array and skip.
-				// delete slots[slug];
-				return;
-			}
-
-			// Bail if it's a client ad.
-			if ( 'client' === ads[slug]['context'] ) {
-				return;
-			}
-
-			// Add slot to array for UAD.
-			uadSlots.push({
-				slotID: 'mai-ad-' + slug,
-				slotName: gamBase + ads[slug]['id'],
-				sizes: ads[slug].sizes,
+				return {
+					slotID: elId,
+					slotName: gamBase + ads[slug]['id'],
+					sizes: ads[slug].sizes,
+				};
 			});
-		});
 
 		// If we have uadSlots.
 		if ( uadSlots.length ) {
@@ -464,6 +526,16 @@ function maiPubDisplaySlots( slots ) {
 
 					maiPubLog( 'refresh() with amazon fetch: ' + uadSlots.map( slot => slot.slotID.replace( 'mai-ad-', '' ) ).join( ', ' ) );
 				}
+
+				// Log if debugging.
+				if ( debug || log ) {
+					// Check bid responses for errors.
+					bids.forEach((bid) => {
+						if ( bid.error ) {
+							maiPubLog( 'apstag.fetchBids error:', bid );
+						}
+					});
+				}
 			});
 		}
 		// No UAD, but we have others.
@@ -486,7 +558,7 @@ function maiPubDisplaySlots( slots ) {
 			return;
 		}
 
-		// Set the amazon request manager to true.
+		// Set the request manager to true.
 		requestManager.apsBidsReceived = true;
 
 		// If we have all bids, send the adserver request.
@@ -498,7 +570,7 @@ function maiPubDisplaySlots( slots ) {
 	}
 
 	// Start the failsafe timeout.
-	setTimeout( function() {
+	setTimeout(() => {
 		// Log if no adserver request has been sent.
 		if ( ! requestManager.adserverRequestSent ) {
 			maiPubLog( 'refresh() with failsafe timeout: ' + slots.map( slot => slot.getSlotElementId() ).join( ', ' ) );
@@ -511,6 +583,18 @@ function maiPubDisplaySlots( slots ) {
 }
 
 /**
+ * Check if a slot is a defined mai ad slot.
+ * Checks if the ad slot ID is in our array of ad slot IDs.
+ *
+ * @param {object} slot The ad slot.
+ *
+ * @return {boolean} True if a mai ad slot.
+ */
+function maiPubIsMaiSlot( slot ) {
+	return slot && adSlotIds.includes( slot.getAdUnitPath() );
+}
+
+/**
  * Check if a slot is refreshable.
  * Checks if we have a defined mai ad slot that has targetting set to refresh.
  *
@@ -519,7 +603,7 @@ function maiPubDisplaySlots( slots ) {
  * @return {boolean} True if refreshable.
  */
 function maiPubIsRefreshable( slot ) {
-	return slot && adSlotIds.includes( slot.getAdUnitPath() ) && Boolean( slot.getTargeting( refreshKey ).shift() );
+	return maiPubIsMaiSlot( slot ) && Boolean( slot.getTargeting( refreshKey ).shift() );
 }
 
 /**

@@ -377,7 +377,6 @@ class Mai_Publisher_Settings {
 			'maipub_settings_views' // section
 		);
 
-
 		add_settings_field(
 			'views_interval', // id
 			__( 'Trending/Popular Interval', 'mai-publisher' ), // title

@@ -37,8 +37,8 @@ class Mai_Publisher_Ad_Unit_Client_Block {
 	 * @return void
 	 */
 	function register_block() {
-		$client  = (array) maipub_get_config( 'client' );
-		$label   = isset( $client['label'] ) ? (string) $client['label'] : 'Mai ' . __( 'Client', 'mai-publisher' );
+		$client = (array) maipub_get_config( 'client' );
+		$label  = isset( $client['label'] ) ? (string) $client['label'] : 'Mai ' . __( 'Client', 'mai-publisher' );
 
 		register_block_type( __DIR__ . '/block.json',
 			[
@@ -62,15 +62,20 @@ class Mai_Publisher_Ad_Unit_Client_Block {
 	 * @return void
 	 */
 	function render_block( $block, $content, $is_preview, $post_id, $context ) {
+		$client   = (array) maipub_get_config( 'client' );
+		$ad_unit  = get_field( 'id' );
+		$backfill = $ad_unit && isset( $client['ad_units'][ $ad_unit ]['backfill'] ) ? (string) $client['ad_units'][ $ad_unit ]['backfill'] : '';
+
 		maipub_do_ad_unit(
 			[
 				'preview'    => $this->is_preview( $is_preview ),
-				'id'         => get_field( 'id' ),
+				'id'         => $ad_unit,
 				'position'   => get_field( 'position' ),
 				'targets'    => get_field( 'targets' ),
 				'label'      => get_field( 'label' ),
 				'label_hide' => get_field( 'label_hide' ),
 				'context'    => 'client',
+				'backfill'   => $backfill,
 			]
 		);
 	}

@@ -63,7 +63,6 @@ class Mai_Publisher_Ad_Unit_Block {
 				'targets'    => get_field( 'targets' ),
 				'label'      => get_field( 'label' ),
 				'label_hide' => get_field( 'label_hide' ),
-				'context'    => '',
 			]
 		);
 	}

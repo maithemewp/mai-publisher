@@ -2,14 +2,14 @@
 	flex: 1 1 100%;
 }
 
-.maipub-entry {
-	--mai-ad-unit-aspect-ratio-width: var(--entry-image-link-max-width);
-	--mai-ad-unit-aspect-ratio: var(--aspect-ratio);
-}
-
 .maipub-entry:not(.entry) {
 	display: grid;
 	align-items: center;
+}
+
+.maipub-entry:has(.mai-ad-unit-debug),
+.maipub-entry:has(.mai-ad-unit-log) {
+	overflow: visible;
 }
 
 .maipub-entry.entry {
