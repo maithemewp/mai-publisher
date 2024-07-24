@@ -344,7 +344,7 @@ class Mai_Publisher_Output {
 			}
 
 			// Magnite.
-			$scripts[] = '<script async src = "https://micro.rubiconproject.com/prebid/dynamic/23744.js">';
+			$scripts[] = '<script async src="//micro.rubiconproject.com/prebid/dynamic/26298.js"></script>';
 
 			// Load GPT.
 			$load_gpt = apply_filters( 'mai_publisher_load_gpt', true );
