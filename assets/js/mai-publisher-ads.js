@@ -16,7 +16,7 @@ const loadTimes        = {};
 const currentlyVisible = {};
 const timeoutIds       = {};
 const fallbackTimeout  = 3500; // Set global failsafe timeout ~500ms after DM UI bidder timeout.
-const debug            = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb');
+const debug            = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb') || window.location.search.includes('pbjs_debug=true');
 const log              = maiPubAdsVars.debug;
 let   timestamp        = Date.now();
 
