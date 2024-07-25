@@ -432,7 +432,7 @@ function maiPubDefineSlot( slug ) {
  *
  * @link https://help.magnite.com/help/web-integration-guide#parallel-header-bidding-integrations
  *
- * @param {array} slots The defined slots.
+ * @param {array} slots An array of the defined slots objects.
  */
 function maiPubDisplaySlots( slots ) {
 	// Enable services.
@@ -462,6 +462,16 @@ function maiPubDisplaySlots( slots ) {
 
 	// Handle Magnite/DM bids.
 	if ( maiPubAdsVars.magnite ) {
+		// If debugging or logging, enable debugging for magnite.
+		if ( debug || log ) {
+			pbjs.setConfig({
+				debugging: {
+					enabled: true,
+				}
+			});
+		}
+
+		// Fetch bids from Magnite using Prebid.
 		pbjs.que.push( function() {
 			pbjs.rp.requestBids( {
 				gptSlotObjects: slots,
