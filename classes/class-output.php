@@ -347,7 +347,7 @@ class Mai_Publisher_Output {
 			if ( $localize['magnite'] ) {
 				// Preconnect and add magnite scripts.
 				$preconnects[] = '<link rel="preconnect" href="//micro.rubiconproject.com">';
-				$scripts[] = '<script id="mai-publisher-prebid" async src="//micro.rubiconproject.com/prebid/dynamic/26298.js"></script>';
+				$scripts[] = '<script async id="mai-publisher-prebid" src="//micro.rubiconproject.com/prebid/dynamic/26298.js"></script>';
 			}
 
 			// Load GPT.
