@@ -343,8 +343,12 @@ class Mai_Publisher_Output {
 				$scripts       = array_merge( $scripts, $this->get_sourcepoint_scripts( $localize['debug'] ) );
 			}
 
-			// Magnite.
-			$scripts[] = '<script async src="//micro.rubiconproject.com/prebid/dynamic/26298.js"></script>';
+			// If magnite is enabled.
+			if ( $localize['magnite'] ) {
+				// Preconnect and add magnite scripts.
+				$preconnects[] = '<link rel="preconnect" href="//micro.rubiconproject.com">';
+				$scripts[] = '<script async src="//micro.rubiconproject.com/prebid/dynamic/26298.js"></script>';
+			}
 
 			// Load GPT.
 			$load_gpt = apply_filters( 'mai_publisher_load_gpt', true );
