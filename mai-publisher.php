@@ -262,7 +262,7 @@ final class Mai_Publisher_Plugin {
 					'not_found_in_trash' => __( 'No Mai Ads found in Trash.', 'mai-publisher' )
 				],
 				'menu_icon'          => 'dashicons-media-code',
-				'menu_position'      => 58,
+				'menu_position'      => 58.994, // Idk why this isn't working. Fixed later in admin_menu hook.
 				'public'             => false,
 				'publicly_queryable' => false,
 				'show_in_menu'       => true,
@@ -315,6 +315,28 @@ final class Mai_Publisher_Plugin {
 	function add_page() {
 		if ( ! class_exists( 'Mai_Engine' ) ) {
 			return;
+		}
+
+		global $menu;
+
+		// Find the key of the CPT menu item
+		foreach ( $menu as $key => $value ) {
+			if ( 'edit.php?post_type=mai_ad' !== $value[2] ) {
+				continue;
+			}
+
+			// Store and unset.
+			$item = $menu[ $key ];
+			unset( $menu[ $key ] );
+
+			// Re-insert right before Mai Theme.
+			// WooCommerce Marketing is 58.
+			// WP Forms is 58.9.
+			// Mai Theme is 58.995.
+			// Genesis is 58.996.
+			$menu[ '58.994' ] = $item;
+
+			break;
 		}
 
 		add_submenu_page(
