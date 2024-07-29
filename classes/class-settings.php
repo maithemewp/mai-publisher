@@ -68,9 +68,8 @@ class Mai_Publisher_Settings {
 		wp_enqueue_script( 'mai-publisher-select2', 'https://cdn.jsdelivr.net/npm/select2/dist/js/select2.min.js' );
 
 		// Get files.
-		$suffix = maipub_get_suffix();
-		$css    = "assets/css/mai-publisher-settings{$suffix}.css";
-		$js     = "assets/js/mai-publisher-settings{$suffix}.js";
+		$css = maipub_is_script_debug() ? 'assets/css/mai-engine-settings.css' : 'assets/css/mai-engine-settings.min.css';
+		$js  = maipub_is_script_debug() ? 'assets/js/mai-engine-settings.js' : 'assets/js/mai-engine-settings.min.js';
 
 		// Enqueue.
 		wp_enqueue_style( 'mai-publisher-settings', maipub_get_file_data( $css, 'url' ), [], maipub_get_file_data( $css, 'version' ) );

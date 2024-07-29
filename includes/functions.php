@@ -478,22 +478,22 @@ function maipub_update_option( $option, $value ) {
 }
 
 /**
- * Gets file suffix.
+ * If script debug is enabled.
  *
- * @since 0.1.0
+ * @since TBD
  *
- * @return string
+ * @return bool
  */
-function maipub_get_suffix() {
-	static $suffix = null;
+function maipub_is_script_debug() {
+	static $cache = null;
 
-	if ( ! is_null( $suffix ) ) {
-		return $suffix;
+	if ( ! is_null( $cache ) ) {
+		return $cache;
 	}
 
-	$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+	$cache = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG;
 
-	return $suffix;
+	return $cache;
 }
 
 /**

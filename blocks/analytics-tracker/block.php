@@ -110,8 +110,7 @@ class Mai_Publisher_Analytics_Tracker_Block {
 	 * @return void
 	 */
 	function register_script() {
-		$suffix = maipub_get_suffix();
-		$file   = "blocks/analytics-tracker/block{$suffix}.js";
+		$file = maipub_is_script_debug() ? 'blocks/analytics-tracker/block.js' : 'blocks/analytics-tracker/min/block.min.js';
 
 		wp_enqueue_script( 'mai-publisher-analytics-tracker', maipub_get_file_data( $file, 'url' ), [], maipub_get_file_data( $file, 'version' ), [ 'in_footer' => true ] );
 	}

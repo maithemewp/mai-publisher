@@ -2,27 +2,31 @@ let mix = require('laravel-mix');
 let fs = require('fs');
 let path = require('path');
 
+// Ensure /min directories exist
+if (!fs.existsSync('assets/js/min')) {
+	fs.mkdirSync('assets/js/min', { recursive: true });
+}
+if (!fs.existsSync('assets/css/min')) {
+	fs.mkdirSync('assets/css/min', { recursive: true });
+}
+
 // Process and minify all CSS files in assets/css
 fs.readdirSync('assets/css').forEach(file => {
 	if (path.extname(file) === '.css') {
-		// Copy original file
-		mix.copy(`assets/css/${file}`, `assets/css/${file}`);
-		// Minify and save as .min.css
-		mix.styles(`assets/css/${file}`, `assets/css/${file.replace('.css', '.min.css')}`)
-		.minify(`assets/css/${file.replace('.css', '.min.css')}`);
+		const outputFileName = `assets/css/min/${file}`;
+		mix.styles(`assets/css/${file}`, outputFileName)
+		.minify(outputFileName);
 	}
 });
 
 // Process and minify all JS files in assets/js
 fs.readdirSync('assets/js').forEach(file => {
 	if (path.extname(file) === '.js') {
-		// Copy original file
-		mix.copy(`assets/js/${file}`, `assets/js/${file}`);
-		// Minify and save as .min.js
-		mix.js(`assets/js/${file}`, `assets/js/${file.replace('.js', '.min.js')}`)
-		.minify(`assets/js/${file.replace('.js', '.min.js')}`);
+		const outputFileName = `assets/js/min/${file}`;
+		mix.js(`assets/js/${file}`, outputFileName)
+		.minify(outputFileName);
 	}
 });
 
-// Set public path
+// Set public path (if needed)
 mix.setPublicPath('assets');

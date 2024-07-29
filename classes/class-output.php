@@ -18,7 +18,6 @@ class Mai_Publisher_Output {
 	protected $grouped;
 	protected $gam;
 	protected $mode;
-	protected $suffix;
 	protected $dom;
 	protected $xpath;
 
@@ -71,7 +70,6 @@ class Mai_Publisher_Output {
 		$this->ads             = maipub_get_page_ads();
 		$this->grouped         = $this->get_grouped_ads( $this->ads );
 		$this->gam             = [];
-		$this->suffix          = maipub_get_suffix();
 
 		// Bail if disabled. Not checking `$this->ads` because there may be manual ads in the content.
 		if ( 'disabled' === $this->mode ) {
@@ -321,7 +319,7 @@ class Mai_Publisher_Output {
 			}
 
 			// Get script location and localize.
-			$file     = "assets/js/mai-publisher-ads{$this->suffix}.js";
+			$file     = maipub_is_script_debug() ? 'assets/js/mai-engine-ads.js' : 'assets/js/mai-engine-ads.min.js';
 			$localize = [
 				'domain'        => $this->domain,
 				'sellersName'   => $this->sellers_name,
