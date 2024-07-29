@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.9.2 (TBD)
+## 1.10.0 (TBD)
 * Changed: Load apstag right away if it’s enabled. No need to wait for googletag.
 
 ## 1.9.1 (7/17/24)

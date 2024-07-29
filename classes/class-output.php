@@ -765,25 +765,39 @@ class Mai_Publisher_Output {
 	 * @return array
 	 */
 	function get_ortb2_vars() {
+		// Get current page data.
+		$page = maipub_get_current_page();
+
 		/**
 		 * 3.2.13 Object: Site
 		 */
 		$site = [
 			'name'          => get_bloginfo( 'name' ),
 			'domain'        => (string) maipub_get_url_host( home_url() ),
-			'page'          => is_singular() ? get_permalink() : home_url( add_query_arg( [] ) ),
+			'page'          => $page['url'],
 			// 'kwarray'       => [ 'sports', 'news', 'rumors', 'gossip' ],
 			'mobile'        => 1,
 			'privacypolicy' => 1,
-			// 'content'       => [],
 		];
 
-		$cattax      = 7; // IAB Tech Lab Content Taxonomy 3.0.
+		/**
+		 * 3.2.15 Object: Publisher
+		 */
+		$site['publisher'] = [
+			'id'     => $this->sellers_id,
+			'name'   => $this->sellers_name,
+			'cat'    => maipub_get_option( 'category' ),
+			'domain' => $this->domain,
+		];
+
+		// Start variables.
+		$cattax      = 7; // IAB Tech Lab Content Taxonomy 3.0. https://github.com/InteractiveAdvertisingBureau/Taxonomies/blob/main/Content%20Taxonomies/Content%20Taxonomy%203.0.tsv
 		$cat         = maipub_get_option( 'category' ); // Sitewide category.
 		$section_cat = ''; // Category.
 		$page_cat    = ''; // Child category.
 		$term_id     = 0;
 
+		// If a single post.
 		if ( is_singular( 'post' ) ) {
 			$post_id = get_the_ID();
 			$primary = maipub_get_primary_term( 'category', $post_id );
@@ -796,7 +810,7 @@ class Mai_Publisher_Output {
 				'id'       => $post_id,
 				'title'    => get_the_title(),
 				'url'      => get_permalink(),
-				'context'  => 5,                                        // Text (i.e., primarily textual document such as a web page, eBook, or news article.
+				'context'  => 5,  // Text (i.e., primarily textual document such as a web page, eBook, or news article.) https://github.com/InteractiveAdvertisingBureau/AdCOM/blob/main/AdCOM%20v1.0%20FINAL.md#list--content-contexts-
 				// 'kwarray'  => [ 'philadelphia 76ers', 'doc rivers' ],   // Array of keywords about the content.
 				// 'language' => '',                                       // Content language using ISO-639-1-alpha-2. Only one of language or langb should be present.
 				// 'langb'    => '',                                       // Content language using IETF BCP 47. Only one of language or langb should be present.
@@ -806,15 +820,21 @@ class Mai_Publisher_Output {
 				// 'data' => [],
 			];
 
-		} elseif ( is_category() ) {
+		}
+		// If category archive.
+		elseif ( is_category() ) {
 			$object    = get_queried_object();
 			$term_id   = $object && $object instanceof WP_Term ? $object->term_id : 0;
 		}
 
+		// If we have a term ID.
 		if ( $term_id ) {
+			// Get the hierarchy.
 			$hierarchy = $this->get_term_hierarchy( $term_id );
 
+			// If we have a hierarchy.
 			if ( $hierarchy ) {
+				// Get the last two categories.
 				$page_cat    = array_pop( $hierarchy );
 				$section_cat = array_pop( $hierarchy );
 				$section_cat = $section_cat ?: $page_cat;
@@ -825,8 +845,10 @@ class Mai_Publisher_Output {
 			}
 		}
 
+		// If we have categories.
 		if ( $cat || $section_cat || $page_cat ) {
 			$site['cattax']            = $cattax;
+			$site['content']           = isset( $site['content'] ) ? $site['content'] : [];
 			$site['content']['cattax'] = $cattax;
 
 			if ( $cat ) {
