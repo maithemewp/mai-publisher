@@ -21,6 +21,8 @@ const debug            = window.location.search.includes('dfpdeb') || window.loc
 const log              = maiPubAdsVars.debug;
 let   timestamp        = Date.now();
 
+console.log( debug, log );
+
 // If debugging, log.
 maiPubLog( 'v201' );
 
