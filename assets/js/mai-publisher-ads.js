@@ -15,6 +15,7 @@ const refreshTime      = 30; // Time in seconds.
 const loadTimes        = {};
 const currentlyVisible = {};
 const timeoutIds       = {};
+const bidderTimeout    = 3000;
 const fallbackTimeout  = 3500; // Set global failsafe timeout ~500ms after DM UI bidder timeout.
 const debug            = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb') || window.location.search.includes('pbjs_debug=true');
 const log              = maiPubAdsVars.debug;
@@ -462,17 +463,55 @@ function maiPubDisplaySlots( slots ) {
 
 	// Handle Magnite/DM bids.
 	if ( maiPubAdsVars.magnite ) {
-		// If debugging or logging, enable debugging for magnite.
-		if ( debug || log ) {
-			pbjs.setConfig({
-				debugging: {
-					enabled: true,
-				}
-			});
-		}
-
 		// Fetch bids from Magnite using Prebid.
 		pbjs.que.push( function() {
+			// Start the config.
+			const pbjsConfig = {
+				bidderTimeout: bidderTimeout,
+				// ortb2: {
+				// 	// contextual ortb2 standard data goes here
+				// 	site: {
+				// 		name:'example',
+				// 		domain:'page.example.com',
+				// 		ext: {
+				// 			data: {
+				// 				// contextual data that isn’t ortb2 standard goes here
+				// 				myCustomFPDKey:'myCustomFPDValue'
+				// 			}
+				// 		}
+				// 	},
+				// 	// user ortb2 standard data goes here
+				// 	user: {
+				// 		data: [{
+				// 			name:'dataprovider.com',
+				// 			ext: {
+				// 				segtax: 4
+				// 			},
+				// 			segment: [{
+				// 				id:'1'
+				// 			}]
+				// 		}],
+				// 		ext: {
+				// 			data: {
+				// 				// user data that isn’t orb2 standard goes here
+				// 				myCustomFPDKey:'myCustomFPDValue'
+				// 			}
+				// 		}
+				// 	}
+				// }
+			};
+
+			// If debugging or logging, enable debugging for magnite.
+			if ( debug || log ) {
+				pbjsConfig.debugging = {
+					enabled: true,
+				};
+			}
+
+			// Set the magnite config.
+			pbjs.setConfig( pbjsConfig );
+
+			// Request bids.
 			pbjs.rp.requestBids( {
 				gptSlotObjects: slots,
 				callback: function() {
@@ -519,7 +558,7 @@ function maiPubDisplaySlots( slots ) {
 			// Fetch bids from Amazon UAM using apstag.
 			apstag.fetchBids({
 				slots: uadSlots,
-				timeout: 2e3,
+				timeout: bidderTimeout,
 				params: {
 					adRefresh: '1', // Must be string.
 				}
