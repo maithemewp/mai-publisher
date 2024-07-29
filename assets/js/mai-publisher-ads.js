@@ -468,37 +468,8 @@ function maiPubDisplaySlots( slots ) {
 			// Start the config.
 			const pbjsConfig = {
 				bidderTimeout: bidderTimeout,
-				// ortb2: {
-				// 	// contextual ortb2 standard data goes here
-				// 	site: {
-				// 		name:'example',
-				// 		domain:'page.example.com',
-				// 		ext: {
-				// 			data: {
-				// 				// contextual data that isn’t ortb2 standard goes here
-				// 				myCustomFPDKey:'myCustomFPDValue'
-				// 			}
-				// 		}
-				// 	},
-				// 	// user ortb2 standard data goes here
-				// 	user: {
-				// 		data: [{
-				// 			name:'dataprovider.com',
-				// 			ext: {
-				// 				segtax: 4
-				// 			},
-				// 			segment: [{
-				// 				id:'1'
-				// 			}]
-				// 		}],
-				// 		ext: {
-				// 			data: {
-				// 				// user data that isn’t orb2 standard goes here
-				// 				myCustomFPDKey:'myCustomFPDValue'
-				// 			}
-				// 		}
-				// 	}
-				// }
+				enableTIDs: true,
+				ortb2: maiPubAdsVars.ortb2,
 			};
 
 			// If debugging or logging, enable debugging for magnite.
