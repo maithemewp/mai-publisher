@@ -319,7 +319,8 @@ class Mai_Publisher_Output {
 			}
 
 			// Get script location and localize.
-			$file     = maipub_is_script_debug() ? 'assets/js/mai-engine-ads.js' : 'assets/js/mai-engine-ads.min.js';
+			$min      = maipub_get_min_dir();
+			$file     = "assets/js/{$min}mai-publisher-ads.js";
 			$localize = [
 				'domain'        => $this->domain,
 				'sellersName'   => $this->sellers_name,

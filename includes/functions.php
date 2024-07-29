@@ -484,14 +484,14 @@ function maipub_update_option( $option, $value ) {
  *
  * @return bool
  */
-function maipub_is_script_debug() {
+function maipub_get_min_dir() {
 	static $cache = null;
 
 	if ( ! is_null( $cache ) ) {
 		return $cache;
 	}
 
-	$cache = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG;
+	$cache = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? 'min/' : '';
 
 	return $cache;
 }

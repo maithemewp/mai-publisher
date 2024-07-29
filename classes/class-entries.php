@@ -139,7 +139,8 @@ class Mai_Publisher_Entries {
 		$inserted = true;
 
 		// Get file (with suffix) and add it after the existing content.
-		$file     = maipub_is_script_debug() ? 'assets/css/mai-engine-entries.css' : 'assets/css/mai-engine-entries.min.css';
+		$min      = maipub_get_min_dir();
+		$file     = "assets/css/{$min}mai-engine-entries.css";
 		$content .= sprintf( '<link href="%s?ver=%s" rel="stylesheet">', maipub_get_file_data( $file, 'url' ), maipub_get_file_data( $file, 'version' ) );
 
 		return $content;

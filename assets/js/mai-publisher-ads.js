@@ -375,7 +375,7 @@ function maiPubDefineSlot( slug ) {
 	googletag.display( 'mai-ad-' + slug );
 
 	// If debugging, log.
-	maiPubLog( 'defineSlot() & display():', slot );
+	maiPubLog( 'defineSlot() & display():', ads[slug] );
 
 	// Add slot to our array.
 	adSlotIds.push( slotId );

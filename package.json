@@ -5,7 +5,8 @@
   "main": "webpack.mix.js",
   "scripts": {
     "dev": "npx mix",
-    "production": "npx mix --production"
+    "production": "npx mix --production",
+    "watch": "npx mix watch"
   },
   "repository": {
     "type": "git",

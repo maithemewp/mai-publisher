@@ -29,7 +29,8 @@ class Mai_Publisher_Display {
 
 
 	function register_styles() {
-		$file = maipub_is_script_debug() ? 'assets/css/mai-publisher.css' : 'assets/css/min/mai-publisher.min.css';
+		$min  = maipub_get_min_dir();
+		$file = "assets/css/{$min}mai-publisher.css";
 
 		wp_register_style( 'mai-publisher', maipub_get_file_data( $file, 'url' ), [], maipub_get_file_data( $file, 'version' ) );
 	}
