@@ -1,10 +1,59 @@
+# Logs
 *.log
-*.lock
+
+# OS generated files
 .DS_Store
-LICENSE
-*test*
+
+# Node modules and build artifacts
+node_modules/
+dist/
+public/
+
+# Compiled source
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Laravel Mix files
+npm-debug.log
+yarn-error.log
+yarn.lock
+package-lock.json
+
+# Production files (already included in dist/)
+*.map
+
+# PHP Composer dependencies
+/vendor/
+
+# Ignore everything in the vendor directory except for specific files or directories
 /vendor/*
 !/vendor/matomo/
 !/vendor/matomo/matomo-php-tracker/
 !/vendor/yahnis-elsts/
 !/vendor/yahnis-elsts/plugin-update-checker/
+
+# Backup & deployment files
+*.bak
+*.swp
+*.tmp
+*.temp
+*.orig
+
+# IDE files
+.idea/
+*.sublime-project
+*.sublime-workspace
+.vscode/
+*.code-workspace
+
+# Sensitive files (update this list based on your actual use case)
+.env
+.env.*.local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
