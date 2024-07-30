@@ -1,6 +1,6 @@
 {
   "name": "mai-publisher",
-  "version": "1.10.0-beta.1",
+  "version": "1.10.0",
   "description": "Manage ads and more for websites in the Mai Publisher network.",
   "main": "webpack.mix.js",
   "scripts": {
@@ -13,7 +13,7 @@
     "url": "git+https://JiveDig@github.com/maithemewp/mai-publisher.git"
   },
   "author": "JiveDig",
-  "license": "ISC",
+  "license": "GPL-2.0-or-later",
   "bugs": {
     "url": "https://github.com/maithemewp/mai-publisher/issues"
   },

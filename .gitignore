@@ -6,8 +6,6 @@
 
 # Node modules and build artifacts
 node_modules/
-dist/
-public/
 
 # Compiled source
 *.com
