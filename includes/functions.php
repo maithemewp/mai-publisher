@@ -478,20 +478,20 @@ function maipub_update_option( $option, $value ) {
 }
 
 /**
- * If script debug is enabled.
+ * Get suffix.
  *
  * @since TBD
  *
  * @return bool
  */
-function maipub_get_min_dir() {
+function maipub_get_suffix() {
 	static $cache = null;
 
 	if ( ! is_null( $cache ) ) {
 		return $cache;
 	}
 
-	$cache = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? 'min/' : '';
+	$cache = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.min' : '';
 
 	return $cache;
 }

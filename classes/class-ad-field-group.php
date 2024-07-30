@@ -42,8 +42,8 @@ class Mai_Publisher_Ad_Field_Group {
 			return;
 		}
 
-		$min  = maipub_get_min_dir();
-		$file = "assets/js/{$min}block.js";
+		$suffix = maipub_get_suffix();
+		$file   = "build/js/mai-publisher-admin{$suffix}.js";
 
 		wp_enqueue_script( 'mai-publisher-admin', maipub_get_file_data( $file, 'url' ), [], maipub_get_file_data( $file, 'version' ), [ 'in_footer' => true ] );
 	}

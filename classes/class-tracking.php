@@ -43,8 +43,8 @@ class Mai_Publisher_Tracking {
 			return;
 		}
 
-		$min  = maipub_get_min_dir();
-		$file = "assets/js/{$min}mai-engine-settings.js";
+		$suffix = maipub_get_suffix();
+		$file   = "build/js/mai-publisher-analytics{$suffix}.js";
 
 		wp_enqueue_script( 'mai-publisher-analytics', maipub_get_file_data( $file, 'url' ), [], maipub_get_file_data( $file, 'version' ), [ 'strategy' => 'async', 'in_footer' => true ] );
 		wp_localize_script( 'mai-publisher-analytics', 'maiPubAnalyticsVars', $this->get_vars() );
