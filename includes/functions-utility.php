@@ -208,18 +208,15 @@ function maipub_add_attributes( $content, $name ) {
 		return $content;
 	}
 
-	// Remove trackers from children.
+	// Get existing trackers.
 	$xpath   = new DOMXPath( $dom );
 	$tracked = $xpath->query( '//*[@data-track-content] | //*[@data-tcontent-name]' );
 
+	// If we have existing trackers, remove them.
 	if ( $tracked->length ) {
 		foreach ( $tracked as $node ) {
 			// Skip if not an element we can add attributes to.
 			if ( ! $node instanceof DOMElement ) {
-				continue;
-			}
-
-			if ( 'DOMElement' !== get_class( $node ) ) {
 				continue;
 			}
 
@@ -229,27 +226,19 @@ function maipub_add_attributes( $content, $name ) {
 		}
 	}
 
-	if ( 1 === $children->length ) {
-		// Get first element and set main attributes.
-		$first = $children->item(0);
-
-		// Make sure it's an element we can add attributes to.
-		if ( $first instanceof DOMElement ) {
-			$first->setAttribute( 'data-content-name', esc_attr( $name ) );
-			$first->setAttribute( 'data-track-content', '' );
+	// Set attributes to first child element
+	foreach ( $children as $node ) {
+		// Skip if not an element we can add attributes to.
+		if ( ! $node instanceof DOMElement ) {
+			continue;
 		}
 
-	} else {
-		foreach ( $children as $node ) {
-			// Skip if not an element we can add attributes to.
-			if ( ! $node instanceof DOMElement ) {
-				continue;
-			}
+		// Set main attributes to all top level child elements.
+		$node->setAttribute( 'data-content-name', esc_attr( $name ) );
+		$node->setAttribute( 'data-track-content', '' );
 
-			// Set main attributes to all top level child elements.
-			$node->setAttribute( 'data-content-name', esc_attr( $name ) );
-			$node->setAttribute( 'data-track-content', '' );
-		}
+		// Break after first element.
+		break;
 	}
 
 	// Query elements.
