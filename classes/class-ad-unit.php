@@ -277,6 +277,12 @@ class Mai_Publisher_Ad_Unit {
 		$inner_attr = str_replace( ' wp-block-acf-mai-ad-unit-client', '', $inner_attr );
 		$inner_attr = str_replace( ' wp-block-acf-mai-ad-unit', '', $inner_attr );
 
+		// If sticky, remove background color classes.
+		if ( $is_sticky ) {
+			$inner_attr = str_replace( ' has-background', '', $inner_attr );
+			$inner_attr = preg_replace( '/has-.*?-background-color/', '', $inner_attr );
+		}
+
 		// Build HTML.
 		$html .= $is_sticky ? sprintf( '<div%s></div>', $spacer_attr ) : '';
 		$html .= sprintf( '<div%s>', $outer_attr ); // No space for `maipub_build_attributes()`.
