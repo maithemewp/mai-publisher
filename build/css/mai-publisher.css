@@ -29,21 +29,30 @@
 	/* background: repeating-conic-gradient(rgba(0, 0, 0, 0.03) 0% 25%, transparent 0% 50%) 0 / 20px 20px; */
 }
 
-.mai-ad-unit-debug[data-label]::before,
-.mai-ad-unit-log[data-label]::before,
-.mai-ad-unit[data-label]:not(:empty)::before {
+.mai-ad-unit[data-label]:before {
 	display: block;
 	width: 100%;
-	position: absolute;
-	left: 50%;
-	bottom: calc(100% + 4px);
-	transform: translateX(-50%);
 	line-height: 1;
 	text-align: center;
 	font-size: var(--mai-ad-unit-label-font-size, 0.9rem);
 	font-variant: all-small-caps;
 	letter-spacing: 1px;
 	color: var(--mai-ad-unit-label-color, rgba(0, 0, 0, 0.6));
+}
+
+.mai-ad-unit-debug[data-label]::before,
+.mai-ad-unit-log[data-label]::before,
+.mai-ad-unit[data-label]:not(:empty)::before {
+	content: attr(data-label);
+}
+
+.mai-ad-unit-debug[data-label]::before,
+.mai-ad-unit-log[data-label]::before,
+.mai-ad-unit[data-label]:not([data-ap="ts"]):not([data-ap="bs"]):not(:empty)::before {
+	position: absolute;
+	left: 50%;
+	bottom: calc(100% + 4px);
+	transform: translateX(-50%);
 	content: attr(data-label);
 }
 
