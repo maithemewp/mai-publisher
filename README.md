@@ -46,3 +46,54 @@ add_filter( 'mai_publisher_config', function( $config ) {
 	return $config;
 });
 ```
+
+## Developers
+This document outlines the steps to set up the development environment, run tasks, and manage the plugin.
+
+### Prerequisites
+
+1. **Node.js**: Ensure that you have Node.js installed. You can download and install it from [nodejs.org](https://nodejs.org/).
+
+2. **npm**: npm (Node Package Manager) is included with Node.js. Verify its installation with:
+```
+bash
+npm -v
+```
+
+### Install Dependencies
+```
+npm install
+```
+
+### Updating Node.js
+If you need to update Node.js to the latest version, you can use nvm (Node Version Manager).
+
+1. Install nvm: Follow the installation instructions on (nvm’s GitHub page)[https://github.com/nvm-sh/nvm].
+2. Update Node.js: Use nvm to install the latest version:
+```
+nvm install node
+nvm use node
+```
+
+### Running Development Tasks
+- Development Build: To compile and minify assets for development:
+```
+npm run dev
+```
+
+- Production Build: To compile and minify assets for production:
+```
+npm run production
+```
+
+- Watch for Changes: To continuously watch and rebuild assets on file changes:
+```
+npm run watch
+```
+
+### Directory Structure
+- assets/js: JavaScript source files.
+- assets/css: CSS source files.
+- blocks: Block-specific source files for JavaScript and CSS.
+- build/js: Full (non-minified) and minified JavaScript files.
+- build/css: Full (non-minified) and minified CSS files.

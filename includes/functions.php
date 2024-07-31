@@ -437,6 +437,7 @@ function maipub_get_default_options() {
 		'sourcepoint_msps_message_id' => '',
 		'sourcepoint_tcf_message_id'  => '',
 		'category'                    => '',
+		'magnite_enabled'             => 0,
 		'amazon_uam_enabled'          => 0,
 		'load_delay'                  => '',
 		'debug_enabled'               => 0,
@@ -477,22 +478,22 @@ function maipub_update_option( $option, $value ) {
 }
 
 /**
- * Gets file suffix.
+ * Get suffix.
  *
- * @since 0.1.0
+ * @since TBD
  *
- * @return string
+ * @return bool
  */
 function maipub_get_suffix() {
-	static $suffix = null;
+	static $cache = null;
 
-	if ( ! is_null( $suffix ) ) {
-		return $suffix;
+	if ( ! is_null( $cache ) ) {
+		return $cache;
 	}
 
-	$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+	$cache = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.min' : '';
 
-	return $suffix;
+	return $cache;
 }
 
 /**
