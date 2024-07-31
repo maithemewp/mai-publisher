@@ -1,7 +1,12 @@
 # Changelog
 
-## 1.10.0 (TBD)
+## 1.10.0 (7/31/24)
+* Added: Support for prebid via Magnite.
+* Added: Now using Laravel Mix for a build process.
 * Changed: Load apstag right away if it’s enabled. No need to wait for googletag.
+* Changed: Ad type default label is now Programmatic.
+* Chnaged: Standard ad type option was removed.
+* Changed: Now only tracking first item in the Mai Analytics Tracker block when there are multiple top level elements inside. This should avoid skewed counts from multiple items having the same name.
 
 ## 1.9.1 (7/17/24)
 * Changed: Log full event in console when debugging.
