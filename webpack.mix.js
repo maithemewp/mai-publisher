@@ -22,30 +22,47 @@ const addMinSuffix = (filePath) => {
 	return `${basename}.min${extname}`;
 };
 
-// Create directories if they don't exist
-fs.ensureDirSync(jsDestDir);
-fs.ensureDirSync(cssDestDir);
-
 // Minify and duplicate JavaScript files
 jsSourceDirs.forEach(sourceDir => {
 	glob.sync(`${sourceDir}/*.js`).forEach(file => {
-		const minFileName     = addMinSuffix(file);
-		const minOutputPath   = path.join(jsDestDir, minFileName);
-		const fullOutputPath  = path.join(jsDestDir, path.basename(file));
+		const minFileName    = addMinSuffix(file);
+		const minOutputPath  = path.join(jsDestDir, minFileName);
+		const fullOutputPath = path.join(jsDestDir, path.basename(file));
 
-		mix.js(file, minOutputPath);   // Process minified version
-		fs.copyFileSync(file, fullOutputPath);  // Copy full version
+		mix.js(file, minOutputPath); // Process minified version
 	});
 });
 
 // Minify and duplicate CSS files
 cssSourceDirs.forEach(sourceDir => {
 	glob.sync(`${sourceDir}/*.css`).forEach(file => {
-		const minFileName     = addMinSuffix(file);
-		const minOutputPath   = path.join(cssDestDir, minFileName);
-		const fullOutputPath  = path.join(cssDestDir, path.basename(file));
+		const minFileName    = addMinSuffix(file);
+		const minOutputPath  = path.join(cssDestDir, minFileName);
+		const fullOutputPath = path.join(cssDestDir, path.basename(file));
 
-		mix.postCss(file, minOutputPath);   // Process minified version
-		fs.copyFileSync(file, fullOutputPath);  // Copy full version
+		mix.postCss(file, minOutputPath); // Process minified version
+	});
+});
+
+// Copy files after processing
+mix.after(() => {
+	// Create directories if they don't exist
+	fs.ensureDirSync(jsDestDir);
+	fs.ensureDirSync(cssDestDir);
+
+	// Copy JavaScript files
+	jsSourceDirs.forEach(sourceDir => {
+		glob.sync(`${sourceDir}/*.js`).forEach(file => {
+			const fullOutputPath = path.join(jsDestDir, path.basename(file));
+			fs.copyFileSync(file, fullOutputPath); // Copy full version
+		});
+	});
+
+	// Copy CSS files
+	cssSourceDirs.forEach(sourceDir => {
+		glob.sync(`${sourceDir}/*.css`).forEach(file => {
+			const fullOutputPath = path.join(cssDestDir, path.basename(file));
+			fs.copyFileSync(file, fullOutputPath); // Copy full version
+		});
 	});
 });

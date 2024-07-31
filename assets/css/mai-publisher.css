@@ -23,6 +23,7 @@
 	position: relative;
 	display: flex;
 	flex-direction: column;
+
 	justify-content: var(--mai-ad-unit-justify-content, center);
 	align-items: var(--mai-ad-unit-align-items, center);
 	max-width: var(--mai-ad-unit-width, initial);
@@ -44,12 +45,6 @@
 .mai-ad-unit-debug[data-label]::before,
 .mai-ad-unit-log[data-label]::before,
 .mai-ad-unit[data-label]:not(:empty)::before {
-	content: attr(data-label);
-}
-
-.mai-ad-unit-debug[data-label]::before,
-.mai-ad-unit-log[data-label]::before,
-.mai-ad-unit[data-label]:not([data-ap="ts"]):not([data-ap="bs"]):not(:empty)::before {
 	position: absolute;
 	left: 50%;
 	bottom: calc(100% + 4px);
