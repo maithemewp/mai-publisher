@@ -33,19 +33,23 @@ class Mai_Publisher_Ad_Unit {
 				'label'      => '',
 				'label_hide' => '',
 				'context'    => '',
+				'backfill'   => '',
 			]
 		);
 
 		$is_preview = (bool) $args['preview'];
+		$logging    = (bool) maipub_get_option( 'ad_debug', false );
+		$debug      = isset( $_GET['dfpdeb'] ) || isset( $_GET['maideb'] );
 		$id         = sanitize_text_field( $args['id'] );
 		$type       = sanitize_text_field( $args['type'] );
 		$pos        = sanitize_text_field( $args['position'] );
 		$split_test = sanitize_text_field( $args['split_test'] );
 		$targets    = sanitize_text_field( $args['targets'] );
 		$label      = sanitize_text_field( $args['label'] );
-		$label_hide = (bool) sanitize_text_field( $args['label_hide'] );
+		$label_hide = (bool) sanitize_text_field( $args['label_hide'] ) || ( ! $is_preview && ( $logging || $debug ) );
 		$label      = $label ? $label : maipub_get_option( 'ad_label', false );
 		$label      = $label_hide ? '' : $label;
+		$backfill   = sanitize_text_field( $args['backfill'] );
 		$context    = sanitize_text_field( $args['context'] );
 		$config     = maipub_get_config( $context );
 		$ad_units   = isset( $config['ad_units'] ) ? $config['ad_units'] : [];
@@ -179,6 +183,7 @@ class Mai_Publisher_Ad_Unit {
 		$inner_attr = [
 			'class'     => 'mai-ad-unit',
 			'data-unit' => $id,
+			// 'data-unit' => sanitize_html_class( $id ),
 		];
 
 		// If context.
@@ -244,6 +249,21 @@ class Mai_Publisher_Ad_Unit {
 			$inner_attr['data-context'] = esc_attr( $context );
 		}
 
+		// If backfill.
+		if ( $backfill ) {
+			$inner_attr['data-backfill'] = esc_attr( $backfill );
+		}
+
+		// If logging.
+		if ( $logging ) {
+			$inner_attr['class'] .= ' mai-ad-unit-log';
+		}
+
+		// If debug.
+		if ( $debug ) {
+			$inner_attr['class'] .= ' mai-ad-unit-debug';
+		}
+
 		// Get spacer attributes string.
 		if ( $is_sticky ) {
 			$spacer_attr = $is_preview ? maipub_build_attributes( $spacer_attr ) : ' ' . get_block_wrapper_attributes( $spacer_attr );
@@ -256,6 +276,12 @@ class Mai_Publisher_Ad_Unit {
 		$inner_attr = $is_preview ? maipub_build_attributes( $inner_attr ) : ' ' . get_block_wrapper_attributes( $inner_attr );
 		$inner_attr = str_replace( ' wp-block-acf-mai-ad-unit-client', '', $inner_attr );
 		$inner_attr = str_replace( ' wp-block-acf-mai-ad-unit', '', $inner_attr );
+
+		// If sticky, remove background color classes.
+		if ( $is_sticky ) {
+			$inner_attr = str_replace( ' has-background', '', $inner_attr );
+			$inner_attr = preg_replace( '/has-.*?-background-color/', '', $inner_attr );
+		}
 
 		// Build HTML.
 		$html .= $is_sticky ? sprintf( '<div%s></div>', $spacer_attr ) : '';
@@ -295,31 +321,22 @@ class Mai_Publisher_Ad_Unit {
 				continue;
 			}
 
-			$largest_width = 0;
-			$height        = 0;
+			$width  = 0;
+			$height = 0;
 
-			// Check for largest width and height.
-			foreach ( $item as $subitem ) {
-				// Bail if not array, mostly for fluid.
-				if ( ! is_array( $subitem ) ) {
-					continue;
+			// Find largest width and height.
+			foreach ( $item as $size ) {
+				if ( $size[0] > $width ) {
+					$width = $size[0];
 				}
 
-				$width = $subitem[0];
-
-				if ( $width > $largest_width ) {
-					$largest_width = $width;
-					$height        = $subitem[1];
+				if ( $size[1] > $height ) {
+					$height = $size[1];
 				}
-			}
-
-			// Bail if we don't have at least a width.
-			if ( ! $largest_width ) {
-				continue;
 			}
 
 			// Set sizes.
-			$sizes[ $key ] = array( $largest_width, $height );
+			$sizes[ $key ] = [ $width, $height ];
 		}
 
 		return $sizes;
@@ -337,22 +354,14 @@ class Mai_Publisher_Ad_Unit {
 	function get_styles( $sizes ) {
 		$styles = '';
 
-		// Build width.
+		// Build width and height.
 		foreach ( $sizes as $break => $values ) {
-			if ( ! ( $values && is_array( $values ) ) ) {
+			if ( ! ( $values && is_array( $values ) && isset( $values[0] ) && isset( $values[1] ) ) ) {
 				continue;
 			}
 
-			$styles .= sprintf( '--mai-ad-unit-max-width-%s:%spx;', $break, $values[0] );
-		}
-
-		// Build aspect-ratio.
-		foreach ( $sizes as $break => $values ) {
-			if ( ! ( $values && is_array( $values ) ) ) {
-				continue;
-			}
-
-			$styles .= sprintf( '--mai-ad-unit-aspect-ratio-%s:%s/%s;', $break, $values[0], $values[1] );
+			$styles .= sprintf( '--mai-ad-unit-width-%s:%spx;', $break, $values[0] );
+			$styles .= sprintf( '--mai-ad-unit-height-%s:%spx;', $break, $values[1] );
 		}
 
 		return $styles;

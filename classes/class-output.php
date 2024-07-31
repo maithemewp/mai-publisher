@@ -18,7 +18,6 @@ class Mai_Publisher_Output {
 	protected $grouped;
 	protected $gam;
 	protected $mode;
-	protected $suffix;
 	protected $dom;
 	protected $xpath;
 
@@ -71,7 +70,6 @@ class Mai_Publisher_Output {
 		$this->ads             = maipub_get_page_ads();
 		$this->grouped         = $this->get_grouped_ads( $this->ads );
 		$this->gam             = [];
-		$this->suffix          = maipub_get_suffix();
 
 		// Bail if disabled. Not checking `$this->ads` because there may be manual ads in the content.
 		if ( 'disabled' === $this->mode ) {
@@ -254,11 +252,26 @@ class Mai_Publisher_Output {
 					$this->gam[ $slot ]['splitTest'] = $split_test;
 				}
 
-				// Get context.
-				$context = $ad_unit->getAttribute( 'data-context' );
+				// Get context and backfill.
+				$context  = $ad_unit->getAttribute( 'data-context' );
+				$backfill = $ad_unit->getAttribute( 'data-backfill' );
 
 				// Add context.
-				$this->gam[ $slot ]['context'] = $context ?: '';
+				if ( $context ) {
+					$this->gam[ $slot ]['context'] = $context;
+				}
+
+				// // Add backfill and backfill id.
+				// if ( $backfill && isset( $config_mai[ $backfill ] ) ) {
+				// 	$this->gam[ $slot ]['backfill']   = [
+				// 		'id'           => $backfill,
+				// 		'elId'         => 'mai-ad-' . $this->increment_string( $backfill ),
+				// 		'sizes'        => $config_mai[ $backfill ]['sizes'],
+				// 		'sizesDesktop' => $config_mai[ $backfill ]['sizes_desktop'],
+				// 		'sizesTablet'  => $config_mai[ $backfill ]['sizes_tablet'],
+				// 		'sizesMobile'  => $config_mai[ $backfill ]['sizes_mobile'],
+				// 	];
+				// }
 			}
 		}
 
@@ -306,7 +319,8 @@ class Mai_Publisher_Output {
 			}
 
 			// Get script location and localize.
-			$file     = "assets/js/mai-publisher-ads{$this->suffix}.js";
+			$suffix   = maipub_get_suffix();
+			$file     = "build/js/mai-publisher-ads{$suffix}.js";
 			$localize = [
 				'domain'        => $this->domain,
 				'sellersName'   => $this->sellers_name,
@@ -315,16 +329,29 @@ class Mai_Publisher_Output {
 				'gamBaseClient' => $gam_base_client,
 				'ads'           => $this->gam,
 				'targets'       => $this->get_targets(),
+				'magnite'       => maipub_get_option( 'magnite_enabled' ),
 				'amazonUAM'     => maipub_get_option( 'amazon_uam_enabled' ),
 				'loadDelay'     => maipub_get_option( 'load_delay' ),
 				'debug'         => maipub_get_option( 'debug_enabled' ),
 			];
+
+			// If magnite is enabled.
+			if ( $localize['magnite'] ) {
+				$localize['ortb2'] = $this->get_ortb2_vars();
+			}
 
 			// If sourcepoint data.
 			if ( $this->sp_property_id && $this->sp_msps_id && $this->sp_tcf_id ) {
 				// Preconnect and add sourcepoint scripts.
 				$preconnects[] = '<link rel="preconnect" href="https://cdn.privacy-mgmt.com">';
 				$scripts       = array_merge( $scripts, $this->get_sourcepoint_scripts( $localize['debug'] ) );
+			}
+
+			// If magnite is enabled.
+			if ( $localize['magnite'] ) {
+				// Preconnect and add magnite scripts.
+				$preconnects[] = '<link rel="preconnect" href="//micro.rubiconproject.com">';
+				$scripts[] = '<script async id="mai-publisher-prebid" src="//micro.rubiconproject.com/prebid/dynamic/26298.js"></script>';
 			}
 
 			// Load GPT.
@@ -724,6 +751,143 @@ class Mai_Publisher_Output {
 				$this->insert_nodes( $ad['content'], $comment, 'after' );
 			}
 		}
+	}
+
+	/**
+	 * Gets localized args for OpenRTB.
+	 *
+	 * OpenRTB 2.6 spec / Content Taxonomy.
+	 * @link https://iabtechlab.com/wp-content/uploads/2022/04/OpenRTB-2-6_FINAL.pdf
+	 *
+	 * @since TBD
+	 *
+	 * @return array
+	 */
+	function get_ortb2_vars() {
+		// Get current page data.
+		$page = maipub_get_current_page();
+
+		/**
+		 * 3.2.13 Object: Site
+		 */
+		$site = [
+			'name'          => get_bloginfo( 'name' ),
+			'domain'        => (string) maipub_get_url_host( home_url() ),
+			'page'          => $page['url'],
+			// 'kwarray'       => [ 'sports', 'news', 'rumors', 'gossip' ],
+			'mobile'        => 1,
+			'privacypolicy' => 1,
+		];
+
+		/**
+		 * 3.2.15 Object: Publisher
+		 */
+		$site['publisher'] = [
+			'id'     => $this->sellers_id,
+			'name'   => $this->sellers_name,
+			'cat'    => maipub_get_option( 'category' ),
+			'domain' => $this->domain,
+		];
+
+		// Start variables.
+		$cattax      = 7; // IAB Tech Lab Content Taxonomy 3.0. https://github.com/InteractiveAdvertisingBureau/Taxonomies/blob/main/Content%20Taxonomies/Content%20Taxonomy%203.0.tsv
+		$cat         = maipub_get_option( 'category' ); // Sitewide category.
+		$section_cat = ''; // Category.
+		$page_cat    = ''; // Child category.
+		$term_id     = 0;
+
+		// If a single post.
+		if ( is_singular( 'post' ) ) {
+			$post_id = get_the_ID();
+			$primary = maipub_get_primary_term( 'category', $post_id );
+			$term_id = $primary ? $primary->term_id : 0;
+
+			/**
+			 * 3.2.16 Object: Content
+			 */
+			$site['content'] = [
+				'id'       => $post_id,
+				'title'    => get_the_title(),
+				'url'      => get_permalink(),
+				'context'  => 5,  // Text (i.e., primarily textual document such as a web page, eBook, or news article.) https://github.com/InteractiveAdvertisingBureau/AdCOM/blob/main/AdCOM%20v1.0%20FINAL.md#list--content-contexts-
+				// 'kwarray'  => [ 'philadelphia 76ers', 'doc rivers' ],   // Array of keywords about the content.
+				// 'language' => '',                                       // Content language using ISO-639-1-alpha-2. Only one of language or langb should be present.
+				// 'langb'    => '',                                       // Content language using IETF BCP 47. Only one of language or langb should be present.
+				/**
+				 * 3.2.21 Object: Data
+				 */
+				// 'data' => [],
+			];
+
+		}
+		// If category archive.
+		elseif ( is_category() ) {
+			$object    = get_queried_object();
+			$term_id   = $object && $object instanceof WP_Term ? $object->term_id : 0;
+		}
+
+		// If we have a term ID.
+		if ( $term_id ) {
+			// Get the hierarchy.
+			$hierarchy = $this->get_term_hierarchy( $term_id );
+
+			// If we have a hierarchy.
+			if ( $hierarchy ) {
+				// Get the last two categories.
+				$page_cat    = array_pop( $hierarchy );
+				$section_cat = array_pop( $hierarchy );
+				$section_cat = $section_cat ?: $page_cat;
+
+				// Check for IATB category.
+				$page_cat    = $page_cat ? get_term_meta( $term_id, 'maipub_category', true ) : 0;
+				$section_cat = $section_cat ? get_term_meta( $term_id, 'maipub_category', true ) : 0;
+			}
+		}
+
+		// If we have categories.
+		if ( $cat || $section_cat || $page_cat ) {
+			$site['cattax']            = $cattax;
+			$site['content']           = isset( $site['content'] ) ? $site['content'] : [];
+			$site['content']['cattax'] = $cattax;
+
+			if ( $cat ) {
+				$site['cat']            = [ $cat ];
+				$site['content']['cat'] = [ $cat ];
+			}
+
+			if ( $section_cat ) {
+				$site['sectioncat']            = [ $section_cat ];
+				$site['content']['sectioncat'] = [ $section_cat ];
+			}
+
+			if ( $page_cat ) {
+				$site['pagecat']            = [ $page_cat ];
+				$site['content']['pagecat'] = [ $page_cat ];
+			}
+		}
+
+		return $site;
+	}
+
+	/**
+	 * Gets the hierarchy of a term.
+	 *
+	 * @since TBD
+	 *
+	 * @param int    $term_id
+	 * @param string $taxonomy
+	 *
+	 * @return int[]
+	 */
+	function get_term_hierarchy( $term_id, $taxonomy = 'category' ) {
+		$term_ids  = [ $term_id ];
+		$parent_id = wp_get_term_taxonomy_parent_id( $term_id, $taxonomy );
+
+		if ( $parent_id ) {
+			$term_ids = array_merge( $this->get_term_hierarchy( $parent_id, $taxonomy ), $term_ids );
+		}
+
+		return $term_ids;
 	}
 
 	/**

@@ -63,7 +63,6 @@ class Mai_Publisher_Ad_Unit_Block {
 				'targets'    => get_field( 'targets' ),
 				'label'      => get_field( 'label' ),
 				'label_hide' => get_field( 'label_hide' ),
-				'context'    => '',
 			]
 		);
 	}
@@ -127,9 +126,9 @@ class Mai_Publisher_Ad_Unit_Block {
 						'name'    => 'type',
 						'type'    => 'select',
 						'choices' => [
-							''   => __( 'Not set', 'mai-publisher' ),
+							''   => __( 'Programmatic (Default)', 'mai-publisher' ),
 							'sp' => __( 'Sponsorship', 'mai-publisher' ),
-							'st' => __( 'Standard', 'mai-publisher' ),
+							// 'st' => __( 'Standard', 'mai-publisher' ),
 							'h'  => __( 'House', 'mai-publisher' ),
 							'nt' => __( 'Native Top', 'mai-publisher' ),
 							'nl' => __( 'Native Left', 'mai-publisher' ),

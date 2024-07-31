@@ -1,0 +1,27 @@
+{
+  "name": "mai-publisher",
+  "version": "1.10.0",
+  "description": "Manage ads and more for websites in the Mai Publisher network.",
+  "main": "webpack.mix.js",
+  "scripts": {
+    "dev": "npx mix",
+    "production": "npx mix --production",
+    "watch": "npx mix watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://JiveDig@github.com/maithemewp/mai-publisher.git"
+  },
+  "author": "JiveDig",
+  "license": "GPL-2.0-or-later",
+  "bugs": {
+    "url": "https://github.com/maithemewp/mai-publisher/issues"
+  },
+  "homepage": "https://github.com/maithemewp/mai-publisher#readme",
+  "devDependencies": {
+    "fs-extra": "^11.2.0",
+    "laravel-mix": "^6.0.0",
+    "webpack": "^5.0.0",
+    "webpack-cli": "^5.1.4"
+  }
+}

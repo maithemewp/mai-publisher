@@ -69,8 +69,8 @@ class Mai_Publisher_Settings {
 
 		// Get files.
 		$suffix = maipub_get_suffix();
-		$css    = "assets/css/mai-publisher-settings{$suffix}.css";
-		$js     = "assets/js/mai-publisher-settings{$suffix}.js";
+		$css    = "build/css/mai-publisher-settings{$suffix}.css";
+		$js     = "build/js/mai-publisher-settings{$suffix}.js";
 
 		// Enqueue.
 		wp_enqueue_style( 'mai-publisher-settings', maipub_get_file_data( $css, 'url' ), [], maipub_get_file_data( $css, 'version' ) );
@@ -262,6 +262,14 @@ class Mai_Publisher_Settings {
 		);
 
 		add_settings_field(
+			'magnite_enabled', // id
+			__( 'Magnite Demand Manager', 'mai-publisher' ), // title
+			[ $this, 'magnite_enabled_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings' // section
+		);
+
+		add_settings_field(
 			'amazon_uam_enabled', // id
 			__( 'Amazon UAM', 'mai-publisher' ), // title
 			[ $this, 'amazon_uam_enabled_callback' ], // callback
@@ -369,7 +377,6 @@ class Mai_Publisher_Settings {
 			'maipub_settings_views' // section
 		);
 
-
 		add_settings_field(
 			'views_interval', // id
 			__( 'Trending/Popular Interval', 'mai-publisher' ), // title
@@ -421,6 +428,7 @@ class Mai_Publisher_Settings {
 			'load_delay'                  => 'absint',
 			'debug_enabled'               => 'rest_sanitize_boolean',
 			'category'                    => 'sanitize_text_field',
+			'magnite_enabled'             => 'rest_sanitize_boolean',
 			'amazon_uam_enabled'          => 'rest_sanitize_boolean',
 			'matomo_enabled_global'       => 'rest_sanitize_boolean',
 			'matomo_enabled'              => 'rest_sanitize_boolean',
@@ -653,6 +661,23 @@ class Mai_Publisher_Settings {
 	/**
 	 * Setting callback.
 	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	function magnite_enabled_callback() {
+		$value = (bool) maipub_get_option( 'magnite_enabled', false );
+
+		printf(
+			'<input type="checkbox" name="mai_publisher[magnite_enabled]" id="magnite_enabled" %s> <label for="magnite_enabled">%s</label>',
+			$value ? ' checked' : '',
+			__( 'Enable Magnite bidding for ads', 'mai-publisher' )
+		);
+	}
+
+	/**
+	 * Setting callback.
+	 *
 	 * @since 0.11.0?
 	 *
 	 * @return void
@@ -663,7 +688,7 @@ class Mai_Publisher_Settings {
 		printf(
 			'<input type="checkbox" name="mai_publisher[amazon_uam_enabled]" id="amazon_uam_enabled" %s> <label for="amazon_uam_enabled">%s</label>',
 			$value ? ' checked' : '',
-			__( 'Enable Amazon UAM bids for ads', 'mai-publisher' )
+			__( 'Enable Amazon UAM bidding for ads', 'mai-publisher' )
 		);
 	}
 
