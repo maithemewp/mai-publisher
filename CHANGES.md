@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.10.1 (8/12/24)
+* Fixed: Remove pbjs debugging per Magnite's request. They have their own built in debugging.
+
 ## 1.10.0 (7/31/24)
 * Added: Support for prebid via Magnite.
 * Added: Now using Laravel Mix for a build process.
