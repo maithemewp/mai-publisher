@@ -197,7 +197,7 @@ class Mai_Publisher_Display {
 			$open     = isset( $this->locations[ $args['location'] ]['open'] ) ? $this->locations[ $args['location'] ]['open'] : '';
 			$close    = isset( $this->locations[ $args['location'] ]['close'] ) ? $this->locations[ $args['location'] ]['close'] : '';
 			$count    = isset( $this->locations[ $args['location'] ]['content_count'] ) ? $this->locations[ $args['location'] ]['content_count'] : '';
-			$count    = array_filter( explode( ',', $count ) );
+			$count    = $count ? array_filter( explode( ',', $count ) ) : [];
 			$priority = isset( $this->locations[ $args['location'] ]['priority'] ) && $this->locations[ $args['location'] ]['priority'] ? $this->locations[ $args['location'] ]['priority'] : 10;
 
 			/**
