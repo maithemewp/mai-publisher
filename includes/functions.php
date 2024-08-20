@@ -318,6 +318,9 @@ function maipub_get_location_choices( $type = '' ) {
 		],
 	];
 
+	// Filter.
+	$cache = apply_filters( 'mai_publisher_location_choices', $cache );
+
 	if ( $type ) {
 		return $cache[ $type ];
 	}
