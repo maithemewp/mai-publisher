@@ -455,6 +455,11 @@ class Mai_Publisher_Views {
 			'trending' => null,
 		];
 
+		// Bail if Jetpack is not active.
+		if ( ! ( class_exists( 'Jetpack' ) && Jetpack::is_module_active( 'stats' ) && class_exists( 'Automattic\Jetpack\Stats\WPCOM_Stats' ) ) ) {
+			return new WP_Error( 'jetpack_not_active', __( 'Jetpack Stats module is not active.', 'mai-publisher' ) );
+		}
+
 		// Get views data.
 		$stats = new Automattic\Jetpack\Stats\WPCOM_Stats;
 		$views = $stats->get_post_views( $this->id );
