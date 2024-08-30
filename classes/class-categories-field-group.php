@@ -20,9 +20,9 @@ class Mai_Publisher_Categories_Field_Group {
 	 * @return void
 	 */
 	function hooks() {
-		add_action( 'acf/init',                                             [ $this, 'register_field_group' ] );
-		add_filter( 'acf/load_field/key=maipub_category',                   [ $this, 'load_all_categories' ] );
-		add_filter( 'acf/location/rule_match/maipub_public_taxonomy_terms', [ $this, 'taxonomy_rule_match' ], 10, 4 );
+		add_action( 'acf/init',                                         [ $this, 'register_field_group' ] );
+		add_filter( 'acf/load_field/key=maipub_category',               [ $this, 'load_all_categories' ] );
+		add_filter( 'acf/location/rule_match/maipub_mapped_taxonomies', [ $this, 'taxonomy_rule_match' ], 10, 4 );
 	}
 
 	/**
@@ -69,7 +69,7 @@ class Mai_Publisher_Categories_Field_Group {
 				'location'  => [
 					[
 						[
-							'param'    => 'maipub_public_taxonomy_terms',
+							'param'    => 'maipub_mapped_taxonomies',
 							'operator' => '==', // Currently unused.
 							'value'    => true, // Currently unused.
 						],
@@ -116,9 +116,8 @@ class Mai_Publisher_Categories_Field_Group {
 	 * @return bool
 	 */
 	function taxonomy_rule_match( $result, $rule, $screen, $field_group ) {
-		// Get all public taxonomy names.
-		$taxonomies = get_taxonomies( [ 'public' => true ], 'names' );
+		$taxonomies = array_values( (array) maipub_get_option( 'category_mapping', false ) );
 
-		return isset( $screen['taxonomy'] ) && isset( $taxonomies[ $screen['taxonomy'] ] );
+		return $taxonomies && isset( $screen['taxonomy'] ) && in_array( $screen['taxonomy'], $taxonomies );
 	}
 }
