@@ -440,6 +440,7 @@ function maipub_get_default_options() {
 		'sourcepoint_msps_message_id' => '',
 		'sourcepoint_tcf_message_id'  => '',
 		'category'                    => '',
+		'category_mapping'            => [ 'post' => 'category' ],
 		'magnite_enabled'             => 0,
 		'amazon_uam_enabled'          => 0,
 		'load_delay'                  => '',
