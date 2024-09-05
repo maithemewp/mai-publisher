@@ -527,18 +527,19 @@ function maipub_validate_ad_conditions_archive( $args ) {
 	}
 	// Term archive.
 	elseif ( is_tax() || is_category() || is_tag() ) {
-		$object = get_queried_object();
+		$object  = get_queried_object();
+		$is_term = $object && is_a( $object, 'WP_Term' );
 
 		// Bail if excluding this term archive.
-		if ( $args['exclude'] && $object && in_array( $object->term_id, $args['exclude'] ) ) {
+		if ( $args['exclude'] && $is_term && in_array( $object->term_id, $args['exclude'] ) ) {
 			return [];
 		}
 
 		// If including this entry.
-		$include = $args['terms'] && $object && in_array( $object->term_id, $args['terms'] );
+		$include = $args['terms'] && $is_term && in_array( $object->term_id, $args['terms'] );
 
 		// If not already including, check taxonomies if we're restricting to specific taxonomies.
-		if ( ! $include && ! ( $args['taxonomies'] && ( in_array( '*', $args['taxonomies'] ) || ( $object && in_array( $object->taxonomy, $args['taxonomies'] ) ) ) ) ) {
+		if ( ! $include && ! ( $args['taxonomies'] && ( in_array( '*', $args['taxonomies'] ) || ( $is_term && in_array( $object->taxonomy, $args['taxonomies'] ) ) ) ) ) {
 			return [];
 		}
 	}
