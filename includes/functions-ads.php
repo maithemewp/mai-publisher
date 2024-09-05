@@ -530,15 +530,15 @@ function maipub_validate_ad_conditions_archive( $args ) {
 		$object = get_queried_object();
 
 		// Bail if excluding this term archive.
-		if ( $args['exclude'] && in_array( $object->term_id, $args['exclude'] ) ) {
+		if ( $args['exclude'] && $object && in_array( $object->term_id, $args['exclude'] ) ) {
 			return [];
 		}
 
 		// If including this entry.
-		$include = $args['terms'] && in_array( $object->term_id, $args['terms'] );
+		$include = $args['terms'] && $object && in_array( $object->term_id, $args['terms'] );
 
 		// If not already including, check taxonomies if we're restricting to specific taxonomies.
-		if ( ! $include && ! ( $args['taxonomies'] && ( in_array( '*', $args['taxonomies'] ) || in_array( $object->taxonomy, $args['taxonomies'] ) ) ) ) {
+		if ( ! $include && ! ( $args['taxonomies'] && ( in_array( '*', $args['taxonomies'] ) || ( $object && in_array( $object->taxonomy, $args['taxonomies'] ) ) ) ) ) {
 			return [];
 		}
 	}
