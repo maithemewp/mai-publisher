@@ -574,6 +574,7 @@ class Mai_Publisher_Ad_Fields {
 	 * Gets an ACF request, checking nonce and value.
 	 *
 	 * @since 0.1.0
+	 * @since TBD Switched to using `acf_verify_ajax` for nonce verification.
 	 *
 	 * @param string $request Request data.
 	 *
