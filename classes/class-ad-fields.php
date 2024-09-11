@@ -580,10 +580,14 @@ class Mai_Publisher_Ad_Fields {
 	 * @return bool
 	 */
 	function get_acf_request( $request ) {
-		if ( isset( $_REQUEST['nonce'] ) && wp_verify_nonce( $_REQUEST['nonce'], 'acf_nonce' ) && isset( $_REQUEST[ $request ] ) && ! empty( $_REQUEST[ $request ] ) ) {
-			return $_REQUEST[ $request ];
+		if ( ! function_exists( 'acf_verify_ajax' ) ) {
+			return false;
 		}
 
-		return false;
+		$nonce  = isset( $_REQUEST['nonce'] ) ? $_REQUEST['nonce'] : '';
+		$action = isset( $_REQUEST['field_key'] ) ? $_REQUEST['field_key'] : '';
+		$return = isset( $_REQUEST[ $request ] ) ? $_REQUEST[ $request ] : false;
+
+		return $nonce && $action && $return && acf_verify_ajax( $nonce, $action ) ? $return : false;
 	}
 }
