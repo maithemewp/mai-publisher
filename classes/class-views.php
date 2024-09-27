@@ -276,20 +276,43 @@ class Mai_Publisher_Views {
 		switch ( $this->api ) {
 			case 'matomo':
 				$return = $this->update_views_from_matomo();
-
-				if ( is_wp_error( $return ) ) {
-					wp_send_json_error( $return->get_error_message(), $return->get_error_code() );
-					wp_die();
-				}
 			break;
 			case 'jetpack':
 				$return = $this->update_views_from_jetpack();
-
-				if ( is_wp_error( $return ) ) {
-					wp_send_json_error( $return->get_error_message(), $return->get_error_code() );
-					wp_die();
-				}
 			break;
+		}
+
+		// If error.
+		if ( is_wp_error( $return ) ) {
+			// Set future time. Current time + interval (minutes) x2 (in seconds).
+			$future = $this->current + (($this->interval * 2) * 60);
+
+			// Update updated time.
+			switch ( $this->type ) {
+				case 'post':
+					update_post_meta( $this->id, 'mai_views_updated', $future );
+				break;
+				case 'term':
+					update_term_meta( $this->id, 'mai_views_updated', $future );
+				break;
+			}
+
+			// If debugging, log it to error.log.
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
+				error_log( 'Mai Publisher (Views) Error: ' . $return->get_error_code() . ' - ' . $return->get_error_message() );
+
+				// Check for additional error data.
+				$error_data = $return->get_error_data();
+
+				// If the error has additional data, log that as well
+				if ( $error_data ) {
+					error_log( 'Mai Publisher (Views) Data: ' . print_r( $error_data, true ) );
+				}
+			}
+
+			// Send error.
+			wp_send_json_error( $return->get_error_message(), $return->get_error_code() );
+			wp_die();
 		}
 
 		// Update updated time.

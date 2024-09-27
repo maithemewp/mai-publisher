@@ -27,7 +27,13 @@ class Mai_Publisher_Display {
 		add_action( 'get_header',     [ $this, 'maybe_run' ] );
 	}
 
-
+	/**
+	 * Register styles.
+	 *
+	 * @since 0.11.0
+	 *
+	 * @return void
+	 */
 	function register_styles() {
 		$suffix = maipub_get_suffix();
 		$file   = "build/css/mai-publisher{$suffix}.css";
