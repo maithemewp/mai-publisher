@@ -309,7 +309,9 @@ class Mai_Publisher_Views {
 
 			// If debugging, log it to error.log.
 			// if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
-				error_log( 'Mai Publisher (Views) Error: ' . $return->get_error_code() . ' - ' . $return->get_error_message() );
+				$permalink = 'post' === $this->type ? get_permalink( $this->id ) : get_term_link( $this->id );
+
+				error_log( 'Mai Publisher (Views) Error: ' . $return->get_error_code() . ' - ' . $return->get_error_message() . ' - ' . $permalink );
 
 				// Check for additional error data.
 				$error_data = $return->get_error_data();
