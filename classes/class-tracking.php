@@ -125,7 +125,9 @@ class Mai_Publisher_Tracking {
 							}
 						break;
 						case 'jetpack';
-							$updated = get_post_meta( $page['id'], 'mai_views_updated', true );
+							if ( is_singular() ) {
+								$updated = get_post_meta( $page['id'], 'mai_views_updated', true );
+							}
 						break;
 					}
 				}
