@@ -1209,14 +1209,14 @@ class Mai_Publisher_Output {
 									pmLink.style.visibility="visible";
 									pmLink.innerHTML= "Do Not Sell/Share My Personal Information";
 									pmLink.addEventListener("click", function(){
-										window._sp_.usnat.loadPrivacyManagerModal( " " );
+										window._sp_.usnat.loadPrivacyManagerModal(\'\');
 									});
 								}
 								if( "gdpr" == message_type ) {
 									pmLink.style.visibility="visible";
 									pmLink.innerHTML= "Privacy Preferences";
 									pmLink.addEventListener("click", function(){
-										window._sp_.gdpr.loadPrivacyManagerModal( " " );
+										window._sp_.gdpr.loadPrivacyManagerModal(\'\');
 									});
 								}
 							}
