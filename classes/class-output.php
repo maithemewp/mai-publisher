@@ -1210,7 +1210,7 @@ class Mai_Publisher_Output {
 									pmLink.innerHTML= "Do Not Sell/Share My Personal Information";
 									pmLink.addEventListener("click", function(e){
 										e.preventDefault();
-										window._sp_.usnat.loadPrivacyManagerModal(\'\');
+										window._sp_.usnat.loadPrivacyManagerModal();
 									});
 								}
 								if( "gdpr" == message_type ) {
@@ -1218,7 +1218,7 @@ class Mai_Publisher_Output {
 									pmLink.innerHTML= "Privacy Preferences";
 									pmLink.addEventListener("click", function(e){
 										e.preventDefault();
-										window._sp_.gdpr.loadPrivacyManagerModal(\'\');
+										window._sp_.gdpr.loadPrivacyManagerModal();
 									});
 								}
 							}
