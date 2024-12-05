@@ -1208,14 +1208,16 @@ class Mai_Publisher_Output {
 								if( "usnat" == message_type ) {
 									pmLink.style.visibility="visible";
 									pmLink.innerHTML= "Do Not Sell/Share My Personal Information";
-									pmLink.addEventListener("click", function(){
+									pmLink.addEventListener("click", function(e){
+										e.preventDefault();
 										window._sp_.usnat.loadPrivacyManagerModal(\'\');
 									});
 								}
 								if( "gdpr" == message_type ) {
 									pmLink.style.visibility="visible";
 									pmLink.innerHTML= "Privacy Preferences";
-									pmLink.addEventListener("click", function(){
+									pmLink.addEventListener("click", function(e){
+										e.preventDefault();
 										window._sp_.gdpr.loadPrivacyManagerModal(\'\');
 									});
 								}
