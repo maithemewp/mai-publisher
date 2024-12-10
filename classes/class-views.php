@@ -272,26 +272,6 @@ class Mai_Publisher_Views {
 			wp_die();
 		}
 
-		// Get API data.
-		switch ( $this->api ) {
-			case 'matomo':
-				$return = $this->update_views_from_matomo();
-
-				if ( is_wp_error( $return ) ) {
-					wp_send_json_error( $return->get_error_message(), $return->get_error_code() );
-					wp_die();
-				}
-			break;
-			case 'jetpack':
-				$return = $this->update_views_from_jetpack();
-
-				if ( is_wp_error( $return ) ) {
-					wp_send_json_error( $return->get_error_message(), $return->get_error_code() );
-					wp_die();
-				}
-			break;
-		}
-
 		// Update updated time.
 		switch ( $this->type ) {
 			case 'post':
@@ -300,6 +280,51 @@ class Mai_Publisher_Views {
 			case 'term':
 				update_term_meta( $this->id, 'mai_views_updated', $this->current );
 			break;
+		}
+
+		// Get API data.
+		switch ( $this->api ) {
+			case 'matomo':
+				$return = $this->update_views_from_matomo();
+			break;
+			case 'jetpack':
+				$return = $this->update_views_from_jetpack();
+			break;
+		}
+
+		// If error.
+		if ( is_wp_error( $return ) ) {
+			// Set future time. Current time + interval (minutes) x2 (in seconds).
+			$future = $this->current + (($this->interval * 2) * 60);
+
+			// Update updated time.
+			switch ( $this->type ) {
+				case 'post':
+					update_post_meta( $this->id, 'mai_views_updated', $future );
+				break;
+				case 'term':
+					update_term_meta( $this->id, 'mai_views_updated', $future );
+				break;
+			}
+
+			// If debugging, log it to error.log.
+			// if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
+				$permalink = 'post' === $this->type ? get_permalink( $this->id ) : get_term_link( $this->id );
+
+				error_log( 'Mai Publisher (Views) Error: ' . $return->get_error_code() . ' - ' . $return->get_error_message() . ' - ' . $permalink );
+
+				// Check for additional error data.
+				$error_data = $return->get_error_data();
+
+				// If the error has additional data, log that as well
+				if ( $error_data ) {
+					error_log( 'Mai Publisher (Views) Data: ' . print_r( $error_data, true ) );
+				}
+			// }
+
+			// Send error.
+			wp_send_json_error( $return->get_error_message(), $return->get_error_code() );
+			wp_die();
 		}
 
 		// Send it home.
@@ -454,6 +479,11 @@ class Mai_Publisher_Views {
 			'views'    => null,
 			'trending' => null,
 		];
+
+		// Bail if Jetpack is not active.
+		if ( ! ( class_exists( 'Jetpack' ) && Jetpack::is_module_active( 'stats' ) && class_exists( 'Automattic\Jetpack\Stats\WPCOM_Stats' ) ) ) {
+			return new WP_Error( 'jetpack_not_active', __( 'Jetpack Stats module is not active.', 'mai-publisher' ) );
+		}
 
 		// Get views data.
 		$stats = new Automattic\Jetpack\Stats\WPCOM_Stats;

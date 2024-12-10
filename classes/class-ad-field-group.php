@@ -498,14 +498,14 @@ class Mai_Publisher_Ad_Field_Group {
 	function get_taxonomies_sub_fields() {
 		return [
 			[
-				'label'             => __( 'Taxonomy', 'mai-publisher' ),
-				'key'               => 'maipub_single_taxonomy',
-				'name'              => 'taxonomy',
-				'type'              => 'select',
-				'choices'           => [],
-				'allow_null'   => 1,
-				'ajax'              => 1,
-				'ui'                => 1,
+				'label'      => __( 'Taxonomy', 'mai-publisher' ),
+				'key'        => 'maipub_single_taxonomy',
+				'name'       => 'taxonomy',
+				'type'       => 'select',
+				'choices'    => [],
+				'allow_null' => 1,
+				'ajax'       => 1,
+				'ui'         => 1,
 			],
 			[
 				'label'             => __( 'Terms', 'mai-publisher' ),
@@ -513,7 +513,7 @@ class Mai_Publisher_Ad_Field_Group {
 				'name'              => 'terms',
 				'type'              => 'select',
 				'choices'           => [],
-				'allow_null'   => 1,
+				'allow_null'        => 1,
 				'ajax'              => 1,
 				'ui'                => 1,
 				'multiple'          => 1,

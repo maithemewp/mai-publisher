@@ -37,9 +37,9 @@ class Mai_Publisher_Settings_Categories {
 	 */
 	function add_menu_item() {
 		add_submenu_page(
-			'', // No parent page, so no menu item.
+			'edit.php?post_type=mai_ad', // TODO: This blows up when empty for some reason now. But now we have a link with no text.
 			__( 'IAB Tech Lab Taxonomy Mapping', 'mai-publisher' ), // page_title
-			'', // No menu title.
+			__( 'IAB Categories', 'mai-publisher' ), // meny title
 			'manage_options', // capability
 			'categories', // menu_slug
 			[ $this, 'add_content' ], // callback

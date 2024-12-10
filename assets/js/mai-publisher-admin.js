@@ -32,19 +32,8 @@
 		}
 
 		if ( field && taxoKeys.includes( data.field_key ) ) {
-
-			var taxoField = acf.getFields(
-				{
-					key: 'maipub_single_taxonomy',
-					sibling: field.$el,
-				}
-			);
-
-			if ( taxoField ) {
-				var first = taxoField.shift();
-				var value = first ? first.val() : '';
-				data.taxonomy = value;
-			}
+			var $field = $input.parents( '.acf-row' ).find( '.acf-field[data-key="maipub_single_taxonomy"]' );
+			data.taxonomy = $field ? acf.getField( $field ).val() : '';
 		}
 
 		return data;

@@ -20,8 +20,9 @@ class Mai_Publisher_Categories_Field_Group {
 	 * @return void
 	 */
 	function hooks() {
-		add_action( 'acf/init',                           [ $this, 'register_field_group' ] );
-		add_filter( 'acf/load_field/key=maipub_category', [ $this, 'load_all_categories' ] );
+		add_action( 'acf/init',                                         [ $this, 'register_field_group' ] );
+		add_filter( 'acf/load_field/key=maipub_category',               [ $this, 'load_all_categories' ] );
+		add_filter( 'acf/location/rule_match/maipub_mapped_taxonomies', [ $this, 'taxonomy_rule_match' ], 10, 4 );
 	}
 
 	/**
@@ -39,7 +40,7 @@ class Mai_Publisher_Categories_Field_Group {
 		acf_add_local_field_group(
 			[
 				'key'      => 'maipub_categories_field_group',
-				'title'    => __( 'Mai Publisher', 'mai-publisher' ),
+				'title'    => __( 'Mai Publisher IAB Category', 'mai-publisher' ),
 				'fields'   => [
 					[
 
@@ -56,16 +57,25 @@ class Mai_Publisher_Categories_Field_Group {
 						'placeholder'  => '',
 					],
 				],
-				'location' => [
+				// 'location' => [
+				// 	[
+				// 		[
+				// 			'param'    => 'taxonomy',
+				// 			'operator' => '==',
+				// 			'value'    => 'category',
+				// 		],
+				// 	]
+				// ],
+				'location'  => [
 					[
 						[
-							'param'    => 'taxonomy',
-							'operator' => '==',
-							'value'    => 'category',
+							'param'    => 'maipub_mapped_taxonomies',
+							'operator' => '==', // Currently unused.
+							'value'    => true, // Currently unused.
 						],
-					]
+					],
 				],
-				'menu_order' => -1,
+				'menu_order' => 5,
 				'position'   => 'high',
 			]
 		);
@@ -92,5 +102,22 @@ class Mai_Publisher_Categories_Field_Group {
 		}
 
 		return $field;
+	}
+
+	/**
+	 * Shows field group when editing public taxonomy terms.
+	 *
+	 * @since ?
+	 *
+	 * @param bool      $result Whether the rule matches.
+	 * @param array     $rule   Current rule to match (param, operator, value).
+	 * @param WP_Screen $screen The current screen.
+	 *
+	 * @return bool
+	 */
+	function taxonomy_rule_match( $result, $rule, $screen, $field_group ) {
+		$taxonomies = array_values( (array) maipub_get_option( 'category_mapping', false ) );
+
+		return $taxonomies && isset( $screen['taxonomy'] ) && in_array( $screen['taxonomy'], $taxonomies );
 	}
 }

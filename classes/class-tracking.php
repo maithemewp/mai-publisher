@@ -125,14 +125,16 @@ class Mai_Publisher_Tracking {
 							}
 						break;
 						case 'jetpack';
-							$updated = get_post_meta( $page['id'], 'mai_views_updated', true );
+							if ( is_singular() ) {
+								$updated = get_post_meta( $page['id'], 'mai_views_updated', true );
+							}
 						break;
 					}
 				}
 
 				// If some value other than null.
 				if ( ! is_null( $updated ) ) {
-					// If last updated timestampe is more than N minutes (converted to seconds) ago.
+					// If last updated timestamp is more than N minutes (converted to seconds) ago.
 					if ( ! $updated || $updated < ( $current - ( $interval * 60 ) ) ) {
 						$analytics['ajaxUrl'] = admin_url( 'admin-ajax.php' );
 						$analytics['body']    = [

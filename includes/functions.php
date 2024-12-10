@@ -318,6 +318,9 @@ function maipub_get_location_choices( $type = '' ) {
 		],
 	];
 
+	// Filter.
+	$cache = apply_filters( 'mai_publisher_location_choices', $cache );
+
 	if ( $type ) {
 		return $cache[ $type ];
 	}
@@ -437,6 +440,7 @@ function maipub_get_default_options() {
 		'sourcepoint_msps_message_id' => '',
 		'sourcepoint_tcf_message_id'  => '',
 		'category'                    => '',
+		'category_mapping'            => [ 'post' => 'category' ],
 		'magnite_enabled'             => 0,
 		'amazon_uam_enabled'          => 0,
 		'load_delay'                  => '',
@@ -480,7 +484,7 @@ function maipub_update_option( $option, $value ) {
 /**
  * Get suffix.
  *
- * @since TBD
+ * @since 0.1.0
  *
  * @return bool
  */

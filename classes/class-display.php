@@ -27,7 +27,13 @@ class Mai_Publisher_Display {
 		add_action( 'get_header',     [ $this, 'maybe_run' ] );
 	}
 
-
+	/**
+	 * Register styles.
+	 *
+	 * @since 0.11.0
+	 *
+	 * @return void
+	 */
 	function register_styles() {
 		$suffix = maipub_get_suffix();
 		$file   = "build/css/mai-publisher{$suffix}.css";
@@ -191,7 +197,13 @@ class Mai_Publisher_Display {
 				continue;
 			}
 
-			// Set priority.
+			// TODO: Should entries and other DOMDocument locations be handled here now that we added open/close/count?
+
+			// Set opening and closing markup, count, and priority.
+			$open     = isset( $this->locations[ $args['location'] ]['open'] ) ? $this->locations[ $args['location'] ]['open'] : '';
+			$close    = isset( $this->locations[ $args['location'] ]['close'] ) ? $this->locations[ $args['location'] ]['close'] : '';
+			$count    = isset( $this->locations[ $args['location'] ]['content_count'] ) ? $this->locations[ $args['location'] ]['content_count'] : '';
+			$count    = $count ? array_filter( explode( ',', $count ) ) : [];
 			$priority = isset( $this->locations[ $args['location'] ]['priority'] ) && $this->locations[ $args['location'] ]['priority'] ? $this->locations[ $args['location'] ]['priority'] : 10;
 
 			/**
@@ -201,8 +213,22 @@ class Mai_Publisher_Display {
 			 *
 			 * @return string
 			 */
-			add_action( $this->locations[ $args['location'] ]['hook'], function() use ( $args, $priority ) {
+			add_action( $this->locations[ $args['location'] ]['hook'], function() use ( $args, $open, $close, $count, $priority ) {
+				// Maybe check counts.
+				if ( $count ) {
+					static $i = 0;
+					$i++;
+
+					// Bail if not in count.
+					if ( ! in_array( $i, $count ) ) {
+						return;
+					}
+				}
+
+				echo $open;
 				echo maipub_get_processed_content( $args['content'] );
+				echo $close;
+
 			}, $priority );
 		}
 	}

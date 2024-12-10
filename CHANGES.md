@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.10.2 (12/10/24)
+* Changed: Updated Sourcepoint to latest scripts.
+
 ## 1.10.1 (8/12/24)
 * Fixed: Remove pbjs debugging per Magnite's request. They have their own built in debugging.
 

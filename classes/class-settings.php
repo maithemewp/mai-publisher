@@ -107,7 +107,7 @@ class Mai_Publisher_Settings {
 		register_setting(
 			'maipub_group', // option_group
 			'mai_publisher', // option_name
-			[ $this, 'maipub_sanitize' ] // sanitize_callback
+			[ $this, 'sanitize' ] // sanitize_callback
 		);
 
 		/****************
@@ -126,6 +126,20 @@ class Mai_Publisher_Settings {
 			'maipub_settings', // id
 			'', // title
 			[ $this, 'maipub_section_info' ], // callback
+			'mai-publisher-section' // page
+		);
+
+		add_settings_section(
+			'maipub_settings_sourcepoint', // id
+			'', // title
+			[ $this, 'maipub_section_sourcepoint' ], // callback
+			'mai-publisher-section' // page
+		);
+
+		add_settings_section(
+			'maipub_settings_iab', // id
+			'', // title
+			[ $this, 'maipub_section_iab' ], // callback
 			'mai-publisher-section' // page
 		);
 
@@ -230,38 +244,6 @@ class Mai_Publisher_Settings {
 		);
 
 		add_settings_field(
-			'sourcepoint_property_id', // id
-			__( 'Sourcepoint Property ID', 'mai-publisher' ), // title
-			[ $this, 'sourcepoint_property_id_callback' ], // callback
-			'mai-publisher-section', // page
-			'maipub_settings' // section
-		);
-
-		add_settings_field(
-			'sourcepoint_tcf_message_id', // id
-			__( 'Sourcepoint TCF Message ID', 'mai-publisher' ), // title
-			[ $this, 'sourcepoint_tcf_message_id_callback' ], // callback
-			'mai-publisher-section', // page
-			'maipub_settings' // section
-		);
-
-		add_settings_field(
-			'sourcepoint_msps_message_id', // id
-			__( 'Sourcepoint MSPS Message ID', 'mai-publisher' ), // title
-			[ $this, 'sourcepoint_msps_message_id_callback' ], // callback
-			'mai-publisher-section', // page
-			'maipub_settings' // section
-		);
-
-		add_settings_field(
-			'category', // id
-			__( 'Sitewide Category', 'mai-publisher' ), // title
-			[ $this, 'category_callback' ], // callback
-			'mai-publisher-section', // page
-			'maipub_settings' // section
-		);
-
-		add_settings_field(
 			'magnite_enabled', // id
 			__( 'Magnite Demand Manager', 'mai-publisher' ), // title
 			[ $this, 'magnite_enabled_callback' ], // callback
@@ -275,6 +257,54 @@ class Mai_Publisher_Settings {
 			[ $this, 'amazon_uam_enabled_callback' ], // callback
 			'mai-publisher-section', // page
 			'maipub_settings' // section
+		);
+
+		/**
+		 * Sourcepoint
+		 */
+
+		add_settings_field(
+			'sourcepoint_property_id', // id
+			__( 'Property ID', 'mai-publisher' ), // title
+			[ $this, 'sourcepoint_property_id_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings_sourcepoint' // section
+		);
+
+		add_settings_field(
+			'sourcepoint_tcf_message_id', // id
+			__( 'TCF Message ID', 'mai-publisher' ), // title
+			[ $this, 'sourcepoint_tcf_message_id_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings_sourcepoint' // section
+		);
+
+		add_settings_field(
+			'sourcepoint_msps_message_id', // id
+			__( 'MSPS Message ID', 'mai-publisher' ), // title
+			[ $this, 'sourcepoint_msps_message_id_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings_sourcepoint' // section
+		);
+
+		/**
+		 * IAB Categories
+		 */
+
+		add_settings_field(
+			'category', // id
+			__( 'Sitewide Category', 'mai-publisher' ), // title
+			[ $this, 'category_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings_iab' // section
+		);
+
+		add_settings_field(
+			'category_mapping', // id
+			__( 'Taxonomy Mapping', 'mai-publisher' ), // title
+			[ $this, 'category_mapping_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings_iab' // section
 		);
 
 		/**
@@ -413,7 +443,7 @@ class Mai_Publisher_Settings {
 	 *
 	 * @return array
 	 */
-	function maipub_sanitize( $input ) {
+	function sanitize( $input ) {
 		$allowed = [
 			'ad_mode'                     => 'sanitize_text_field',
 			'gam_domain'                  => 'maipub_get_url_host',
@@ -428,6 +458,7 @@ class Mai_Publisher_Settings {
 			'load_delay'                  => 'absint',
 			'debug_enabled'               => 'rest_sanitize_boolean',
 			'category'                    => 'sanitize_text_field',
+			'category_mapping'            => [ 'sanitize_text_field', 'sanitize_text_field' ], // Sanitize key and value separately.
 			'magnite_enabled'             => 'rest_sanitize_boolean',
 			'amazon_uam_enabled'          => 'rest_sanitize_boolean',
 			'matomo_enabled_global'       => 'rest_sanitize_boolean',
@@ -450,9 +481,30 @@ class Mai_Publisher_Settings {
 
 		// Sanitize.
 		foreach ( $input as $key => $value ) {
-			if ( is_null( $value ) || '' === $value ) {
-				$input[ $key ] = '';
-			} else {
+			// If this is an array value.
+			if ( is_array( $value ) ) {
+				// If the function is an array, we have a key and value to sanitize separately.
+				if ( is_array( $allowed[ $key ] ) ) {
+					$array = [];
+
+					// Sanitize key and value.
+					foreach( $value as $child_key => $child_value ) {
+						$array[ $allowed[ $key ][0]( $child_key ) ] = $allowed[ $key ][1]( $child_value );
+					}
+
+					// Save the array as the new value.
+					$input[ $key ] = $array;
+				}
+				// Not an array, use the same one.
+				else {
+					// Sanitize key and value.
+					foreach( $value as $child_key => $child_value ) {
+						$array[ $allowed[ $key ]( $child_key ) ] = $allowed[ $key ]( $child_value );
+					}
+				}
+			}
+			// Single value.
+			else {
 				$input[ $key ] = $allowed[ $key ]( $value );
 			}
 		}
@@ -474,6 +526,14 @@ class Mai_Publisher_Settings {
 	 */
 	function maipub_section_info() {
 		printf( '<h3 class="heading-tab"><span class="heading-tab__text">%s</span></h3>', __( 'Ads', 'mai-publisher' ) );
+	}
+
+	function maipub_section_sourcepoint() {
+		printf( '<h3 class="heading-tab"><span class="heading-tab__text">%s</span></h3>', __( 'Sourcepoint', 'mai-publisher' ) );
+	}
+
+	function maipub_section_iab() {
+		printf( '<h3 class="heading-tab"><span class="heading-tab__text">%s</span></h3>', __( 'IAB Categories', 'mai-publisher' ) );
 	}
 
 	function maipub_section_debug() {
@@ -661,7 +721,53 @@ class Mai_Publisher_Settings {
 	/**
 	 * Setting callback.
 	 *
-	 * @since TBD
+	 * @since ?
+	 *
+	 * @return void
+	 */
+	function category_mapping_callback() {
+		$mapping    = maipub_get_option( 'category_mapping', true ); // We want defaults here.
+		$post_types = get_post_types( [ 'public' => true ], 'objects' );
+
+		// Start table.
+		echo '<table>';
+		echo '<tbody>';
+
+		// Loop through post types.
+		foreach( $post_types as $post_type => $object ) {
+			// Get taxonomies for post type.
+			$taxonomies = get_object_taxonomies( $post_type, 'objects' );
+
+			// Skip if no taxonomies.
+			if ( ! $taxonomies ) {
+				continue;
+			}
+
+			$selected = isset( $mapping[ $post_type ] ) ? $mapping[ $post_type ] : '';
+
+			echo '<tr>';
+				printf( '<td style="padding:0 20px 10px 0;">%s</td>', $object->label );
+				echo '<td style="padding:0 0 10px 0;">';
+					printf( '<select id="category-mapping" name="mai_publisher[category_mapping][%s]">', $post_type );
+						printf( '<option value="">%s</option>', __( 'Select a taxonomy...', 'mai-publisher' ) );
+						foreach ( $taxonomies as $taxonomy ) {
+							printf( '<option value="%s"%s>%s</option>', $taxonomy->name, selected( $selected, $taxonomy->name ), $taxonomy->label );
+						}
+					echo '</select>';
+				echo '</td>';
+			echo '</tr>';
+		}
+
+		echo '</tbody>';
+		echo '</table>';
+
+		// printf( '<p class="description">%s</p>', __( 'Comma-separated key value pairs. Example: a=b, d=f', 'mai-publisher' ) );
+	}
+
+	/**
+	 * Setting callback.
+	 *
+	 * @since ?
 	 *
 	 * @return void
 	 */

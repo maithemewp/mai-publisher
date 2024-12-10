@@ -427,6 +427,7 @@ function maipub_get_current_page( $key = '' ) {
 	// IAB category ID.
 	$iabct = maipub_get_iab_category();
 
+	// If we have an IAB category, add it to the data.
 	if ( $iabct ) {
 		$data['iabct'] = $iabct;
 	}
@@ -459,21 +460,90 @@ function maipub_get_iab_category() {
 		return $iab;
 	}
 
-	$primary = false;
+	// Set defaults.
+	$default = maipub_get_option( 'category' );
+	$term    = false;
 
-	if ( is_singular( 'post' ) ) {
-		$primary = maipub_get_primary_term( 'category', get_the_ID() );
-
-	} elseif ( is_category() ) {
-		$object  = get_queried_object();
-		$primary = $object && $object instanceof WP_Term ? $object : 0;
+	// Bail if not a single post, category, tag, or taxonomy.
+	if ( ! ( is_singular() || is_category() || is_tag() || is_tax() ) ) {
+		return $default;
 	}
 
-	if ( $primary ) {
-		$iab = get_term_meta( $primary->term_id, 'maipub_category', true );
+	// Get the mapping.
+	$mapping = maipub_get_option( 'category_mapping', true );
+
+	// Bail if no mapping.
+	if ( ! $mapping ) {
+		return $default;
 	}
 
-	return $iab ?: maipub_get_option( 'category' );
+	// Single post.
+	if ( is_singular() ) {
+		$post_type = get_post_type();
+
+		// If we have a mapping for this post type.
+		if ( $post_type && isset( $mapping[ $post_type ] ) && $mapping[ $post_type ] ) {
+			$taxonomy = $mapping[ $post_type ];
+			$term     = maipub_get_primary_term( $taxonomy, get_the_ID() );
+		}
+	}
+	// Term archive.
+	elseif ( is_category() || is_tag() || is_tax() ) {
+		$object = get_queried_object();
+
+		// If this taxonomy is in the mapping.
+		if ( $object && $object instanceof WP_Term && in_array( $object->taxonomy, array_values( $mapping ) ) ) {
+			if ( in_array( $object->taxonomy, array_values( $mapping ) ) ) {
+				$taxonomy = $object->taxonomy;
+				$term     = $object;
+			}
+		}
+	}
+
+	// Bail if no primary term.
+	if ( ! $term ) {
+		return $default;
+	}
+
+	// Get the IAB category.
+	$iab = get_term_meta( $term->term_id, 'maipub_category', true );
+
+	// If iab, return it.
+	if ( $iab ) {
+		return $iab;
+	}
+
+	// If no taxonomy, or it's not hierarchical, return default.
+	if ( ! $taxonomy || ! is_taxonomy_hierarchical( $taxonomy ) ) {
+		return $default;
+	}
+
+	// Get the ancestors.
+	$ancestors = get_ancestors( $term->term_id, $taxonomy, 'taxonomy' );
+
+	// Loop through ancestors to find the first with an IAB category.
+	foreach ( $ancestors as $ancestor ) {
+		$parent = get_term( $ancestor, $taxonomy );
+
+		// Skip if no parent or error.
+		if ( ! $parent || is_wp_error( $parent ) ) {
+			continue;
+		}
+
+		// Get the IAB category.
+		$iab = get_term_meta( $parent->term_id, 'maipub_category', true );
+
+		// Skip if no IAB category.
+		if ( ! $iab ) {
+			continue;
+		}
+
+		return $iab;
+	}
+
+	$iab = $default;
+
+	return $iab;
 }
 
 /**

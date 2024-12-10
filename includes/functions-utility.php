@@ -189,7 +189,6 @@ function maipub_build_attributes( $attr, $escape = 'esc_attr' ) {
  *
  * @param string $content The content.
  * @param string $name    The name.
- * @param bool   $force   Whether to force override existing tracking attributes, if they already exist.
  *
  * @return string
  */
