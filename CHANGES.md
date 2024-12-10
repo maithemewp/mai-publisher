@@ -1,7 +1,15 @@
 # Changelog
 
-## 1.10.2 (12/10/24)
+## 1.11.0 (12/10/24)
+* Added: IAB categories support for custom taxonomies.
+* Added: New `mai_publisher_location_choices` filter.
 * Changed: Updated Sourcepoint to latest scripts.
+* Changed: Now updating `mai_views_updated` time before hitting api’s.
+* Changed: Now updating `mai_views_updated` time with 2x interval if getting stats fails.
+* Changed: Simplified `get_acf_request()` to match Mai Engine and latest ACF changes.
+* Changed: Only track stats/views on singular if it’s Jetpack since Jetpack doesn't handle archive stats.
+* Fixed: Check for Jetpack at runtime before updating stats.
+* Fixed: Error when `get_queried_object()` doesn't return an object.
 
 ## 1.10.1 (8/12/24)
 * Fixed: Remove pbjs debugging per Magnite's request. They have their own built in debugging.
