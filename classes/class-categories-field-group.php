@@ -107,7 +107,7 @@ class Mai_Publisher_Categories_Field_Group {
 	/**
 	 * Shows field group when editing public taxonomy terms.
 	 *
-	 * @since TBD
+	 * @since ?
 	 *
 	 * @param bool      $result Whether the rule matches.
 	 * @param array     $rule   Current rule to match (param, operator, value).

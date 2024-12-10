@@ -759,7 +759,7 @@ class Mai_Publisher_Output {
 	 * OpenRTB 2.6 spec / Content Taxonomy.
 	 * @link https://iabtechlab.com/wp-content/uploads/2022/04/OpenRTB-2-6_FINAL.pdf
 	 *
-	 * @since TBD
+	 * @since ?
 	 *
 	 * @return array
 	 */
@@ -872,7 +872,7 @@ class Mai_Publisher_Output {
 	/**
 	 * Gets the hierarchy of a term.
 	 *
-	 * @since TBD
+	 * @since ?
 	 *
 	 * @param int    $term_id
 	 * @param string $taxonomy
