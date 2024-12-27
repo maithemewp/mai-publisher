@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.11.1 (12/27/24)
+* Fixed: Updater files missing in some instances.
+
 ## 1.11.0 (12/10/24)
 * Added: IAB categories support for custom taxonomies.
 * Added: New `mai_publisher_location_choices` filter.
