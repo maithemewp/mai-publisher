@@ -19,7 +19,7 @@ add_filter( 'mai_publisher_config', function( $config ) {
 	$to_remove = [
 		'leaderboard-wide' => [
 			[300, 100],
-			[466, 60],
+			[468, 60],
 			[750, 100],
 			[970, 90],
 		],
