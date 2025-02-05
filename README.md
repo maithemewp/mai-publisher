@@ -5,6 +5,55 @@ Manage ads and more for websites in the Mai Publisher network.
 1. Visit Dashboard > Mai Ads > Settings and configure the settings.
 1. Visit Dashboard > Mai Ads and configure and default ads or add your own.
 
+### How to remove ad sizes from ad units
+```
+/**
+ * Remove ad sizes from specific ad units.
+ *
+ * @param array $config The publisher config.
+ *
+ * @return array
+ */
+add_filter( 'mai_publisher_config', function( $config ) {
+	// Sizes to remove, organized by ad unit key.
+	$to_remove = [
+		'leaderboard-wide' => [
+			[300, 100],
+			[466, 60],
+			[750, 100],
+			[970, 90],
+		],
+		// Add more ad unit keys and their sizes to remove as needed.
+		// 'rectangle-medium' => [
+		//     [300, 250],
+		//     [300, 300],
+		// ],
+	];
+
+	// Loop through each ad unit type we want to modify
+	foreach ( $to_remove as $ad_unit => $sizes_to_remove ) {
+		// Skip if this ad unit doesn't exist in config.
+		if ( ! isset( $config['ad_units'][ $ad_unit ] ) ) {
+			continue;
+		}
+
+		// Loop through the ad units.
+		foreach ( $config['ad_units'][ $ad_unit ] as $key => $ad ) {
+			// Filter out any sizes that exist in $sizes_to_remove.
+			$config['ad_units'][ $ad_unit ][ $key ] = array_filter( $ad, function( $size ) use ( $sizes_to_remove ) {
+				return ! in_array( $size, $sizes_to_remove );
+			});
+
+			// Reindex the array after removals.
+			$config['ad_units'][ $ad_unit ][ $key ] = array_values( $config['ad_units'][ $ad_unit ][ $key ] );
+		}
+
+	}
+
+	return $config;
+});
+```
+
 ## How to ad client GAM ads
 1. Make sure the client network code is set in the settings.
 1. Run the following filter to add existing ads from GAM.
