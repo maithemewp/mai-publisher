@@ -47,7 +47,6 @@ add_filter( 'mai_publisher_config', function( $config ) {
 			// Reindex the array after removals.
 			$config['ad_units'][ $ad_unit ][ $key ] = array_values( $config['ad_units'][ $ad_unit ][ $key ] );
 		}
-
 	}
 
 	return $config;
