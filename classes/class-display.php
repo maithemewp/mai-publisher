@@ -226,7 +226,7 @@ class Mai_Publisher_Display {
 				}
 
 				echo $open;
-				echo maipub_get_processed_content( $args['content'] );
+				echo $args['content']; // Content is already processed via `maipub_get_page_ads()`.
 				echo $close;
 
 			}, $priority );

@@ -1,5 +1,8 @@
 # Changelog
 
+## TBD
+* Fixed: Content was being double processed causing weirdness, especially around `wpautop()`.
+
 ## 1.11.1 (12/27/24)
 * Fixed: Updater files missing in some instances.
 
