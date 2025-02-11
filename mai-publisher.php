@@ -270,7 +270,7 @@ final class Mai_Publisher_Plugin {
 				'show_in_rest'       => true,
 				'show_ui'            => true,
 				'rewrite'            => false,
-				'supports'           => [ 'title', 'editor', 'excerpt' ],
+				'supports'           => [ 'title', 'editor', 'excerpt', 'page-attributes' ],
 			]
 		);
 	}
