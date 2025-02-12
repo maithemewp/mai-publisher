@@ -1,1 +1,12 @@
-jQuery(document).ready((function(e){e("#iab-category").select2({placeholder:"Select a category",allowClear:!0})}));
+/******/ (() => { // webpackBootstrap
+/*!*********************************************!*\
+  !*** ./assets/js/mai-publisher-settings.js ***!
+  \*********************************************/
+jQuery(document).ready(function ($) {
+  $('#iab-category').select2({
+    placeholder: "Select a category",
+    allowClear: true
+  });
+});
+/******/ })()
+;

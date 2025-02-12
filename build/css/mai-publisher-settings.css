@@ -8,7 +8,6 @@
 
 .heading-tab:before,
 .heading-tab:after {
-
 	border-bottom: 1px solid var(--heading-tab-border-color);
 	content: "";
 }

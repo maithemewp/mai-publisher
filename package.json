@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/maithemewp/mai-publisher#readme",
   "devDependencies": {
+    "cssnano": "^7.0.6",
     "fs-extra": "^11.2.0",
     "laravel-mix": "^6.0.0",
     "webpack": "^5.0.0",

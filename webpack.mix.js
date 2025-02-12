@@ -22,47 +22,72 @@ const addMinSuffix = (filePath) => {
 	return `${basename}.min${extname}`;
 };
 
-// Minify and duplicate JavaScript files
+// Configure minification options
+const minifyOptions = {
+	terser: {
+		extractComments: false,
+		terserOptions: {
+			compress: true,
+			output: {
+				comments: false
+			}
+		}
+	},
+	cssNano: {
+		preset: ['default', {
+			discardComments: { removeAll: true },
+			minifyFontValues: true,
+			minifySelectors: true
+		}]
+	}
+};
+
+// Process JavaScript files
 jsSourceDirs.forEach(sourceDir => {
 	glob.sync(`${sourceDir}/*.js`).forEach(file => {
-		const minFileName    = addMinSuffix(file);
-		const minOutputPath  = path.join(jsDestDir, minFileName);
-		const fullOutputPath = path.join(jsDestDir, path.basename(file));
+		// Skip files that are already minified
+		if (file.includes('.min.js')) return;
 
-		mix.js(file, minOutputPath); // Process minified version
+		// Create both original and minified versions
+		const fileName = path.basename(file);
+		const minFileName = addMinSuffix(file);
+		const outputPath = path.join(jsDestDir, fileName);
+		const minOutputPath = path.join(jsDestDir, minFileName);
+
+		// Copy original file
+		mix.after(() => {
+			fs.ensureDirSync(jsDestDir);
+			fs.copyFileSync(file, outputPath);
+		});
+
+		// Create minified version
+		mix.js(file, minOutputPath).options({
+			terser: minifyOptions.terser
+		});
 	});
 });
 
-// Minify and duplicate CSS files
+// Process CSS files
 cssSourceDirs.forEach(sourceDir => {
 	glob.sync(`${sourceDir}/*.css`).forEach(file => {
-		const minFileName    = addMinSuffix(file);
-		const minOutputPath  = path.join(cssDestDir, minFileName);
-		const fullOutputPath = path.join(cssDestDir, path.basename(file));
+		// Skip files that are already minified
+		if (file.includes('.min.css')) return;
 
-		mix.postCss(file, minOutputPath); // Process minified version
-	});
-});
+		// Create both original and minified versions
+		const fileName = path.basename(file);
+		const minFileName = addMinSuffix(file);
+		const outputPath = path.join(cssDestDir, fileName);
+		const minOutputPath = path.join(cssDestDir, minFileName);
 
-// Copy files after processing
-mix.after(() => {
-	// Create directories if they don't exist
-	fs.ensureDirSync(jsDestDir);
-	fs.ensureDirSync(cssDestDir);
-
-	// Copy JavaScript files
-	jsSourceDirs.forEach(sourceDir => {
-		glob.sync(`${sourceDir}/*.js`).forEach(file => {
-			const fullOutputPath = path.join(jsDestDir, path.basename(file));
-			fs.copyFileSync(file, fullOutputPath); // Copy full version
+		// Copy original file
+		mix.after(() => {
+			fs.ensureDirSync(cssDestDir);
+			fs.copyFileSync(file, outputPath);
 		});
-	});
 
-	// Copy CSS files
-	cssSourceDirs.forEach(sourceDir => {
-		glob.sync(`${sourceDir}/*.css`).forEach(file => {
-			const fullOutputPath = path.join(cssDestDir, path.basename(file));
-			fs.copyFileSync(file, fullOutputPath); // Copy full version
-		});
+		// Create minified version
+		mix.postCss(file, minOutputPath, [
+			require('cssnano')(minifyOptions.cssNano)
+		]);
 	});
 });
