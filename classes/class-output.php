@@ -208,9 +208,9 @@ class Mai_Publisher_Output {
 				$this->gam[ $slot ] = [
 					'id'           => $unit,
 					'sizes'        => $config[ $unit ]['sizes'],
-					'sizesDesktop' => $config[ $unit ]['sizes_desktop'],
-					'sizesTablet'  => $config[ $unit ]['sizes_tablet'],
-					'sizesMobile'  => $config[ $unit ]['sizes_mobile'],
+					'sizesDesktop' => $ad_unit->hasAttribute( 'data-hidden-desktop' ) ? [] : $config[ $unit ]['sizes_desktop'],
+					'sizesTablet'  => $ad_unit->hasAttribute( 'data-hidden-tablet' ) ? [] : $config[ $unit ]['sizes_tablet'],
+					'sizesMobile'  => $ad_unit->hasAttribute( 'data-hidden-mobile' ) ? [] : $config[ $unit ]['sizes_mobile'],
 					'targets'      => [],
 				];
 

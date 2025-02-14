@@ -242,6 +242,10 @@ the order of these may affect things and cause issues when it's dark inside ligh
 
 @media only screen and (max-width: 727px) {
 
+	.mai-ad-unit-container:has([data-hidden-mobile]) {
+		display: none;
+	}
+
 	.maipub-placeholder {
 		--maipub-placeholder-width: var(--width-mobile);
 		--maipub-placeholder-height: var(--height-mobile);
@@ -254,6 +258,10 @@ the order of these may affect things and cause issues when it's dark inside ligh
 
 @media only screen and (min-width: 728px) and (max-width: 1023px) {
 
+	.mai-ad-unit-container:has([data-hidden-tablet]) {
+		display: none;
+	}
+
 	.maipub-placeholder {
 		--maipub-placeholder-width: var(--width-tablet);
 		--maipub-placeholder-height: var(--height-tablet);
@@ -265,6 +273,10 @@ the order of these may affect things and cause issues when it's dark inside ligh
 }
 
 @media only screen and (min-width: 1024px) {
+
+	.mai-ad-unit-container:has([data-hidden-desktop]) {
+		display: none;
+	}
 
 	.maipub-placeholder {
 		--maipub-placeholder-width: var(--width-desktop);

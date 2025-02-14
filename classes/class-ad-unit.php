@@ -24,16 +24,19 @@ class Mai_Publisher_Ad_Unit {
 		// Parse args.
 		$args = wp_parse_args( $this->args,
 			[
-				'preview'    => false,
-				'id'         => '',
-				'type'       => '',
-				'position'   => '',
-				'split_test' => '',
-				'targets'    => '',
-				'label'      => '',
-				'label_hide' => '',
-				'context'    => '',
-				'backfill'   => '',
+				'preview'      => false,
+				'id'           => '',
+				'type'         => '',
+				'position'     => '',
+				'split_test'   => '',
+				'targets'      => '',
+				'label'        => '',
+				'label_hide'   => '',
+				'context'      => '',
+				'backfill'     => '',
+				'hide_desktop' => false,
+				'hide_tablet'  => false,
+				'hide_mobile'  => false,
 			]
 		);
 
@@ -252,6 +255,21 @@ class Mai_Publisher_Ad_Unit {
 		// If backfill.
 		if ( $backfill ) {
 			$inner_attr['data-backfill'] = esc_attr( $backfill );
+		}
+
+		// If hide desktop.
+		if ( $args['hide_desktop'] ) {
+			$inner_attr['data-hidden-desktop'] = null; // Only checking if attribute exists, not true/false.
+		}
+
+		// If hide tablet.
+		if ( $args['hide_tablet'] ) {
+			$inner_attr['data-hidden-tablet'] = null; // Only checking if attribute exists, not true/false.
+		}
+
+		// If hide mobile.
+		if ( $args['hide_mobile'] ) {
+			$inner_attr['data-hidden-mobile'] = null; // Only checking if attribute exists, not true/false.
 		}
 
 		// If logging.
