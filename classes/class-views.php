@@ -409,7 +409,9 @@ class Mai_Publisher_Views {
 		$api_url = add_query_arg( $api_args, $api_url );
 
 		// Send a GET request to the Matomo API.
-		$response = wp_remote_get( $api_url );
+		$response = wp_remote_get( $api_url, [
+			'user-agent' => 'BizBudding/1.0',
+		] );
 
 		// Check for a successful request.
 		if ( is_wp_error( $response ) ) {
@@ -433,8 +435,19 @@ class Mai_Publisher_Views {
 			return new WP_Error( 'matomo_no_data', __( 'No data returned.', 'mai-publisher' ) );
 		}
 
+		// If matomo returns an error, return it.
+		if ( isset( $data['result'] ) && 'error' === $data['result'] ) {
+			$message = isset( $data['message'] ) ? $data['message'] : __( 'Unknown error in class-views.php.', 'mai-publisher' );
+
+			return new WP_Error( 'matomo_api_error', $message, $code );
+		}
+
 		// Loop through each item in the bulk request.
 		foreach ( $data as $index => $row ) {
+			if ( ! isset( $fetch[ $index ]['key'] ) ) {
+				continue;
+			}
+
 			$key    = $fetch[ $index ]['key'];
 			$visits = null;
 

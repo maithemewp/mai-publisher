@@ -1099,12 +1099,17 @@ class Mai_Publisher_Settings {
 			foreach ( $connections as $label => $url ) {
 				// Handle first request.
 				if ( $first ) {
-					$response = wp_remote_post( $url, [ 'body' => [ 'token_auth' => $token ] ] );
 					$first    = false;
+					$response = wp_remote_post( $url, [
+						'body'       => [ 'token_auth' => $token ],
+						'user-agent' => 'BizBudding/1.0',
+					] );
 				}
 				// Not first.
 				else {
-					$response = wp_remote_get( $url );
+					$response = wp_remote_get( $url, [
+						'user-agent' => 'BizBudding/1.0',
+					] );
 				}
 
 				// If error, add error message.
