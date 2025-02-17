@@ -92,6 +92,7 @@ class Mai_Publisher_Tracking {
 		// Handle site tracking vars.
 		if ( $matomo_enabled ) {
 			$vars['analytics'] = [];
+			$page_dimensions   = [];
 			$dimensions        = $this->get_site_dimensions();
 			$analytics         = [
 				'url'    => trailingslashit( $site_url ),
@@ -107,12 +108,14 @@ class Mai_Publisher_Tracking {
 			// If dimensions, set them.
 			if ( $dimensions ) {
 				foreach ( $dimensions as $index => $value ) {
-					$analytics['toPush'][] = [ 'setCustomDimension', $index, $value ];
+					// @link https://developer.matomo.org/guides/tracking-javascript-guide#custom-dimensions
+					// _paq.push(['trackPageView', pageTitle, {dimension1: 'DimensionValue'}]);
+					$page_dimensions["dimension{$index}"] = $value;
 				}
 			}
 
 			$analytics['toPush'][] = [ 'enableLinkTracking' ];
-			$analytics['toPush'][] = [ 'trackPageView' ];
+			$analytics['toPush'][] = [ 'trackPageView', null, $page_dimensions ];
 			$analytics['toPush'][] = [ 'trackVisibleContentImpressions' ];
 			// $analytics['toPush'][] = [ 'trackAllContentImpressions' ];
 		}
