@@ -43,11 +43,32 @@ class Mai_Publisher_Tracking {
 			return;
 		}
 
+		do_action( 'mai_publisher_before_enqueue_analytics' );
+
+		// Get the script file.
 		$suffix = maipub_get_suffix();
 		$file   = "build/js/mai-publisher-analytics{$suffix}.js";
 
-		wp_enqueue_script( 'mai-publisher-analytics', maipub_get_file_data( $file, 'url' ), [], maipub_get_file_data( $file, 'version' ), [ 'strategy' => 'async', 'in_footer' => true ] );
-		wp_localize_script( 'mai-publisher-analytics', 'maiPubAnalyticsVars', $this->get_vars() );
+		// Enqueue the script.
+		wp_enqueue_script(
+			'mai-publisher-analytics',
+			maipub_get_file_data( $file, 'url' ),
+			[],
+			maipub_get_file_data( $file, 'version' ),
+			[
+				'strategy' => 'async',
+				'in_footer' => true,
+			]
+		);
+
+		// Add the data from PHP to the script.
+		wp_add_inline_script(
+			'mai-publisher-analytics',
+			sprintf( 'const maiPubAnalyticsVars = %s;', wp_json_encode( $this->get_vars() ) ),
+			'before'
+		);
+
+		do_action( 'mai_publisher_after_enqueue_analytics' );
 	}
 
 	/**
@@ -566,7 +587,7 @@ class Mai_Publisher_Tracking {
 			return;
 		}
 
-		$this->global_dimensions[7] = esc_html( ltrim( $iab, '– ' ) );
+		$this->global_dimensions[7] = esc_html( ltrim( $iab, '– ' ) );
 	}
 
 	/**
