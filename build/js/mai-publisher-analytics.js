@@ -33,6 +33,14 @@
 	 * Handles all trackers asyncronously.
 	 */
 	window.matomoAsyncInit = function() {
+		// Dispatch custom event before processing analytics.
+		const event = new CustomEvent( 'beforeMaiPublisherAnalytics', {
+			detail: maiPubAnalyticsVars,
+			cancelable: true
+		});
+		document.dispatchEvent(event);
+
+		// Continue with existing tracker code
 		for ( const tracker in analytics ) {
 			try {
 				const matomoTracker = Matomo.getTracker( analytics[ tracker ].url + 'matomo.php', analytics[ tracker ].id );
@@ -51,7 +59,7 @@
 					}
 				}
 
-				// If we have an ajax url and body, pdate the views.
+				// If we have an ajax url and body, update the views.
 				if ( analytics[ tracker ].ajaxUrl && analytics[ tracker ].body ) {
 					// Send ajax request.
 					fetch( analytics[ tracker ].ajaxUrl, {
