@@ -16,13 +16,14 @@ const loadTimes        = {};
 const currentlyVisible = {};
 const timeoutIds       = {};
 const bidderTimeout    = 3000;
-const fallbackTimeout  = 3500; // Set global failsafe timeout ~500ms after DM UI bidder timeout.
+const fallbackTimeout  = 4000; // Set global failsafe timeout ~1000ms after DM UI bidder timeout.
 const debug            = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb') || window.location.search.includes('pbjs_debug=true');
 const log              = maiPubAdsVars.debug;
+const bidResponses     = { prebid: {}, amazon: {}, timeouts: [] };
 let   timestamp        = Date.now();
 
 // If debugging, log.
-maiPubLog( 'v201' );
+maiPubLog( 'v202' );
 
 // If using Amazon UAM bids, add it. No need to wait for googletag to be loaded.
 if ( maiPubAdsVars.amazonUAM ) {
@@ -492,18 +493,57 @@ function maiPubDisplaySlots( slots ) {
 			// Set the magnite config.
 			pbjs.setConfig( pbjsConfig );
 
-			// Request bids.
+			// Add bid response tracking
+			pbjs.onEvent('bidResponse', function(bid) {
+				bidResponses.prebid[bid.bidder] = {
+					time: Date.now(),
+					value: bid.cpm,
+					size: bid.size,
+					adUnitCode: bid.adUnitCode,
+					timeToRespond: bid.timeToRespond
+				};
+				maiPubLog('Prebid bid received from ' + bid.bidder, bid);
+			});
+
+			// Add timeout monitoring
+			pbjs.onEvent('bidTimeout', function(timeoutBids) {
+				timeoutBids.forEach(bid => {
+					bidResponses.timeouts.push({
+						bidder: bid.bidder,
+						adUnitCode: bid.adUnitCode,
+						time: Date.now(),
+						timeout: bidderTimeout
+					});
+				});
+				maiPubLog('Bid timeout occurred:', timeoutBids);
+			});
+
+			// Add all bid response monitoring
+			pbjs.onEvent('allBidsBack', function(bids) {
+				maiPubLog('All bids back:', {
+					bids: bids,
+					timeouts: bidResponses.timeouts,
+					timing: {
+						totalTime: Date.now() - timestamp,
+						bidderTimeout: bidderTimeout,
+						fallbackTimeout: fallbackTimeout
+					}
+				});
+			});
+
+			// Request bids
 			pbjs.rp.requestBids( {
 				gptSlotObjects: slots,
 				callback: function() {
 					pbjs.setTargetingForGPTAsync();
-
 					requestManager.dmBidsReceived = true;
+
+					// Log bid responses for debugging
+					maiPubLog('All prebid responses:', bidResponses.prebid);
 
 					if ( requestManager.apsBidsReceived ) {
 						sendAdserverRequest();
-
-						maiPubLog( 'refresh() with prebid: ' + uadSlots.map( slot => slot.slotID.replace( 'mai-ad-', '' ) ).join( ', ' ), uadSlots );
+						maiPubLog('refresh() with prebid: ' + slots.map( slot => slot.getSlotElementId() ).join(', '), slots);
 					}
 				}
 			});
@@ -551,7 +591,24 @@ function maiPubDisplaySlots( slots ) {
 			maiPubLog( 'amazonConfig', amazonConfig );
 
 			// Fetch bids from Amazon UAM using apstag.
-			apstag.fetchBids( amazonConfig, function( bids ) {
+			const requestStartTime = Date.now();
+			apstag.fetchBids( amazonConfig, function(bids) {
+				// Log timing information
+				const amazonResponseTime = Date.now() - requestStartTime;
+				maiPubLog('Amazon response time:', amazonResponseTime);
+
+				// Track Amazon bids
+				bids.forEach((bid) => {
+					bidResponses.amazon[bid.slotID] = {
+						time: Date.now(),
+						value: bid.amznbid,
+						size: bid.size,
+						responseTime: amazonResponseTime,
+						error: bid.error || null
+					};
+				});
+				maiPubLog('Amazon bids received:', bidResponses.amazon);
+
 				// Set apstag bids, then trigger the first request to GAM.
 				apstag.setDisplayBids();
 
@@ -609,9 +666,23 @@ function maiPubDisplaySlots( slots ) {
 
 	// Start the failsafe timeout.
 	setTimeout(() => {
+		const timeoutData = {
+			adserverRequestSent: requestManager.adserverRequestSent,
+			dmBidsReceived: requestManager.dmBidsReceived,
+			apsBidsReceived: requestManager.apsBidsReceived,
+			prebidBids: bidResponses.prebid,
+			amazonBids: bidResponses.amazon,
+			timeouts: bidResponses.timeouts,
+			timing: {
+				totalTime: Date.now() - timestamp,
+				bidderTimeout: bidderTimeout,
+				fallbackTimeout: fallbackTimeout
+			}
+		};
+
 		// Log if no adserver request has been sent.
 		if ( ! requestManager.adserverRequestSent ) {
-			maiPubLog( 'refresh() with failsafe timeout: ' + slots.map( slot => slot.getSlotElementId() ).join( ', ' ), slots );
+			maiPubLog( 'refresh() with failsafe timeout. Debug data:', timeoutData );
 		}
 
 		// Maybe send request.
