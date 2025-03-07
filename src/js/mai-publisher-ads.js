@@ -23,7 +23,7 @@ const bidResponses     = { prebid: {}, amazon: {}, timeouts: [] };
 let   timestamp        = Date.now();
 
 // If debugging, log.
-maiPubLog( 'v202' );
+maiPubLog( 'v203' );
 
 // If using Amazon UAM bids, add it. No need to wait for googletag to be loaded.
 if ( maiPubAdsVars.amazonUAM ) {
