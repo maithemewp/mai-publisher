@@ -319,7 +319,6 @@ class Mai_Publisher_Output {
 			}
 
 			// Get script location and localize.
-			$file     = 'build/mai-publisher-ads.js';
 			$localize = [
 				'domain'        => $this->domain,
 				'sellersName'   => $this->sellers_name,
@@ -377,8 +376,9 @@ class Mai_Publisher_Output {
 			}
 
 			// Add mai-publisher-ads scripts.
-			$scripts[] = sprintf( '<script>/* <![CDATA[ */%svar maiPubAdsVars = %s;%s/* ]]> */</script>', PHP_EOL, wp_json_encode( $localize ), PHP_EOL );
-			$scripts[] = sprintf( '<script async id="mai-publisher-ads" src="%s?ver=%s"></script>', maipub_get_file_data( $file, 'url' ), maipub_get_file_data( $file, 'version' ) );
+			$asset_data = maipub_get_asset_data( 'mai-publisher-ads.js', 'script' );
+			$scripts[]  = sprintf( '<script>/* <![CDATA[ */%svar maiPubAdsVars = %s;%s/* ]]> */</script>', PHP_EOL, wp_json_encode( $localize ), PHP_EOL );
+			$scripts[]  = sprintf( '<script async id="mai-publisher-ads" src="%s?ver=%s"></script>', $asset_data['url'], $asset_data['version'] );
 		}
 
 		// Check connatix. This checks the context of the script to see if it contains the connatix domain.
