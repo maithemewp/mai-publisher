@@ -1,3 +1,6 @@
+/*!***************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/@wordpress/scripts/node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[2].use[2]!./src/css/mai-publisher.css ***!
+  \***************************************************************************************************************************************************************************************************************/
 .mai-ad-unit-container:not([data-label]):not(:first-child) {
 	margin-block-start: var(--mai-ad-unit-margin-block, var(--spacing-md, 24px) 0);
 }
@@ -46,9 +49,9 @@
 .mai-ad-unit-log[data-label]::before,
 .mai-ad-unit[data-label]:not(:empty)::before {
 	position: absolute;
-	left: 50%;
+	right: 50%;
 	bottom: calc(100% + 4px);
-	transform: translateX(-50%);
+	transform: translateX(50%);
 	content: attr(data-label);
 }
 
@@ -96,8 +99,8 @@
 
 .mai-ad-unit-sticky {
 	position: fixed;
-	left: 0;
 	right: 0;
+	left: 0;
 	margin-block: 0 !important;
 	z-index: 999999;
 }
@@ -115,8 +118,8 @@
 	position: absolute;
 	top: 0;
 	bottom: 0;
-	left: 50%;
-	transform: translateX(-50%);
+	right: 50%;
+	transform: translateX(50%);
 	background: rgba(255, 255, 255, 0.8);
 	box-shadow: 0 0 16px 0px rgba(0, 0, 0, 0.1);
 	z-index: -1;
@@ -287,3 +290,4 @@ the order of these may affect things and cause issues when it's dark inside ligh
 		display: block;
 	}
 }
+

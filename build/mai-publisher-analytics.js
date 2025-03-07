@@ -1,13 +1,7 @@
 /******/ (() => { // webpackBootstrap
-/*!**********************************************!*\
-  !*** ./assets/js/mai-publisher-analytics.js ***!
-  \**********************************************/
-function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
-function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
-function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
-function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
+/*!*******************************************!*\
+  !*** ./src/js/mai-publisher-analytics.js ***!
+  \*******************************************/
 /**
  * Run Matomo instance.
  *
@@ -25,7 +19,7 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
   (function () {
     _paq.push(['setTrackerUrl', analyticsPrimary.url + 'matomo.php']);
     _paq.push(['setSiteId', analyticsPrimary.id]);
-    for (var key in analyticsMore) {
+    for (const key in analyticsMore) {
       _paq.push(['addTracker', analyticsMore[key].url + 'matomo.php', analyticsMore[key].id]);
     }
     var d = document,
@@ -41,24 +35,24 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
    */
   window.matomoAsyncInit = function () {
     // Dispatch custom event before processing analytics.
-    var event = new CustomEvent('beforeMaiPublisherAnalytics', {
+    const event = new CustomEvent('beforeMaiPublisherAnalytics', {
       detail: maiPubAnalyticsVars,
       cancelable: true
     });
     document.dispatchEvent(event);
 
     // Continue with existing tracker code
-    for (var tracker in analytics) {
+    for (const tracker in analytics) {
       try {
-        var matomoTracker = Matomo.getTracker(analytics[tracker].url + 'matomo.php', analytics[tracker].id);
+        const matomoTracker = Matomo.getTracker(analytics[tracker].url + 'matomo.php', analytics[tracker].id);
 
         // Loop through and push items.
-        for (var key in analytics[tracker].toPush) {
+        for (const key in analytics[tracker].toPush) {
           var func = analytics[tracker].toPush[key][0];
           var vals = analytics[tracker].toPush[key].slice(1);
           vals = vals ? vals : null;
           if (vals) {
-            matomoTracker[func].apply(matomoTracker, _toConsumableArray(vals));
+            matomoTracker[func](...vals);
           } else {
             matomoTracker[func]();
           }
@@ -80,7 +74,7 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
               throw new Error(response.statusText);
             }
             return response.json();
-          }).then(function (data) {})["catch"](function (error) {
+          }).then(function (data) {}).catch(function (error) {
             console.log(error.name + ', ', error.message);
           });
         }
@@ -92,3 +86,4 @@ function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length)
 })();
 /******/ })()
 ;
+//# sourceMappingURL=mai-publisher-analytics.js.map

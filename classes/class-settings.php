@@ -68,9 +68,8 @@ class Mai_Publisher_Settings {
 		wp_enqueue_script( 'mai-publisher-select2', 'https://cdn.jsdelivr.net/npm/select2/dist/js/select2.min.js' );
 
 		// Get files.
-		$suffix = maipub_get_suffix();
-		$css    = "build/css/mai-publisher-settings{$suffix}.css";
-		$js     = "build/js/mai-publisher-settings{$suffix}.js";
+		$css = 'build/mai-publisher-settings.css';
+		$js  = 'build/mai-publisher-settings.js';
 
 		// Enqueue.
 		wp_enqueue_style( 'mai-publisher-settings', maipub_get_file_data( $css, 'url' ), [], maipub_get_file_data( $css, 'version' ) );

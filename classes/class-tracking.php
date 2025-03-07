@@ -46,8 +46,7 @@ class Mai_Publisher_Tracking {
 		do_action( 'mai_publisher_before_enqueue_analytics' );
 
 		// Get the script file.
-		$suffix = maipub_get_suffix();
-		$file   = "build/js/mai-publisher-analytics{$suffix}.js";
+		$file = 'build/mai-publisher-analytics.js';
 
 		// Enqueue the script.
 		wp_enqueue_script(

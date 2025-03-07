@@ -35,9 +35,7 @@ class Mai_Publisher_Display {
 	 * @return void
 	 */
 	function register_styles() {
-		$suffix = maipub_get_suffix();
-		$file   = "build/css/mai-publisher{$suffix}.css";
-
+		$file = 'build/mai-publisher.css';
 		wp_register_style( 'mai-publisher', maipub_get_file_data( $file, 'url' ), [], maipub_get_file_data( $file, 'version' ) );
 	}
 

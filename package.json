@@ -2,11 +2,10 @@
   "name": "mai-publisher",
   "version": "1.10.0",
   "description": "Manage ads and more for websites in the Mai Publisher network.",
-  "main": "webpack.mix.js",
   "scripts": {
-    "dev": "npx mix",
-    "production": "npx mix --production",
-    "watch": "npx mix watch"
+    "build": "wp-scripts build",
+    "start": "wp-scripts start",
+    "packages-update": "wp-scripts packages-update"
   },
   "repository": {
     "type": "git",
@@ -19,10 +18,7 @@
   },
   "homepage": "https://github.com/maithemewp/mai-publisher#readme",
   "devDependencies": {
-    "cssnano": "^7.0.6",
-    "fs-extra": "^11.2.0",
-    "laravel-mix": "^6.0.0",
-    "webpack": "^5.0.0",
-    "webpack-cli": "^5.1.4"
+    "@wordpress/scripts": "^27.4.0",
+    "glob": "^10.3.10"
   }
 }

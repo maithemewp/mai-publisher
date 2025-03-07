@@ -1,0 +1,37 @@
+/*!************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/@wordpress/scripts/node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[2].use[2]!./src/css/mai-publisher-settings.css ***!
+  \************************************************************************************************************************************************************************************************************************/
+.heading-tab {
+	--heading-tab-border-color: rgba(0, 0, 0, 0.2);
+	display: flex;
+	justify-content: start;
+	align-items: end;
+	margin: 56px 0 24px;
+}
+
+.heading-tab:before,
+.heading-tab:after {
+	border-bottom: 1px solid var(--heading-tab-border-color);
+	content: "";
+}
+
+.heading-tab:before {
+	flex-basis: 16px;
+}
+
+.heading-tab:after {
+	flex-grow: 1;
+}
+
+.heading-tab__text {
+	display: inline-block;
+	margin: 0;
+	padding: 12px 16px 8px 16px;
+	line-height: 1;
+	border: 1px solid var(--heading-tab-border-color);
+	border-bottom-color: #f0f0f1;
+	border-radius: 3px 3px 0 0;
+}
+
+
+/*# sourceMappingURL=mai-publisher-settings.css.map*/

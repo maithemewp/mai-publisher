@@ -482,25 +482,6 @@ function maipub_update_option( $option, $value ) {
 }
 
 /**
- * Get suffix.
- *
- * @since 0.1.0
- *
- * @return bool
- */
-function maipub_get_suffix() {
-	static $cache = null;
-
-	if ( ! is_null( $cache ) ) {
-		return $cache;
-	}
-
-	$cache = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.min' : '';
-
-	return $cache;
-}
-
-/**
  * Gets file data.
  *
  * @since 0.1.0

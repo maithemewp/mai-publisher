@@ -1,7 +1,7 @@
 /******/ (() => { // webpackBootstrap
-/*!****************************************!*\
-  !*** ./assets/js/mai-publisher-ads.js ***!
-  \****************************************/
+/*!*************************************!*\
+  !*** ./src/js/mai-publisher-ads.js ***!
+  \*************************************/
 // define global PBJS and GPT libraries
 window.pbjs = window.pbjs || {
   que: []
@@ -10,27 +10,27 @@ window.googletag = window.googletag || {};
 googletag.cmd = googletag.cmd || [];
 
 // Define global variables.
-var ads = maiPubAdsVars['ads'];
-var adSlotIds = [];
-var adSlots = [];
-var gamBase = maiPubAdsVars.gamBase;
-var gamBaseClient = maiPubAdsVars.gamBaseClient;
-var refreshKey = 'refresh';
-var refreshValue = maiPubAdsVars.targets.refresh;
-var refreshTime = 30; // Time in seconds.
-var loadTimes = {};
-var currentlyVisible = {};
-var timeoutIds = {};
-var bidderTimeout = 3000;
-var fallbackTimeout = 4000; // Set global failsafe timeout ~1000ms after DM UI bidder timeout.
-var debug = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb') || window.location.search.includes('pbjs_debug=true');
-var log = maiPubAdsVars.debug;
-var bidResponses = {
+const ads = maiPubAdsVars['ads'];
+const adSlotIds = [];
+const adSlots = [];
+const gamBase = maiPubAdsVars.gamBase;
+const gamBaseClient = maiPubAdsVars.gamBaseClient;
+const refreshKey = 'refresh';
+const refreshValue = maiPubAdsVars.targets.refresh;
+const refreshTime = 30; // Time in seconds.
+const loadTimes = {};
+const currentlyVisible = {};
+const timeoutIds = {};
+const bidderTimeout = 3000;
+const fallbackTimeout = 4000; // Set global failsafe timeout ~1000ms after DM UI bidder timeout.
+const debug = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb') || window.location.search.includes('pbjs_debug=true');
+const log = maiPubAdsVars.debug;
+const bidResponses = {
   prebid: {},
   amazon: {},
   timeouts: []
 };
-var timestamp = Date.now();
+let timestamp = Date.now();
 
 // If debugging, log.
 maiPubLog('v202');
@@ -48,14 +48,14 @@ if (maiPubAdsVars.amazonUAM) {
       a[a9]._Q.push([c, r]);
     }
     a[a9] = {
-      init: function init() {
+      init: function () {
         q("i", arguments);
       },
-      fetchBids: function fetchBids() {
+      fetchBids: function () {
         q("f", arguments);
       },
-      setDisplayBids: function setDisplayBids() {},
-      targetingKeys: function targetingKeys() {
+      setDisplayBids: function () {},
+      targetingKeys: function () {
         return [];
       },
       _Q: []
@@ -96,7 +96,7 @@ if (maiPubAdsVars.amazonUAM) {
 }
 
 // Add to googletag items.
-googletag.cmd.push(function () {
+googletag.cmd.push(() => {
   /**
    * Set SafeFrame -- This setting will only take effect for subsequent ad requests made for the respective slots.
    * To enable cross domain rendering for all creatives, execute setForceSafeFrame before loading any ad slots.
@@ -106,7 +106,7 @@ googletag.cmd.push(function () {
 
   // Set page-level targeting.
   if (maiPubAdsVars.targets) {
-    Object.keys(maiPubAdsVars.targets).forEach(function (key) {
+    Object.keys(maiPubAdsVars.targets).forEach(key => {
       googletag.pubads().setTargeting(key, maiPubAdsVars.targets[key].toString());
     });
   }
@@ -135,7 +135,7 @@ googletag.cmd.push(function () {
   // Delayed on window load.
   else {
     // On window load.
-    window.addEventListener('load', function () {
+    window.addEventListener('load', () => {
       setTimeout(maiPubDOMContentLoaded, maiPubAdsVars.loadDelay);
     });
   }
@@ -143,9 +143,9 @@ googletag.cmd.push(function () {
   /**
    * Set 30 refresh when an ad is in view.
    */
-  googletag.pubads().addEventListener('impressionViewable', function (event) {
-    var slot = event.slot;
-    var slotId = slot.getSlotElementId();
+  googletag.pubads().addEventListener('impressionViewable', event => {
+    const slot = event.slot;
+    const slotId = slot.getSlotElementId();
 
     // Bail if not a refreshable slot.
     if (!maiPubIsRefreshable(slot)) {
@@ -161,7 +161,7 @@ googletag.cmd.push(function () {
     }
 
     // Set timeout to refresh ads for current visible ads.
-    timeoutIds[slotId] = setTimeout(function () {
+    timeoutIds[slotId] = setTimeout(() => {
       // If debugging, log.
       maiPubLog('refreshed via impressionViewable: ' + slotId, slot);
 
@@ -174,10 +174,10 @@ googletag.cmd.push(function () {
    * Refreshes ads when scrolled back into view.
    * Only refreshes if it's been n seconds since the ad was initially shown.
    */
-  googletag.pubads().addEventListener('slotVisibilityChanged', function (event) {
-    var slot = event.slot;
-    var slotId = slot.getSlotElementId();
-    var inView = event.inViewPercentage > 5;
+  googletag.pubads().addEventListener('slotVisibilityChanged', event => {
+    const slot = event.slot;
+    const slotId = slot.getSlotElementId();
+    const inView = event.inViewPercentage > 5;
 
     // Bail if not a refreshable slot.
     if (!maiPubIsRefreshable(slot)) {
@@ -204,7 +204,7 @@ googletag.cmd.push(function () {
     }
 
     // Bail if loadTimes is undefined, or it hasn't been n seconds (in milliseconds).
-    if (!(loadTimes !== null && loadTimes !== void 0 && loadTimes[slotId]) || loadTimes[slotId] && Date.now() - loadTimes[slotId] < refreshTime * 1000) {
+    if (!loadTimes?.[slotId] || loadTimes[slotId] && Date.now() - loadTimes[slotId] < refreshTime * 1000) {
       return;
     }
 
@@ -219,8 +219,7 @@ googletag.cmd.push(function () {
    * Checks if this is a client GAM ad and not the main plugin MCM ad,
    * if it's a client ad and isEmpty, try to load the main plugin ad.
    */
-  googletag.pubads().addEventListener('slotRenderEnded', function (event) {
-    var _ads$slug, _ads$slug2;
+  googletag.pubads().addEventListener('slotRenderEnded', event => {
     // Bail if slot is not empty.
     if (!event.isEmpty) {
       return;
@@ -232,8 +231,8 @@ googletag.cmd.push(function () {
     }
 
     // Get slug from slot ID.
-    var slotId = event.slot.getSlotElementId();
-    var slug = slotId.replace('mai-ad-', '');
+    const slotId = event.slot.getSlotElementId();
+    const slug = slotId.replace('mai-ad-', '');
 
     // Bail if it's not a client ad.
     if ('client' !== ads[slug]['context']) {
@@ -241,7 +240,7 @@ googletag.cmd.push(function () {
     }
 
     // Bail if no backfill ad with a backfill id.
-    if (!(ads !== null && ads !== void 0 && (_ads$slug = ads[slug]) !== null && _ads$slug !== void 0 && _ads$slug['backfill'] && ads !== null && ads !== void 0 && (_ads$slug2 = ads[slug]) !== null && _ads$slug2 !== void 0 && _ads$slug2['backfillId'])) {
+    if (!(ads?.[slug]?.['backfill'] && ads?.[slug]?.['backfillId'])) {
       return;
     }
 
@@ -267,22 +266,22 @@ googletag.cmd.push(function () {
   // If debugging, set listeners to log.
   if (debug || log) {
     // Log when a slot is requested/fetched.
-    googletag.pubads().addEventListener('slotRequested', function (event) {
+    googletag.pubads().addEventListener('slotRequested', event => {
       maiPubLog('slotRequested:', event.slot, event);
     });
 
     // Log when a slot response is received.
-    googletag.pubads().addEventListener('slotResponseReceived', function (event) {
+    googletag.pubads().addEventListener('slotResponseReceived', event => {
       maiPubLog('slotResponseReceived:', event.slot, event);
     });
 
     // Log when a slot was loaded.
-    googletag.pubads().addEventListener('slotOnload', function (event) {
+    googletag.pubads().addEventListener('slotOnload', event => {
       maiPubLog('slotOnload:', event.slot, event);
     });
 
     // Log when slot render has ended, regardless of whether ad was empty or not.
-    googletag.pubads().addEventListener('slotRenderEnded', function (event) {
+    googletag.pubads().addEventListener('slotRenderEnded', event => {
       maiPubLog('slotRenderEnded:', event.slot, event);
     });
 
@@ -298,16 +297,16 @@ googletag.cmd.push(function () {
  */
 function maiPubDOMContentLoaded() {
   // Select all atf and btf ads.
-  var toloadATF = [];
-  var adsATF = document.querySelectorAll('.mai-ad-unit[data-ap="atf"], .mai-ad-unit[data-ap="bs"]');
-  var adsBTF = document.querySelectorAll('.mai-ad-unit:not([data-ap="atf"]):not([data-ap="bs"])');
+  const toloadATF = [];
+  const adsATF = document.querySelectorAll('.mai-ad-unit[data-ap="atf"], .mai-ad-unit[data-ap="bs"]');
+  const adsBTF = document.querySelectorAll('.mai-ad-unit:not([data-ap="atf"]):not([data-ap="bs"])');
 
   // Add to queue, so they don't step on each other.
-  googletag.cmd.push(function () {
+  googletag.cmd.push(() => {
     // Define ATF ads.
-    adsATF.forEach(function (adATF) {
+    adsATF.forEach(adATF => {
       // Get slug.
-      var slug = adATF.getAttribute('id').replace('mai-ad-', '');
+      const slug = adATF.getAttribute('id').replace('mai-ad-', '');
 
       // Add to toloadATF array.
       toloadATF.push(maiPubDefineSlot(slug));
@@ -328,18 +327,18 @@ function maiPubDOMContentLoaded() {
   });
 
   // Create the IntersectionObserver.
-  var observer = new IntersectionObserver(function (entries, observer) {
-    var toLoadBTF = [];
+  const observer = new IntersectionObserver((entries, observer) => {
+    const toLoadBTF = [];
 
     // Loop through the entries.
-    entries.forEach(function (entry) {
+    entries.forEach(entry => {
       // Skip if not intersecting.
       if (!entry.isIntersecting) {
         return;
       }
 
       // Get slug.
-      var slug = entry.target.getAttribute('id').replace('mai-ad-', '');
+      const slug = entry.target.getAttribute('id').replace('mai-ad-', '');
 
       // If debugging, add inline styling.
       if (debug) {
@@ -362,11 +361,9 @@ function maiPubDOMContentLoaded() {
     }
 
     // Add to queue, so they don't step on each other.
-    googletag.cmd.push(function () {
+    googletag.cmd.push(() => {
       // Define and display all slots in view.
-      maiPubDisplaySlots(toLoadBTF.map(function (slug) {
-        return maiPubDefineSlot(slug);
-      }));
+      maiPubDisplaySlots(toLoadBTF.map(slug => maiPubDefineSlot(slug)));
     });
   }, {
     root: null,
@@ -377,7 +374,7 @@ function maiPubDOMContentLoaded() {
   });
 
   // Observe each BTF ad.
-  adsBTF.forEach(function (adBTF) {
+  adsBTF.forEach(adBTF => {
     observer.observe(adBTF);
   });
 }
@@ -388,22 +385,19 @@ function maiPubDOMContentLoaded() {
  * @param {string} slug The ad slug.
  */
 function maiPubDefineSlot(slug) {
-  var _ads$slug3;
-  var toReturn = null;
+  let toReturn = null;
 
   // Get base from context.
-  var base = ads !== null && ads !== void 0 && (_ads$slug3 = ads[slug]) !== null && _ads$slug3 !== void 0 && _ads$slug3['context'] && 'client' === ads[slug]['context'] ? gamBaseClient : gamBase;
+  const base = ads?.[slug]?.['context'] && 'client' === ads[slug]['context'] ? gamBaseClient : gamBase;
 
   // Define slot ID.
-  var slotId = base + ads[slug]['id'];
+  const slotId = base + ads[slug]['id'];
 
   // Get slot element ID.
-  var slotElId = 'mai-ad-' + slug;
+  const slotElId = 'mai-ad-' + slug;
 
   // Check for existing slot.
-  var existingSlot = adSlots.find(function (slot) {
-    return slotElId == slot.getSlotElementId();
-  });
+  const existingSlot = adSlots.find(slot => slotElId == slot.getSlotElementId());
 
   // If existing, return it.
   if (existingSlot) {
@@ -412,7 +406,7 @@ function maiPubDefineSlot(slug) {
   }
 
   // Define ad slot. googletag.defineSlot( "/1234567/sports", [728, 90], "div-1" );
-  var slot = googletag.defineSlot(slotId, ads[slug].sizes, 'mai-ad-' + slug);
+  const slot = googletag.defineSlot(slotId, ads[slug].sizes, 'mai-ad-' + slug);
 
   // Register the ad slot.
   // An ad will not be fetched until refresh is called,
@@ -440,7 +434,7 @@ function maiPubDefineSlot(slug) {
 
   // Set slot-level targeting.
   if (ads[slug].targets) {
-    Object.keys(ads[slug].targets).forEach(function (key) {
+    Object.keys(ads[slug].targets).forEach(key => {
       slot.setTargeting(key, ads[slug].targets[key]);
     });
   }
@@ -481,7 +475,7 @@ function maiPubDisplaySlots(slots) {
   // googletag.enableServices();
 
   // Object to manage each request state.
-  var requestManager = {
+  const requestManager = {
     adserverRequestSent: false,
     dmBidsReceived: false,
     apsBidsReceived: false
@@ -492,7 +486,7 @@ function maiPubDisplaySlots(slots) {
    *
    * @link https://help.magnite.com/help/web-integration-guide#parallel-header-bidding-integrations
    */
-  var sendAdserverRequest = function sendAdserverRequest() {
+  const sendAdserverRequest = function () {
     if (!requestManager.adserverRequestSent) {
       requestManager.adserverRequestSent = true;
       googletag.pubads().refresh(slots);
@@ -510,7 +504,7 @@ function maiPubDisplaySlots(slots) {
     // Fetch bids from Magnite using Prebid.
     pbjs.que.push(function () {
       // Start the config.
-      var pbjsConfig = {
+      const pbjsConfig = {
         bidderTimeout: bidderTimeout,
         enableTIDs: true,
         ortb2: maiPubAdsVars.ortb2
@@ -544,7 +538,7 @@ function maiPubDisplaySlots(slots) {
 
       // Add timeout monitoring
       pbjs.onEvent('bidTimeout', function (timeoutBids) {
-        timeoutBids.forEach(function (bid) {
+        timeoutBids.forEach(bid => {
           bidResponses.timeouts.push({
             bidder: bid.bidder,
             adUnitCode: bid.adUnitCode,
@@ -571,7 +565,7 @@ function maiPubDisplaySlots(slots) {
       // Request bids
       pbjs.rp.requestBids({
         gptSlotObjects: slots,
-        callback: function callback() {
+        callback: function () {
           pbjs.setTargetingForGPTAsync();
           requestManager.dmBidsReceived = true;
 
@@ -579,9 +573,7 @@ function maiPubDisplaySlots(slots) {
           maiPubLog('All prebid responses:', bidResponses.prebid);
           if (requestManager.apsBidsReceived) {
             sendAdserverRequest();
-            maiPubLog('refresh() with prebid: ' + slots.map(function (slot) {
-              return slot.getSlotElementId();
-            }).join(', '), slots);
+            maiPubLog('refresh() with prebid: ' + slots.map(slot => slot.getSlotElementId()).join(', '), slots);
           }
         }
       });
@@ -597,12 +589,12 @@ function maiPubDisplaySlots(slots) {
   if (maiPubAdsVars.amazonUAM) {
     // Filter out ads[slug].sizes that only contain a single size named 'fluid'. This was throwing an error in amazon.
     // Filter out client ads.
-    var uadSlots = slots.filter(function (slot) {
-      var slug = slot.getSlotElementId().replace('mai-ad-', '');
+    const uadSlots = slots.filter(slot => {
+      const slug = slot.getSlotElementId().replace('mai-ad-', '');
       return !(1 === ads[slug].sizes.length && 'fluid' === ads[slug].sizes[0]) && 'client' !== ads[slug]['context'];
-    }).map(function (slot) {
-      var elId = slot.getSlotElementId();
-      var slug = elId.replace('mai-ad-', '');
+    }).map(slot => {
+      const elId = slot.getSlotElementId();
+      const slug = elId.replace('mai-ad-', '');
       return {
         slotID: elId,
         slotName: gamBase + ads[slug]['id'],
@@ -613,7 +605,7 @@ function maiPubDisplaySlots(slots) {
     // If we have uadSlots.
     if (uadSlots.length) {
       // Set the amazon config.
-      var amazonConfig = {
+      const amazonConfig = {
         slots: uadSlots,
         timeout: bidderTimeout,
         params: {
@@ -625,14 +617,14 @@ function maiPubDisplaySlots(slots) {
       maiPubLog('amazonConfig', amazonConfig);
 
       // Fetch bids from Amazon UAM using apstag.
-      var requestStartTime = Date.now();
+      const requestStartTime = Date.now();
       apstag.fetchBids(amazonConfig, function (bids) {
         // Log timing information
-        var amazonResponseTime = Date.now() - requestStartTime;
+        const amazonResponseTime = Date.now() - requestStartTime;
         maiPubLog('Amazon response time:', amazonResponseTime);
 
         // Track Amazon bids
-        bids.forEach(function (bid) {
+        bids.forEach(bid => {
           bidResponses.amazon[bid.slotID] = {
             time: Date.now(),
             value: bid.amznbid,
@@ -652,15 +644,13 @@ function maiPubDisplaySlots(slots) {
         // If we have all bids, send the adserver request.
         if (requestManager.dmBidsReceived) {
           sendAdserverRequest();
-          maiPubLog('refresh() with amazon fetch: ' + uadSlots.map(function (slot) {
-            return slot.slotID.replace('mai-ad-', '');
-          }).join(', '), uadSlots);
+          maiPubLog('refresh() with amazon fetch: ' + uadSlots.map(slot => slot.slotID.replace('mai-ad-', '')).join(', '), uadSlots);
         }
 
         // Log if debugging.
         if (debug || log) {
           // Check bid responses for errors.
-          bids.forEach(function (bid) {
+          bids.forEach(bid => {
             if (bid.error) {
               maiPubLog('apstag.fetchBids error:', bid);
             }
@@ -676,9 +666,7 @@ function maiPubDisplaySlots(slots) {
       // If we have all bids, send the adserver request.
       if (requestManager.dmBidsReceived) {
         sendAdserverRequest();
-        maiPubLog('refresh() without amazon slots to fetch: ' + slots.map(function (slot) {
-          return slot.getSlotElementId();
-        }).join(', '), slots);
+        maiPubLog('refresh() without amazon slots to fetch: ' + slots.map(slot => slot.getSlotElementId()).join(', '), slots);
       }
     }
   }
@@ -696,14 +684,12 @@ function maiPubDisplaySlots(slots) {
     if (requestManager.dmBidsReceived) {
       sendAdserverRequest();
     }
-    maiPubLog('refresh() with GAM:' + slots.map(function (slot) {
-      return slot.getSlotElementId();
-    }).join(', '), slots);
+    maiPubLog('refresh() with GAM:' + slots.map(slot => slot.getSlotElementId()).join(', '), slots);
   }
 
   // Start the failsafe timeout.
-  setTimeout(function () {
-    var timeoutData = {
+  setTimeout(() => {
+    const timeoutData = {
       adserverRequestSent: requestManager.adserverRequestSent,
       dmBidsReceived: requestManager.dmBidsReceived,
       apsBidsReceived: requestManager.apsBidsReceived,
@@ -758,9 +744,7 @@ function maiPubIsRefreshable(slot) {
  */
 function maiPubRefreshSlots(slots) {
   if (maiPubAdsVars.amazonUAM) {
-    maiPubLog('setDisplayBids via apstag: ' + slots.map(function (slot) {
-      return slot.getSlotElementId();
-    }).join(', '), slots);
+    maiPubLog('setDisplayBids via apstag: ' + slots.map(slot => slot.getSlotElementId()).join(', '), slots);
     apstag.setDisplayBids();
   }
 
@@ -775,17 +759,17 @@ function maiPubRefreshSlots(slots) {
  *
  * @param {mixed} mixed The data to log.
  */
-function maiPubLog() {
+function maiPubLog(...mixed) {
   if (!(debug || log)) {
     return;
   }
 
   // Set log variables.
-  var timer = 'maipub ';
+  let timer = 'maipub ';
 
   // Set times.
-  var current = Date.now();
-  var now = new Date().toLocaleTimeString('en-US', {
+  const current = Date.now();
+  const now = new Date().toLocaleTimeString('en-US', {
     hour12: true
   });
 
@@ -799,10 +783,8 @@ function maiPubLog() {
   }
 
   // Log the combined message.
-  for (var _len = arguments.length, mixed = new Array(_len), _key = 0; _key < _len; _key++) {
-    mixed[_key] = arguments[_key];
-  }
-  console.log("".concat(timer, " ").concat(now), mixed);
+  console.log(`${timer} ${now}`, mixed);
 }
 /******/ })()
 ;
+//# sourceMappingURL=mai-publisher-ads.js.map
