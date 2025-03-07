@@ -23,7 +23,7 @@ const bidResponses     = { prebid: {}, amazon: {}, timeouts: [] };
 let   timestamp        = Date.now();
 
 // If debugging, log.
-maiPubLog( 'v203' );
+maiPubLog( 'v204' );
 
 // If using Amazon UAM bids, add it. No need to wait for googletag to be loaded.
 if ( maiPubAdsVars.amazonUAM ) {
@@ -596,15 +596,14 @@ function maiPubDisplaySlots( slots ) {
 			apstag.fetchBids( amazonConfig, function(bids) {
 				// Log timing information
 				const amazonResponseTime = Date.now() - requestStartTime;
-				maiPubLog('Amazon response time:', amazonResponseTime);
+				maiPubLog('Amazon response time:', amazonResponseTime + 'ms' );
 
 				// Track Amazon bids
 				bids.forEach((bid) => {
 					bidResponses.amazon[bid.slotID] = {
-						time: Date.now(),
 						value: bid.amznbid,
 						size: bid.size,
-						responseTime: amazonResponseTime,
+						responseTime: amazonResponseTime + 'ms',
 						error: bid.error || null
 					};
 				});
