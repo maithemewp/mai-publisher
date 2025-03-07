@@ -1377,4 +1377,24 @@ class Mai_Publisher_Output {
 
 		return trim( $input );
 	}
+
+	/**
+	 * Adds scripts to the footer.
+	 *
+	 * @since 0.1.0
+	 *
+	 * @return void
+	 */
+	function add_scripts() {
+		// Bail if not rendering.
+		if ( ! maipub_should_render() ) {
+			return;
+		}
+
+		$scripts    = [];
+		$asset_data = maipub_get_asset_data( 'mai-publisher-ads.js', 'script' );
+		$scripts[]  = sprintf( '<script async id="mai-publisher-ads" src="%s?ver=%s"></script>', $asset_data['url'], $asset_data['version'] );
+
+		echo implode( "\n", $scripts );
+	}
 }

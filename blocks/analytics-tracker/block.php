@@ -21,7 +21,7 @@ class Mai_Publisher_Analytics_Tracker_Block {
 	function hooks() {
 		add_action( 'acf/init',   [ $this, 'register_block' ] );
 		add_action( 'acf/init',   [ $this, 'register_field_group' ] );
-		add_action( 'admin_init', [ $this, 'register_script' ] );
+		add_action( 'admin_init', [ $this, 'enqueue_assets' ] );
 	}
 
 	/**
@@ -103,14 +103,14 @@ class Mai_Publisher_Analytics_Tracker_Block {
 	}
 
 	/**
-	 * Enqueue JS for block transforms.
+	 * Enqueues block assets.
 	 *
-	 * @since 0.7.0
+	 * @since 0.1.0
 	 *
 	 * @return void
 	 */
-	function register_script() {
-		$file = 'build/mai-analytics-tracker.js';
-		wp_enqueue_script( 'mai-publisher-analytics-tracker', maipub_get_file_data( $file, 'url' ), [], maipub_get_file_data( $file, 'version' ), [ 'in_footer' => true ] );
+	function enqueue_assets() {
+		$asset_data = maipub_get_asset_data( 'mai-analytics-tracker.js', 'script' );
+		wp_enqueue_script( 'mai-publisher-analytics-tracker', $asset_data['url'], $asset_data['dependencies'], $asset_data['version'], [ 'in_footer' => true ] );
 	}
 }

@@ -10,24 +10,8 @@ const entries = [...glob.sync('./src/js/*.js'), ...glob.sync('./src/css/*.css')]
         return acc;
     }, {});
 
-// Create a modified config with source maps enabled
-const config = {
+module.exports = {
     ...defaultConfig,
     entry: entries,
-    devtool: 'source-map',
+    devtool: 'source-map', // Explicitly enable source maps
 };
-
-// Enable source maps for CSS
-if (config.module && config.module.rules) {
-    config.module.rules.forEach(rule => {
-        if (rule.test && rule.test.toString().includes('.css') && Array.isArray(rule.use)) {
-            rule.use.forEach(loader => {
-                if (loader && typeof loader === 'object' && loader.options) {
-                    loader.options.sourceMap = true;
-                }
-            });
-        }
-    });
-}
-
-module.exports = config;

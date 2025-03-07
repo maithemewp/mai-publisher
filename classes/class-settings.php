@@ -26,7 +26,7 @@ class Mai_Publisher_Settings {
 	 */
 	function hooks() {
 		add_action( 'admin_menu',                                          [ $this, 'add_menu_item' ], 12 );
-		add_action( 'admin_enqueue_scripts',                               [ $this, 'enqueue_script' ] );
+		add_action( 'admin_enqueue_scripts',                               [ $this, 'enqueue' ] );
 		add_action( 'admin_init',                                          [ $this, 'init' ] );
 		add_filter( 'plugin_action_links_mai-publisher/mai-publisher.php', [ $this, 'add_plugin_links' ], 10, 4 );
 	}
@@ -50,30 +50,23 @@ class Mai_Publisher_Settings {
 	}
 
 	/**
-	 * Enqueue script for select2.
+	 * Enqueues scripts and styles.
 	 *
-	 * @since 0.7.0
+	 * @since 0.1.0
 	 *
 	 * @return void
 	 */
-	function enqueue_script() {
-		$screen = get_current_screen();
-
-		if ( 'mai_ad_page_settings' !== $screen->id ) {
-			return;
-		}
-
-		// Select2 from CDN.
+	function enqueue() {
+		// External libraries.
 		wp_enqueue_style( 'mai-publisher-select2', 'https://cdn.jsdelivr.net/npm/select2/dist/css/select2.min.css' );
 		wp_enqueue_script( 'mai-publisher-select2', 'https://cdn.jsdelivr.net/npm/select2/dist/js/select2.min.js' );
 
-		// Get files.
-		$css = 'build/mai-publisher-settings.css';
-		$js  = 'build/mai-publisher-settings.js';
+		// Our asset data.
+		$css_data = maipub_get_asset_data( 'mai-publisher-settings.css', 'style' );
+		$js_data  = maipub_get_asset_data( 'mai-publisher-settings.js', 'script' );
 
-		// Enqueue.
-		wp_enqueue_style( 'mai-publisher-settings', maipub_get_file_data( $css, 'url' ), [], maipub_get_file_data( $css, 'version' ) );
-		wp_enqueue_script( 'mai-publisher-settings', maipub_get_file_data( $js, 'url' ), [ 'jquery', 'mai-publisher-select2' ], maipub_get_file_data( $js, 'version' ), [ 'in_footer' => true ] );
+		wp_enqueue_style( 'mai-publisher-settings', $css_data['url'], [], $css_data['version'] );
+		wp_enqueue_script( 'mai-publisher-settings', $js_data['url'], array_merge( $js_data['dependencies'], [ 'jquery', 'mai-publisher-select2' ] ), $js_data['version'], [ 'in_footer' => true ] );
 	}
 
 	/**

@@ -482,41 +482,66 @@ function maipub_update_option( $option, $value ) {
 }
 
 /**
- * Gets file data.
+ * Gets asset file data for a script or style.
  *
- * @since 0.1.0
+ * @since TBD
  *
- * @param string $file The file path name.
- * @param string $key The specific key to return
+ * @param string $file    The file path relative to the build directory.
+ * @param string $type    The asset type ('script' or 'style').
+ * @param array  $options Additional options.
  *
- * @return array|string
+ * @return array Asset data including url, version, and dependencies.
  */
-function maipub_get_file_data( $file, $key = '' ) {
-	static $cache = null;
+function maipub_get_asset_data( $file, $type = 'script', $options = [] ) {
+	static $cache = [];
 
-	if ( ! is_null( $cache ) && isset( $cache[ $file ] ) ) {
-		if ( $key ) {
-			return $cache[ $file ][ $key ];
-		}
-
-		return $cache[ $file ];
+	// Return cached data if available.
+	$cache_key = $file . '|' . $type;
+	if ( isset( $cache[ $cache_key ] ) ) {
+		return $cache[ $cache_key ];
 	}
 
-	$cache          = is_array( $cache ) ? $cache : [];
-	$file_path      = MAI_PUBLISHER_DIR . $file;
-	$file_url       = MAI_PUBLISHER_URL . $file;
-	$version        = MAI_PUBLISHER_VERSION . '.' . date( 'njYHi', filemtime( $file_path ) );
-	$cache[ $file ] = [
-		'path'    => $file_path,
-		'url'     => $file_url,
-		'version' => $version,
+	// Set up default data.
+	$data = [
+		'url'          => MAI_PUBLISHER_URL . 'build/' . $file,
+		'version'      => MAI_PUBLISHER_VERSION,
+		'dependencies' => [],
 	];
 
-	if ( $key ) {
-		return $cache[ $file ][ $key ];
+	// For scripts, try to get data from the asset file.
+	if ( 'script' === $type ) {
+		$asset_file = MAI_PUBLISHER_DIR . 'build/' . str_replace( '.js', '.asset.php', $file );
+
+		if ( file_exists( $asset_file ) ) {
+			$asset_data = require( $asset_file );
+			$data['version'] = $asset_data['version'];
+			$data['dependencies'] = $asset_data['dependencies'];
+		}
 	}
 
-	return $cache[ $file ];
+	// For styles, use the corresponding script's version if available.
+	if ( 'style' === $type && empty( $options['script_file'] ) ) {
+		// Try to find a matching script file.
+		$script_file = str_replace( '.css', '.js', $file );
+		$asset_file = MAI_PUBLISHER_DIR . 'build/' . str_replace( '.js', '.asset.php', $script_file );
+
+		if ( file_exists( $asset_file ) ) {
+			$asset_data = require( $asset_file );
+			$data['version'] = $asset_data['version'];
+		}
+	} elseif ( 'style' === $type && ! empty( $options['script_file'] ) ) {
+		// Use the specified script file for version.
+		$asset_file = MAI_PUBLISHER_DIR . 'build/' . str_replace( '.js', '.asset.php', $options['script_file'] );
+
+		if ( file_exists( $asset_file ) ) {
+			$asset_data = require( $asset_file );
+			$data['version'] = $asset_data['version'];
+		}
+	}
+
+	// Cache and return the data.
+	$cache[ $cache_key ] = $data;
+	return $data;
 }
 
 /**

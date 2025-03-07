@@ -46,14 +46,14 @@ class Mai_Publisher_Tracking {
 		do_action( 'mai_publisher_before_enqueue_analytics' );
 
 		// Get the script file.
-		$file = 'build/mai-publisher-analytics.js';
+		$asset_data = maipub_get_asset_data( 'mai-publisher-analytics.js', 'script' );
 
 		// Enqueue the script.
 		wp_enqueue_script(
 			'mai-publisher-analytics',
-			maipub_get_file_data( $file, 'url' ),
-			[],
-			maipub_get_file_data( $file, 'version' ),
+			$asset_data['url'],
+			$asset_data['dependencies'],
+			$asset_data['version'],
 			[
 				'strategy' => 'async',
 				'in_footer' => true,

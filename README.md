@@ -103,45 +103,58 @@ This document outlines the steps to set up the development environment, run task
 1. **Node.js**: Ensure that you have Node.js installed. You can download and install it from [nodejs.org](https://nodejs.org/).
 
 2. **npm**: npm (Node Package Manager) is included with Node.js. Verify its installation with:
-```
-bash
+```bash
 npm -v
 ```
 
 ### Install Dependencies
-```
+```bash
 npm install
 ```
 
 ### Updating Node.js
 If you need to update Node.js to the latest version, you can use nvm (Node Version Manager).
 
-1. Install nvm: Follow the installation instructions on (nvm’s GitHub page)[https://github.com/nvm-sh/nvm].
+1. Install nvm: Follow the installation instructions on [nvm's GitHub page](https://github.com/nvm-sh/nvm).
 2. Update Node.js: Use nvm to install the latest version:
-```
+```bash
 nvm install node
 nvm use node
 ```
 
-### Running Development Tasks
-- Development Build: To compile and minify assets for development:
+### Build System
+Mai Publisher uses WordPress Scripts (@wordpress/scripts) for its build system, which provides a modern development workflow.
+
+#### Running Development Tasks
+- **Development Mode**: For development with automatic rebuilding on file changes:
+```bash
+npm run start
 ```
-npm run dev
+This mode generates non-minified files with source maps for easier debugging.
+
+- **Production Build**: To compile and minify assets for production:
+```bash
+npm run build
+```
+This mode generates minified files optimized for production use.
+
+- **Update Packages**: To update WordPress Scripts and other dependencies:
+```bash
+npm run packages-update
 ```
 
-- Production Build: To compile and minify assets for production:
-```
-npm run production
-```
+### Source and Build Directories
+- **Source Files**:
+  - `src/js/`: JavaScript source files
+  - `src/css/`: CSS source files
 
-- Watch for Changes: To continuously watch and rebuild assets on file changes:
-```
-npm run watch
-```
+- **Build Output**:
+  - `build/`: Contains all compiled and minified assets
+  - Source maps are included for both JS and CSS files
+  - RTL CSS files are automatically generated
 
-### Directory Structure
-- assets/js: JavaScript source files.
-- assets/css: CSS source files.
-- blocks: Block-specific source files for JavaScript and CSS.
-- build/js: Full (non-minified) and minified JavaScript files.
-- build/css: Full (non-minified) and minified CSS files.
+### Build Features
+- **Automatic Entry Points**: All JS and CSS files in the source directories are automatically processed
+- **Source Maps**: Enabled for both JS and CSS files to aid debugging
+- **Minification**: JS and CSS files are minified in production builds
+- **RTL Support**: RTL CSS files are automatically generated

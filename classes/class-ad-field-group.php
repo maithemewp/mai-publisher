@@ -42,8 +42,8 @@ class Mai_Publisher_Ad_Field_Group {
 			return;
 		}
 
-		$file = 'build/mai-publisher-admin.js';
-		wp_enqueue_script( 'mai-publisher-admin', maipub_get_file_data( $file, 'url' ), [], maipub_get_file_data( $file, 'version' ), [ 'in_footer' => true ] );
+		$asset_data = maipub_get_asset_data( 'mai-publisher-admin.js', 'script' );
+		wp_enqueue_script( 'mai-publisher-admin', $asset_data['url'], $asset_data['dependencies'], $asset_data['version'], [ 'in_footer' => true ] );
 	}
 
 	/**
