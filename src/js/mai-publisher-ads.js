@@ -493,40 +493,41 @@ function maiPubDisplaySlots( slots ) {
 			// Set the magnite config.
 			pbjs.setConfig( pbjsConfig );
 
+			// This is from Claude, Idk if this is an actual event, I couldn't find it in the docs.
 			// Add bid response tracking
 			pbjs.onEvent('bidResponse', function(bid) {
 				bidResponses.prebid[bid.bidder] = {
-					time: Date.now(),
 					value: bid.cpm,
 					size: bid.size,
 					adUnitCode: bid.adUnitCode,
-					timeToRespond: bid.timeToRespond
+					timeToRespond: bid.timeToRespond + 'ms'
 				};
 				maiPubLog('Prebid bid received from ' + bid.bidder, bid);
 			});
 
+			// This is from Claude, Idk if this is an actual event, I couldn't find it in the docs.
 			// Add timeout monitoring
 			pbjs.onEvent('bidTimeout', function(timeoutBids) {
 				timeoutBids.forEach(bid => {
 					bidResponses.timeouts.push({
 						bidder: bid.bidder,
 						adUnitCode: bid.adUnitCode,
-						time: Date.now(),
-						timeout: bidderTimeout
+						timeout: bidderTimeout + 'ms'
 					});
 				});
 				maiPubLog('Bid timeout occurred:', timeoutBids);
 			});
 
+			// This is from Claude, Idk if this is an actual event, I couldn't find it in the docs.
 			// Add all bid response monitoring
 			pbjs.onEvent('allBidsBack', function(bids) {
 				maiPubLog('All bids back:', {
 					bids: bids,
 					timeouts: bidResponses.timeouts,
 					timing: {
-						totalTime: Date.now() - timestamp,
-						bidderTimeout: bidderTimeout,
-						fallbackTimeout: fallbackTimeout
+						totalTime: Date.now() - timestamp + 'ms',
+						bidderTimeout: bidderTimeout + 'ms',
+						fallbackTimeout: fallbackTimeout + 'ms'
 					}
 				});
 			});
