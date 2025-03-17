@@ -318,19 +318,36 @@ class Mai_Publisher_Output {
 				$gam_base_client = "/$this->network_code/";
 			}
 
+			// Get dc segs.
+			$dc_seg = maipub_get_option( 'dc_seg' );
+
+			// If dc segs, explode and sanitize.
+			if ( $dc_seg ) {
+				$dc_seg = array_map( 'sanitize_text_field', explode( ',', $dc_seg ) );
+				$dc_seg = array_map( 'trim', $dc_seg );
+			}
+
 			// Get script location and localize.
 			$localize = [
 				'domain'        => $this->domain,
+				'domainHashed'  => $this->domain_hashed,
+				'bbNetworkCode' => $this->bb_network_code,
 				'sellersName'   => $this->sellers_name,
 				'sellersId'     => $this->sellers_id,
 				'gamBase'       => $gam_base,
 				'gamBaseClient' => $gam_base_client,
 				'ads'           => $this->gam,
 				'targets'       => $this->get_targets(),
+				'dcSeg'         => (array) $dc_seg,
 				'magnite'       => maipub_get_option( 'magnite_enabled' ),
 				'amazonUAM'     => maipub_get_option( 'amazon_uam_enabled' ),
 				'loadDelay'     => maipub_get_option( 'load_delay' ),
 				'debug'         => maipub_get_option( 'debug_enabled' ),
+				'matomo'        => [
+					'url'     => maipub_get_option( 'matomo_url', false ),
+					'site_id' => maipub_get_option( 'matomo_site_id', false ),
+					'enabled' => maipub_matomo_enabled(),
+				],
 			];
 
 			// If magnite is enabled.
@@ -373,6 +390,30 @@ class Mai_Publisher_Output {
 
 				// Add GPT.
 				$scripts[] = '<script async id="mai-publisher-gpt" src="https://securepubads.g.doubleclick.net/tag/js/gpt.js"></script>'; // Google Ad Manager GPT.
+			}
+
+			// If matomo is enabled.
+			if ( $localize['matomo']['enabled'] ) {
+				// Script IDs.
+				$analytics_js = [
+					'mai-publisher-analytics-js-before',
+					'mai-publisher-analytics-js',
+				];
+
+				// Loop through script IDs.
+				foreach ( $analytics_js as $script_id ) {
+					$script_query = $this->xpath->query( "//script[@id='$script_id']" );
+
+					// If script exists, add it to the scripts array.
+					if ( $script_query->length ) {
+						$node = $script_query->item(0);
+						$node->removeAttribute( 'async' ); // Remove the async attribute so we have visitorID right away.
+						$scripts[] = $this->dom->saveHTML( $node );  // This gets the entire <script> tag.
+
+						// Remove the node.
+						$node->parentNode->removeChild( $node );
+					}
+				}
 			}
 
 			// Add mai-publisher-ads scripts.
@@ -1376,25 +1417,5 @@ class Mai_Publisher_Output {
 		);
 
 		return trim( $input );
-	}
-
-	/**
-	 * Adds scripts to the footer.
-	 *
-	 * @since 0.1.0
-	 *
-	 * @return void
-	 */
-	function add_scripts() {
-		// Bail if not rendering.
-		if ( ! maipub_should_render() ) {
-			return;
-		}
-
-		$scripts    = [];
-		$asset_data = maipub_get_asset_data( 'mai-publisher-ads.js', 'script' );
-		$scripts[]  = sprintf( '<script async id="mai-publisher-ads" src="%s?ver=%s"></script>', $asset_data['url'], $asset_data['version'] );
-
-		echo implode( "\n", $scripts );
 	}
 }

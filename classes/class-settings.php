@@ -236,6 +236,14 @@ class Mai_Publisher_Settings {
 		);
 
 		add_settings_field(
+			'dc_seg', // id
+			__( 'Audience Segments', 'mai-publisher' ), // title
+			[ $this, 'dc_seg_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings' // section
+		);
+
+		add_settings_field(
 			'magnite_enabled', // id
 			__( 'Magnite Demand Manager', 'mai-publisher' ), // title
 			[ $this, 'magnite_enabled_callback' ], // callback
@@ -444,6 +452,7 @@ class Mai_Publisher_Settings {
 			'gam_sellers_id'              => 'sanitize_text_field',
 			'gam_sellers_name'            => 'sanitize_text_field',
 			'gam_targets'                 => 'sanitize_text_field',
+			'dc_seg'                      => 'sanitize_text_field',
 			'sourcepoint_property_id'     => 'absint',
 			'sourcepoint_msps_message_id' => 'absint',
 			'sourcepoint_tcf_message_id'  => 'absint',
@@ -645,6 +654,18 @@ class Mai_Publisher_Settings {
 	function gam_targets_callback() {
 		printf( '<input class="regular-text" type="text" name="mai_publisher[gam_targets]" id="gam_targets" value="%s">', maipub_get_option( 'gam_targets', false ) );
 		printf( '<p class="description">%s</p>', __( 'Comma-separated key value pairs. Example: a=b, d=f', 'mai-publisher' ) );
+	}
+
+	/**
+	 * Setting callback.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	function dc_seg_callback() {
+		printf( '<input class="regular-text" type="text" name="mai_publisher[dc_seg]" id="dc_seg" value="%s">', maipub_get_option( 'dc_seg', false ) );
+		printf( '<p class="description">%s</p>', __( 'Comma-separated values. Example: 1234567890, 0987654321', 'mai-publisher' ) );
 	}
 
 	/**

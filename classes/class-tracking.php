@@ -55,8 +55,8 @@ class Mai_Publisher_Tracking {
 			$asset_data['dependencies'],
 			$asset_data['version'],
 			[
-				'strategy' => 'async',
-				'in_footer' => true,
+				'strategy'  => 'async',   // Removed in output.php if we have ads.
+				'in_footer' => true,      // Moved higher in output.php if we have ads.
 			]
 		);
 

@@ -80,6 +80,46 @@ googletag.cmd.push(() => {
 	googletag.pubads().disableInitialLoad(); // Disable initial load for header bidding.
 	googletag.pubads().enableSingleRequest();
 
+	// Get visitor ID.
+	let visitorId = '';
+	if ( typeof Matomo !== 'undefined' && typeof maiPubAnalyticsVars !== 'undefined' ) {
+		const tracker   = Matomo.getTracker( maiPubAnalyticsVars.analytics.url, maiPubAnalyticsVars.analytics.id );
+		      visitorId = tracker.getVisitorId();
+
+		// Set publisher provided ID.
+		googletag.pubads().setPublisherProvidedId( visitorId );
+	}
+
+	// If we have segments.
+	if ( maiPubAdsVars.dcSeg ) {
+		// Build the PCD script.
+		const pcdScript           = document.createElement( 'script' );
+		      pcdScript.async     = true;
+		      pcdScript.id        = 'google-pcd-tag';
+		      pcdScript.className = 'mai-pcd-tag';
+		      pcdScript.src       = 'https://pagead2.googlesyndication.com/pagead/js/pcd.js';
+
+		// Build the segments.
+		let segments = '';
+		maiPubAdsVars.dcSeg.forEach( seg => {
+			segments += `dc_seg=${seg};`;
+		});
+
+		// Build the audience pixel.
+		let audiencePixel = `dc_iu=/${maiPubAdsVars.bbNetworkCode}/DFPAudiencePixel;${segments}gd=${maiPubAdsVars.domainHashed}`;
+
+		// If we have a visitor ID, add it.
+		if ( visitorId ) {
+			audiencePixel += `;ppid=${visitorId};`;
+		}
+
+		// Set the audience pixel.
+		pcdScript.setAttribute( 'data-audience-pixel', audiencePixel );
+
+		// Insert before the current script.
+		document.currentScript.parentNode.insertBefore( pcdScript, document.currentScript );
+	}
+
 	// Enable services.
 	googletag.enableServices();
 

@@ -4,6 +4,21 @@
 defined( 'ABSPATH' ) || die;
 
 /**
+ * Checks if Matomo is enabled.
+ *
+ * @since TBD
+ *
+ * @return bool
+ */
+function maipub_matomo_enabled() {
+	$site_url         = maipub_get_option( 'matomo_url', false );
+	$site_id          = maipub_get_option( 'matomo_site_id', false );
+	$matomo_enabled   = maipub_get_option( 'matomo_enabled', false );
+
+	return $matomo_enabled && $site_url && $site_id;
+}
+
+/**
  * Gets the content age.
  * Index 0 is the min months, index 1 is the readable string label.
  *
