@@ -406,8 +406,7 @@ class Mai_Publisher_Output {
 
 					// If script exists, add it to the scripts array.
 					if ( $script_query->length ) {
-						$node = $script_query->item(0);
-						$node->removeAttribute( 'async' ); // Remove the async attribute so we have visitorID right away.
+						$node      = $script_query->item(0);
 						$scripts[] = $this->dom->saveHTML( $node );  // This gets the entire <script> tag.
 
 						// Remove the node.
