@@ -545,22 +545,20 @@ function maiPubDisplaySlots( slots ) {
 
 			// If we have a visitor ID, add it.
 			if ( visitorId ) {
-				pbjs.setConfig({
-					userSync: {
-						userIds: [{
-							name: "pubProvidedId",
-							params: {
-								eids: [{
-									source: maiPubAdsVars.domain,
-									uids: [{
-										id: visitorId,
-										atype: 1
-									}]
+				pbjsConfig.userSync = {
+					userIds: [{
+						name: "pubProvidedId",
+						params: {
+							eids: [{
+								source: maiPubAdsVars.domain,
+								uids: [{
+									id: visitorId,
+									atype: 1
 								}]
-							}
-						}]
-					}
-				});
+							}]
+						}
+					}]
+				};
 			}
 
 			// If debugging or logging, enable debugging for magnite.
