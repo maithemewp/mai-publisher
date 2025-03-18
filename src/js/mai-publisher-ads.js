@@ -543,7 +543,10 @@ function maiPubDisplaySlots( slots ) {
 				ortb2: maiPubAdsVars.ortb2,
 			};
 
-			// If we have a visitor ID, add it.
+			/**
+			 * If we have a visitor ID, add it.
+			 * @link https://docs.prebid.org/dev-docs/modules/userid-submodules/pubprovided.html
+			 */
 			if ( visitorId ) {
 				pbjsConfig.userSync = {
 					userIds: [{
