@@ -21,6 +21,7 @@ const debug            = window.location.search.includes('dfpdeb') || window.loc
 const log              = maiPubAdsVars.debug;
 const bidResponses     = { prebid: {}, amazon: {}, timeouts: [] };
 let   timestamp        = Date.now();
+let   visitorId        = '';
 
 // If debugging, log.
 maiPubLog( 'v204' );
@@ -81,7 +82,6 @@ googletag.cmd.push(() => {
 	googletag.pubads().enableSingleRequest();
 
 	// Get visitor ID.
-	let visitorId = '';
 	if ( typeof Matomo !== 'undefined' && typeof maiPubAnalyticsVars !== 'undefined' ) {
 		const tracker   = Matomo.getTracker( maiPubAnalyticsVars.analytics.url, maiPubAnalyticsVars.analytics.id );
 		      visitorId = tracker.getVisitorId();
@@ -518,6 +518,26 @@ function maiPubDisplaySlots( slots ) {
 				enableTIDs: true,
 				ortb2: maiPubAdsVars.ortb2,
 			};
+
+			// If we have a visitor ID, add it.
+			if ( visitorId ) {
+				pbjs.setConfig({
+					userSync: {
+						userIds: [{
+							name: "pubProvidedId",
+							params: {
+								eids: [{
+									source: maiPubAdsVars.domain,
+									uids: [{
+										id: visitorId,
+										atype: 1
+									}]
+								}]
+							}
+						}]
+					}
+				});
+			}
 
 			// If debugging or logging, enable debugging for magnite.
 			// Disabled. Magnite said this was breaking their own debugging.
