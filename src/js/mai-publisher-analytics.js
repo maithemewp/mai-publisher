@@ -59,6 +59,15 @@
 					}
 				}
 
+				// Dispatch custom event after processing analytics.
+				const trackerEvent  = new CustomEvent( 'maiPublisherAnalyticsInit', {
+					detail: {
+						tracker: matomoTracker,
+					},
+					cancelable: true
+				});
+				document.dispatchEvent(trackerEvent);
+
 				// If we have an ajax url and body, update the views.
 				if ( analytics[ tracker ].ajaxUrl && analytics[ tracker ].body ) {
 					// Send ajax request.

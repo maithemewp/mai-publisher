@@ -24,7 +24,7 @@ let   timestamp        = Date.now();
 let   visitorId        = '';
 
 // If debugging, log.
-maiPubLog( 'v204' );
+maiPubLog( 'v206' );
 
 // If using Amazon UAM bids, add it. No need to wait for googletag to be loaded.
 if ( maiPubAdsVars.amazonUAM ) {
@@ -58,242 +58,266 @@ if ( maiPubAdsVars.amazonUAM ) {
 	});
 }
 
-// Add to googletag items.
-googletag.cmd.push(() => {
-	/**
-	 * Set SafeFrame -- This setting will only take effect for subsequent ad requests made for the respective slots.
-	 * To enable cross domain rendering for all creatives, execute setForceSafeFrame before loading any ad slots.
-	 */
-	// Disabled for now: https://developers.google.com/publisher-tag/reference#googletag.PubAdsService_setForceSafeFrame
-	// googletag.pubads().setForceSafeFrame( true );
-
-	// Set page-level targeting.
-	if ( maiPubAdsVars.targets ) {
-		Object.keys( maiPubAdsVars.targets ).forEach( key => {
-			googletag.pubads().setTargeting( key, maiPubAdsVars.targets[key].toString() );
+// If we need analytics, wait for visitor ID
+if ( maiPubAdsVars.matomo.enabled ) {
+	// Check if Matomo is already initialized with a tracker.
+	if ( 'undefined' !== typeof Matomo ) {
+		visitorId = Matomo.getAsyncTracker().getVisitorId();
+		maiPubLog( 'Matomo initialized, initGoogleTag with visitorId: ' + visitorId );
+		initGoogleTag( visitorId );
+	} else {
+		// Wait for analytics init event.
+		document.addEventListener('maiPublisherAnalyticsInit', function(event) {
+			visitorId = event.detail.tracker.getVisitorId();
+			maiPubLog( 'Waited for Matomo, initGoogleTag with visitorId: ' + visitorId );
+			initGoogleTag( visitorId );
 		});
 	}
-
-	// Make ads centered.
-	googletag.pubads().setCentering( true );
-
-	// Enable SRA and services.
-	googletag.pubads().disableInitialLoad(); // Disable initial load for header bidding.
-	googletag.pubads().enableSingleRequest();
-
-	// Get visitor ID.
-	if ( typeof Matomo !== 'undefined' && typeof maiPubAnalyticsVars !== 'undefined' ) {
-		const tracker   = Matomo.getTracker( maiPubAnalyticsVars.analytics.url, maiPubAnalyticsVars.analytics.id );
-		      visitorId = tracker.getVisitorId();
-
-		// Set publisher provided ID.
-		googletag.pubads().setPublisherProvidedId( visitorId );
+} else {
+	// Create a persistent visitor ID if one doesn't exist.
+	visitorId = localStorage.getItem( 'maiPubVisitorId' );
+	if ( ! visitorId ) {
+		visitorId = Math.random().toString(36).substring(2, 10) + Date.now().toString(36).substring(2, 10);
+		localStorage.setItem( 'maiPubVisitorId', visitorId );
 	}
+	maiPubLog( 'No Matomo, using visitorId: ' + visitorId );
+	initGoogleTag( visitorId );
+}
 
-	// If we have segments.
-	if ( maiPubAdsVars.dcSeg ) {
-		// Build the PCD script.
-		const pcdScript           = document.createElement( 'script' );
-		      pcdScript.async     = true;
-		      pcdScript.id        = 'google-pcd-tag';
-		      pcdScript.className = 'mai-pcd-tag';
-		      pcdScript.src       = 'https://pagead2.googlesyndication.com/pagead/js/pcd.js';
+// Function to initialize Google Tag.
+function initGoogleTag( visitorId ) {
+	googletag.cmd.push(() => {
+		/**
+		 * Set SafeFrame -- This setting will only take effect for subsequent ad requests made for the respective slots.
+		 * To enable cross domain rendering for all creatives, execute setForceSafeFrame before loading any ad slots.
+		 */
+		// Disabled for now: https://developers.google.com/publisher-tag/reference#googletag.PubAdsService_setForceSafeFrame
+		// googletag.pubads().setForceSafeFrame( true );
 
-		// Build the segments.
-		let segments = '';
-		maiPubAdsVars.dcSeg.forEach( seg => {
-			segments += `dc_seg=${seg};`;
-		});
+		// Set page-level targeting.
+		if ( maiPubAdsVars.targets ) {
+			Object.keys( maiPubAdsVars.targets ).forEach( key => {
+				googletag.pubads().setTargeting( key, maiPubAdsVars.targets[key].toString() );
+			});
+		}
 
-		// Build the audience pixel.
-		let audiencePixel = `dc_iu=/${maiPubAdsVars.bbNetworkCode}/DFPAudiencePixel;${segments}gd=${maiPubAdsVars.domainHashed}`;
+		// Make ads centered.
+		googletag.pubads().setCentering( true );
 
-		// If we have a visitor ID, add it.
+		// Enable SRA and services.
+		googletag.pubads().disableInitialLoad(); // Disable initial load for header bidding.
+		googletag.pubads().enableSingleRequest();
+
+		// If we have a visitor ID, set it.
 		if ( visitorId ) {
-			audiencePixel += `;ppid=${visitorId};`;
+			googletag.pubads().setPublisherProvidedId( visitorId );
 		}
 
-		// Set the audience pixel.
-		pcdScript.setAttribute( 'data-audience-pixel', audiencePixel );
+		// If we have segments.
+		if ( maiPubAdsVars.dcSeg ) {
+			// Build the PCD script.
+			const pcdScript           = document.createElement( 'script' );
+				  pcdScript.async     = true;
+				  pcdScript.id        = 'google-pcd-tag';
+				  pcdScript.className = 'mai-pcd-tag';
+				  pcdScript.src       = 'https://pagead2.googlesyndication.com/pagead/js/pcd.js';
 
-		// Insert before the current script.
-		document.currentScript.parentNode.insertBefore( pcdScript, document.currentScript );
-	}
+			// Build the segments.
+			let segments = '';
+			maiPubAdsVars.dcSeg.forEach( seg => {
+				segments += `dc_seg=${seg};`;
+			});
 
-	// Enable services.
-	googletag.enableServices();
+			// Build the audience pixel.
+			let audiencePixel = `dc_iu=/${maiPubAdsVars.bbNetworkCode}/DFPAudiencePixel;${segments}gd=${maiPubAdsVars.domainHashed}`;
 
-	// If no delay, run on DOMContentLoaded.
-	if ( ! maiPubAdsVars.loadDelay ) {
-		// Check if DOMContentLoaded has run.
-		if ( 'loading' === document.readyState ) {
-			// If it's still loading, wait for the event.
-			document.addEventListener( 'DOMContentLoaded', maiPubDOMContentLoaded );
-		} else {
-			// If it's already loaded, execute maiPubDOMContentLoaded().
-			maiPubDOMContentLoaded();
+			// If we have a visitor ID, add it.
+			if ( visitorId ) {
+				audiencePixel += `;ppid=${visitorId};`;
+			}
+
+			// Set the audience pixel.
+			pcdScript.setAttribute( 'data-audience-pixel', audiencePixel );
+
+			// Insert before the current script.
+			document.currentScript.parentNode.insertBefore( pcdScript, document.currentScript );
 		}
-	}
-	// Delayed on window load.
-	else {
-		// On window load.
-		window.addEventListener( 'load', () => {
-			setTimeout( maiPubDOMContentLoaded, maiPubAdsVars.loadDelay );
+
+		// Enable services.
+		googletag.enableServices();
+
+		// If no delay, run on DOMContentLoaded.
+		if ( ! maiPubAdsVars.loadDelay ) {
+			// Check if DOMContentLoaded has run.
+			if ( 'loading' === document.readyState ) {
+				// If it's still loading, wait for the event.
+				document.addEventListener( 'DOMContentLoaded', maiPubDOMContentLoaded );
+			} else {
+				// If it's already loaded, execute maiPubDOMContentLoaded().
+				maiPubDOMContentLoaded();
+			}
+		}
+		// Delayed on window load.
+		else {
+			// On window load.
+			window.addEventListener( 'load', () => {
+				setTimeout( maiPubDOMContentLoaded, maiPubAdsVars.loadDelay );
+			});
+		}
+
+		/**
+		 * Set 30 refresh when an ad is in view.
+		 */
+		googletag.pubads().addEventListener( 'impressionViewable', (event) => {
+			const slot   = event.slot;
+			const slotId = slot.getSlotElementId();
+
+			// Bail if not a refreshable slot.
+			if ( ! maiPubIsRefreshable( slot ) ) {
+				return;
+			}
+
+			// Set first load to current time.
+			loadTimes[slotId] = Date.now();
+
+			// Clear timeout if it exists.
+			if ( timeoutIds[slotId] ) {
+				clearTimeout( timeoutIds[slotId] );
+			}
+
+			// Set timeout to refresh ads for current visible ads.
+			timeoutIds[slotId] = setTimeout(() => {
+				// If debugging, log.
+				maiPubLog( 'refreshed via impressionViewable: ' + slotId, slot );
+
+				// Refresh the slot(s).
+				maiPubRefreshSlots( [slot] );
+
+			}, refreshTime * 1000 ); // Time in milliseconds.
 		});
-	}
 
-	/**
-	 * Set 30 refresh when an ad is in view.
-	 */
-	googletag.pubads().addEventListener( 'impressionViewable', (event) => {
-		const slot   = event.slot;
-		const slotId = slot.getSlotElementId();
+		/**
+		 * Refreshes ads when scrolled back into view.
+		 * Only refreshes if it's been n seconds since the ad was initially shown.
+		 */
+		googletag.pubads().addEventListener( 'slotVisibilityChanged', (event) => {
+			const slot   = event.slot;
+			const slotId = slot.getSlotElementId();
+			const inView = event.inViewPercentage > 5;
 
-		// Bail if not a refreshable slot.
-		if ( ! maiPubIsRefreshable( slot ) ) {
-			return;
-		}
+			// Bail if not a refreshable slot.
+			if ( ! maiPubIsRefreshable( slot ) ) {
+				return;
+			}
 
-		// Set first load to current time.
-		loadTimes[slotId] = Date.now();
+			// If in view and not currently visible, set to visible.
+			if ( inView && ! currentlyVisible[slotId] ) {
+				currentlyVisible[slotId] = true;
+			}
+			// If not in view and currently visible, set to not visible.
+			else if ( ! inView && currentlyVisible[slotId] ) {
+				currentlyVisible[slotId] = false;
+			}
+			// Not a change we care about.
+			else {
+				return;
+			}
 
-		// Clear timeout if it exists.
-		if ( timeoutIds[slotId] ) {
-			clearTimeout( timeoutIds[slotId] );
-		}
+			// If scrolled out of view, clear timeout then bail.
+			if ( ! currentlyVisible[slotId] ) {
+				clearTimeout( timeoutIds[slotId] );
+				return;
+			}
 
-		// Set timeout to refresh ads for current visible ads.
-		timeoutIds[slotId] = setTimeout(() => {
+			// Bail if loadTimes is undefined, or it hasn't been n seconds (in milliseconds).
+			if ( ! loadTimes?.[slotId] || ( loadTimes[slotId] && Date.now() - loadTimes[slotId] < refreshTime * 1000 ) ) {
+				return;
+			}
+
 			// If debugging, log.
-			maiPubLog( 'refreshed via impressionViewable: ' + slotId, slot );
+			maiPubLog( 'refreshed via slotVisibilityChanged: ' + slotId, slot );
 
 			// Refresh the slot(s).
 			maiPubRefreshSlots( [slot] );
-
-		}, refreshTime * 1000 ); // Time in milliseconds.
-	});
-
-	/**
-	 * Refreshes ads when scrolled back into view.
-	 * Only refreshes if it's been n seconds since the ad was initially shown.
-	 */
-	googletag.pubads().addEventListener( 'slotVisibilityChanged', (event) => {
-		const slot   = event.slot;
-		const slotId = slot.getSlotElementId();
-		const inView = event.inViewPercentage > 5;
-
-		// Bail if not a refreshable slot.
-		if ( ! maiPubIsRefreshable( slot ) ) {
-			return;
-		}
-
-		// If in view and not currently visible, set to visible.
-		if ( inView && ! currentlyVisible[slotId] ) {
-			currentlyVisible[slotId] = true;
-		}
-		// If not in view and currently visible, set to not visible.
-		else if ( ! inView && currentlyVisible[slotId] ) {
-			currentlyVisible[slotId] = false;
-		}
-		// Not a change we care about.
-		else {
-			return;
-		}
-
-		// If scrolled out of view, clear timeout then bail.
-		if ( ! currentlyVisible[slotId] ) {
-			clearTimeout( timeoutIds[slotId] );
-			return;
-		}
-
-		// Bail if loadTimes is undefined, or it hasn't been n seconds (in milliseconds).
-		if ( ! loadTimes?.[slotId] || ( loadTimes[slotId] && Date.now() - loadTimes[slotId] < refreshTime * 1000 ) ) {
-			return;
-		}
-
-		// If debugging, log.
-		maiPubLog( 'refreshed via slotVisibilityChanged: ' + slotId, slot );
-
-		// Refresh the slot(s).
-		maiPubRefreshSlots( [slot] );
-	});
-
-	/**
-	 * Checks if this is a client GAM ad and not the main plugin MCM ad,
-	 * if it's a client ad and isEmpty, try to load the main plugin ad.
-	 */
-	googletag.pubads().addEventListener( 'slotRenderEnded', (event) => {
-		// Bail if slot is not empty.
-		if ( ! event.isEmpty ) {
-			return;
-		}
-
-		// Bail if not one of our slots.
-		if ( ! maiPubIsMaiSlot( event.slot ) ) {
-			return;
-		}
-
-		// Get slug from slot ID.
-		const slotId = event.slot.getSlotElementId();
-		const slug   = slotId.replace( 'mai-ad-', '' );
-
-		// Bail if it's not a client ad.
-		if ( 'client' !== ads[slug]['context'] ) {
-			return;
-		}
-
-		// Bail if no backfill ad with a backfill id.
-		if ( ! ( ads?.[slug]?.['backfill'] && ads?.[slug]?.['backfillId'] ) ) {
-			return;
-		}
-
-		// // If debugging, log.
-		// maiPubLog( 'maipub backfilling with: ' + ads[slug]['backfill'], document.getElementById( slotId ).id );
-
-		// // Set the ID to the backfill ID and define/display the backfill ad.
-		// document.getElementById( slotId ).id = ads[slug]['backfillId'];
-
-		// // Define and display the main plugin ad.
-		// maiPubDisplaySlots( [ maiPubDefineSlot( ads[slug]['backfill'] ) ] );
-
-		// // If debugging, log.
-		// maiPubLog( 'maipub destroying: ' + slug );
-
-		// // Unset ads[slug].
-		// // delete ads[slug];
-
-		// // Destroy the empty slot.
-		// googletag.destroySlots( [ event.slot ] );
-	});
-
-	// If debugging, set listeners to log.
-	if ( debug || log ) {
-		// Log when a slot is requested/fetched.
-		googletag.pubads().addEventListener( 'slotRequested', (event) => {
-			maiPubLog( 'slotRequested:', event.slot, event );
 		});
 
-		// Log when a slot response is received.
-		googletag.pubads().addEventListener( 'slotResponseReceived', (event) => {
-			maiPubLog( 'slotResponseReceived:', event.slot, event );
-		});
-
-		// Log when a slot was loaded.
-		googletag.pubads().addEventListener( 'slotOnload', (event) => {
-			maiPubLog( 'slotOnload:', event.slot, event );
-		});
-
-		// Log when slot render has ended, regardless of whether ad was empty or not.
+		/**
+		 * Checks if this is a client GAM ad and not the main plugin MCM ad,
+		 * if it's a client ad and isEmpty, try to load the main plugin ad.
+		 */
 		googletag.pubads().addEventListener( 'slotRenderEnded', (event) => {
-			maiPubLog( 'slotRenderEnded:', event.slot, event );
+			// Bail if slot is not empty.
+			if ( ! event.isEmpty ) {
+				return;
+			}
+
+			// Bail if not one of our slots.
+			if ( ! maiPubIsMaiSlot( event.slot ) ) {
+				return;
+			}
+
+			// Get slug from slot ID.
+			const slotId = event.slot.getSlotElementId();
+			const slug   = slotId.replace( 'mai-ad-', '' );
+
+			// Bail if it's not a client ad.
+			if ( 'client' !== ads[slug]['context'] ) {
+				return;
+			}
+
+			// Bail if no backfill ad with a backfill id.
+			if ( ! ( ads?.[slug]?.['backfill'] && ads?.[slug]?.['backfillId'] ) ) {
+				return;
+			}
+
+			// // If debugging, log.
+			// maiPubLog( 'maipub backfilling with: ' + ads[slug]['backfill'], document.getElementById( slotId ).id );
+
+			// // Set the ID to the backfill ID and define/display the backfill ad.
+			// document.getElementById( slotId ).id = ads[slug]['backfillId'];
+
+			// // Define and display the main plugin ad.
+			// maiPubDisplaySlots( [ maiPubDefineSlot( ads[slug]['backfill'] ) ] );
+
+			// // If debugging, log.
+			// maiPubLog( 'maipub destroying: ' + slug );
+
+			// // Unset ads[slug].
+			// // delete ads[slug];
+
+			// // Destroy the empty slot.
+			// googletag.destroySlots( [ event.slot ] );
 		});
 
-		// Log when a slot ID visibility changed.
-		// googletag.pubads().addEventListener( 'slotVisibilityChanged', (event) => {
-		// 	maiPubLog( 'changed:', event.slot.getSlotElementId(), `${event.inViewPercentage}%` );
-		// });
-	}
-}); // End `googletag.cmd.push`.
+		// If debugging, set listeners to log.
+		if ( debug || log ) {
+			// Log when a slot is requested/fetched.
+			googletag.pubads().addEventListener( 'slotRequested', (event) => {
+				maiPubLog( 'slotRequested:', event.slot, event );
+			});
+
+			// Log when a slot response is received.
+			googletag.pubads().addEventListener( 'slotResponseReceived', (event) => {
+				maiPubLog( 'slotResponseReceived:', event.slot, event );
+			});
+
+			// Log when a slot was loaded.
+			googletag.pubads().addEventListener( 'slotOnload', (event) => {
+				maiPubLog( 'slotOnload:', event.slot, event );
+			});
+
+			// Log when slot render has ended, regardless of whether ad was empty or not.
+			googletag.pubads().addEventListener( 'slotRenderEnded', (event) => {
+				maiPubLog( 'slotRenderEnded:', event.slot, event );
+			});
+
+			// Log when a slot ID visibility changed.
+			// googletag.pubads().addEventListener( 'slotVisibilityChanged', (event) => {
+			// 	maiPubLog( 'changed:', event.slot.getSlotElementId(), `${event.inViewPercentage}%` );
+			// });
+		}
+	});
+}
 
 /**
  * DOMContentLoaded and IntersectionObserver handler.
