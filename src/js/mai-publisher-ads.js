@@ -66,12 +66,12 @@ if ( maiPubAdsVars.matomo.enabled ) {
 		maiPubLog( 'Matomo initialized, initGoogleTag with visitorId: ' + visitorId );
 		initGoogleTag( visitorId );
 	} else {
-		// Wait for analytics init event.
+		// Wait for analytics init event, using {once: true} to ensure it only fires once.
 		document.addEventListener('maiPublisherAnalyticsInit', function(event) {
 			visitorId = event.detail.tracker.getVisitorId();
 			maiPubLog( 'Waited for Matomo, initGoogleTag with visitorId: ' + visitorId );
 			initGoogleTag( visitorId );
-		});
+		}, { once: true });
 	}
 } else {
 	// Create a persistent visitor ID if one doesn't exist.
@@ -152,7 +152,7 @@ function initGoogleTag( visitorId ) {
 			// Check if DOMContentLoaded has run.
 			if ( 'loading' === document.readyState ) {
 				// If it's still loading, wait for the event.
-				document.addEventListener( 'DOMContentLoaded', maiPubDOMContentLoaded );
+				document.addEventListener( 'DOMContentLoaded', maiPubDOMContentLoaded, { once: true } );
 			} else {
 				// If it's already loaded, execute maiPubDOMContentLoaded().
 				maiPubDOMContentLoaded();
@@ -163,7 +163,7 @@ function initGoogleTag( visitorId ) {
 			// On window load.
 			window.addEventListener( 'load', () => {
 				setTimeout( maiPubDOMContentLoaded, maiPubAdsVars.loadDelay );
-			});
+			}, { once: true });
 		}
 
 		/**
