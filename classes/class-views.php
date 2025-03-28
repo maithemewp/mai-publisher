@@ -370,48 +370,55 @@ class Mai_Publisher_Views {
 		if ( $this->views_years ) {
 			$fetch[] = [
 				'key'    => 'views',
-				'period' => 'year',
-				'date'   => 'last' . $this->views_years,
+				// 'period' => 'year',
+				// 'date'   => 'last' . $this->views_years,
+				// Convert years to weeks.
+				// Testing with Matomo showed month/year were not getting values,
+				// while weeks were. Idk if it's a Matomo thing or not, but this works.
+				'period' => 'week',
+				'date'   => 'last' . ( $this->views_years * 52 ),
 			];
 		}
 
 		// Start API args.
 		$url_count = 0;
 		$api_args  = [
-			'module' => 'API',
-			'method' => 'API.getBulkRequest',
-			'format' => 'json',
+			'module'     => 'API',
+			'method'     => 'API.getBulkRequest',
+			'format'     => 'json',
+			'idSite'     => $site_id,
+			'token_auth' => $token,
+			'urls'       => [],
 		];
 
 		// Bundle each API hit for bulk request.
 		foreach ( $fetch as $values ) {
-			$string = add_query_arg( [
-				'module'      => 'API',
-				'method'      => 'Actions.getPageUrl',
-				'idSite'      => $site_id,
-				'token_auth'  => $token,
-				'pageUrl'     => $this->url,
-				'hideColumns' => 'label',
-				'showColumns' => 'nb_visits',
-				'period'      => $values['period'],
-				'date'        => $values['date'],
-				'format'      => 'json',
-			], '' );
-
-			// Add args.
-			$api_args[ sprintf( 'urls[%s]', $url_count ) ] = urlencode( '&' . ltrim( $string, '?' ) );
+			// Add the encoded query string to the urls array
+			$api_args['urls'][] = http_build_query(
+				[
+					'method'      => 'Actions.getPageUrl',
+					'pageUrl'     => $this->url,
+					'period'      => $values['period'],
+					'date'        => $values['date'],
+					'hideColumns' => 'label',
+					'showColumns' => 'nb_visits',
+				]
+			);
 
 			// Increment count.
 			$url_count++;
 		}
 
-		// Get API url.
-		$api_url = add_query_arg( $api_args, $api_url );
-
-		// Send a GET request to the Matomo API.
-		$response = wp_remote_get( $api_url, [
-			'user-agent' => 'BizBudding/1.0',
+		// Send a POST request to the Matomo API with x-www-form-urlencoded body.
+		$response = wp_remote_post( $api_url, [
+			'headers' => [
+				'Content-Type' => 'application/x-www-form-urlencoded',
+				'User-Agent'   => 'BizBudding/1.0',
+			],
+			'body' => $api_args,
 		] );
+
+		// error_log( 'Matomo API Response v7: ' . print_r( $response, true ) );
 
 		// Check for a successful request.
 		if ( is_wp_error( $response ) ) {
