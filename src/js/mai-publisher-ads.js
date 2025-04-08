@@ -113,7 +113,10 @@ function initGoogleTag( visitorId ) {
 		pcdScript.setAttribute( 'data-audience-pixel', audiencePixel );
 
 		// Insert before the current script.
-		document.currentScript.parentNode.insertBefore( pcdScript, document.currentScript );
+		// document.currentScript.parentNode.insertBefore( pcdScript, document.currentScript );
+
+		// Insert at the end of the head.
+		document.head.appendChild( pcdScript );
 	}
 
 	googletag.cmd.push(() => {
