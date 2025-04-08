@@ -251,7 +251,7 @@ class Mai_Publisher_Tracking {
 
 	// TODO.
 	function set_site_dimension_1() {}
-	function set_site_dimension_2() {}
+	function set_site_dimension_2() {} // User type (roles).
 	function set_site_dimension_3() {}
 	function set_site_dimension_4() {}
 
@@ -459,6 +459,9 @@ class Mai_Publisher_Tracking {
 		}
 
 		$cache[ $user_id ] = [];
+
+		// TODO: Add support for RCP.
+		// TODO: Use name instead of ID.
 
 		// Bail if Woo Memberships is not active.
 		if ( ! ( is_user_logged_in( $user_id ) && class_exists( 'WooCommerce' ) && function_exists( 'wc_memberships_get_user_memberships' ) ) ) {

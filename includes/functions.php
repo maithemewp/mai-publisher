@@ -435,6 +435,7 @@ function maipub_get_default_options() {
 		'gam_sellers_id'              => '',
 		'gam_sellers_name'            => '',
 		'gam_targets'                 => '',
+		'dc_seg'                      => '',
 		'sourcepoint_property_id'     => '',
 		'sourcepoint_property_id'     => '',
 		'sourcepoint_msps_message_id' => '',
