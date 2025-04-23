@@ -105,14 +105,14 @@ if ( typeof __tcfapi === 'function' ) {
  * Handle Matomo initialization.
  */
 if ( maiPubAdsVars.matomo?.enabled ) {
-	// Set timeout to proceed with initialization if Matomo never responds.
-	const matomoTimeoutId = setTimeout(() => {
-		if ( ! matomoReady ) {
-			maiPubLog( 'MaiPub Matomo timeout, proceeding with initialization' );
-			matomoReady = true;
-			checkInit();
-		}
-	}, matomoTimeout );
+	// // Set timeout to proceed with initialization if Matomo never responds.
+	// const matomoTimeoutId = setTimeout(() => {
+	// 	if ( ! matomoReady ) {
+	// 		maiPubLog( 'MaiPub Matomo timeout, proceeding with initialization' );
+	// 		matomoReady = true;
+	// 		checkInit();
+	// 	}
+	// }, matomoTimeout );
 
 	// Check if Matomo is already initialized.
 	if ( typeof Matomo !== 'undefined' ) {
