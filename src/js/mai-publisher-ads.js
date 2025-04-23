@@ -88,6 +88,14 @@ if ( maiPubAdsVars.matomo.enabled ) {
 function initGoogleTag( visitorId ) {
 	// Check for Sourcepoint first.
 	if (window._sp_ && window._sp_.config) {
+		// Check if consent data is already available
+		const consentData = window._sp_.getConsentData();
+		if (consentData) {
+			maiPubLog('Sourcepoint consent data already available:', consentData);
+			pushGoogleTag(visitorId);
+			return;
+		}
+
 		// Wait for consent data before proceeding.
 		window._sp_.config.events = window._sp_.config.events || {};
 		window._sp_.config.events.onConsentReady = function(tcData) {
@@ -102,11 +110,9 @@ function initGoogleTag( visitorId ) {
 		};
 		return;
 	}
-	// No Sourcepoint.
-	else {
-		// Proceed with initialization.
-		pushGoogleTag(visitorId);
-	}
+
+	// Proceed with initialization.
+	pushGoogleTag(visitorId);
 }
 
 // Function to push Google Tag commands.
