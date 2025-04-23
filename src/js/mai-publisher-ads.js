@@ -174,7 +174,7 @@ function maybeInitGoogleTag() {
 	}
 
 	// Log reason.
-	maiPubLog( `Proceeding: (${reason}) with visitorId: ${visitorId}` );
+	maiPubLog( `Initializing GAM with visitorId: ${visitorId}` );
 
 	// Init.
 	initGoogleTag();
