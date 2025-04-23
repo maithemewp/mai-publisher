@@ -71,7 +71,7 @@ if ( typeof __tcfapi === 'function' ) {
 		if ( ! cmpReady ) {
 			maiPubLog( 'MaiPub CMP timeout, proceeding with initialization' );
 			cmpReady = true;
-			checkInit();
+			maybeInitGoogleTag();
 		}
 	}, cmpTimeout );
 
@@ -86,59 +86,67 @@ if ( typeof __tcfapi === 'function' ) {
 				cmpReady = true;
 				clearTimeout( cmpTimeoutId );
 				maiPubLog( 'MaiPub CMP loaded, proceeding with initialization', success, tcData );
-				checkInit();
+				maybeInitGoogleTag();
 			}
 		});
 	} catch ( error ) {
 		maiPubLog( 'MaiPub CMP error:', error );
 		clearTimeout( cmpTimeoutId );
 		cmpReady = true;
-		checkInit();
+		maybeInitGoogleTag();
 	}
 } else {
 	// No CMP present, mark as ready.
 	cmpReady = true;
-	checkInit();
+	maybeInitGoogleTag();
 }
 
 /**
  * Handle Matomo initialization.
  */
-if ( maiPubAdsVars.matomo?.enabled ) {
+if ( maiPubAdsVars.matomo.enabled ) {
 	// // Set timeout to proceed with initialization if Matomo never responds.
 	// const matomoTimeoutId = setTimeout(() => {
 	// 	if ( ! matomoReady ) {
 	// 		maiPubLog( 'MaiPub Matomo timeout, proceeding with initialization' );
 	// 		matomoReady = true;
-	// 		checkInit();
+	// 		maybeInitGoogleTag();
 	// 	}
 	// }, matomoTimeout );
 
 	// Check if Matomo is already initialized.
-	if ( typeof Matomo !== 'undefined' ) {
+	if ( 'undefined' !== typeof Matomo ) {
 		if ( ! visitorId ) {
-			visitorId = Matomo.getAsyncTracker().getVisitorId();
+			visitorId   = Matomo.getAsyncTracker().getVisitorId();
 		}
 		matomoReady = true;
 		clearTimeout( matomoTimeoutId );
 		maiPubLog( `Matomo already initialized, visitorId: ${visitorId}` );
-		checkInit();
+		maybeInitGoogleTag();
 	}
-
-	// Wait for analytics init event.
-	document.addEventListener( 'maiPublisherAnalyticsInit', function( event ) {
-		if ( ! visitorId ) {
-			visitorId = event.detail.tracker.getVisitorId();
-		}
-		matomoReady = true;
-		clearTimeout( matomoTimeoutId );
-		maiPubLog( `Matomo async event fired, visitorId: ${visitorId}` );
-		checkInit();
-	}, { once: true } );
+	// Matomo not initialized, wait for analytics init event.
+	else {
+		// Wait for analytics init event.
+		document.addEventListener( 'maiPublisherAnalyticsInit', function( event ) {
+			if ( ! visitorId ) {
+				visitorId = event.detail.tracker.getVisitorId();
+			}
+			matomoReady = true;
+			clearTimeout( matomoTimeoutId );
+			maiPubLog( `Matomo async event fired, visitorId: ${visitorId}` );
+			maybeInitGoogleTag();
+		}, { once: true } );
+	}
 } else {
-	// Matomo not enabled, mark as ready.
+	// Create a persistent visitor ID if one doesn't exist.
+	visitorId = localStorage.getItem( 'maiPubVisitorId' );
+	if ( ! visitorId ) {
+		visitorId = Math.random().toString(36).substring(2, 10) + Date.now().toString(36).substring(2, 10);
+		localStorage.setItem( 'maiPubVisitorId', visitorId );
+	}
+	maiPubLog( 'No Matomo, using visitorId: ' + visitorId );
 	matomoReady = true;
-	checkInit();
+	maybeInitGoogleTag();
 }
 
 /**
@@ -147,64 +155,38 @@ if ( maiPubAdsVars.matomo?.enabled ) {
  * 1. CMP is ready (or not present) AND Matomo is ready (or not enabled)
  * 2. We've hit our timeout for either system
  */
-function checkInit() {
+function maybeInitGoogleTag() {
 	// Check if we should initialize based on CMP and Matomo states.
 	const shouldInit = (
 		// CMP is ready or not present.
 		( cmpReady || typeof __tcfapi !== 'function' ) &&
 		// Matomo is ready or not enabled.
-		( matomoReady || ! maiPubAdsVars.matomo?.enabled )
+		( matomoReady || ! maiPubAdsVars.matomo.enabled )
 	);
 
 	if ( ! shouldInit ) {
 		maiPubLog( 'GAM not initialized, waiting for:', {
 			cmp: ! cmpReady && typeof __tcfapi === 'function' ? 'CMP' : null,
-			matomo: ! matomoReady && maiPubAdsVars.matomo?.enabled ? 'Matomo' : null
+			matomo: ! matomoReady && maiPubAdsVars.matomo.enabled ? 'Matomo' : null
 		} );
 		return;
 	}
 
-	// Initialize the Google Tag.
-	initGoogleTag( 'GAM initialized, all systems ready' );
-}
+	// Log reason.
+	maiPubLog( `Proceeding: (${reason}) with visitorId: ${visitorId}` );
 
-/**
- * Initialize the Google Tag once.
- *
- * @param {string} reason - The reason for initializing the Google Tag.
- *
- * @return {void}
- */
-function initGoogleTag( reason ) {
-	// If still no visitor ID
-	if ( ! visitorId ) {
-		// Get visitor ID from localStorage
-		visitorId = localStorage.getItem( 'maiPubVisitorId' );
-
-		// If still no visitor ID, generate a new one
-		if ( ! visitorId ) {
-			visitorId = Math.random().toString(36).substring(2, 10) + Date.now().toString(36).substring(2, 10);
-			localStorage.setItem( 'maiPubVisitorId', visitorId );
-		}
-
-		maiPubLog( `Generated fallback visitorId: ${visitorId}` );
-	}
-
-	// Log
-	maiPubLog( `Proceeding (${reason}) with visitorId: ${visitorId}` );
-
-	// Push to the queue
-	pushGoogleTag( visitorId );
+	// Init.
+	initGoogleTag();
 }
 
 /**
  * Push the Google Tag to the queue.
  *
- * @param {string} visitorId - The visitor ID.
- *
  * @return {void}
  */
-function pushGoogleTag( visitorId ) {
+function initGoogleTag() {
+
+
 	// If we have segments.
 	if ( maiPubAdsVars.dcSeg ) {
 		// Build the PCD script.
