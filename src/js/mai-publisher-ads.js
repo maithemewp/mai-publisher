@@ -136,9 +136,19 @@ if ( maiPubAdsVars.matomo?.enabled ) {
  * 2. We've hit our timeout for either system
  */
 function checkInit() {
-	// If already initialized, bail.
-	if ( ! cmpReady || ! matomoReady ) {
-		maiPubLog( 'GAM not initialized, CMP or Matomo are enabled butnot ready' );
+	// Check if we should initialize based on CMP and Matomo states.
+	const shouldInit = (
+		// CMP is ready or not present.
+		( cmpReady || typeof __tcfapi !== 'function' ) &&
+		// Matomo is ready or not enabled.
+		( matomoReady || ! maiPubAdsVars.matomo?.enabled )
+	);
+
+	if ( ! shouldInit ) {
+		maiPubLog( 'GAM not initialized, waiting for:', {
+			cmp: ! cmpReady && typeof __tcfapi === 'function' ? 'CMP' : null,
+			matomo: ! matomoReady && maiPubAdsVars.matomo?.enabled ? 'Matomo' : null
+		} );
 		return;
 	}
 
