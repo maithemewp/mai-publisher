@@ -15,6 +15,7 @@ const refreshTime      = 30; // Time in seconds.
 const loadTimes        = {};
 const currentlyVisible = {};
 const timeoutIds       = {};
+const consentTimeout   = 1500; // Fallback in case CMP never responds.
 const bidderTimeout    = 3000;
 const fallbackTimeout  = 4000; // Set global failsafe timeout ~1000ms after DM UI bidder timeout.
 const debug            = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb') || window.location.search.includes('pbjs_debug=true');
@@ -58,29 +59,36 @@ if ( maiPubAdsVars.amazonUAM ) {
 	});
 }
 
-const CMP_TIMEOUT = 1500; // Fallback in case CMP never responds.
-
 // Check if CMP (__tcfapi) is available
-if (typeof __tcfapi === 'function') {
+if ( typeof __tcfapi === 'function' ) {
 	let hasResponded = false;
 
-	const fallback = setTimeout(() => {
-		if (!hasResponded) {
-			console.warn('MaiPub CMP timeout — proceeding without consent info');
-		}
-	}, CMP_TIMEOUT);
+	// Fallback in case CMP doesn't respond in time.
+	const tcTimeout = setTimeout(() => {
+		console.warn('MaiPub CMP timeout, proceeding with initialization');
+	}, consentTimeout );
 
-	__tcfapi('addEventListener', 2, (tcData, success) => {
-		if (hasResponded) return;
-		if (tcData.eventStatus === 'tcloaded' || tcData.eventStatus === 'useractioncomplete') {
-			hasResponded = true;
-			clearTimeout(fallback);
-			console.log('MaiPub CMP loaded, proceeding with initialization');
-		}
-	});
+	try {
+		// Add event listener for CMP.
+		__tcfapi( 'addEventListener', 2, ( tcData, success ) => {
+			// Bail if we've already responded.
+			if ( hasResponded ) {
+				return;
+			}
+
+			// If the event status is tcloaded or useractioncomplete, we've received consent data.
+			if ( tcData && ( 'tcloaded' === tcData.eventStatus || 'useractioncomplete' === tcData.eventStatus ) ) {
+				hasResponded = true;
+				clearTimeout( tcTimeout );
+				console.warn('MaiPub CMP loaded, proceeding with initialization');
+			}
+		});
+	} catch ( error ) {
+		console.error('MaiPub CMP error:', error);
+	}
 } else {
 	// No CMP present at all — proceed normally
-	console.log('MaiPub no CMP present, proceeding with initialization');
+	console.warn('MaiPub no CMP present, proceeding with initialization');
 }
 
 // If we need analytics, wait for visitor ID
