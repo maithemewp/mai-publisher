@@ -343,6 +343,7 @@ class Mai_Publisher_Output {
 				'amazonUAM'     => maipub_get_option( 'amazon_uam_enabled' ),
 				'loadDelay'     => maipub_get_option( 'load_delay' ),
 				'debug'         => maipub_get_option( 'debug_enabled' ),
+				'shouldTrack'   => maipub_should_track(),
 				'matomo'        => [
 					'url'     => maipub_get_option( 'matomo_url', false ),
 					'site_id' => maipub_get_option( 'matomo_site_id', false ),

@@ -104,7 +104,7 @@ if ( 'function' === typeof __tcfapi ) {
 /**
  * Handle Matomo initialization.
  */
-if ( maiPubAdsVars.matomo.enabled ) {
+if ( maiPubAdsVars.matomo.enabled && maiPubAdsVars.shouldTrack ) {
 	// Set timeout to proceed with initialization if Matomo never responds.
 	const matomoTimeoutId = setTimeout(() => {
 		if ( ! matomoReady ) {
@@ -139,8 +139,9 @@ if ( maiPubAdsVars.matomo.enabled ) {
 		}, { once: true } );
 	}
 } else {
-	// No Matomo present, mark as ready.
+	// No Matomo present or tracking disabled, mark as ready.
 	matomoReady = true;
+	maiPubLog( 'Matomo tracking disabled' );
 	maybeInitGoogleTag();
 }
 
