@@ -139,14 +139,8 @@ if ( maiPubAdsVars.matomo.enabled ) {
 		}, { once: true } );
 	}
 } else {
-	// Create a persistent visitor ID if one doesn't exist.
-	visitorId = localStorage.getItem( 'maiPubVisitorId' );
-	if ( ! visitorId ) {
-		visitorId = Math.random().toString(36).substring(2, 10) + Date.now().toString(36).substring(2, 10);
-		localStorage.setItem( 'maiPubVisitorId', visitorId );
-	}
+	// No Matomo present, mark as ready.
 	matomoReady = true;
-	maiPubLog( 'No Matomo, using visitorId: ' + visitorId );
 	maybeInitGoogleTag();
 }
 
@@ -177,6 +171,13 @@ function maybeInitGoogleTag() {
 
 		maiPubLog( 'GAM not initialized, waiting for ' + waitingFor.join( ' and ' ) );
 		return;
+	}
+
+	// Create a persistent visitor ID if one doesn't exist.
+	visitorId = localStorage.getItem( 'maiPubVisitorId' );
+	if ( ! visitorId ) {
+		visitorId = Math.random().toString(36).substring(2, 10) + Date.now().toString(36).substring(2, 10);
+		localStorage.setItem( 'maiPubVisitorId', visitorId );
 	}
 
 	// Log reason.
