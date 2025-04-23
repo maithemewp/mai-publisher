@@ -67,7 +67,7 @@ if ( maiPubAdsVars.amazonUAM ) {
  */
 if ( typeof __tcfapi === 'function' ) {
 	// Set timeout to proceed with initialization if CMP never responds.
-	const tcTimeout = setTimeout(() => {
+	const cmpTimeoutId = setTimeout(() => {
 		if ( ! cmpReady ) {
 			maiPubLog( 'MaiPub CMP timeout, proceeding with initialization' );
 			cmpReady = true;
@@ -84,14 +84,14 @@ if ( typeof __tcfapi === 'function' ) {
 
 			if ( tcData && ( tcData.eventStatus === 'tcloaded' || tcData.eventStatus === 'useractioncomplete' ) ) {
 				cmpReady = true;
-				clearTimeout( tcTimeout );
+				clearTimeout( cmpTimeoutId );
 				maiPubLog( 'MaiPub CMP loaded, proceeding with initialization', success, tcData );
 				checkInit();
 			}
 		});
 	} catch ( error ) {
 		maiPubLog( 'MaiPub CMP error:', error );
-		clearTimeout( tcTimeout );
+		clearTimeout( cmpTimeoutId );
 		cmpReady = true;
 		checkInit();
 	}
@@ -106,7 +106,7 @@ if ( typeof __tcfapi === 'function' ) {
  */
 if ( maiPubAdsVars.matomo?.enabled ) {
 	// Set timeout to proceed with initialization if Matomo never responds.
-	const matomoTimeout = setTimeout(() => {
+	const matomoTimeoutId = setTimeout(() => {
 		if ( ! matomoReady ) {
 			maiPubLog( 'MaiPub Matomo timeout, proceeding with initialization' );
 			matomoReady = true;
@@ -120,7 +120,7 @@ if ( maiPubAdsVars.matomo?.enabled ) {
 			visitorId = Matomo.getAsyncTracker().getVisitorId();
 		}
 		matomoReady = true;
-		clearTimeout( matomoTimeout );
+		clearTimeout( matomoTimeoutId );
 		maiPubLog( `Matomo already initialized, visitorId: ${visitorId}` );
 		checkInit();
 	} else {
@@ -130,7 +130,7 @@ if ( maiPubAdsVars.matomo?.enabled ) {
 				visitorId = event.detail.tracker.getVisitorId();
 			}
 			matomoReady = true;
-			clearTimeout( matomoTimeout );
+			clearTimeout( matomoTimeoutId );
 			maiPubLog( `Matomo async event fired, visitorId: ${visitorId}` );
 			checkInit();
 		}, { once: true } );
