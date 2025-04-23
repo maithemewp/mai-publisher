@@ -80,6 +80,7 @@ if ( typeof __tcfapi === 'function' ) {
 			if ( tcData && ( 'tcloaded' === tcData.eventStatus || 'useractioncomplete' === tcData.eventStatus ) ) {
 				hasResponded = true;
 				clearTimeout( tcTimeout );
+				console.warn( success, tcData );
 				console.warn('MaiPub CMP loaded, proceeding with initialization');
 			}
 		});
