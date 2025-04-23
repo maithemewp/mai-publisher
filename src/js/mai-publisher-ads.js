@@ -15,7 +15,8 @@ const refreshTime      = 30; // Time in seconds.
 const loadTimes        = {};
 const currentlyVisible = {};
 const timeoutIds       = {};
-const initTimeout      = 1500; // Fallback in case CMP/Matomo never responds.
+const cmpTimeout       = 1500; // Fallback in case CMP never responds.
+const matomoTimeout    = 3000; // Fallback in case Matomo never loads.
 const bidderTimeout    = 3000;
 const fallbackTimeout  = 4000; // Set global failsafe timeout ~1000ms after DM UI bidder timeout.
 const debug            = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb') || window.location.search.includes('pbjs_debug=true');
@@ -72,7 +73,7 @@ if ( typeof __tcfapi === 'function' ) {
 			cmpReady = true;
 			checkInit();
 		}
-	}, initTimeout );
+	}, cmpTimeout );
 
 	try {
 		// Add event listener for CMP events.
@@ -111,7 +112,7 @@ if ( maiPubAdsVars.matomo?.enabled ) {
 			matomoReady = true;
 			checkInit();
 		}
-	}, initTimeout );
+	}, matomoTimeout );
 
 	// Check if Matomo is already initialized.
 	if ( typeof Matomo !== 'undefined' ) {
