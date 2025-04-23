@@ -123,18 +123,18 @@ if ( maiPubAdsVars.matomo?.enabled ) {
 		clearTimeout( matomoTimeoutId );
 		maiPubLog( `Matomo already initialized, visitorId: ${visitorId}` );
 		checkInit();
-	} else {
-		// Wait for analytics init event.
-		document.addEventListener( 'maiPublisherAnalyticsInit', function( event ) {
-			if ( ! visitorId ) {
-				visitorId = event.detail.tracker.getVisitorId();
-			}
-			matomoReady = true;
-			clearTimeout( matomoTimeoutId );
-			maiPubLog( `Matomo async event fired, visitorId: ${visitorId}` );
-			checkInit();
-		}, { once: true } );
 	}
+
+	// Wait for analytics init event.
+	document.addEventListener( 'maiPublisherAnalyticsInit', function( event ) {
+		if ( ! visitorId ) {
+			visitorId = event.detail.tracker.getVisitorId();
+		}
+		matomoReady = true;
+		clearTimeout( matomoTimeoutId );
+		maiPubLog( `Matomo async event fired, visitorId: ${visitorId}` );
+		checkInit();
+	}, { once: true } );
 } else {
 	// Matomo not enabled, mark as ready.
 	matomoReady = true;
