@@ -84,39 +84,40 @@ if ( maiPubAdsVars.matomo.enabled ) {
 	initGoogleTag( visitorId );
 }
 
-// Function to initialize Google Tag.
-function initGoogleTag( visitorId ) {
-	// Check for Sourcepoint first.
-	if (window._sp_ && window._sp_.config) {
-		// Check if consent data is already available
-		const consentData = window._sp_.getConsentData();
-		if (consentData) {
-			maiPubLog('Sourcepoint consent data already available:', consentData);
-			pushGoogleTag(visitorId);
-			return;
-		}
+// // Function to initialize Google Tag.
+// function initGoogleTag( visitorId ) {
+// 	// Check for Sourcepoint first.
+// 	if (window._sp_ && window._sp_.config) {
+// 		// Check if consent data is already available
+// 		const consentData = window._sp_.getConsentData();
+// 		if (consentData) {
+// 			maiPubLog('Sourcepoint consent data already available:', consentData);
+// 			pushGoogleTag(visitorId);
+// 			return;
+// 		}
 
-		// Wait for consent data before proceeding.
-		window._sp_.config.events = window._sp_.config.events || {};
-		window._sp_.config.events.onConsentReady = function(tcData) {
-			maiPubLog('Sourcepoint TC data received:', tcData);
-			pushGoogleTag(visitorId);
-		};
-		// If there's an error, proceed with initialization.
-		window._sp_.config.events.onError = function(error) {
-			maiPubLog('Sourcepoint TC data failed to load:', error);
-			// Proceed with initialization even if TC fails
-			pushGoogleTag(visitorId);
-		};
-		return;
-	}
+// 		// Wait for consent data before proceeding.
+// 		window._sp_.config.events = window._sp_.config.events || {};
+// 		window._sp_.config.events.onConsentReady = function(tcData) {
+// 			maiPubLog('Sourcepoint TC data received:', tcData);
+// 			pushGoogleTag(visitorId);
+// 		};
+// 		// If there's an error, proceed with initialization.
+// 		window._sp_.config.events.onError = function(error) {
+// 			maiPubLog('Sourcepoint TC data failed to load:', error);
+// 			// Proceed with initialization even if TC fails
+// 			pushGoogleTag(visitorId);
+// 		};
+// 		return;
+// 	}
 
-	// Proceed with initialization.
-	pushGoogleTag(visitorId);
-}
+// 	// Proceed with initialization.
+// 	pushGoogleTag(visitorId);
+// }
 
 // Function to push Google Tag commands.
-function pushGoogleTag(visitorId) {
+// function pushGoogleTag(visitorId) {
+function initGoogleTag(visitorId) {
 	// If we have segments.
 	if ( maiPubAdsVars.dcSeg ) {
 		// Build the PCD script.
