@@ -104,12 +104,22 @@ if ( typeof __tcfapi === 'function' ) {
  * Handle Matomo initialization.
  */
 if ( maiPubAdsVars.matomo?.enabled ) {
+	// Set timeout to proceed with initialization if Matomo never responds.
+	const matomoTimeout = setTimeout(() => {
+		if ( ! matomoReady ) {
+			maiPubLog( 'MaiPub Matomo timeout, proceeding with initialization' );
+			matomoReady = true;
+			checkInit();
+		}
+	}, initTimeout );
+
 	// Check if Matomo is already initialized.
 	if ( typeof Matomo !== 'undefined' ) {
 		if ( ! visitorId ) {
 			visitorId = Matomo.getAsyncTracker().getVisitorId();
 		}
 		matomoReady = true;
+		clearTimeout( matomoTimeout );
 		maiPubLog( `Matomo already initialized, visitorId: ${visitorId}` );
 		checkInit();
 	} else {
@@ -119,6 +129,7 @@ if ( maiPubAdsVars.matomo?.enabled ) {
 				visitorId = event.detail.tracker.getVisitorId();
 			}
 			matomoReady = true;
+			clearTimeout( matomoTimeout );
 			maiPubLog( `Matomo async event fired, visitorId: ${visitorId}` );
 			checkInit();
 		}, { once: true } );
