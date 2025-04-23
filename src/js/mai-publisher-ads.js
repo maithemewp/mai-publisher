@@ -1,4 +1,4 @@
-// define global PBJS and GPT libraries
+// define global PBJS and GPT libraries.
 window.pbjs      = window.pbjs || { que: [] };
 window.googletag = window.googletag || {};
 googletag.cmd    = googletag.cmd || [];
@@ -15,7 +15,7 @@ const refreshTime      = 30; // Time in seconds.
 const loadTimes        = {};
 const currentlyVisible = {};
 const timeoutIds       = {};
-const consentTimeout   = 1500; // Fallback in case CMP never responds.
+const initTimeout      = 1500; // Fallback in case CMP/Matomo never responds.
 const bidderTimeout    = 3000;
 const fallbackTimeout  = 4000; // Set global failsafe timeout ~1000ms after DM UI bidder timeout.
 const debug            = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb') || window.location.search.includes('pbjs_debug=true');
@@ -23,11 +23,13 @@ const log              = maiPubAdsVars.debug;
 const bidResponses     = { prebid: {}, amazon: {}, timeouts: [] };
 let   timestamp        = Date.now();
 let   visitorId        = '';
+let   cmpReady         = false;
+let   matomoReady      = false;
 
 // If debugging, log.
-maiPubLog( 'v206' );
+maiPubLog( 'v207' );
 
-// If using Amazon UAM bids, add it. No need to wait for googletag to be loaded.
+// If using Amazon UAM bids, add it early since it's a large script.
 if ( maiPubAdsVars.amazonUAM ) {
 	/**
 	 * Amazon UAD.
@@ -59,99 +61,128 @@ if ( maiPubAdsVars.amazonUAM ) {
 	});
 }
 
-// Check if CMP (__tcfapi) is available
+/**
+ * Handle CMP initialization.
+ */
 if ( typeof __tcfapi === 'function' ) {
-	let hasResponded = false;
-
-	// Fallback in case CMP doesn't respond in time.
+	// Set timeout to proceed with initialization if CMP never responds.
 	const tcTimeout = setTimeout(() => {
-		console.warn('MaiPub CMP timeout, proceeding with initialization');
-	}, consentTimeout );
+		if ( ! cmpReady ) {
+			maiPubLog( 'MaiPub CMP timeout, proceeding with initialization' );
+			cmpReady = true;
+			checkInit();
+		}
+	}, initTimeout );
 
 	try {
-		// Add event listener for CMP.
+		// Add event listener for CMP events.
 		__tcfapi( 'addEventListener', 2, ( tcData, success ) => {
-			// Bail if we've already responded.
-			if ( hasResponded ) {
+			if ( cmpReady ) {
 				return;
 			}
 
-			// If the event status is tcloaded or useractioncomplete, we've received consent data.
-			if ( tcData && ( 'tcloaded' === tcData.eventStatus || 'useractioncomplete' === tcData.eventStatus ) ) {
-				hasResponded = true;
+			if ( tcData && ( tcData.eventStatus === 'tcloaded' || tcData.eventStatus === 'useractioncomplete' ) ) {
+				cmpReady = true;
 				clearTimeout( tcTimeout );
-				console.warn( success, tcData );
-				console.warn('MaiPub CMP loaded, proceeding with initialization');
+				maiPubLog( 'MaiPub CMP loaded, proceeding with initialization', success, tcData );
+				checkInit();
 			}
 		});
 	} catch ( error ) {
-		console.error('MaiPub CMP error:', error);
+		maiPubLog( 'MaiPub CMP error:', error );
+		clearTimeout( tcTimeout );
+		cmpReady = true;
+		checkInit();
 	}
 } else {
-	// No CMP present at all — proceed normally
-	console.warn('MaiPub no CMP present, proceeding with initialization');
+	// No CMP present, mark as ready.
+	cmpReady = true;
+	checkInit();
 }
 
-// If we need analytics, wait for visitor ID
-if ( maiPubAdsVars.matomo.enabled ) {
-	// Check if Matomo is already initialized with a tracker.
-	if ( 'undefined' !== typeof Matomo ) {
-		visitorId = Matomo.getAsyncTracker().getVisitorId();
-		maiPubLog( 'Matomo initialized, initGoogleTag with visitorId: ' + visitorId );
-		initGoogleTag( visitorId );
+/**
+ * Handle Matomo initialization.
+ */
+if ( maiPubAdsVars.matomo?.enabled ) {
+	// Check if Matomo is already initialized.
+	if ( typeof Matomo !== 'undefined' ) {
+		if ( ! visitorId ) {
+			visitorId = Matomo.getAsyncTracker().getVisitorId();
+		}
+		matomoReady = true;
+		maiPubLog( `Matomo already initialized, visitorId: ${visitorId}` );
+		checkInit();
 	} else {
-		// Wait for analytics init event, using {once: true} to ensure it only fires once.
-		document.addEventListener('maiPublisherAnalyticsInit', function(event) {
-			visitorId = event.detail.tracker.getVisitorId();
-			maiPubLog( 'Waited for Matomo, initGoogleTag with visitorId: ' + visitorId );
-			initGoogleTag( visitorId );
-		}, { once: true });
+		// Wait for analytics init event.
+		document.addEventListener( 'maiPublisherAnalyticsInit', function( event ) {
+			if ( ! visitorId ) {
+				visitorId = event.detail.tracker.getVisitorId();
+			}
+			matomoReady = true;
+			maiPubLog( `Matomo async event fired, visitorId: ${visitorId}` );
+			checkInit();
+		}, { once: true } );
 	}
 } else {
-	// Create a persistent visitor ID if one doesn't exist.
-	visitorId = localStorage.getItem( 'maiPubVisitorId' );
-	if ( ! visitorId ) {
-		visitorId = Math.random().toString(36).substring(2, 10) + Date.now().toString(36).substring(2, 10);
-		localStorage.setItem( 'maiPubVisitorId', visitorId );
-	}
-	maiPubLog( 'No Matomo, using visitorId: ' + visitorId );
-	initGoogleTag( visitorId );
+	// Matomo not enabled, mark as ready.
+	matomoReady = true;
+	checkInit();
 }
 
-// // Function to initialize Google Tag.
-// function initGoogleTag( visitorId ) {
-// 	// Check for Sourcepoint first.
-// 	if (window._sp_ && window._sp_.config) {
-// 		// Check if consent data is already available
-// 		const consentData = window._sp_.getConsentData();
-// 		if (consentData) {
-// 			maiPubLog('Sourcepoint consent data already available:', consentData);
-// 			pushGoogleTag(visitorId);
-// 			return;
-// 		}
+/**
+ * Check if we should initialize GAM.
+ * We initialize when either:
+ * 1. CMP is ready (or not present) AND Matomo is ready (or not enabled)
+ * 2. We've hit our timeout for either system
+ */
+function checkInit() {
+	// If already initialized, bail.
+	if ( ! cmpReady || ! matomoReady ) {
+		maiPubLog( 'GAM not initialized, CMP or Matomo are enabled butnot ready' );
+		return;
+	}
 
-// 		// Wait for consent data before proceeding.
-// 		window._sp_.config.events = window._sp_.config.events || {};
-// 		window._sp_.config.events.onConsentReady = function(tcData) {
-// 			maiPubLog('Sourcepoint TC data received:', tcData);
-// 			pushGoogleTag(visitorId);
-// 		};
-// 		// If there's an error, proceed with initialization.
-// 		window._sp_.config.events.onError = function(error) {
-// 			maiPubLog('Sourcepoint TC data failed to load:', error);
-// 			// Proceed with initialization even if TC fails
-// 			pushGoogleTag(visitorId);
-// 		};
-// 		return;
-// 	}
+	// Initialize the Google Tag.
+	initGoogleTag( 'GAM initialized, all systems ready' );
+}
 
-// 	// Proceed with initialization.
-// 	pushGoogleTag(visitorId);
-// }
+/**
+ * Initialize the Google Tag once.
+ *
+ * @param {string} reason - The reason for initializing the Google Tag.
+ *
+ * @return {void}
+ */
+function initGoogleTag( reason ) {
+	// If still no visitor ID
+	if ( ! visitorId ) {
+		// Get visitor ID from localStorage
+		visitorId = localStorage.getItem( 'maiPubVisitorId' );
 
-// Function to push Google Tag commands.
-// function pushGoogleTag(visitorId) {
-function initGoogleTag(visitorId) {
+		// If still no visitor ID, generate a new one
+		if ( ! visitorId ) {
+			visitorId = Math.random().toString(36).substring(2, 10) + Date.now().toString(36).substring(2, 10);
+			localStorage.setItem( 'maiPubVisitorId', visitorId );
+		}
+
+		maiPubLog( `Generated fallback visitorId: ${visitorId}` );
+	}
+
+	// Log
+	maiPubLog( `Proceeding (${reason}) with visitorId: ${visitorId}` );
+
+	// Push to the queue
+	pushGoogleTag( visitorId );
+}
+
+/**
+ * Push the Google Tag to the queue.
+ *
+ * @param {string} visitorId - The visitor ID.
+ *
+ * @return {void}
+ */
+function pushGoogleTag( visitorId ) {
 	// If we have segments.
 	if ( maiPubAdsVars.dcSeg ) {
 		// Build the PCD script.
@@ -391,6 +422,8 @@ function initGoogleTag(visitorId) {
 
 /**
  * DOMContentLoaded and IntersectionObserver handler.
+ *
+ * @return {void}
  */
 function maiPubDOMContentLoaded() {
 	// Select all atf and btf ads.
@@ -478,6 +511,8 @@ function maiPubDOMContentLoaded() {
  * Define a slot.
  *
  * @param {string} slug The ad slug.
+ *
+ * @return {object} The slot object.
  */
 function maiPubDefineSlot( slug ) {
 	let toReturn = null;
@@ -569,6 +604,8 @@ function maiPubDefineSlot( slug ) {
  * @link https://help.magnite.com/help/web-integration-guide#parallel-header-bidding-integrations
  *
  * @param {array} slots An array of the defined slots objects.
+ *
+ * @return {void}
  */
 function maiPubDisplaySlots( slots ) {
 	// Enable services.
@@ -874,6 +911,8 @@ function maiPubIsRefreshable( slot ) {
  * Refreshes slots.
  *
  * @param {array} slots The defined slots.
+ *
+ * @return {void}
  */
 function maiPubRefreshSlots( slots ) {
 	if ( maiPubAdsVars.amazonUAM ) {
@@ -889,6 +928,8 @@ function maiPubRefreshSlots( slots ) {
  * Log if debugging.
  *
  * @param {mixed} mixed The data to log.
+ *
+ * @return {void}
  */
 function maiPubLog( ...mixed ) {
 	if ( ! ( debug || log ) ) {
