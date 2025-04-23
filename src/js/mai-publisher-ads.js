@@ -182,11 +182,10 @@ function maybeInitGoogleTag() {
 		if ( ! visitorId ) {
 			// Create a persistent visitor ID if one doesn't exist.
 			visitorId = Math.random().toString(36).substring(2, 10) + Date.now().toString(36).substring(2, 10);
+			// Set visitor ID in localStorage.
+			localStorage.setItem( 'maiPubVisitorId', visitorId );
 		}
 	}
-
-	// Set visitor ID in localStorage.
-	localStorage.setItem( 'maiPubVisitorId', visitorId );
 
 	// Log reason.
 	maiPubLog( `Initializing GAM with visitorId: ${visitorId}` );
