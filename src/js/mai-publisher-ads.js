@@ -174,12 +174,19 @@ function maybeInitGoogleTag() {
 		return;
 	}
 
-	// Create a persistent visitor ID if one doesn't exist.
-	visitorId = localStorage.getItem( 'maiPubVisitorId' );
+	// If still no visitor ID.
 	if ( ! visitorId ) {
-		visitorId = Math.random().toString(36).substring(2, 10) + Date.now().toString(36).substring(2, 10);
-		localStorage.setItem( 'maiPubVisitorId', visitorId );
+		// Get visitor ID from localStorage.
+		visitorId = localStorage.getItem( 'maiPubVisitorId' );
+		// If no visitor ID, create one.
+		if ( ! visitorId ) {
+			// Create a persistent visitor ID if one doesn't exist.
+			visitorId = Math.random().toString(36).substring(2, 10) + Date.now().toString(36).substring(2, 10);
+		}
 	}
+
+	// Set visitor ID in localStorage.
+	localStorage.setItem( 'maiPubVisitorId', visitorId );
 
 	// Log reason.
 	maiPubLog( `Initializing GAM with visitorId: ${visitorId}` );
