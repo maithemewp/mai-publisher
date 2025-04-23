@@ -86,22 +86,27 @@ if ( maiPubAdsVars.matomo.enabled ) {
 
 // Function to initialize Google Tag.
 function initGoogleTag( visitorId ) {
-	// Check for TCF v2.0 CMP
-	if (window.__tcfapi) {
-		// Wait for TC data before proceeding
-		window.__tcfapi('addEventListener', 2, (tcData, success) => {
-			if (success) {
-				maiPubLog('TCF v2.0 data successfully received:', tcData);
-				pushGoogleTag(visitorId);
-			} else {
-				maiPubLog('TCF v2.0 data was not successfully received:', tcData);
-			}
-		});
+	// Check for Sourcepoint first.
+	if (window._sp_ && window._sp_.config) {
+		// Wait for consent data before proceeding.
+		window._sp_.config.events = window._sp_.config.events || {};
+		window._sp_.config.events.onConsentReady = function(tcData) {
+			maiPubLog('Sourcepoint TC data received:', tcData);
+			pushGoogleTag(visitorId);
+		};
+		// If there's an error, proceed with initialization.
+		window._sp_.config.events.onError = function(error) {
+			maiPubLog('Sourcepoint TC data failed to load:', error);
+			// Proceed with initialization even if TC fails
+			pushGoogleTag(visitorId);
+		};
 		return;
 	}
-
-	// No TCF v2.0 CMP, proceed with normal initialization
-	pushGoogleTag(visitorId);
+	// No Sourcepoint.
+	else {
+		// Proceed with initialization.
+		pushGoogleTag(visitorId);
+	}
 }
 
 // Function to push Google Tag commands.
