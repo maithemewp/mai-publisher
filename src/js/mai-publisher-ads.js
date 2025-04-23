@@ -16,7 +16,7 @@ const loadTimes        = {};
 const currentlyVisible = {};
 const timeoutIds       = {};
 const cmpTimeout       = 1500; // Fallback in case CMP never responds.
-const matomoTimeout    = 3000; // Fallback in case Matomo never loads.
+const matomoTimeout    = 1500; // Fallback in case Matomo never loads.
 const bidderTimeout    = 3000;
 const fallbackTimeout  = 4000; // Set global failsafe timeout ~1000ms after DM UI bidder timeout.
 const debug            = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb') || window.location.search.includes('pbjs_debug=true');
