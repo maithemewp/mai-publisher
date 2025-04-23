@@ -86,6 +86,26 @@ if ( maiPubAdsVars.matomo.enabled ) {
 
 // Function to initialize Google Tag.
 function initGoogleTag( visitorId ) {
+	// Check for TCF v2.0 CMP
+	if (window.__tcfapi) {
+		// Wait for TC data before proceeding
+		window.__tcfapi('addEventListener', 2, (tcData, success) => {
+			if (success) {
+				maiPubLog('TCF v2.0 data successfully received:', tcData);
+				pushGoogleTag(visitorId);
+			} else {
+				maiPubLog('TCF v2.0 data was not successfully received:', tcData);
+			}
+		});
+		return;
+	}
+
+	// No TCF v2.0 CMP, proceed with normal initialization
+	pushGoogleTag(visitorId);
+}
+
+// Function to push Google Tag commands.
+function pushGoogleTag(visitorId) {
 	// If we have segments.
 	if ( maiPubAdsVars.dcSeg ) {
 		// Build the PCD script.
