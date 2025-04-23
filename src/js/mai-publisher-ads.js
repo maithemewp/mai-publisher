@@ -166,10 +166,16 @@ function maybeInitGoogleTag() {
 	);
 
 	if ( ! shouldInit ) {
-		maiPubLog( 'GAM not initialized, waiting for:', {
-			cmp: ! cmpReady && 'function' === typeof __tcfapi ? 'CMP' : null,
-			matomo: ! matomoReady && maiPubAdsVars.matomo.enabled ? 'Matomo' : null
-		} );
+		// Build a string of what we're waiting for.
+		const waitingFor = [];
+		if ( ! cmpReady && 'function' === typeof __tcfapi ) {
+			waitingFor.push( 'CMP' );
+		}
+		if ( ! matomoReady && maiPubAdsVars.matomo.enabled ) {
+			waitingFor.push( 'Matomo' );
+		}
+
+		maiPubLog( 'GAM not initialized, waiting for ' + waitingFor.join( ' and ' ) );
 		return;
 	}
 
