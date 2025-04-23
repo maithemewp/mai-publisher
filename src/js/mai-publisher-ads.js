@@ -69,7 +69,7 @@ if ( 'function' === typeof __tcfapi ) {
 	// Set timeout to proceed with initialization if CMP never responds.
 	const cmpTimeoutId = setTimeout(() => {
 		if ( ! cmpReady ) {
-			maiPubLog( 'MaiPub CMP timeout, proceeding with initialization' );
+			maiPubLog( 'CMP timeout, proceeding with initialization' );
 			cmpReady = true;
 			maybeInitGoogleTag();
 		}
@@ -85,12 +85,12 @@ if ( 'function' === typeof __tcfapi ) {
 			if ( tcData && ( tcData.eventStatus === 'tcloaded' || tcData.eventStatus === 'useractioncomplete' ) ) {
 				cmpReady = true;
 				clearTimeout( cmpTimeoutId );
-				maiPubLog( 'MaiPub CMP loaded, proceeding with initialization', success, tcData );
+				maiPubLog( 'CMP loaded, proceeding with initialization', success, tcData );
 				maybeInitGoogleTag();
 			}
 		});
 	} catch ( error ) {
-		maiPubLog( 'MaiPub CMP error:', error );
+		maiPubLog( 'CMP error:', error );
 		clearTimeout( cmpTimeoutId );
 		cmpReady = true;
 		maybeInitGoogleTag();
@@ -108,7 +108,7 @@ if ( maiPubAdsVars.matomo.enabled ) {
 	// Set timeout to proceed with initialization if Matomo never responds.
 	const matomoTimeoutId = setTimeout(() => {
 		if ( ! matomoReady ) {
-			maiPubLog( 'MaiPub Matomo timeout, proceeding with initialization' );
+			maiPubLog( 'Matomo timeout, proceeding with initialization' );
 			matomoReady = true;
 			maybeInitGoogleTag();
 		}
