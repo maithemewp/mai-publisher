@@ -58,6 +58,31 @@ if ( maiPubAdsVars.amazonUAM ) {
 	});
 }
 
+const CMP_TIMEOUT = 1500; // Fallback in case CMP never responds.
+
+// Check if CMP (__tcfapi) is available
+if (typeof __tcfapi === 'function') {
+	let hasResponded = false;
+
+	const fallback = setTimeout(() => {
+		if (!hasResponded) {
+			console.warn('MaiPub CMP timeout — proceeding without consent info');
+		}
+	}, CMP_TIMEOUT);
+
+	__tcfapi('addEventListener', 2, (tcData, success) => {
+		if (hasResponded) return;
+		if (tcData.eventStatus === 'tcloaded' || tcData.eventStatus === 'useractioncomplete') {
+			hasResponded = true;
+			clearTimeout(fallback);
+			console.log('MaiPub CMP loaded, proceeding with initialization');
+		}
+	});
+} else {
+	// No CMP present at all — proceed normally
+	console.log('MaiPub no CMP present, proceeding with initialization');
+}
+
 // If we need analytics, wait for visitor ID
 if ( maiPubAdsVars.matomo.enabled ) {
 	// Check if Matomo is already initialized with a tracker.
