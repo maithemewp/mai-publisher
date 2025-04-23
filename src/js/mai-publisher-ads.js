@@ -16,7 +16,7 @@ const loadTimes        = {};
 const currentlyVisible = {};
 const timeoutIds       = {};
 const cmpTimeout       = 1500; // Fallback in case CMP never responds.
-const matomoTimeout    = 3000; // Fallback in case Matomo never loads.
+const matomoTimeout    = 5000; // Fallback in case Matomo never loads.
 const bidderTimeout    = 3000;
 const fallbackTimeout  = 4000; // Set global failsafe timeout ~1000ms after DM UI bidder timeout.
 const debug            = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb') || window.location.search.includes('pbjs_debug=true');
@@ -65,7 +65,7 @@ if ( maiPubAdsVars.amazonUAM ) {
 /**
  * Handle CMP initialization.
  */
-if ( typeof __tcfapi === 'function' ) {
+if ( 'function' === typeof __tcfapi ) {
 	// Set timeout to proceed with initialization if CMP never responds.
 	const cmpTimeoutId = setTimeout(() => {
 		if ( ! cmpReady ) {
@@ -105,14 +105,14 @@ if ( typeof __tcfapi === 'function' ) {
  * Handle Matomo initialization.
  */
 if ( maiPubAdsVars.matomo.enabled ) {
-	// // Set timeout to proceed with initialization if Matomo never responds.
-	// const matomoTimeoutId = setTimeout(() => {
-	// 	if ( ! matomoReady ) {
-	// 		maiPubLog( 'MaiPub Matomo timeout, proceeding with initialization' );
-	// 		matomoReady = true;
-	// 		maybeInitGoogleTag();
-	// 	}
-	// }, matomoTimeout );
+	// Set timeout to proceed with initialization if Matomo never responds.
+	const matomoTimeoutId = setTimeout(() => {
+		if ( ! matomoReady ) {
+			maiPubLog( 'MaiPub Matomo timeout, proceeding with initialization' );
+			matomoReady = true;
+			maybeInitGoogleTag();
+		}
+	}, matomoTimeout );
 
 	// Check if Matomo is already initialized.
 	if ( 'undefined' !== typeof Matomo ) {
@@ -126,6 +126,7 @@ if ( maiPubAdsVars.matomo.enabled ) {
 	}
 	// Matomo not initialized, wait for analytics init event.
 	else {
+		maiPubLog( 'Matomo not initialized, waiting for analytics init event' );
 		// Wait for analytics init event.
 		document.addEventListener( 'maiPublisherAnalyticsInit', function( event ) {
 			if ( ! visitorId ) {
@@ -144,8 +145,8 @@ if ( maiPubAdsVars.matomo.enabled ) {
 		visitorId = Math.random().toString(36).substring(2, 10) + Date.now().toString(36).substring(2, 10);
 		localStorage.setItem( 'maiPubVisitorId', visitorId );
 	}
-	maiPubLog( 'No Matomo, using visitorId: ' + visitorId );
 	matomoReady = true;
+	maiPubLog( 'No Matomo, using visitorId: ' + visitorId );
 	maybeInitGoogleTag();
 }
 
@@ -159,14 +160,14 @@ function maybeInitGoogleTag() {
 	// Check if we should initialize based on CMP and Matomo states.
 	const shouldInit = (
 		// CMP is ready or not present.
-		( cmpReady || typeof __tcfapi !== 'function' ) &&
+		( cmpReady || 'function' !== typeof __tcfapi ) &&
 		// Matomo is ready or not enabled.
 		( matomoReady || ! maiPubAdsVars.matomo.enabled )
 	);
 
 	if ( ! shouldInit ) {
 		maiPubLog( 'GAM not initialized, waiting for:', {
-			cmp: ! cmpReady && typeof __tcfapi === 'function' ? 'CMP' : null,
+			cmp: ! cmpReady && 'function' === typeof __tcfapi ? 'CMP' : null,
 			matomo: ! matomoReady && maiPubAdsVars.matomo.enabled ? 'Matomo' : null
 		} );
 		return;
@@ -185,8 +186,6 @@ function maybeInitGoogleTag() {
  * @return {void}
  */
 function initGoogleTag() {
-
-
 	// If we have segments.
 	if ( maiPubAdsVars.dcSeg ) {
 		// Build the PCD script.

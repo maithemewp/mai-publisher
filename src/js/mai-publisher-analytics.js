@@ -38,7 +38,7 @@
 			detail: maiPubAnalyticsVars,
 			cancelable: true
 		});
-		document.dispatchEvent(event);
+		document.dispatchEvent( event );
 
 		// Continue with existing tracker code
 		for ( const tracker in analytics ) {
@@ -60,7 +60,7 @@
 				}
 
 				// Dispatch custom event after processing analytics.
-				const trackerEvent  = new CustomEvent( 'maiPublisherAnalyticsInit', {
+				const trackerEvent = new CustomEvent( 'maiPublisherAnalyticsInit', {
 					detail: {
 						tracker: matomoTracker,
 					},
