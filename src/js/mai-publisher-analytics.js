@@ -90,13 +90,45 @@
 					.then(function( data ) {
 					})
 					.catch(function( error ) {
-						console.log( error );
+						maiPubAnalyticsLog( error );
 					});
 				}
 
 			} catch( error ) {
-				console.log( error );
+				maiPubAnalyticsLog( error );
 			}
 		}
 	};
+
+	/**
+	 * Log if debugging.
+	 *
+	 * @param {mixed} mixed The data to log.
+	 *
+	 * @return {void}
+	 */
+	function maiPubAnalyticsLog( ...mixed ) {
+		if ( ! ( debug || log ) ) {
+			return;
+		}
+
+		// Set log variables.
+		let timer = 'maipub analytics ';
+
+		// Set times.
+		const current = Date.now();
+		const now     = new Date().toLocaleTimeString( 'en-US', { hour12: true } );
+
+		// If first, start.
+		if ( timestamp === current ) {
+			timer += 'start';
+		}
+		// Not first, add time since.
+		else {
+			timer += current - timestamp + 'ms';
+		}
+
+		// Log the combined message.
+		console.log( `${timer} ${now}`, mixed );
+	}
 })();
