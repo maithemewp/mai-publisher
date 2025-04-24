@@ -39,10 +39,10 @@ maiPubLog( 'v208' );
 // If we have a server-side PPID, log it.
 if ( serverPpid ) {
 	ppid = serverPpid;
-	maiPubLog( 'Using server-side PPID:', ppid );
+	maiPubLog( `Using server-side PPID: ${ ppid }` );
 } else if ( localPpid ) {
 	ppid = localPpid;
-	maiPubLog( 'Using local PPID:', ppid );
+	maiPubLog( `Using local PPID: ${ ppid }` );
 }
 
 // If using Amazon UAM bids, add it early since it's a large script.
@@ -102,7 +102,7 @@ if ( 'function' === typeof __tcfapi ) {
 				cmpReady = true;
 				consent  = Boolean( success );
 				clearTimeout( cmpTimeoutId );
-				maiPubLog( 'CMP loaded, proceeding with initialization', success, tcData );
+				maiPubLog( `CMP loaded, proceeding with initialization: ${ success }`, tcData );
 				maybeInitGoogleTag();
 			}
 		});
@@ -383,7 +383,7 @@ function initGoogleTag() {
 				// Set timeout to refresh ads for current visible ads.
 				timeoutIds[slotId] = setTimeout(() => {
 					// If debugging, log.
-					maiPubLog( 'refreshed via impressionViewable: ' + slotId, slot );
+					maiPubLog( `refreshed via impressionViewable: ${ slotId }`, slot );
 
 					// Refresh the slot(s).
 					maiPubRefreshSlots( [slot] );
@@ -430,7 +430,7 @@ function initGoogleTag() {
 				}
 
 				// If debugging, log.
-				maiPubLog( 'refreshed via slotVisibilityChanged: ' + slotId, slot );
+				maiPubLog( `refreshed via slotVisibilityChanged: ${ slotId }`, slot );
 
 				// Refresh the slot(s).
 				maiPubRefreshSlots( [slot] );
@@ -960,12 +960,12 @@ function maiPubDisplaySlots( slots ) {
 					adUnitCode: bid.adUnitCode,
 					timeToRespond: bid.timeToRespond + 'ms'
 				};
-				maiPubLog('Prebid bid received from ' + bid.bidder, bid);
+				maiPubLog( `Prebid bid received from ${ bid.bidder }`, bid );
 			});
 
 			// This is from Claude, Idk if this is an actual event, I couldn't find it in the docs.
 			// Add timeout monitoring
-			pbjs.onEvent('bidTimeout', function(timeoutBids) {
+			pbjs.onEvent('bidTimeout', function( timeoutBids ) {
 				timeoutBids.forEach(bid => {
 					bidResponses.timeouts.push({
 						bidder: bid.bidder,
@@ -973,13 +973,13 @@ function maiPubDisplaySlots( slots ) {
 						timeout: bidderTimeout + 'ms'
 					});
 				});
-				maiPubLog('Bid timeout occurred:', timeoutBids);
+				maiPubLog( 'Bid timeout occurred:', timeoutBids );
 			});
 
 			// This is from Claude, Idk if this is an actual event, I couldn't find it in the docs.
 			// Add all bid response monitoring
 			pbjs.onEvent('allBidsBack', function(bids) {
-				maiPubLog('All bids back:', {
+				maiPubLog( 'All bids back:', {
 					bids: bids,
 					timeouts: bidResponses.timeouts,
 					timing: {
@@ -998,11 +998,11 @@ function maiPubDisplaySlots( slots ) {
 					requestManager.dmBidsReceived = true;
 
 					// Log bid responses for debugging
-					maiPubLog('All prebid responses:', bidResponses.prebid);
+					maiPubLog( 'All prebid responses:', bidResponses.prebid );
 
 					if ( requestManager.apsBidsReceived ) {
 						sendAdserverRequest();
-						maiPubLog('refresh() with prebid: ' + slots.map( slot => slot.getSlotElementId() ).join(', '), slots);
+						maiPubLog( `refresh() with prebid: ${ slots.map( slot => slot.getSlotElementId() ).join( ', ' ) }`, slots );
 					}
 				}
 			});
@@ -1054,7 +1054,7 @@ function maiPubDisplaySlots( slots ) {
 			apstag.fetchBids( amazonConfig, function(bids) {
 				// Log timing information
 				const amazonResponseTime = Date.now() - requestStartTime;
-				maiPubLog('Amazon response time:', amazonResponseTime + 'ms' );
+				maiPubLog( `Amazon response time: ${ amazonResponseTime }ms` );
 
 				// Track Amazon bids
 				bids.forEach((bid) => {
@@ -1065,7 +1065,7 @@ function maiPubDisplaySlots( slots ) {
 						error: bid.error || null
 					};
 				});
-				maiPubLog('Amazon bids received:', bidResponses.amazon);
+				maiPubLog( 'Amazon bids received:', bidResponses.amazon );
 
 				// Set apstag bids, then trigger the first request to GAM.
 				apstag.setDisplayBids();
@@ -1077,7 +1077,7 @@ function maiPubDisplaySlots( slots ) {
 				if ( requestManager.dmBidsReceived ) {
 					sendAdserverRequest();
 
-					maiPubLog( 'refresh() with amazon fetch: ' + uadSlots.map( slot => slot.slotID.replace( 'mai-ad-', '' ) ).join( ', ' ), uadSlots );
+					maiPubLog( `refresh() with amazon fetch: ${ uadSlots.map( slot => slot.slotID.replace( 'mai-ad-', '' ) ).join( ', ' ) }`, uadSlots );
 				}
 
 				// Log if debugging.
@@ -1100,7 +1100,7 @@ function maiPubDisplaySlots( slots ) {
 			if ( requestManager.dmBidsReceived ) {
 				sendAdserverRequest();
 
-				maiPubLog( 'refresh() without amazon slots to fetch: ' + slots.map( slot => slot.getSlotElementId() ).join( ', ' ), slots );
+				maiPubLog( `refresh() without amazon slots to fetch: ${ slots.map( slot => slot.getSlotElementId() ).join( ', ' ) }`, slots );
 			}
 		}
 	}
@@ -1119,7 +1119,7 @@ function maiPubDisplaySlots( slots ) {
 			sendAdserverRequest();
 		}
 
-		maiPubLog( 'refresh() with GAM:' + slots.map( slot => slot.getSlotElementId() ).join( ', ' ), slots );
+		maiPubLog( `refresh() with GAM: ${ slots.map( slot => slot.getSlotElementId() ).join( ', ' ) }`, slots );
 	}
 
 	// Start the failsafe timeout.
@@ -1182,7 +1182,7 @@ function maiPubIsRefreshable( slot ) {
  */
 function maiPubRefreshSlots( slots ) {
 	if ( maiPubAdsVars.amazonUAM ) {
-		maiPubLog( 'setDisplayBids via apstag: ' + slots.map( slot => slot.getSlotElementId() ).join( ', ' ), slots );
+		maiPubLog( `setDisplayBids via apstag: ${ slots.map( slot => slot.getSlotElementId() ).join( ', ' ) }`, slots );
 		apstag.setDisplayBids();
 	}
 
