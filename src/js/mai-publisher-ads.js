@@ -34,7 +34,7 @@ let   cmpReady         = false;
 let   matomoReady      = false;
 
 // If debugging, log.
-maiPubLog( 'v210' );
+maiPubLog( 'v211' );
 
 // If we have a server-side PPID, log it.
 if ( serverPpid ) {
@@ -634,8 +634,7 @@ function getLocalPpid() {
 	const cookieMatch = document.cookie.match( /(?:^|;)\s*maipub_ppid=([^;]*)(?:;|$)/ );
 	const scopedPpid  = cookieMatch?.[1] || localStorage.getItem( 'maipub_ppid' );
 
-	// Checking for string 'null' from an early mistake. We can remove this later.
-	return scopedPpid && 'null' !== scopedPpid ? String( scopedPpid ) : '';
+	return scopedPpid ? String( scopedPpid ) : '';
 }
 
 /**
