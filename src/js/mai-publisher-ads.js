@@ -34,7 +34,7 @@ let   cmpReady         = false;
 let   matomoReady      = false;
 
 // If debugging, log.
-maiPubLog( 'v211' );
+maiPubLog( 'v212' );
 
 // If we have a server-side PPID, log it.
 if ( serverPpid ) {
@@ -631,10 +631,21 @@ function getLocalConsent() {
  * @return {string} The PPID from cookie or local storage, or an empty string if not found.
  */
 function getLocalPpid() {
-	const cookieMatch = document.cookie.match( /(?:^|;)\s*maipub_ppid=([^;]*)(?:;|$)/ );
+	const cookieMatch = getCookiePpid();
 	const scopedPpid  = cookieMatch?.[1] || localStorage.getItem( 'maipub_ppid' );
 
 	return scopedPpid ? String( scopedPpid ) : '';
+}
+
+/**
+ * Get the PPID from cookie.
+ *
+ * @return {string} The PPID from cookie, or an empty string if not found.
+ */
+function getCookiePpid() {
+	const cookieMatch = document.cookie.match( /(?:^|;)\s*maipub_ppid=([^;]*)(?:;|$)/ );
+
+	return cookieMatch?.[1] || '';
 }
 
 /**
@@ -670,6 +681,9 @@ function setLocalPpid( ppid ) {
 	if ( consent ) {
 		maiPubLog( `Storing PPID in cookie: ${ ppid }` );
 		document.cookie = `maipub_ppid=${ ppid };path=/;max-age=31104000;SameSite=Lax;Secure`;
+	} else if ( getCookiePpid() ) {
+		// If consent is removed and we have a PPID cookie, delete it.
+		document.cookie = 'maipub_ppid=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT;SameSite=Lax;Secure';
 	}
 
 	// Store in local storage also, for fallback.
