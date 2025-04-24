@@ -628,15 +628,15 @@ function getLocalConsent() {
 /**
  * Get the PPID from cookie or local storage.
  *
- * @return {string} The PPID from cookie or local storage.
+ * @return {string} The PPID from cookie or local storage, or an empty string if not found.
  */
 function getLocalPpid() {
 	// Set cached PPID variable.
-	let localPpid = null;
+	let localPpid = '';
 
 	// Check for existing PPID in cookie.
 	localPpid = document.cookie.match( /(?:^|;)\s*maipub_ppid=([^;]*)(?:;|$)/ );
-	localPpid = localPpid && localPpid[1] ? localPpid[1] : null;
+	localPpid = localPpid && localPpid[1] ? localPpid[1] : '';
 
 	// If no cookie PPID, check local storage.
 	if ( ! localPpid ) {
