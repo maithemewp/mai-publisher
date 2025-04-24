@@ -329,6 +329,8 @@ class Mai_Publisher_Output {
 
 			// Get script location and localize.
 			$localize = [
+				'consent'       => (bool) maipub_get_consent(),
+				'ppid'          => (string) maipub_get_ppid(),
 				'domain'        => $this->domain,
 				'domainHashed'  => $this->domain_hashed,
 				'bbNetworkCode' => $this->bb_network_code,
