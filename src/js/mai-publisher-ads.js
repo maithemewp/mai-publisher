@@ -34,7 +34,7 @@ let   cmpReady         = false;
 let   matomoReady      = false;
 
 // If debugging, log.
-maiPubLog( 'v213' );
+maiPubLog( 'v214' );
 
 // If we have a server-side PPID, log it.
 if ( serverPpid ) {
@@ -295,7 +295,7 @@ function initGoogleTag() {
 
 		// If we have a ppid, add it.
 		if ( ppid ) {
-			audiencePixel += `;ppid=${ppid};`;
+			audiencePixel += `;ppid=${ppid}`;
 		}
 
 		// Set the audience pixel.
