@@ -34,7 +34,7 @@ let   cmpReady         = false;
 let   matomoReady      = false;
 
 // If debugging, log.
-maiPubLog( 'v209' );
+maiPubLog( 'v210' );
 
 // If we have a server-side PPID, log it.
 if ( serverPpid ) {
@@ -643,7 +643,7 @@ function getLocalPpid() {
 		localPpid = localStorage.getItem( 'maipub_ppid' );
 	}
 
-	return String( localPpid );
+	return localPpid ? String( localPpid ) : '';
 }
 
 /**
