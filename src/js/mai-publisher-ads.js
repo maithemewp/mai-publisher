@@ -12,6 +12,7 @@ const gamBaseClient    = maiPubAdsVars.gamBaseClient;
 const refreshKey       = 'refresh';
 const refreshValue     = maiPubAdsVars.targets.refresh;
 const refreshTime      = 30; // Time in seconds.
+const lastRefreshTimes = {};
 const loadTimes        = {};
 const currentlyVisible = {};
 const timeoutIds       = {};
@@ -887,6 +888,30 @@ function maiPubDisplaySlots( slots ) {
 	// NM, changed this when Magnites docs show it how we had it. Via: https://help.magnite.com/help/web-integration-guide
 	// googletag.enableServices();
 
+	// Get current time
+	const now = Date.now();
+
+	// Filter out slots that were refreshed too recently.
+	const slotsToRefresh = slots.filter( slot => {
+		const slotId      = slot.getSlotElementId();
+		const lastRefresh = lastRefreshTimes[slotId] || 0;
+
+		// Skip if refreshed too recently.
+		if ( now - lastRefresh < refreshTime ) {
+			maiPubLog( `Skipping refresh of ${slotId}, refreshed too recently` );
+			return false;
+		}
+
+		// Update last refresh time.
+		lastRefreshTimes[slotId] = now;
+		return true;
+	});
+
+	// If no slots to refresh, bail.
+	if ( ! slotsToRefresh.length ) {
+		return;
+	}
+
 	// Object to manage each request state.
 	const requestManager = {
 		adserverRequestSent: false,
@@ -902,7 +927,7 @@ function maiPubDisplaySlots( slots ) {
 	const sendAdserverRequest = function() {
 		if ( ! requestManager.adserverRequestSent ) {
 			requestManager.adserverRequestSent = true;
-			googletag.pubads().refresh( slots );
+			maiPubRefreshSlots( slotsToRefresh );
 		}
 	}
 
@@ -999,7 +1024,7 @@ function maiPubDisplaySlots( slots ) {
 
 			// Request bids
 			pbjs.rp.requestBids( {
-				gptSlotObjects: slots,
+				gptSlotObjects: slotsToRefresh,
 				callback: function() {
 					pbjs.setTargetingForGPTAsync();
 					requestManager.dmBidsReceived = true;
@@ -1009,7 +1034,7 @@ function maiPubDisplaySlots( slots ) {
 
 					if ( requestManager.apsBidsReceived ) {
 						sendAdserverRequest();
-						maiPubLog( `refresh() with prebid: ${ slots.map( slot => slot.getSlotElementId() ).join( ', ' ) }`, slots );
+						maiPubLog( `refresh() with prebid: ${ slotsToRefresh.map( slot => slot.getSlotElementId() ).join( ', ' ) }`, slotsToRefresh );
 					}
 				}
 			});
@@ -1025,7 +1050,7 @@ function maiPubDisplaySlots( slots ) {
 	if ( maiPubAdsVars.amazonUAM ) {
 		// Filter out ads[slug].sizes that only contain a single size named 'fluid'. This was throwing an error in amazon.
 		// Filter out client ads.
-		const uadSlots = slots
+		const uadSlots = slotsToRefresh
 			.filter( slot => {
 				const slug = slot.getSlotElementId().replace( 'mai-ad-', '' );
 
@@ -1099,7 +1124,7 @@ function maiPubDisplaySlots( slots ) {
 			});
 		}
 		// No UAD, but we have others.
-		else if ( slots.length ) {
+		else {
 			// Set the request manager to true.
 			requestManager.apsBidsReceived = true;
 
@@ -1107,17 +1132,12 @@ function maiPubDisplaySlots( slots ) {
 			if ( requestManager.dmBidsReceived ) {
 				sendAdserverRequest();
 
-				maiPubLog( `refresh() without amazon slots to fetch: ${ slots.map( slot => slot.getSlotElementId() ).join( ', ' ) }`, slots );
+				maiPubLog( `refresh() without amazon slots to fetch: ${ slotsToRefresh.map( slot => slot.getSlotElementId() ).join( ', ' ) }`, slotsToRefresh );
 			}
 		}
 	}
 	// Standard GAM.
 	else {
-		// Bail if no slots.
-		if ( ! slots.length ) {
-			return;
-		}
-
 		// Set the request manager to true.
 		requestManager.apsBidsReceived = true;
 
@@ -1126,7 +1146,7 @@ function maiPubDisplaySlots( slots ) {
 			sendAdserverRequest();
 		}
 
-		maiPubLog( `refresh() with GAM: ${ slots.map( slot => slot.getSlotElementId() ).join( ', ' ) }`, slots );
+		maiPubLog( `refresh() with GAM: ${ slotsToRefresh.map( slot => slot.getSlotElementId() ).join( ', ' ) }`, slotsToRefresh );
 	}
 
 	// Start the failsafe timeout.
