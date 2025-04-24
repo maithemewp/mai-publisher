@@ -29,8 +29,9 @@ const localPpid        = getLocalPpid();
 let   timestamp        = Date.now();
 let   consent          = serverConsent || localConsent;
 let   ppid             = '';
-let   matomoReady      = false;
 let   isGeneratingPpid = false;
+let   cmpReady         = false;
+let   matomoReady      = false;
 
 // If debugging, log.
 maiPubLog( 'v208' );
