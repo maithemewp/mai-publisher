@@ -90,12 +90,12 @@
 					.then(function( data ) {
 					})
 					.catch(function( error ) {
-						console.log( error.name + ', ', error.message );
+						console.log( error );
 					});
 				}
 
-			} catch( err ) {
-				console.log( err );
+			} catch( error ) {
+				console.log( error );
 			}
 		}
 	};
