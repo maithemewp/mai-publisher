@@ -1,6 +1,21 @@
 # Changelog
 
-## TBD
+## 1.12.0 (4/24/25)
+* Added: New PCD script support.
+* Added: New PPID support via Matomo `visitorId`.
+* Added: Better ads JS timing by waiting for CMP and/or Matomo before initializing `googletag`.
+* Added: New Mai Ad Unit block settings to hide ad(s) on Desktop, Tablet, and/or Mobile.
+* Added: New `maiPublisherAnalyticsInit` JS event, which is now used to trigger the event to get the `visitorId` from Matomo.
+* Added: New `beforeMaiPublisherAnalytics` JS event.
+* Added: Updated README.md with code examples for customizing ad sizes.
+* Added: Mai Ad support for drag/drop sorting and reordering via Simple Page Ordering plugin.
+* Added: New `mai_publisher_before_enqueue_analytics` and `mai_publisher_after_enqueue_analytics` hooks for before/after enqueuing of `mai-publisher-analytics` script.
+* Added: Custom user agent for `wp_remote_*` function calls.
+* Changed: Converted `mai-publisher-analytics` script to be added via `wp_add_inline_script()`.
+* Changed: Move page dimensions to `trackPageView` values in Matomo.
+* Changed: Updated build process to use `wp-scripts` the WordPress way.
+* Changed: Added classes to all SourcePoint script tags. This helps when using the split testing class.
+* Changed: Using `?maideb` now shows the `ms` with the integer value for better readability when viewing console logs.
 * Fixed: Content was being double processed causing weirdness, especially around `wpautop()`.
 
 ## 1.11.1 (12/27/24)
