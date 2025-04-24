@@ -271,7 +271,7 @@ function initGoogleTag() {
 	}
 
 	// If ppid is different from the local ppid, store it.
-	if ( ppid !== serverPpid || ppid !== localPpid ) {
+	if ( ppid && ( ppid !== serverPpid || ! localPpid || ppid !== localPpid ) ) {
 		console.warn( 'maipub ppid mismatch', ppid, serverPpid, localPpid );
 
 		setLocalPpid( ppid );
@@ -633,10 +633,11 @@ function getLocalConsent() {
  * @return {string} The PPID from cookie or local storage, or an empty string if not found.
  */
 function getLocalPpid() {
-	const cookieMatch = getCookiePpid();
-	const scopedPpid  = cookieMatch?.[1] || localStorage.getItem( 'maipub_ppid' );
+	const cookiePpid = getCookiePpid();
+	const storagePpid = localStorage.getItem( 'maipub_ppid' );
 
-	return scopedPpid ? String( scopedPpid ) : '';
+	// Return cookie PPID if we have one, otherwise try localStorage
+	return cookiePpid || storagePpid || '';
 }
 
 /**
