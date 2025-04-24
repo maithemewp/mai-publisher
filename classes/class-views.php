@@ -308,7 +308,7 @@ class Mai_Publisher_Views {
 			}
 
 			// If debugging, log it to error.log.
-			// if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
 				$permalink = 'post' === $this->type ? get_permalink( $this->id ) : get_term_link( $this->id );
 
 				error_log( 'Mai Publisher (Views) Error: ' . (string) $return->get_error_code() . ' - ' . (string) $return->get_error_message() . ' - ' . (string) $permalink );
@@ -320,7 +320,7 @@ class Mai_Publisher_Views {
 				if ( $error_data ) {
 					error_log( 'Mai Publisher (Views) Data: ' . print_r( $error_data, true ) );
 				}
-			// }
+			}
 
 			// Send error.
 			wp_send_json_error( $return->get_error_message(), $return->get_error_code() );
