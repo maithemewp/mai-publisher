@@ -17,7 +17,8 @@ function maipub_get_consent() {
 /**
  * Get a GAM-compliant PPID from the logged in user.
  * PHP equivalent of JavaScript generatePpid function in mai-publisher-ads.js
- * except this doesn't generate a random PPID if no identifier is provided.
+ * except this doesn't generate a random PPID if no identifier is provided and it
+ * only checks for cookie since session storage is not available in PHP.
  *
  * @since TBD
  *
