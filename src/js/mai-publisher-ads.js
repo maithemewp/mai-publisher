@@ -35,7 +35,7 @@ let   cmpReady         = false;
 let   matomoReady      = false;
 
 // If debugging, log.
-maiPubLog( 'v216' );
+maiPubLog( 'v217' );
 
 // If we have a server-side PPID, log it.
 if ( serverPpid ) {
@@ -902,8 +902,6 @@ function maiPubDisplaySlots( slots ) {
 			return false;
 		}
 
-		// Update last refresh time
-		lastRefreshTimes[slotId] = now;
 		return true;
 	});
 
@@ -928,6 +926,11 @@ function maiPubDisplaySlots( slots ) {
 		if ( ! requestManager.adserverRequestSent ) {
 			requestManager.adserverRequestSent = true;
 			maiPubRefreshSlots( slotsToRefresh );
+
+			// Update last refresh times after actually refreshing
+			slotsToRefresh.forEach( slot => {
+				lastRefreshTimes[slot.getSlotElementId()] = Date.now();
+			});
 		}
 	}
 
