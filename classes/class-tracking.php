@@ -43,11 +43,31 @@ class Mai_Publisher_Tracking {
 			return;
 		}
 
-		$suffix = maipub_get_suffix();
-		$file   = "build/js/mai-publisher-analytics{$suffix}.js";
+		do_action( 'mai_publisher_before_enqueue_analytics' );
 
-		wp_enqueue_script( 'mai-publisher-analytics', maipub_get_file_data( $file, 'url' ), [], maipub_get_file_data( $file, 'version' ), [ 'strategy' => 'async', 'in_footer' => true ] );
-		wp_localize_script( 'mai-publisher-analytics', 'maiPubAnalyticsVars', $this->get_vars() );
+		// Get the script file.
+		$asset_data = maipub_get_asset_data( 'mai-publisher-analytics.js', 'script' );
+
+		// Enqueue the script.
+		wp_enqueue_script(
+			'mai-publisher-analytics',
+			$asset_data['url'],
+			$asset_data['dependencies'],
+			$asset_data['version'],
+			[
+				'strategy'  => 'async',   // Removed in output.php if we have ads.
+				'in_footer' => true,      // Moved higher in output.php if we have ads.
+			]
+		);
+
+		// Add the data from PHP to the script.
+		wp_add_inline_script(
+			'mai-publisher-analytics',
+			sprintf( 'const maiPubAnalyticsVars = %s;', wp_json_encode( $this->get_vars() ) ),
+			'before'
+		);
+
+		do_action( 'mai_publisher_after_enqueue_analytics' );
 	}
 
 	/**
@@ -71,6 +91,7 @@ class Mai_Publisher_Tracking {
 		// Handle site tracking vars.
 		if ( $matomo_enabled ) {
 			$vars['analytics'] = [];
+			$page_dimensions   = [];
 			$dimensions        = $this->get_site_dimensions();
 			$analytics         = [
 				'url'    => trailingslashit( $site_url ),
@@ -86,12 +107,14 @@ class Mai_Publisher_Tracking {
 			// If dimensions, set them.
 			if ( $dimensions ) {
 				foreach ( $dimensions as $index => $value ) {
-					$analytics['toPush'][] = [ 'setCustomDimension', $index, $value ];
+					// @link https://developer.matomo.org/guides/tracking-javascript-guide#custom-dimensions
+					// _paq.push(['trackPageView', pageTitle, {dimension1: 'DimensionValue'}]);
+					$page_dimensions["dimension{$index}"] = $value;
 				}
 			}
 
 			$analytics['toPush'][] = [ 'enableLinkTracking' ];
-			$analytics['toPush'][] = [ 'trackPageView' ];
+			$analytics['toPush'][] = [ 'trackPageView', null, $page_dimensions ];
 			$analytics['toPush'][] = [ 'trackVisibleContentImpressions' ];
 			// $analytics['toPush'][] = [ 'trackAllContentImpressions' ];
 		}
@@ -228,7 +251,7 @@ class Mai_Publisher_Tracking {
 
 	// TODO.
 	function set_site_dimension_1() {}
-	function set_site_dimension_2() {}
+	function set_site_dimension_2() {} // User type (roles).
 	function set_site_dimension_3() {}
 	function set_site_dimension_4() {}
 
@@ -437,6 +460,9 @@ class Mai_Publisher_Tracking {
 
 		$cache[ $user_id ] = [];
 
+		// TODO: Add support for RCP.
+		// TODO: Use name instead of ID.
+
 		// Bail if Woo Memberships is not active.
 		if ( ! ( is_user_logged_in( $user_id ) && class_exists( 'WooCommerce' ) && function_exists( 'wc_memberships_get_user_memberships' ) ) ) {
 			return $cache[ $user_id ];
@@ -566,7 +592,7 @@ class Mai_Publisher_Tracking {
 			return;
 		}
 
-		$this->global_dimensions[7] = esc_html( ltrim( $iab, '– ' ) );
+		$this->global_dimensions[7] = esc_html( ltrim( $iab, '– ' ) );
 	}
 
 	/**

@@ -5,6 +5,54 @@ Manage ads and more for websites in the Mai Publisher network.
 1. Visit Dashboard > Mai Ads > Settings and configure the settings.
 1. Visit Dashboard > Mai Ads and configure and default ads or add your own.
 
+### How to remove ad sizes from ad units
+```
+/**
+ * Remove ad sizes from specific ad units.
+ *
+ * @param array $config The publisher config.
+ *
+ * @return array
+ */
+add_filter( 'mai_publisher_config', function( $config ) {
+	// Sizes to remove, organized by ad unit key.
+	$to_remove = [
+		'leaderboard-wide' => [
+			[300, 100],
+			[468, 60],
+			[750, 100],
+			[970, 90],
+		],
+		// Add more ad unit keys and their sizes to remove as needed.
+		// 'rectangle-medium' => [
+		//     [300, 250],
+		//     [300, 300],
+		// ],
+	];
+
+	// Loop through each ad unit type we want to modify
+	foreach ( $to_remove as $ad_unit => $sizes_to_remove ) {
+		// Skip if this ad unit doesn't exist in config.
+		if ( ! isset( $config['ad_units'][ $ad_unit ] ) ) {
+			continue;
+		}
+
+		// Loop through the ad units.
+		foreach ( $config['ad_units'][ $ad_unit ] as $key => $ad ) {
+			// Filter out any sizes that exist in $sizes_to_remove.
+			$config['ad_units'][ $ad_unit ][ $key ] = array_filter( $ad, function( $size ) use ( $sizes_to_remove ) {
+				return ! in_array( $size, $sizes_to_remove );
+			});
+
+			// Reindex the array after removals.
+			$config['ad_units'][ $ad_unit ][ $key ] = array_values( $config['ad_units'][ $ad_unit ][ $key ] );
+		}
+	}
+
+	return $config;
+});
+```
+
 ## How to ad client GAM ads
 1. Make sure the client network code is set in the settings.
 1. Run the following filter to add existing ads from GAM.
@@ -55,45 +103,58 @@ This document outlines the steps to set up the development environment, run task
 1. **Node.js**: Ensure that you have Node.js installed. You can download and install it from [nodejs.org](https://nodejs.org/).
 
 2. **npm**: npm (Node Package Manager) is included with Node.js. Verify its installation with:
-```
-bash
+```bash
 npm -v
 ```
 
 ### Install Dependencies
-```
+```bash
 npm install
 ```
 
 ### Updating Node.js
 If you need to update Node.js to the latest version, you can use nvm (Node Version Manager).
 
-1. Install nvm: Follow the installation instructions on (nvm’s GitHub page)[https://github.com/nvm-sh/nvm].
+1. Install nvm: Follow the installation instructions on [nvm's GitHub page](https://github.com/nvm-sh/nvm).
 2. Update Node.js: Use nvm to install the latest version:
-```
+```bash
 nvm install node
 nvm use node
 ```
 
-### Running Development Tasks
-- Development Build: To compile and minify assets for development:
+### Build System
+Mai Publisher uses WordPress Scripts (@wordpress/scripts) for its build system, which provides a modern development workflow.
+
+#### Running Development Tasks
+- **Development Mode**: For development with automatic rebuilding on file changes:
+```bash
+npm run start
 ```
-npm run dev
+This mode generates non-minified files with source maps for easier debugging.
+
+- **Production Build**: To compile and minify assets for production:
+```bash
+npm run build
+```
+This mode generates minified files optimized for production use.
+
+- **Update Packages**: To update WordPress Scripts and other dependencies:
+```bash
+npm run packages-update
 ```
 
-- Production Build: To compile and minify assets for production:
-```
-npm run production
-```
+### Source and Build Directories
+- **Source Files**:
+  - `src/js/`: JavaScript source files
+  - `src/css/`: CSS source files
 
-- Watch for Changes: To continuously watch and rebuild assets on file changes:
-```
-npm run watch
-```
+- **Build Output**:
+  - `build/`: Contains all compiled and minified assets
+  - Source maps are included for both JS and CSS files
+  - RTL CSS files are automatically generated
 
-### Directory Structure
-- assets/js: JavaScript source files.
-- assets/css: CSS source files.
-- blocks: Block-specific source files for JavaScript and CSS.
-- build/js: Full (non-minified) and minified JavaScript files.
-- build/css: Full (non-minified) and minified CSS files.
+### Build Features
+- **Automatic Entry Points**: All JS and CSS files in the source directories are automatically processed
+- **Source Maps**: Enabled for both JS and CSS files to aid debugging
+- **Minification**: JS and CSS files are minified in production builds
+- **RTL Support**: RTL CSS files are automatically generated

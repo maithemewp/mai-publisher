@@ -1,0 +1,2 @@
+wp.hooks.addFilter("blocks.registerBlockType","mai-analytics/mai-analytics-tracker",(function(a,c){return"acf/mai-analytics-tracker"!==c||(a.transforms={from:[{type:"block",isMultiBlock:!0,blocks:["*"],__experimentalConvert(a){const c=a.map((a=>wp.blocks.createBlock(a.name,a.attributes,a.innerBlocks)));return wp.blocks.createBlock("acf/mai-analytics-tracker",{},c)}}],to:[{type:"block",name:"Unwrap Mai Analytics Tracker block",blocks:["*"],transform:(a,c)=>c}]}),a}));
+//# sourceMappingURL=mai-analytics-tracker.js.map

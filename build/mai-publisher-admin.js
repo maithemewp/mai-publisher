@@ -1,0 +1,2 @@
+!function(){if("object"==typeof acf){var a=["maipub_single_taxonomy"],e=["maipub_single_terms"];acf.addFilter("select2_ajax_data",(function(i,t,f,n,l){if(f&&a.includes(i.field_key)){var r=acf.getFields({key:"maipub_single_types",parent:n.$el.parents(".acf-row").parents(".acf-row")});if(r){var s=r.shift(),c=s?s.val():"";i.post_type=c}}if(n&&e.includes(i.field_key)){var o=f.parents(".acf-row").find('.acf-field[data-key="maipub_single_taxonomy"]');i.taxonomy=o?acf.getField(o).val():""}return i}))}}(jQuery);
+//# sourceMappingURL=mai-publisher-admin.js.map

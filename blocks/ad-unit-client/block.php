@@ -68,14 +68,17 @@ class Mai_Publisher_Ad_Unit_Client_Block {
 
 		maipub_do_ad_unit(
 			[
-				'preview'    => $this->is_preview( $is_preview ),
-				'id'         => $ad_unit,
-				'position'   => get_field( 'position' ),
-				'targets'    => get_field( 'targets' ),
-				'label'      => get_field( 'label' ),
-				'label_hide' => get_field( 'label_hide' ),
-				'context'    => 'client',
-				'backfill'   => $backfill,
+				'preview'      => $this->is_preview( $is_preview ),
+				'id'           => $ad_unit,
+				'position'     => get_field( 'position' ),
+				'targets'      => get_field( 'targets' ),
+				'label'        => get_field( 'label' ),
+				'label_hide'   => get_field( 'label_hide' ),
+				'hide_desktop' => get_field( 'hide_desktop' ),
+				'hide_tablet'  => get_field( 'hide_tablet' ),
+				'hide_mobile'  => get_field( 'hide_mobile' ),
+				'context'      => 'client',
+				'backfill'     => $backfill,
 			]
 		);
 	}
@@ -170,6 +173,25 @@ class Mai_Publisher_Ad_Unit_Client_Block {
 						'message' => __( 'Hide label', 'mai-publisher' ),
 						'key'     => 'maipub_ad_unit_client_label_hide',
 						'name'    => 'label_hide',
+						'type'    => 'true_false',
+					],
+					[
+						'label'   => __( 'Visibility', 'mai-publisher' ),
+						'message' => __( 'Hide on desktop', 'mai-publisher' ),
+						'key'     => 'maipub_ad_unit_client_hide_desktop',
+						'name'    => 'hide_desktop',
+						'type'    => 'true_false',
+					],
+					[
+						'message' => __( 'Hide on tablet', 'mai-publisher' ),
+						'key'     => 'maipub_ad_unit_client_hide_tablet',
+						'name'    => 'hide_tablet',
+						'type'    => 'true_false',
+					],
+					[
+						'message' => __( 'Hide on mobile', 'mai-publisher' ),
+						'key'     => 'maipub_ad_unit_client_hide_mobile',
+						'name'    => 'hide_mobile',
 						'type'    => 'true_false',
 					],
 				],

@@ -308,10 +308,10 @@ class Mai_Publisher_Views {
 			}
 
 			// If debugging, log it to error.log.
-			// if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {
 				$permalink = 'post' === $this->type ? get_permalink( $this->id ) : get_term_link( $this->id );
 
-				error_log( 'Mai Publisher (Views) Error: ' . $return->get_error_code() . ' - ' . $return->get_error_message() . ' - ' . $permalink );
+				error_log( 'Mai Publisher (Views) Error: ' . (string) $return->get_error_code() . ' - ' . (string) $return->get_error_message() . ' - ' . (string) $permalink );
 
 				// Check for additional error data.
 				$error_data = $return->get_error_data();
@@ -320,7 +320,7 @@ class Mai_Publisher_Views {
 				if ( $error_data ) {
 					error_log( 'Mai Publisher (Views) Data: ' . print_r( $error_data, true ) );
 				}
-			// }
+			}
 
 			// Send error.
 			wp_send_json_error( $return->get_error_message(), $return->get_error_code() );
@@ -370,46 +370,55 @@ class Mai_Publisher_Views {
 		if ( $this->views_years ) {
 			$fetch[] = [
 				'key'    => 'views',
-				'period' => 'year',
-				'date'   => 'last' . $this->views_years,
+				// 'period' => 'year',
+				// 'date'   => 'last' . $this->views_years,
+				// Convert years to weeks.
+				// Testing with Matomo showed month/year were not getting values,
+				// while weeks were. Idk if it's a Matomo thing or not, but this works.
+				'period' => 'week',
+				'date'   => 'last' . ( $this->views_years * 52 ),
 			];
 		}
 
 		// Start API args.
 		$url_count = 0;
 		$api_args  = [
-			'module' => 'API',
-			'method' => 'API.getBulkRequest',
-			'format' => 'json',
+			'module'     => 'API',
+			'method'     => 'API.getBulkRequest',
+			'format'     => 'json',
+			'idSite'     => $site_id,
+			'token_auth' => $token,
+			'urls'       => [],
 		];
 
 		// Bundle each API hit for bulk request.
 		foreach ( $fetch as $values ) {
-			$string = add_query_arg( [
-				'module'      => 'API',
-				'method'      => 'Actions.getPageUrl',
-				'idSite'      => $site_id,
-				'token_auth'  => $token,
-				'pageUrl'     => $this->url,
-				'hideColumns' => 'label',
-				'showColumns' => 'nb_visits',
-				'period'      => $values['period'],
-				'date'        => $values['date'],
-				'format'      => 'json',
-			], '' );
-
-			// Add args.
-			$api_args[ sprintf( 'urls[%s]', $url_count ) ] = urlencode( '&' . ltrim( $string, '?' ) );
+			// Add the encoded query string to the urls array
+			$api_args['urls'][] = http_build_query(
+				[
+					'method'      => 'Actions.getPageUrl',
+					'pageUrl'     => $this->url,
+					'period'      => $values['period'],
+					'date'        => $values['date'],
+					'hideColumns' => 'label',
+					'showColumns' => 'nb_visits',
+				]
+			);
 
 			// Increment count.
 			$url_count++;
 		}
 
-		// Get API url.
-		$api_url = add_query_arg( $api_args, $api_url );
+		// Send a POST request to the Matomo API with x-www-form-urlencoded body.
+		$response = wp_remote_post( $api_url, [
+			'headers' => [
+				'Content-Type' => 'application/x-www-form-urlencoded',
+				'User-Agent'   => 'BizBudding/1.0',
+			],
+			'body' => $api_args,
+		] );
 
-		// Send a GET request to the Matomo API.
-		$response = wp_remote_get( $api_url );
+		// error_log( 'Matomo API Response v7: ' . print_r( $response, true ) );
 
 		// Check for a successful request.
 		if ( is_wp_error( $response ) ) {
@@ -433,8 +442,19 @@ class Mai_Publisher_Views {
 			return new WP_Error( 'matomo_no_data', __( 'No data returned.', 'mai-publisher' ) );
 		}
 
+		// If matomo returns an error, return it.
+		if ( isset( $data['result'] ) && 'error' === $data['result'] ) {
+			$message = isset( $data['message'] ) ? $data['message'] : __( 'Unknown error in class-views.php.', 'mai-publisher' );
+
+			return new WP_Error( 'matomo_api_error', $message, $code );
+		}
+
 		// Loop through each item in the bulk request.
 		foreach ( $data as $index => $row ) {
+			if ( ! isset( $fetch[ $index ]['key'] ) ) {
+				continue;
+			}
+
 			$key    = $fetch[ $index ]['key'];
 			$visits = null;
 

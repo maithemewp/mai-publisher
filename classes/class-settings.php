@@ -26,7 +26,7 @@ class Mai_Publisher_Settings {
 	 */
 	function hooks() {
 		add_action( 'admin_menu',                                          [ $this, 'add_menu_item' ], 12 );
-		add_action( 'admin_enqueue_scripts',                               [ $this, 'enqueue_script' ] );
+		add_action( 'admin_enqueue_scripts',                               [ $this, 'enqueue' ] );
 		add_action( 'admin_init',                                          [ $this, 'init' ] );
 		add_filter( 'plugin_action_links_mai-publisher/mai-publisher.php', [ $this, 'add_plugin_links' ], 10, 4 );
 	}
@@ -50,31 +50,23 @@ class Mai_Publisher_Settings {
 	}
 
 	/**
-	 * Enqueue script for select2.
+	 * Enqueues scripts and styles.
 	 *
-	 * @since 0.7.0
+	 * @since 0.1.0
 	 *
 	 * @return void
 	 */
-	function enqueue_script() {
-		$screen = get_current_screen();
-
-		if ( 'mai_ad_page_settings' !== $screen->id ) {
-			return;
-		}
-
-		// Select2 from CDN.
+	function enqueue() {
+		// External libraries.
 		wp_enqueue_style( 'mai-publisher-select2', 'https://cdn.jsdelivr.net/npm/select2/dist/css/select2.min.css' );
 		wp_enqueue_script( 'mai-publisher-select2', 'https://cdn.jsdelivr.net/npm/select2/dist/js/select2.min.js' );
 
-		// Get files.
-		$suffix = maipub_get_suffix();
-		$css    = "build/css/mai-publisher-settings{$suffix}.css";
-		$js     = "build/js/mai-publisher-settings{$suffix}.js";
+		// Our asset data.
+		$css_data = maipub_get_asset_data( 'mai-publisher-settings.css', 'style' );
+		$js_data  = maipub_get_asset_data( 'mai-publisher-settings.js', 'script' );
 
-		// Enqueue.
-		wp_enqueue_style( 'mai-publisher-settings', maipub_get_file_data( $css, 'url' ), [], maipub_get_file_data( $css, 'version' ) );
-		wp_enqueue_script( 'mai-publisher-settings', maipub_get_file_data( $js, 'url' ), [ 'jquery', 'mai-publisher-select2' ], maipub_get_file_data( $js, 'version' ), [ 'in_footer' => true ] );
+		wp_enqueue_style( 'mai-publisher-settings', $css_data['url'], [], $css_data['version'] );
+		wp_enqueue_script( 'mai-publisher-settings', $js_data['url'], array_merge( $js_data['dependencies'], [ 'jquery', 'mai-publisher-select2' ] ), $js_data['version'], [ 'in_footer' => true ] );
 	}
 
 	/**
@@ -239,6 +231,14 @@ class Mai_Publisher_Settings {
 			'gam_targets', // id
 			__( 'Key/Value Pairs', 'mai-publisher' ), // title
 			[ $this, 'gam_targets_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings' // section
+		);
+
+		add_settings_field(
+			'dc_seg', // id
+			__( 'Audience Segments', 'mai-publisher' ), // title
+			[ $this, 'dc_seg_callback' ], // callback
 			'mai-publisher-section', // page
 			'maipub_settings' // section
 		);
@@ -452,6 +452,7 @@ class Mai_Publisher_Settings {
 			'gam_sellers_id'              => 'sanitize_text_field',
 			'gam_sellers_name'            => 'sanitize_text_field',
 			'gam_targets'                 => 'sanitize_text_field',
+			'dc_seg'                      => 'sanitize_text_field',
 			'sourcepoint_property_id'     => 'absint',
 			'sourcepoint_msps_message_id' => 'absint',
 			'sourcepoint_tcf_message_id'  => 'absint',
@@ -653,6 +654,18 @@ class Mai_Publisher_Settings {
 	function gam_targets_callback() {
 		printf( '<input class="regular-text" type="text" name="mai_publisher[gam_targets]" id="gam_targets" value="%s">', maipub_get_option( 'gam_targets', false ) );
 		printf( '<p class="description">%s</p>', __( 'Comma-separated key value pairs. Example: a=b, d=f', 'mai-publisher' ) );
+	}
+
+	/**
+	 * Setting callback.
+	 *
+	 * @since TBD
+	 *
+	 * @return void
+	 */
+	function dc_seg_callback() {
+		printf( '<input class="regular-text" type="text" name="mai_publisher[dc_seg]" id="dc_seg" value="%s">', maipub_get_option( 'dc_seg', false ) );
+		printf( '<p class="description">%s</p>', __( 'Comma-separated values. Example: 1234567890, 0987654321', 'mai-publisher' ) );
 	}
 
 	/**
@@ -1099,12 +1112,17 @@ class Mai_Publisher_Settings {
 			foreach ( $connections as $label => $url ) {
 				// Handle first request.
 				if ( $first ) {
-					$response = wp_remote_post( $url, [ 'body' => [ 'token_auth' => $token ] ] );
 					$first    = false;
+					$response = wp_remote_post( $url, [
+						'body'       => [ 'token_auth' => $token ],
+						'user-agent' => 'BizBudding/1.0',
+					] );
 				}
 				// Not first.
 				else {
-					$response = wp_remote_get( $url );
+					$response = wp_remote_get( $url, [
+						'user-agent' => 'BizBudding/1.0',
+					] );
 				}
 
 				// If error, add error message.
