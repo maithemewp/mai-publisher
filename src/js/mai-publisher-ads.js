@@ -198,9 +198,14 @@ if ( maiPubAdsVars.matomo.enabled && maiPubAdsVars.shouldTrack ) {
 		maybeInitGoogleTag();
 	}
 } else {
-	// No Matomo present or tracking disabled, mark as ready.
 	matomoReady = true;
-	maiPubLog( 'Matomo tracking disabled' );
+
+	if ( ! maiPubAdsVars.matomo.enabled ) {
+		maiPubLog( 'Matomo disabled' );
+	} else if ( ! maiPubAdsVars.shouldTrack ) {
+		maiPubLog( 'Matomo should not track' );
+	}
+
 	maybeInitGoogleTag();
 }
 
