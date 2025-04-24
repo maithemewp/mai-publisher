@@ -632,18 +632,22 @@ function getLocalConsent() {
  */
 function getLocalPpid() {
 	// Set cached PPID variable.
-	let localPpid = '';
+	let scopedPpid = '';
 
 	// Check for existing PPID in cookie.
-	localPpid = document.cookie.match( /(?:^|;)\s*maipub_ppid=([^;]*)(?:;|$)/ );
-	localPpid = localPpid && localPpid[1] ? localPpid[1] : '';
+	scopedPpid = document.cookie.match( /(?:^|;)\s*maipub_ppid=([^;]*)(?:;|$)/ );
+	scopedPpid = scopedPpid && scopedPpid[1] ? scopedPpid[1] : '';
+
+	console.warn( 'scopedPpid 1', scopedPpid );
 
 	// If no cookie PPID, check local storage.
-	if ( ! localPpid ) {
-		localPpid = localStorage.getItem( 'maipub_ppid' );
+	if ( ! scopedPpid ) {
+		scopedPpid = localStorage.getItem( 'maipub_ppid' );
+
+		console.warn( 'scopedPpid 2', scopedPpid );
 	}
 
-	return localPpid ? String( localPpid ) : '';
+	return scopedPpid ? String( scopedPpid ) : '';
 }
 
 /**
