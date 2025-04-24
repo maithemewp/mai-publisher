@@ -35,7 +35,7 @@ let   cmpReady         = false;
 let   matomoReady      = false;
 
 // If debugging, log.
-maiPubLog( 'v215' );
+maiPubLog( 'v216' );
 
 // If we have a server-side PPID, log it.
 if ( serverPpid ) {
@@ -894,15 +894,15 @@ function maiPubDisplaySlots( slots ) {
 	// Filter out slots that were refreshed too recently.
 	const slotsToRefresh = slots.filter( slot => {
 		const slotId      = slot.getSlotElementId();
-		const lastRefresh = lastRefreshTimes[slotId] || 0;
+		const lastRefresh = lastRefreshTimes[slotId];
 
-		// Skip if refreshed too recently.
-		if ( now - lastRefresh < refreshTime ) {
+		// Skip if this slot has been refreshed before and it's too soon
+		if ( lastRefresh && now - lastRefresh < refreshTime * 1000 ) {
 			maiPubLog( `Skipping refresh of ${slotId}, refreshed too recently` );
 			return false;
 		}
 
-		// Update last refresh time.
+		// Update last refresh time
 		lastRefreshTimes[slotId] = now;
 		return true;
 	});
