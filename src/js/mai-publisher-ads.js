@@ -203,7 +203,7 @@ if ( maiPubAdsVars.matomo.enabled && maiPubAdsVars.shouldTrack ) {
 	if ( ! maiPubAdsVars.matomo.enabled ) {
 		maiPubLog( 'Matomo disabled' );
 	} else if ( ! maiPubAdsVars.shouldTrack ) {
-		maiPubLog( 'Matomo should not track' );
+		maiPubLog( 'Matomo enabled but should not track' );
 	}
 
 	maybeInitGoogleTag();
