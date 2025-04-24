@@ -131,8 +131,15 @@ if ( maiPubAdsVars.matomo.enabled && maiPubAdsVars.shouldTrack ) {
 		}
 	}, matomoTimeout );
 
+	// If we already have a PPID, proceed without waiting for Matomo.
+	if ( ppid ) {
+		matomoReady = true;
+		clearTimeout( matomoTimeoutId );
+		maiPubLog( `Skipping Matomo initialization, using existing PPID: ${ppid}` );
+		maybeInitGoogleTag();
+	}
 	// Check if Matomo is already initialized.
-	if ( 'undefined' !== typeof Matomo ) {
+	else if ( 'undefined' !== typeof Matomo ) {
 		try {
 			// Get the tracker.
 			const tracker = Matomo.getAsyncTracker();
@@ -145,7 +152,7 @@ if ( maiPubAdsVars.matomo.enabled && maiPubAdsVars.shouldTrack ) {
 				// If we have a visitor ID, generate a PPID from it.
 				if ( visitorId ) {
 					generatePpid( visitorId ).then( transformedPpid => {
-						ppid = transformedPpid;
+						ppid        = transformedPpid;
 						matomoReady = true;
 						clearTimeout( matomoTimeoutId );
 						maiPubLog( `Matomo already initialized, generated PPID from visitor ID: ${ppid}` );
@@ -154,7 +161,7 @@ if ( maiPubAdsVars.matomo.enabled && maiPubAdsVars.shouldTrack ) {
 						maiPubLog( 'Error generating PPID from Matomo visitor ID:', error );
 						// Fallback to random PPID.
 						generatePpid().then( transformedPpid => {
-							ppid = transformedPpid;
+							ppid        = transformedPpid;
 							matomoReady = true;
 							clearTimeout( matomoTimeoutId );
 							maiPubLog( `Matomo already initialized, generated random PPID after generation error: ${ppid}` );
@@ -167,7 +174,7 @@ if ( maiPubAdsVars.matomo.enabled && maiPubAdsVars.shouldTrack ) {
 			maiPubLog( 'Error accessing Matomo:', error );
 			// Fallback to random PPID.
 			generatePpid().then( transformedPpid => {
-				ppid = transformedPpid;
+				ppid        = transformedPpid;
 				matomoReady = true;
 				clearTimeout( matomoTimeoutId );
 				maiPubLog( `Matomo already initialized, generated random PPID after catching error: ${ppid}` );
@@ -175,8 +182,8 @@ if ( maiPubAdsVars.matomo.enabled && maiPubAdsVars.shouldTrack ) {
 			});
 		}
 	}
-	// No matomo and we don't have a ppid.
-	else if ( ! ppid ) {
+	// No matomo and no ppid, wait for analytics init event
+	else {
 		maiPubLog( 'Matomo not initialized, waiting for analytics init event' );
 		// Wait for analytics init event.
 		document.addEventListener( 'maiPublisherAnalyticsInit', function( event ) {
@@ -189,13 +196,6 @@ if ( maiPubAdsVars.matomo.enabled && maiPubAdsVars.shouldTrack ) {
 				maybeInitGoogleTag();
 			});
 		}, { once: true } );
-	}
-	// No matomo and we have a ppid.
-	else if ( ppid ) {
-		matomoReady = true;
-		clearTimeout( matomoTimeoutId );
-		maiPubLog( `Not waiting for Matomo, we have a local PPID: ${ppid}` );
-		maybeInitGoogleTag();
 	}
 } else {
 	matomoReady = true;
