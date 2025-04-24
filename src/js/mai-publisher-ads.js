@@ -272,6 +272,8 @@ function initGoogleTag() {
 
 	// If ppid is different from the local ppid, store it.
 	if ( ppid !== serverPpid || ppid !== localPpid ) {
+		console.warn( 'maipub ppid mismatch', ppid, serverPpid, localPpid );
+
 		setLocalPpid( ppid );
 	}
 
