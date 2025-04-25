@@ -976,8 +976,8 @@ function maiPubDisplaySlots( slots, force = false ) {
 	// Object to manage each request state.
 	const requestManager = {
 		adserverRequestSent: false,
-		dmBidsReceived: false,
-		apsBidsReceived: false,
+		dmBidsReceived: ! maiPubAdsVars.magnite, // If Magnite is disabled, consider bids received.
+		apsBidsReceived: ! maiPubAdsVars.amazonUAM, // If Amazon is disabled, consider bids received.
 	};
 
 	/**
@@ -986,15 +986,19 @@ function maiPubDisplaySlots( slots, force = false ) {
 	 * @link https://help.magnite.com/help/web-integration-guide#parallel-header-bidding-integrations
 	 */
 	const sendAdserverRequest = function() {
-		if ( ! requestManager.adserverRequestSent ) {
-			requestManager.adserverRequestSent = true;
-			maiPubRefreshSlots( slotsToRefresh );
-
-			// Update last refresh times after actually refreshing
-			slotsToRefresh.forEach( slot => {
-				lastRefreshTimes[ slot.getSlotElementId() ] = Date.now();
-			});
+		// Bail if the request has already been sent.
+		if ( requestManager.adserverRequestSent ) {
+			return;
 		}
+
+		// Set the request manager to true and refresh the slots.
+		requestManager.adserverRequestSent = true;
+		maiPubRefreshSlots( slotsToRefresh );
+
+		// Update last refresh times after actually refreshing
+		slotsToRefresh.forEach( slot => {
+			lastRefreshTimes[ slot.getSlotElementId() ] = Date.now();
+		});
 	}
 
 	// Handle Magnite/DM bids.
@@ -1018,11 +1022,6 @@ function maiPubDisplaySlots( slots, force = false ) {
 				}
 			});
 		});
-	}
-	// No magnite.
-	else {
-		// Set the magnite demand manager request manager to true.
-		requestManager.dmBidsReceived = true;
 	}
 
 	// Handle Amazon UAM bids.
@@ -1087,7 +1086,6 @@ function maiPubDisplaySlots( slots, force = false ) {
 				// If we have all bids, send the adserver request.
 				if ( requestManager.dmBidsReceived ) {
 					sendAdserverRequest();
-
 					maiPubLog( `refresh() with amazon fetch: ${ uadSlots.map( slot => slot.slotID.replace( 'mai-ad-', '' ) ).join( ', ' ) }`, uadSlots );
 				}
 
@@ -1110,21 +1108,14 @@ function maiPubDisplaySlots( slots, force = false ) {
 			// If we have all bids, send the adserver request.
 			if ( requestManager.dmBidsReceived ) {
 				sendAdserverRequest();
-
 				maiPubLog( `refresh() without amazon slots to fetch: ${ slotsToRefresh.map( slot => slot.getSlotElementId() ).join( ', ' ) }`, slotsToRefresh );
 			}
 		}
 	}
+
 	// Standard GAM.
-	else {
-		// Set the request manager to true.
-		requestManager.apsBidsReceived = true;
-
-		// If we have all bids, send the adserver request.
-		if ( requestManager.dmBidsReceived ) {
-			sendAdserverRequest();
-		}
-
+	if ( ! maiPubAdsVars.magnite && ! maiPubAdsVars.amazonUAM ) {
+		sendAdserverRequest();
 		maiPubLog( `refresh() with GAM: ${ slotsToRefresh.map( slot => slot.getSlotElementId() ).join( ', ' ) }`, slotsToRefresh );
 	}
 
@@ -1205,11 +1196,6 @@ function maiPubMaybeDisplaySlot( slot, eventName ) {
  * @return {void}
  */
 function maiPubRefreshSlots( slots ) {
-	if ( maiPubAdsVars.amazonUAM ) {
-		maiPubLog( `setDisplayBids via apstag: ${ slots.map( slot => slot.getSlotElementId() ).join( ', ' ) }`, slots );
-		apstag.setDisplayBids();
-	}
-
 	// Refresh the slots.
 	googletag.pubads().refresh( slots, { changeCorrelator: false } );
 }
