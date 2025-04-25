@@ -1010,7 +1010,8 @@ function maiPubDisplaySlots( slots, force = false ) {
 			maiPubLog( `Skipping refresh of ${slot.getSlotElementId()}, refreshed ${Math.floor(timeSinceLastRefresh/1000)}s ago` );
 			return false;
 		}
-		maiPubLog( `Refreshing ${slot.getSlotElementId()}, ${Math.floor(timeSinceLastRefresh/1000)}s since last refresh` );
+		const timeSinceLastRefreshText = Infinity === timeSinceLastRefresh ? 'First refresh' : `${Math.floor(timeSinceLastRefresh/1000)}s since last refresh`;
+		maiPubLog( `Refreshing ${slot.getSlotElementId()}, ${timeSinceLastRefreshText}` );
 		return true;
 	});
 
@@ -1049,10 +1050,9 @@ function maiPubDisplaySlots( slots, force = false ) {
 
 		// Update last refresh times after actually refreshing.
 		slotsToRefresh.forEach( slot => {
-			const slotId = slot.getSlotElementId();
-			const oldTime = lastRefreshTimes[ slotId ];
+			const slotId               = slot.getSlotElementId();
 			lastRefreshTimes[ slotId ] = Date.now();
-			maiPubLog( `Updated last refresh time for ${slotId}: ${oldTime ? Math.floor((Date.now() - oldTime)/1000) + 's old' : 'first refresh'}` );
+			maiPubLog( `Updated last refresh time for ${slotId}` );
 		});
 	}
 
