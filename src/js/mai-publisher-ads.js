@@ -458,9 +458,6 @@ function initGoogleTag() {
 					return;
 				}
 
-				// Set last refresh to current time.
-				lastRefreshTimes[ slotId ] = Date.now();
-
 				// Ad is visible.
 				currentlyVisible[ slotId ] = true;
 				maiPubLog( `Slot ${slotId} became initially visible` );
@@ -489,12 +486,6 @@ function initGoogleTag() {
 
 				// If becoming visible, handle display logic.
 				if ( inView ) {
-					// If this is the first time becoming visible, set last refresh time.
-					if ( ! lastRefreshTimes[ slotId ] ) {
-						lastRefreshTimes[ slotId ] = Date.now();
-						maiPubLog( `Setting initial refresh time for ${slotId}` );
-					}
-
 					// Handle display logic.
 					maiPubMaybeDisplaySlot( slot, 'slotVisibilityChanged' );
 				}
@@ -1009,6 +1000,9 @@ function maiPubDisplaySlots( slots, force = false ) {
 	// NM, changed this when Magnites docs show it how we had it. Via: https://help.magnite.com/help/web-integration-guide
 	// googletag.enableServices();
 
+	// Log initial state.
+	maiPubLog( `Display slots called with ${slots.length} slots, force=${force}` );
+
 	// Only filter if not forcing refresh.
 	const slotsToRefresh = force ? slots : slots.filter( slot => {
 		const { shouldRefresh, timeSinceLastRefresh } = maiPubShouldRefreshSlot( slot );
@@ -1022,8 +1016,12 @@ function maiPubDisplaySlots( slots, force = false ) {
 
 	// If no slots to refresh, bail.
 	if ( ! slotsToRefresh.length ) {
+		maiPubLog( 'No slots to refresh after filtering.' );
 		return;
 	}
+
+	// Log slots being refreshed.
+	maiPubLog( `Refreshing ${slotsToRefresh.length} slots:`, slotsToRefresh.map( slot => slot.getSlotElementId() ) );
 
 	// Object to manage each request state.
 	const requestManager = {
@@ -1040,16 +1038,21 @@ function maiPubDisplaySlots( slots, force = false ) {
 	const sendAdserverRequest = function() {
 		// Bail if the request has already been sent.
 		if ( requestManager.adserverRequestSent ) {
+			maiPubLog( 'Adserver request already sent, skipping.' );
 			return;
 		}
 
 		// Set the request manager to true and refresh the slots.
 		requestManager.adserverRequestSent = true;
+		maiPubLog( 'Sending adserver request and refreshing slots.' );
 		maiPubRefreshSlots( slotsToRefresh );
 
-		// Update last refresh times after actually refreshing
+		// Update last refresh times after actually refreshing.
 		slotsToRefresh.forEach( slot => {
-			lastRefreshTimes[ slot.getSlotElementId() ] = Date.now();
+			const slotId = slot.getSlotElementId();
+			const oldTime = lastRefreshTimes[ slotId ];
+			lastRefreshTimes[ slotId ] = Date.now();
+			maiPubLog( `Updated last refresh time for ${slotId}: ${oldTime ? Math.floor((Date.now() - oldTime)/1000) + 's old' : 'first refresh'}` );
 		});
 	}
 
