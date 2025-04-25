@@ -34,7 +34,7 @@ let   cmpReady         = false;
 let   matomoReady      = false;
 
 // If debugging, log.
-maiPubLog( 'v217' );
+maiPubLog( 'v218' );
 
 // If we have a server-side PPID, log it.
 if ( serverPpid ) {
