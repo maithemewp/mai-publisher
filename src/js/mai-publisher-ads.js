@@ -11,15 +11,14 @@ const gamBase          = maiPubAdsVars.gamBase;
 const gamBaseClient    = maiPubAdsVars.gamBaseClient;
 const refreshKey       = 'refresh';
 const refreshValue     = maiPubAdsVars.targets.refresh;
-const refreshTime      = 30; // Time in seconds.
+const refreshTime      = 32; // Time in seconds. Google recommends 30, we add 2 seconds for safety.
 const lastRefreshTimes = {};
-const loadTimes        = {};
 const currentlyVisible = {};
 const timeoutIds       = {};
-const cmpTimeout       = 1500; // Fallback in case CMP never responds.
-const matomoTimeout    = 1500; // Fallback in case Matomo never loads.
-const bidderTimeout    = 3000;
-const fallbackTimeout  = 4000; // Set global failsafe timeout ~1000ms after DM UI bidder timeout.
+const cmpTimeout       = 2000; // Fallback in case CMP never responds.
+const matomoTimeout    = 2000; // Fallback in case Matomo never loads.
+const bidderTimeout    = 5000;
+const fallbackTimeout  = 6000; // Set global failsafe timeout ~1000ms after DM UI bidder timeout.
 const debug            = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb') || window.location.search.includes('pbjs_debug=true');
 const log              = maiPubAdsVars.debug;
 const bidResponses     = { prebid: {}, amazon: {}, timeouts: [] };
@@ -362,7 +361,7 @@ function initGoogleTag() {
 			}
 
 			/**
-			 * Set 30 refresh when an ad is in view.
+			 * Handle the impressionViewable event.
 			 */
 			googletag.pubads().addEventListener( 'impressionViewable', (event) => {
 				const slot   = event.slot;
@@ -373,23 +372,17 @@ function initGoogleTag() {
 					return;
 				}
 
-				// Set first load to current time.
-				loadTimes[slotId] = Date.now();
+				// Get the current time.
+				const now = Date.now();
 
-				// Clear timeout if it exists.
-				if ( timeoutIds[slotId] ) {
-					clearTimeout( timeoutIds[slotId] );
-				}
+				// Set last refresh to current time.
+				lastRefreshTimes[ slotId ] = now;
 
-				// Set timeout to refresh ads for current visible ads.
-				timeoutIds[slotId] = setTimeout(() => {
-					// If debugging, log.
-					maiPubLog( `refreshed via impressionViewable: ${ slotId }`, slot );
+				// Ad is visible.
+				currentlyVisible[ slotId ] = true;
 
-					// Refresh the slot(s).
-					maiPubRefreshSlots( [slot] );
-
-				}, refreshTime * 1000 ); // Time in milliseconds.
+				// Handle display logic.
+				maiPubMaybeDisplaySlot( slot, 'impressionViewable' );
 			});
 
 			/**
@@ -407,83 +400,76 @@ function initGoogleTag() {
 				}
 
 				// If in view and not currently visible, set to visible.
-				if ( inView && ! currentlyVisible[slotId] ) {
-					currentlyVisible[slotId] = true;
+				if ( inView && ! currentlyVisible[ slotId ] ) {
+					currentlyVisible[ slotId ] = true;
+
+					// If this is the first time becoming visible, set last refresh time
+					if ( ! lastRefreshTimes[ slotId ] ) {
+						lastRefreshTimes[ slotId ] = Date.now();
+					}
+
+					// Handle display logic.
+					maiPubMaybeDisplaySlot( slot, 'slotVisibilityChanged' );
 				}
 				// If not in view and currently visible, set to not visible.
-				else if ( ! inView && currentlyVisible[slotId] ) {
-					currentlyVisible[slotId] = false;
-				}
-				// Not a change we care about.
-				else {
-					return;
-				}
+				else if ( ! inView && currentlyVisible[ slotId ] ) {
+					currentlyVisible[ slotId ] = false;
 
-				// If scrolled out of view, clear timeout then bail.
-				if ( ! currentlyVisible[slotId] ) {
-					clearTimeout( timeoutIds[slotId] );
-					return;
+					// Clear any pending refresh timeout.
+					if ( timeoutIds[ slotId ] ) {
+						clearTimeout( timeoutIds[ slotId ] );
+						maiPubLog( `cleared refresh timeout for ${slotId} - no longer visible` );
+					}
 				}
-
-				// Bail if loadTimes is undefined, or it hasn't been n seconds (in milliseconds).
-				if ( ! loadTimes?.[slotId] || ( loadTimes[slotId] && Date.now() - loadTimes[slotId] < refreshTime * 1000 ) ) {
-					return;
-				}
-
-				// If debugging, log.
-				maiPubLog( `refreshed via slotVisibilityChanged: ${ slotId }`, slot );
-
-				// Refresh the slot(s).
-				maiPubRefreshSlots( [slot] );
 			});
 
-			/**
-			 * Checks if this is a client GAM ad and not the main plugin MCM ad,
-			 * if it's a client ad and isEmpty, try to load the main plugin ad.
-			 */
-			googletag.pubads().addEventListener( 'slotRenderEnded', (event) => {
-				// Bail if slot is not empty.
-				if ( ! event.isEmpty ) {
-					return;
-				}
+			// /**
+			//  * Checks if this is a client GAM ad and not the main plugin MCM ad,
+			//  * if it's a client ad and isEmpty, try to load the main plugin ad.
+			//  */
+			// googletag.pubads().addEventListener( 'slotRenderEnded', (event) => {
+			// 	// Bail if slot is not empty.
+			// 	if ( ! event.isEmpty ) {
+			// 		return;
+			// 	}
 
-				// Bail if not one of our slots.
-				if ( ! maiPubIsMaiSlot( event.slot ) ) {
-					return;
-				}
+			// 	// Bail if not one of our slots.
+			// 	if ( ! maiPubIsMaiSlot( event.slot ) ) {
+			// 		return;
+			// 	}
 
-				// Get slug from slot ID.
-				const slotId = event.slot.getSlotElementId();
-				const slug   = slotId.replace( 'mai-ad-', '' );
+			// 	// Get slug from slot ID.
+			// 	const slotId = event.slot.getSlotElementId();
+			// 	const slug   = slotId.replace( 'mai-ad-', '' );
 
-				// Bail if it's not a client ad.
-				if ( 'client' !== ads[slug]['context'] ) {
-					return;
-				}
+			// 	// Bail if it's not a client ad.
+			// 	if ( 'client' !== ads[slug]['context'] ) {
+			// 		return;
+			// 	}
 
-				// Bail if no backfill ad with a backfill id.
-				if ( ! ( ads?.[slug]?.['backfill'] && ads?.[slug]?.['backfillId'] ) ) {
-					return;
-				}
+			// 	// Bail if no backfill ad with a backfill id.
+			// 	if ( ! ( ads?.[slug]?.['backfill'] && ads?.[slug]?.['backfillId'] ) ) {
+			// 		return;
+			// 	}
 
-				// // If debugging, log.
-				// maiPubLog( 'maipub backfilling with: ' + ads[slug]['backfill'], document.getElementById( slotId ).id );
+			// 	// // If debugging, log.
+			// 	// maiPubLog( 'maipub backfilling with: ' + ads[slug]['backfill'], document.getElementById( slotId ).id );
 
-				// // Set the ID to the backfill ID and define/display the backfill ad.
-				// document.getElementById( slotId ).id = ads[slug]['backfillId'];
+			// 	// // Set the ID to the backfill ID and define/display the backfill ad.
+			// 	// document.getElementById( slotId ).id = ads[slug]['backfillId'];
 
-				// // Define and display the main plugin ad.
-				// maiPubDisplaySlots( [ maiPubDefineSlot( ads[slug]['backfill'] ) ] );
+			// 	// // Define and display the main plugin ad.
+			// 	// maiPubDisplaySlots( [ maiPubDefineSlot( ads[slug]['backfill'] ) ] );
 
-				// // If debugging, log.
-				// maiPubLog( 'maipub destroying: ' + slug );
+			// 	// // If debugging, log.
+			// 	// maiPubLog( 'maipub destroying: ' + slug );
 
-				// // Unset ads[slug].
-				// // delete ads[slug];
+			// 	// // Unset ads[slug].
+			// 	// // delete ads[slug];
 
-				// // Destroy the empty slot.
-				// googletag.destroySlots( [ event.slot ] );
-			});
+			// 	// // Destroy the empty slot.
+			// 	// googletag.destroySlots( [ event.slot ] );
+			// });
 
 			// If debugging, set listeners to log.
 			if ( debug || log ) {
@@ -877,11 +863,12 @@ function maiPubDefineSlot( slug ) {
  *
  * @link https://help.magnite.com/help/web-integration-guide#parallel-header-bidding-integrations
  *
- * @param {array} slots An array of the defined slots objects.
+ * @param {array}   slots An array of the defined slots objects.
+ * @param {boolean} force Whether to force refresh without checking timing.
  *
  * @return {void}
  */
-function maiPubDisplaySlots( slots ) {
+function maiPubDisplaySlots( slots, force = false ) {
 	// Enable services.
 	// This needs to run after defineSlot() but before display()/refresh().
 	// If we did this in maiPubDefineSlot() it would run for every single slot, instead of batches.
@@ -891,17 +878,13 @@ function maiPubDisplaySlots( slots ) {
 	// Get current time
 	const now = Date.now();
 
-	// Filter out slots that were refreshed too recently.
-	const slotsToRefresh = slots.filter( slot => {
-		const slotId      = slot.getSlotElementId();
-		const lastRefresh = lastRefreshTimes[slotId];
-
-		// Skip if this slot has been refreshed before and it's too soon
-		if ( lastRefresh && now - lastRefresh < refreshTime * 1000 ) {
-			maiPubLog( `Skipping refresh of ${slotId}, refreshed too recently` );
+	// Only filter if not forcing refresh
+	const slotsToRefresh = force ? slots : slots.filter( slot => {
+		const { shouldRefresh, timeSinceLastRefresh } = maiPubShouldRefreshSlot( slot, now );
+		if ( ! shouldRefresh ) {
+			maiPubLog( `Skipping refresh of ${slot.getSlotElementId()}, refreshed ${Math.floor(timeSinceLastRefresh/1000)}s ago` );
 			return false;
 		}
-
 		return true;
 	});
 
@@ -929,7 +912,7 @@ function maiPubDisplaySlots( slots ) {
 
 			// Update last refresh times after actually refreshing
 			slotsToRefresh.forEach( slot => {
-				lastRefreshTimes[slot.getSlotElementId()] = Date.now();
+				lastRefreshTimes[ slot.getSlotElementId() ] = Date.now();
 			});
 		}
 	}
@@ -1180,6 +1163,67 @@ function maiPubDisplaySlots( slots ) {
 }
 
 /**
+ * Helper function to handle slot display logic.
+ *
+ * @param {object} slot  The slot to display.
+ * @param {string} event The event name for logging.
+ *
+ * @return {void}
+ */
+function maiPubMaybeDisplaySlot( slot, event ) {
+	const slotId = slot.getSlotElementId();
+
+	// Clear timeout if it exists.
+	if ( timeoutIds[ slotId ] ) {
+		maiPubLog( `cleared timeout for ${slotId}` );
+		clearTimeout( timeoutIds[ slotId ] );
+	}
+
+	// Check if we should refresh now or set a timeout.
+	const { shouldRefresh, timeUntilNextRefresh } = maiPubShouldRefreshSlot( slot );
+
+	// If we should refresh, display the slot.
+	if ( shouldRefresh ) {
+		// Log.
+		maiPubLog( `refreshed via ${event}: ${ slotId }`, slot );
+
+		// Use maiPubDisplaySlots to ensure proper bidding.
+		maiPubDisplaySlots( [ slot ], true );
+	}
+	// Not ready to refresh yet.
+	else {
+		// Set timeout to check again in timeUntilNextRefresh.
+		timeoutIds[ slotId ] = setTimeout(() => {
+			// Only refresh if still visible.
+			if ( currentlyVisible[ slotId ] ) {
+				maiPubLog( `checking refresh for ${slotId} after timeout` );
+				maiPubDisplaySlots( [ slot ], true );
+			} else {
+				maiPubLog( `skipping refresh for ${slotId} - no longer visible` );
+			}
+		}, timeUntilNextRefresh );
+	}
+}
+
+/**
+ * Refreshes slots.
+ * This should only be called from maiPubDisplaySlots after getting bids.
+ *
+ * @param {array} slots The defined slots.
+ *
+ * @return {void}
+ */
+function maiPubRefreshSlots( slots ) {
+	if ( maiPubAdsVars.amazonUAM ) {
+		maiPubLog( `setDisplayBids via apstag: ${ slots.map( slot => slot.getSlotElementId() ).join( ', ' ) }`, slots );
+		apstag.setDisplayBids();
+	}
+
+	// Refresh the slots.
+	googletag.pubads().refresh( slots, { changeCorrelator: false } );
+}
+
+/**
  * Check if a slot is a defined mai ad slot.
  * Checks if the ad slot ID is in our array of ad slot IDs.
  *
@@ -1192,6 +1236,41 @@ function maiPubIsMaiSlot( slot ) {
 }
 
 /**
+ * Check if a slot should be refreshed based on timing.
+ *
+ * @param {object} slot The slot to check.
+ * @param {number} now  Optional current timestamp.
+ *
+ * @return {object} Object containing:
+ *                 - shouldRefresh: boolean indicating if slot should be refreshed
+ *                 - timeSinceLastRefresh: number of milliseconds since last refresh
+ *                 - timeUntilNextRefresh: number of milliseconds until next refresh
+ */
+function maiPubShouldRefreshSlot( slot, now = Date.now() ) {
+	const slotId      = slot.getSlotElementId();
+	const lastRefresh = lastRefreshTimes[slotId];
+
+	// If never refreshed, should refresh.
+	if ( ! lastRefresh ) {
+		return {
+			shouldRefresh: true,
+			timeSinceLastRefresh: Infinity,
+			timeUntilNextRefresh: 0
+		};
+	}
+
+	// Only count time while slot is visible.
+	const timeSinceLastRefresh = currentlyVisible[slotId] ? now - lastRefresh : 0;
+	const timeUntilNextRefresh = Math.max( 0, refreshTime * 1000 - timeSinceLastRefresh );
+
+	return {
+		shouldRefresh: timeSinceLastRefresh >= refreshTime * 1000,
+		timeSinceLastRefresh,
+		timeUntilNextRefresh
+	};
+}
+
+/**
  * Check if a slot is refreshable.
  * Checks if we have a defined mai ad slot that has targetting set to refresh.
  *
@@ -1201,23 +1280,6 @@ function maiPubIsMaiSlot( slot ) {
  */
 function maiPubIsRefreshable( slot ) {
 	return maiPubIsMaiSlot( slot ) && Boolean( slot.getTargeting( refreshKey ).shift() );
-}
-
-/**
- * Refreshes slots.
- *
- * @param {array} slots The defined slots.
- *
- * @return {void}
- */
-function maiPubRefreshSlots( slots ) {
-	if ( maiPubAdsVars.amazonUAM ) {
-		maiPubLog( `setDisplayBids via apstag: ${ slots.map( slot => slot.getSlotElementId() ).join( ', ' ) }`, slots );
-		apstag.setDisplayBids();
-	}
-
-	// googletag.pubads().refresh( slots );
-	googletag.pubads().refresh( slots, { changeCorrelator: false } );
 }
 
 /**
