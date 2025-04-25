@@ -45,7 +45,9 @@ if ( serverPpid ) {
 	maiPubLog( `Using local PPID: ${ ppid }` );
 }
 
-// If using Amazon UAM bids, add it early since it's a large script.
+/**
+ * If using Amazon UAM bids, add it early since it's a large script.
+ */
 if ( maiPubAdsVars.amazonUAM ) {
 	/**
 	 * Amazon UAD.
@@ -74,6 +76,90 @@ if ( maiPubAdsVars.amazonUAM ) {
 				}
 			]
 		}
+	});
+}
+
+/**
+ * Configure Prebid.js if Magnite is enabled.
+ */
+if ( maiPubAdsVars.magnite ) {
+	// Force integers.
+	maiPubAdsVars.ortb2.mobile         = parseInt( maiPubAdsVars.ortb2.mobile );
+	maiPubAdsVars.ortb2.privacypolicy  = parseInt( maiPubAdsVars.ortb2.privacypolicy );
+	maiPubAdsVars.ortb2.cattax         = parseInt( maiPubAdsVars.ortb2.cattax );
+	maiPubAdsVars.ortb2.content.cattax = parseInt( maiPubAdsVars.ortb2.content.cattax );
+
+	// Configure Prebid.js
+	pbjs.que.push( function() {
+		// Start the config.
+		const pbjsConfig = {
+			bidderTimeout: bidderTimeout,
+			enableTIDs: true,
+			ortb2: maiPubAdsVars.ortb2,
+		};
+
+		/**
+		 * If we have a ppid, add it.
+		 * @link https://docs.prebid.org/dev-docs/modules/userid-submodules/pubprovided.html
+		 */
+		if ( ppid ) {
+			pbjsConfig.userSync = {
+				userIds: [{
+					name: "pubProvidedId",
+					params: {
+						eids: [{
+							source: maiPubAdsVars.domain,
+							uids: [{
+								id: ppid,
+								atype: 1
+							}]
+						}]
+					}
+				}]
+			};
+		}
+
+		// Log.
+		maiPubLog( 'pbjsConfig', pbjsConfig );
+
+		// Set the magnite config.
+		pbjs.setConfig( pbjsConfig );
+
+		// Add bid response tracking
+		pbjs.onEvent('bidResponse', function(bid) {
+			bidResponses.prebid[bid.bidder] = {
+				value: bid.cpm,
+				size: bid.size,
+				adUnitCode: bid.adUnitCode,
+				timeToRespond: bid.timeToRespond + 'ms'
+			};
+			maiPubLog( `Prebid bid received from ${ bid.bidder }`, bid );
+		});
+
+		// Add timeout monitoring
+		pbjs.onEvent('bidTimeout', function( timeoutBids ) {
+			timeoutBids.forEach(bid => {
+				bidResponses.timeouts.push({
+					bidder: bid.bidder,
+					adUnitCode: bid.adUnitCode,
+					timeout: bidderTimeout + 'ms'
+				});
+			});
+			maiPubLog( 'Bid timeout occurred:', timeoutBids );
+		});
+
+		// Add all bid response monitoring
+		pbjs.onEvent('allBidsBack', function(bids) {
+			maiPubLog( 'All bids back:', {
+				bids: bids,
+				timeouts: bidResponses.timeouts,
+				timing: {
+					totalTime: Date.now() - timestamp + 'ms',
+					bidderTimeout: bidderTimeout + 'ms',
+					fallbackTimeout: fallbackTimeout + 'ms'
+				}
+			});
+		});
 	});
 }
 
@@ -913,95 +999,8 @@ function maiPubDisplaySlots( slots, force = false ) {
 
 	// Handle Magnite/DM bids.
 	if ( maiPubAdsVars.magnite ) {
-		// Force integers.
-		maiPubAdsVars.ortb2.mobile         = parseInt( maiPubAdsVars.ortb2.mobile );
-		maiPubAdsVars.ortb2.privacypolicy  = parseInt( maiPubAdsVars.ortb2.privacypolicy );
-		maiPubAdsVars.ortb2.cattax         = parseInt( maiPubAdsVars.ortb2.cattax );
-		maiPubAdsVars.ortb2.content.cattax = parseInt( maiPubAdsVars.ortb2.content.cattax );
-
 		// Fetch bids from Magnite using Prebid.
 		pbjs.que.push( function() {
-			// Start the config.
-			const pbjsConfig = {
-				bidderTimeout: bidderTimeout,
-				enableTIDs: true,
-				ortb2: maiPubAdsVars.ortb2,
-			};
-
-			/**
-			 * If we have a ppid, add it.
-			 * @link https://docs.prebid.org/dev-docs/modules/userid-submodules/pubprovided.html
-			 */
-			if ( ppid ) {
-				pbjsConfig.userSync = {
-					userIds: [{
-						name: "pubProvidedId",
-						params: {
-							eids: [{
-								source: maiPubAdsVars.domain,
-								uids: [{
-									id: ppid,
-									atype: 1
-								}]
-							}]
-						}
-					}]
-				};
-			}
-
-			// If debugging or logging, enable debugging for magnite.
-			// Disabled. Magnite said this was breaking their own debugging.
-			// if ( debug || log ) {
-			// 	pbjsConfig.debugging = {
-			// 		enabled: true,
-			// 	};
-			// }
-
-			// Log.
-			maiPubLog( 'pbjsConfig', pbjsConfig );
-
-			// Set the magnite config.
-			pbjs.setConfig( pbjsConfig );
-
-			// This is from Claude, Idk if this is an actual event, I couldn't find it in the docs.
-			// Add bid response tracking
-			pbjs.onEvent('bidResponse', function(bid) {
-				bidResponses.prebid[bid.bidder] = {
-					value: bid.cpm,
-					size: bid.size,
-					adUnitCode: bid.adUnitCode,
-					timeToRespond: bid.timeToRespond + 'ms'
-				};
-				maiPubLog( `Prebid bid received from ${ bid.bidder }`, bid );
-			});
-
-			// This is from Claude, Idk if this is an actual event, I couldn't find it in the docs.
-			// Add timeout monitoring
-			pbjs.onEvent('bidTimeout', function( timeoutBids ) {
-				timeoutBids.forEach(bid => {
-					bidResponses.timeouts.push({
-						bidder: bid.bidder,
-						adUnitCode: bid.adUnitCode,
-						timeout: bidderTimeout + 'ms'
-					});
-				});
-				maiPubLog( 'Bid timeout occurred:', timeoutBids );
-			});
-
-			// This is from Claude, Idk if this is an actual event, I couldn't find it in the docs.
-			// Add all bid response monitoring
-			pbjs.onEvent('allBidsBack', function(bids) {
-				maiPubLog( 'All bids back:', {
-					bids: bids,
-					timeouts: bidResponses.timeouts,
-					timing: {
-						totalTime: Date.now() - timestamp + 'ms',
-						bidderTimeout: bidderTimeout + 'ms',
-						fallbackTimeout: fallbackTimeout + 'ms'
-					}
-				});
-			});
-
 			// Request bids
 			pbjs.rp.requestBids( {
 				gptSlotObjects: slotsToRefresh,
