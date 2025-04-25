@@ -712,7 +712,7 @@ function initGoogleTag() {
 
 				// Ad is visible.
 				currentlyVisible[ slotId ] = true;
-				maiPubLog( `Slot ${slotId} became initially visible` );
+				maiPubLog( `Slot ${slotId} impression viewable` );
 
 				// Handle display logic.
 				maiPubMaybeDisplaySlot( slot, 'impressionViewable' );
