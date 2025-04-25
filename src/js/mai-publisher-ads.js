@@ -34,7 +34,7 @@ let   cmpReady         = false;
 let   matomoReady      = false;
 
 // If debugging, log.
-maiPubLog( 'v218' );
+maiPubLog( 'v219' );
 
 // If we have a server-side PPID, log it.
 if ( serverPpid ) {
@@ -1236,12 +1236,17 @@ function maiPubShouldRefreshSlot( slot, now = Date.now() ) {
 		};
 	}
 
+	// Calculate the elapsed time since the last refresh.
+	const elapsedTime = now - lastRefresh;
+
 	// Only count time while slot is visible.
-	const timeSinceLastRefresh = currentlyVisible[slotId] ? now - lastRefresh : 0;
-	const timeUntilNextRefresh = Math.max( 0, refreshTime * 1000 - timeSinceLastRefresh );
+	const timeSinceLastRefresh = currentlyVisible[ slotId ] ? elapsedTime : 0;
+
+	// Calculate time until next refresh based on actual elapsed time.
+	const timeUntilNextRefresh = Math.max( 0, ( refreshTime * 1000 ) - elapsedTime );
 
 	return {
-		shouldRefresh: timeSinceLastRefresh >= refreshTime * 1000,
+		shouldRefresh: timeSinceLastRefresh >= ( refreshTime * 1000 ),
 		timeSinceLastRefresh,
 		timeUntilNextRefresh
 	};
