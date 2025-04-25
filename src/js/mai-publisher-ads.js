@@ -372,11 +372,8 @@ function initGoogleTag() {
 					return;
 				}
 
-				// Get the current time.
-				const now = Date.now();
-
 				// Set last refresh to current time.
-				lastRefreshTimes[ slotId ] = now;
+				lastRefreshTimes[ slotId ] = Date.now();
 
 				// Ad is visible.
 				currentlyVisible[ slotId ] = true;
@@ -415,7 +412,7 @@ function initGoogleTag() {
 				else if ( ! inView && currentlyVisible[ slotId ] ) {
 					currentlyVisible[ slotId ] = false;
 
-					// Clear any pending refresh timeout.
+					// Clear any pending refresh timeout since ad is no longer visible.
 					if ( timeoutIds[ slotId ] ) {
 						clearTimeout( timeoutIds[ slotId ] );
 						maiPubLog( `cleared refresh timeout for ${slotId} - no longer visible` );
@@ -875,12 +872,9 @@ function maiPubDisplaySlots( slots, force = false ) {
 	// NM, changed this when Magnites docs show it how we had it. Via: https://help.magnite.com/help/web-integration-guide
 	// googletag.enableServices();
 
-	// Get current time
-	const now = Date.now();
-
 	// Only filter if not forcing refresh
 	const slotsToRefresh = force ? slots : slots.filter( slot => {
-		const { shouldRefresh, timeSinceLastRefresh } = maiPubShouldRefreshSlot( slot, now );
+		const { shouldRefresh, timeSinceLastRefresh } = maiPubShouldRefreshSlot( slot );
 		if ( ! shouldRefresh ) {
 			maiPubLog( `Skipping refresh of ${slot.getSlotElementId()}, refreshed ${Math.floor(timeSinceLastRefresh/1000)}s ago` );
 			return false;
@@ -1165,19 +1159,13 @@ function maiPubDisplaySlots( slots, force = false ) {
 /**
  * Helper function to handle slot display logic.
  *
- * @param {object} slot  The slot to display.
- * @param {string} event The event name for logging.
+ * @param {object} slot      The slot to display.
+ * @param {string} eventName The event name for logging.
  *
  * @return {void}
  */
-function maiPubMaybeDisplaySlot( slot, event ) {
+function maiPubMaybeDisplaySlot( slot, eventName ) {
 	const slotId = slot.getSlotElementId();
-
-	// Clear timeout if it exists.
-	if ( timeoutIds[ slotId ] ) {
-		maiPubLog( `cleared timeout for ${slotId}` );
-		clearTimeout( timeoutIds[ slotId ] );
-	}
 
 	// Check if we should refresh now or set a timeout.
 	const { shouldRefresh, timeUntilNextRefresh } = maiPubShouldRefreshSlot( slot );
@@ -1185,23 +1173,27 @@ function maiPubMaybeDisplaySlot( slot, event ) {
 	// If we should refresh, display the slot.
 	if ( shouldRefresh ) {
 		// Log.
-		maiPubLog( `refreshed via ${event}: ${ slotId }`, slot );
+		maiPubLog( `refreshed via ${ eventName }: ${ slotId }`, slot );
 
 		// Use maiPubDisplaySlots to ensure proper bidding.
 		maiPubDisplaySlots( [ slot ], true );
 	}
-	// Not ready to refresh yet.
-	else {
+	// Not ready to refresh yet and timeUntilNextRefresh is positive.
+	else if ( currentlyVisible[ slotId ] && timeUntilNextRefresh > 0 ) {
+		// Clear any existing timeout before setting a new one.
+		if ( timeoutIds[ slotId ] ) {
+			clearTimeout( timeoutIds[ slotId ] );
+		}
+
 		// Set timeout to check again in timeUntilNextRefresh.
 		timeoutIds[ slotId ] = setTimeout(() => {
-			// Only refresh if still visible.
-			if ( currentlyVisible[ slotId ] ) {
-				maiPubLog( `checking refresh for ${slotId} after timeout` );
-				maiPubDisplaySlots( [ slot ], true );
-			} else {
-				maiPubLog( `skipping refresh for ${slotId} - no longer visible` );
-			}
+			maiPubLog( `checking refresh for ${slotId} after timeout` );
+			maiPubMaybeDisplaySlot( slot, 'timeout' );
 		}, timeUntilNextRefresh );
+	}
+	// Not displaying and not seeing a timeout.
+	else {
+		maiPubLog( `not refreshing ${ slotId } because it's not visible or no valid timeUntilNextRefresh` );
 	}
 }
 
@@ -1248,7 +1240,7 @@ function maiPubIsMaiSlot( slot ) {
  */
 function maiPubShouldRefreshSlot( slot, now = Date.now() ) {
 	const slotId      = slot.getSlotElementId();
-	const lastRefresh = lastRefreshTimes[slotId];
+	const lastRefresh = lastRefreshTimes[ slotId ];
 
 	// If never refreshed, should refresh.
 	if ( ! lastRefresh ) {
