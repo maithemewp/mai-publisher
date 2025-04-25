@@ -100,13 +100,7 @@ function maiPubProcessSlots(slotsToProcess, forceProcess) {
 		requestManager.adserverRequestSent = true;
 		maiPubLog( 'Sending adserver request for slots:', slotsToRefresh.map(slot => slot.getSlotElementId()));
 
-		// Update last refresh times before refreshing to prevent race conditions
-		slotsToRefresh.forEach( slot => {
-			const slotId               = slot.getSlotElementId();
-			lastRefreshTimes[ slotId ] = Date.now();
-			maiPubLog( `Updated last refresh time for ${slotId}` );
-		});
-
+		// Refresh the slots.
 		maiPubRefreshSlots( slotsToRefresh );
 	}
 
@@ -1244,6 +1238,13 @@ function maiPubMaybeDisplaySlot( slot, eventName ) {
  * @return {void}
  */
 function maiPubRefreshSlots( slots ) {
+	// Update last refresh times before refreshing to prevent race conditions
+	slots.forEach( slot => {
+		const slotId               = slot.getSlotElementId();
+		lastRefreshTimes[ slotId ] = Date.now();
+		maiPubLog( `Updated last refresh time for ${slotId}` );
+	});
+
 	// Log.
 	maiPubLog( `Refreshing ${slots.length} slots:`, slots.map( slot => slot.getSlotElementId() ) );
 
