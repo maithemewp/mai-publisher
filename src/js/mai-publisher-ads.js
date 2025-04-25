@@ -60,7 +60,7 @@ function maiPubProcessSlots(slotsToProcess, forceProcess) {
 			return false;
 		}
 		const timeSinceLastRefreshText = Infinity === timeSinceLastRefresh ? 'First refresh' : `${Math.floor(timeSinceLastRefresh/1000)}s since last refresh`;
-		maiPubLog( `Refreshing ${slot.getSlotElementId()}, ${timeSinceLastRefreshText}` );
+		maiPubLog( `Processing ${slot.getSlotElementId()}, ${timeSinceLastRefreshText}` );
 		return true;
 	});
 
@@ -71,7 +71,7 @@ function maiPubProcessSlots(slotsToProcess, forceProcess) {
 	}
 
 	// Log slots being refreshed.
-	maiPubLog( `Refreshing ${slotsToRefresh.length} slots:`, slotsToRefresh.map( slot => slot.getSlotElementId() ) );
+	maiPubLog( `Processing ${slotsToRefresh.length} slots:`, slotsToRefresh.map( slot => slot.getSlotElementId() ) );
 
 	// Object to manage each request state.
 	const requestManager = {
@@ -125,8 +125,8 @@ function maiPubProcessSlots(slotsToProcess, forceProcess) {
 					maiPubLog( 'All prebid responses:', bidResponses.prebid );
 
 					if ( requestManager.apsBidsReceived ) {
+						maiPubLog( `Sending adserver request with prebid: ${ slotsToRefresh.map( slot => slot.getSlotElementId() ).join( ', ' ) }`, slotsToRefresh );
 						sendAdserverRequest();
-						maiPubLog( `refresh() with prebid: ${ slotsToRefresh.map( slot => slot.getSlotElementId() ).join( ', ' ) }`, slotsToRefresh );
 					}
 				}
 			});
@@ -194,8 +194,8 @@ function maiPubProcessSlots(slotsToProcess, forceProcess) {
 
 				// If we have all bids, send the adserver request.
 				if ( requestManager.dmBidsReceived ) {
+					maiPubLog( `Sending adserver request with amazon fetch: ${ uadSlots.map( slot => slot.slotID.replace( 'mai-ad-', '' ) ).join( ', ' ) }`, uadSlots );
 					sendAdserverRequest();
-					maiPubLog( `refresh() with amazon fetch: ${ uadSlots.map( slot => slot.slotID.replace( 'mai-ad-', '' ) ).join( ', ' ) }`, uadSlots );
 				}
 
 				// Log if debugging.
@@ -216,16 +216,16 @@ function maiPubProcessSlots(slotsToProcess, forceProcess) {
 
 			// If we have all bids, send the adserver request.
 			if ( requestManager.dmBidsReceived ) {
+				maiPubLog( `Sending adserver request without amazon slots to fetch: ${ slotsToRefresh.map( slot => slot.getSlotElementId() ).join( ', ' ) }`, slotsToRefresh );
 				sendAdserverRequest();
-				maiPubLog( `refresh() without amazon slots to fetch: ${ slotsToRefresh.map( slot => slot.getSlotElementId() ).join( ', ' ) }`, slotsToRefresh );
 			}
 		}
 	}
 
 	// Standard GAM.
 	if ( ! maiPubAdsVars.magnite && ! maiPubAdsVars.amazonUAM ) {
+		maiPubLog( `Sending adserver request with GAM: ${ slotsToRefresh.map( slot => slot.getSlotElementId() ).join( ', ' ) }`, slotsToRefresh );
 		sendAdserverRequest();
-		maiPubLog( `refresh() with GAM: ${ slotsToRefresh.map( slot => slot.getSlotElementId() ).join( ', ' ) }`, slotsToRefresh );
 	}
 
 	// Start the failsafe timeout.
@@ -1244,6 +1244,9 @@ function maiPubMaybeDisplaySlot( slot, eventName ) {
  * @return {void}
  */
 function maiPubRefreshSlots( slots ) {
+	// Log.
+	maiPubLog( `Refreshing ${slots.length} slots:`, slots.map( slot => slot.getSlotElementId() ) );
+
 	// Refresh the slots.
 	googletag.pubads().refresh( slots, { changeCorrelator: false } );
 }
