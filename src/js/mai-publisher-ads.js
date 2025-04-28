@@ -464,39 +464,39 @@ function initGoogleTag() {
 			// 	maiPubLog( `Cleared processing flag for ${slotId} after slotResponseReceived` );
 			// });
 
-			/**
-			 * Clear the processing flag when a slot is rendered.
-			 */
-			googletag.pubads().addEventListener( 'slotRenderEnded', function( event ) {
-				const slotId = event.slot.getSlotElementId();
+			// /**
+			//  * Clear the processing flag when a slot is rendered.
+			//  */
+			// googletag.pubads().addEventListener( 'slotRenderEnded', function( event ) {
+			// 	const slotId = event.slot.getSlotElementId();
 
-				// Bail if the slot is not being processed.
-				if ( ! currentlyProcessing[ slotId ] ) {
-					return;
-				}
+			// 	// Bail if the slot is not being processed.
+			// 	if ( ! currentlyProcessing[ slotId ] ) {
+			// 		return;
+			// 	}
 
-				// Clear the processing flag and update last refresh time.
-				delete currentlyProcessing[ slotId ];
-				lastRefreshTimes[ slotId ] = Date.now();
-				maiPubLog( `Cleared processing flag for ${slotId} after slotRenderEnded` );
-			});
+			// 	// Clear the processing flag and update last refresh time.
+			// 	delete currentlyProcessing[ slotId ];
+			// 	lastRefreshTimes[ slotId ] = Date.now();
+			// 	maiPubLog( `Cleared processing flag for ${slotId} after slotRenderEnded` );
+			// });
 
-			/**
-			 * Clear the processing flag when a slot errors.
-			 */
-			googletag.pubads().addEventListener( 'slotError', function( event ) {
-				const slotId = event.slot.getSlotElementId();
+			// /**
+			//  * Clear the processing flag when a slot errors.
+			//  */
+			// googletag.pubads().addEventListener( 'slotError', function( event ) {
+			// 	const slotId = event.slot.getSlotElementId();
 
-				// Bail if the slot is not being processed.
-				if ( ! currentlyProcessing[ slotId ] ) {
-					return;
-				}
+			// 	// Bail if the slot is not being processed.
+			// 	if ( ! currentlyProcessing[ slotId ] ) {
+			// 		return;
+			// 	}
 
-				// Clear the processing flag and update last refresh time.
-				delete currentlyProcessing[ slotId ];
-				lastRefreshTimes[ slotId ] = Date.now();
-				maiPubLog( `Cleared processing flag for ${slotId} after slotError` );
-			});
+			// 	// Clear the processing flag and update last refresh time.
+			// 	delete currentlyProcessing[ slotId ];
+			// 	lastRefreshTimes[ slotId ] = Date.now();
+			// 	maiPubLog( `Cleared processing flag for ${slotId} after slotError` );
+			// });
 
 			// /**
 			//  * Handle the impressionViewable event.
@@ -528,15 +528,18 @@ function initGoogleTag() {
 				const slotId = slot.getSlotElementId();
 				const inView = event.inViewPercentage > 5;
 
+				// If the slot is currently being processed.
+				if ( currentlyProcessing[ slotId ] ) {
+					// Clear the processing flag and update last refresh time.
+					delete currentlyProcessing[ slotId ];
+					lastRefreshTimes[ slotId ] = Date.now();
+					maiPubLog( `Cleared processing flag for ${slotId} after slotRenderEnded` );
+				}
+
 				// Bail if not a refreshable slot.
 				if ( ! maiPubIsRefreshable( slot ) ) {
 					return;
 				}
-
-				// // Bail if the slot is currently being processed.
-				// if ( currentlyProcessing[ slotId ] ) {
-				// 	return;
-				// }
 
 				// Update visibility state.
 				currentlyVisible[ slotId ] = inView;
