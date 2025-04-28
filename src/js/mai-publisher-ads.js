@@ -448,7 +448,56 @@ function initGoogleTag() {
 			}
 
 			/**
+			 * Clear the processing flag when a slot response is received.
+			 */
+			googletag.pubads().addEventListener( 'slotResponseReceived', function( event ) {
+				const slotId = event.slot.getSlotElementId();
+
+				// Bail if the slot is not being processed.
+				if ( ! currentlyProcessing[ slotId ] ) {
+					return;
+				}
+
+				// Clear the processing flag.
+				delete currentlyProcessing[ slotId ];
+				maiPubLog( `Cleared processing flag for ${slotId} after slotResponseReceived` );
+			});
+
+			/**
+			 * Clear the processing flag when a slot is rendered.
+			 */
+			googletag.pubads().addEventListener( 'slotRenderEnded', function( event ) {
+				const slotId = event.slot.getSlotElementId();
+
+				// Bail if the slot is not being processed.
+				if ( ! currentlyProcessing[ slotId ] ) {
+					return;
+				}
+
+				// Clear the processing flag.
+				delete currentlyProcessing[ slotId ];
+				maiPubLog( `Cleared processing flag for ${slotId} after slotRenderEnded` );
+			});
+
+			/**
+			 * Clear the processing flag when a slot errors.
+			 */
+			googletag.pubads().addEventListener( 'slotError', function( event ) {
+				const slotId = event.slot.getSlotElementId();
+
+				// Bail if the slot is not being processed.
+				if ( ! currentlyProcessing[ slotId ] ) {
+					return;
+				}
+
+				// Clear the processing flag.
+				delete currentlyProcessing[ slotId ];
+				maiPubLog( `Cleared processing flag for ${slotId} after slotError` );
+			});
+
+			/**
 			 * Handle the impressionViewable event.
+			 * Set the slot as visible and handle display logic.
 			 */
 			googletag.pubads().addEventListener( 'impressionViewable', (event) => {
 				const slot   = event.slot;
@@ -545,33 +594,33 @@ function initGoogleTag() {
 			// 	// googletag.destroySlots( [ event.slot ] );
 			// });
 
-			// If debugging, set listeners to log.
-			if ( debug || log ) {
-				// Log when a slot is requested/fetched.
-				googletag.pubads().addEventListener( 'slotRequested', (event) => {
-					maiPubLog( 'slotRequested:', event.slot, event );
-				});
+			// // If debugging, set listeners to log.
+			// if ( debug || log ) {
+			// 	// Log when a slot is requested/fetched.
+			// 	googletag.pubads().addEventListener( 'slotRequested', (event) => {
+			// 		maiPubLog( 'slotRequested:', event.slot, event );
+			// 	});
 
-				// Log when a slot response is received.
-				googletag.pubads().addEventListener( 'slotResponseReceived', (event) => {
-					maiPubLog( 'slotResponseReceived:', event.slot, event );
-				});
+			// 	// Log when a slot was loaded.
+			// 	googletag.pubads().addEventListener( 'slotOnload', (event) => {
+			// 		maiPubLog( 'slotOnload:', event.slot, event );
+			// 	});
 
-				// Log when a slot was loaded.
-				googletag.pubads().addEventListener( 'slotOnload', (event) => {
-					maiPubLog( 'slotOnload:', event.slot, event );
-				});
+			// 	// Log when a slot response is received.
+			// 	googletag.pubads().addEventListener( 'slotResponseReceived', (event) => {
+			// 		maiPubLog( 'slotResponseReceived:', event.slot, event );
+			// 	});
 
-				// Log when slot render has ended, regardless of whether ad was empty or not.
-				googletag.pubads().addEventListener( 'slotRenderEnded', (event) => {
-					maiPubLog( 'slotRenderEnded:', event.slot, event );
-				});
+			// 	// Log when slot render has ended, regardless of whether ad was empty or not.
+			// 	googletag.pubads().addEventListener( 'slotRenderEnded', (event) => {
+			// 		maiPubLog( 'slotRenderEnded:', event.slot, event );
+			// 	});
 
-				// Log when a slot ID visibility changed.
-				// googletag.pubads().addEventListener( 'slotVisibilityChanged', (event) => {
-				// 	maiPubLog( 'changed:', event.slot.getSlotElementId(), `${event.inViewPercentage}%` );
-				// });
-			}
+			// 	// Log when a slot ID visibility changed.
+			// 	googletag.pubads().addEventListener( 'slotVisibilityChanged', (event) => {
+			// 		maiPubLog( 'changed:', event.slot.getSlotElementId(), `${event.inViewPercentage}%` );
+			// 	});
+			// }
 		} catch ( error ) {
 			maiPubLog( 'Error initializing GAM:', error );
 			// Potentially retry or fallback to simpler setup
@@ -580,12 +629,20 @@ function initGoogleTag() {
 }
 
 /**
- * Process slots for display
+ * Request slots.
+ * The requestManager logic take from Magnite docs.
+ *
+ * Flow:
+ * 1. If force=true, skips timing check entirely.
+ * 2. If force=false, filters slots based on timing check.
+ * 3. Handles bid requests and refreshes eligible slots.
+ *
+ * @link https://help.magnite.com/help/web-integration-guide#parallel-header-bidding-integrations
  *
  * @param {array}   slotsToProcess The slots to process
  * @param {boolean} forceProcess   Whether to force refresh
  */
-function maiPubProcessSlots(slotsToProcess, forceProcess) {
+function maiPubRequestSlots( slotsToProcess, forceProcess ) {
 	// Only filter if not forcing refresh.
 	const slotsToRefresh = forceProcess ? slotsToProcess : slotsToProcess.filter( slot => {
 		const { shouldRefresh, timeSinceLastRefresh } = maiPubShouldRefreshSlot( slot );
@@ -620,9 +677,11 @@ function maiPubProcessSlots(slotsToProcess, forceProcess) {
 		return;
 	}
 
-	// Mark slots as being processed.
+	// Mark slots as being processed with a timestamp
 	slotsToRefreshNow.forEach( slot => {
-		currentlyProcessing[ slot.getSlotElementId() ] = true;
+		const slotId = slot.getSlotElementId();
+		currentlyProcessing[ slotId ] = Date.now();
+		maiPubLog( `Set processing flag for ${slotId}` );
 	});
 
 	// Log slots being refreshed.
@@ -657,13 +716,6 @@ function maiPubProcessSlots(slotsToProcess, forceProcess) {
 
 		// Refresh the slots.
 		maiPubRefreshSlots( slotsToRefreshNow );
-
-		// Clear processing flags after a delay.
-		setTimeout(() => {
-			slotsToRefreshNow.forEach( slot => {
-				delete currentlyProcessing[ slot.getSlotElementId() ];
-			});
-		}, 1000 );
 	}
 
 	// Handle Magnite/DM bids.
@@ -689,7 +741,7 @@ function maiPubProcessSlots(slotsToProcess, forceProcess) {
 					maiPubLog( `Prebid response time: ${ prebidResponseTime }ms` );
 
 					// Log.
-					maiPubLog('Prebid bids received:', {
+					maiPubLog( 'Prebid bids received:', {
 						prebid: bidResponses.prebid,
 						timeouts: bidResponses.timeouts,
 						timing: {
@@ -702,7 +754,7 @@ function maiPubProcessSlots(slotsToProcess, forceProcess) {
 
 					// If we have all bids, send the adserver request.
 					if ( requestManager.apsBidsReceived ) {
-						maiPubLog('Sending adserver request after Prebid bids');
+						maiPubLog( 'Sending adserver request after Prebid bids' );
 						sendAdserverRequest();
 					}
 				}
@@ -839,53 +891,16 @@ function maiPubProcessSlots(slotsToProcess, forceProcess) {
 }
 
 /**
- * Debounced version of maiPubProcessSlots.
+ * Debounced version of maiPubRequestSlots.
  *
  * @param {array}   slots The slots to process.
  * @param {boolean} force Whether to force refresh.
  *
  * @return {void}
  */
-function maiPubProcessSlotsDebounced( slots, force ) {
-	return maiPubDebounce( maiPubProcessSlots, 100 )( slots, force );
+function maiPubRequestSlotsDebounced( slots, force ) {
+	return maiPubDebounce( maiPubRequestSlots, 100 )( slots, force );
 }
-
-/**
- * Display slots.
- * The requestManager logic take from Magnite docs.
- *
- * Flow:
- * 1. If force=true, skips timing check entirely.
- * 2. If force=false, filters slots based on timing check.
- * 3. Handles bid requests and refreshes eligible slots.
- *
- * @link https://help.magnite.com/help/web-integration-guide#parallel-header-bidding-integrations
- *
- * @param {array}   slots An array of the defined slots objects.
- * @param {boolean} force Whether to force refresh without checking timing.
- *
- * @return {void}
- */
-function maiPubDisplaySlots( slots, force = false ) {
-	// Enable services.
-	// This needs to run after defineSlot() but before display()/refresh().
-	// If we did this in maiPubDefineSlot() it would run for every single slot, instead of batches.
-	// NM, changed this when Magnites docs show it how we had it. Via: https://help.magnite.com/help/web-integration-guide
-	// googletag.enableServices();
-
-	// Log initial state.
-	maiPubLog( `Display slots called with ${slots.length} slots, force=${force}` );
-
-	// If force is true, process immediately without debounce
-	if ( force ) {
-		maiPubProcessSlots( slots, force );
-		return;
-	}
-
-	// Use the debounced version.
-	maiPubProcessSlotsDebounced( slots, force );
-}
-
 /**
  * Generate a GAM-compliant PPID from a single string identifier.
  * JS equivalent of PHP maipub_generate_ppid function in functions-utility.php
@@ -1275,14 +1290,58 @@ function maiPubMaybeDisplaySlot( slot, eventName ) {
 
 		// Set timeout to check again in timeUntilNextRefresh.
 		timeoutIds[ slotId ] = setTimeout(() => {
+			// Bail if the slot is no longer visible.
+			if ( ! currentlyVisible[ slotId ] ) {
+				return;
+			}
+			// Log.
 			maiPubLog( `checking refresh for ${slotId} after ${Math.floor(timeUntilNextRefresh/1000)}s timeout` );
+
+			// Try to the slot.
 			maiPubMaybeDisplaySlot( slot, 'timeout' );
+
 		}, timeUntilNextRefresh );
 	}
 	// Not displaying and not seeing a timeout.
 	else {
 		maiPubLog( `not refreshing ${ slotId } because it's not visible or no valid timeUntilNextRefresh` );
 	}
+}
+
+/**
+ * Display slots.
+ * The requestManager logic take from Magnite docs.
+ *
+ * Flow:
+ * 1. If force=true, skips timing check entirely.
+ * 2. If force=false, filters slots based on timing check.
+ * 3. Handles bid requests and refreshes eligible slots.
+ *
+ * @link https://help.magnite.com/help/web-integration-guide#parallel-header-bidding-integrations
+ *
+ * @param {array}   slots An array of the defined slots objects.
+ * @param {boolean} force Whether to force refresh without checking timing.
+ *
+ * @return {void}
+ */
+function maiPubDisplaySlots( slots, force = false ) {
+	// Enable services.
+	// This needs to run after defineSlot() but before display()/refresh().
+	// If we did this in maiPubDefineSlot() it would run for every single slot, instead of batches.
+	// NM, changed this when Magnites docs show it how we had it. Via: https://help.magnite.com/help/web-integration-guide
+	// googletag.enableServices();
+
+	// Log initial state.
+	maiPubLog( `Display slots called with ${slots.length} slots, force=${force}` );
+
+	// If force is true, process immediately without debounce
+	if ( force ) {
+		maiPubRequestSlots( slots, force );
+		return;
+	}
+
+	// Use the debounced version.
+	maiPubRequestSlotsDebounced( slots, force );
 }
 
 /**
@@ -1368,9 +1427,13 @@ function maiPubShouldRefreshSlot( slot, now = Date.now() ) {
 	// Based on actual elapsed time, not just visible time
 	const timeUntilNextRefresh = Math.max( 0, ( refreshTime * 1000 ) - elapsedTime );
 
+	// Add a 5-second cooldown after any refresh to prevent rapid-fire refreshes
+	const cooldownTime = 5000; // 5 seconds
+	const isInCooldown = elapsedTime < cooldownTime;
+
 	return {
-		// Only refresh if we've accumulated enough visible time.
-		shouldRefresh: timeSinceLastRefresh >= ( refreshTime * 1000 ),
+		// Only refresh if we've accumulated enough visible time and not in cooldown
+		shouldRefresh: timeSinceLastRefresh >= ( refreshTime * 1000 ) && ! isInCooldown,
 		// How long the slot has been visible since last refresh.
 		timeSinceLastRefresh,
 		// How long until the next refresh check.
@@ -1437,3 +1500,23 @@ function maiPubLog( ...mixed ) {
 	// Log the combined message.
 	console.log( `${timer} ${now}`, mixed );
 }
+
+// Set up periodic check for stuck processing slots
+setInterval(() => {
+	const now = Date.now();
+	const stuckSlots = Object.entries(currentlyProcessing)
+		.filter(([slotId, startTime]) => {
+			// If a slot has been processing for more than 30 seconds, consider it stuck
+			return now - startTime > 30000;
+		})
+		.map(([slotId]) => slotId);
+
+	if (stuckSlots.length) {
+		maiPubLog(`WARNING: Found ${stuckSlots.length} stuck slots:`, stuckSlots);
+		// Clear the stuck slots to prevent them from blocking future refreshes
+		stuckSlots.forEach(slotId => {
+			delete currentlyProcessing[slotId];
+			maiPubLog(`Cleared stuck processing flag for ${slotId}`);
+		});
+	}
+}, 30000); // Check every 30 seconds
