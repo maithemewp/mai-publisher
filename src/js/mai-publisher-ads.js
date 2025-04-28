@@ -533,6 +533,11 @@ function initGoogleTag() {
 					return;
 				}
 
+				// Bail if the slot is currently being processed.
+				if ( currentlyProcessing[ slotId ] ) {
+					return;
+				}
+
 				// Update visibility state.
 				currentlyVisible[ slotId ] = inView;
 				maiPubLog( `Slot ${slotId} visibility changed to ${inView ? 'visible' : 'invisible'} (${event.inViewPercentage}%)` );
