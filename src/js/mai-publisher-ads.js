@@ -1470,15 +1470,15 @@ function maiPubShouldRefreshSlot( slot, now = Date.now() ) {
 		timeUntilNextRefresh
 	};
 
-	maiPubLog( `Slot ${slotId} refresh check:`, {
-		lastRefresh: lastRefresh,
-		now: now,
-		elapsedTime: elapsedTime,
-		isVisible: currentlyVisible[ slotId ],
-		timeSinceLastRefresh: timeSinceLastRefresh,
-		requiredTime: refreshTime * 1000,
-		shouldRefresh: result.shouldRefresh
-	});
+	// maiPubLog( `Slot ${slotId} refresh check:`, {
+	// 	lastRefresh: lastRefresh,
+	// 	now: now,
+	// 	elapsedTime: elapsedTime,
+	// 	isVisible: currentlyVisible[ slotId ],
+	// 	timeSinceLastRefresh: timeSinceLastRefresh,
+	// 	requiredTime: refreshTime * 1000,
+	// 	shouldRefresh: result.shouldRefresh
+	// });
 
 	return result;
 }
