@@ -1297,26 +1297,26 @@ function maiPubMaybeDisplaySlot( slot, eventName ) {
 	}
 	// Not ready to refresh yet and timeUntilNextRefresh is positive.
 	else if ( currentlyVisible[ slotId ] && timeUntilNextRefresh > 0 ) {
-		// Clear any existing timeout before setting a new one.
-		if ( timeoutIds[ slotId ] ) {
-			clearTimeout( timeoutIds[ slotId ] );
-		}
+		// // Clear any existing timeout before setting a new one.
+		// if ( timeoutIds[ slotId ] ) {
+		// 	clearTimeout( timeoutIds[ slotId ] );
+		// }
 
-		// Set timeout to check again in timeUntilNextRefresh.
-		timeoutIds[ slotId ] = setTimeout(() => {
-			// Bail if the slot is no longer visible.
-			if ( ! currentlyVisible[ slotId ] ) {
-				return;
-			}
-			// Log.
-			maiPubLog( `checking refresh for ${slotId} after ${Math.floor(timeUntilNextRefresh/1000)}s timeout` );
+		// // Set timeout to check again in timeUntilNextRefresh.
+		// timeoutIds[ slotId ] = setTimeout(() => {
+		// 	// Bail if the slot is no longer visible.
+		// 	if ( ! currentlyVisible[ slotId ] ) {
+		// 		return;
+		// 	}
+		// 	// Log.
+		// 	maiPubLog( `checking refresh for ${slotId} after ${Math.floor(timeUntilNextRefresh/1000)}s timeout` );
 
-			// Try to the slot.
-			maiPubMaybeDisplaySlot( slot, 'setTimeout' );
+		// 	// Try to the slot.
+		// 	maiPubMaybeDisplaySlot( slot, 'setTimeout' );
 
-		}, timeUntilNextRefresh );
+		// }, timeUntilNextRefresh );
 	}
-	// Not displaying and not seeing a timeout.
+	// Not displaying and not setting a timeout.
 	else {
 		maiPubLog( `not refreshing ${ slotId } because it's not visible or no valid timeUntilNextRefresh` );
 	}
