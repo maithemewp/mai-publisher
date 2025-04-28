@@ -447,22 +447,22 @@ function initGoogleTag() {
 				}, { once: true });
 			}
 
-			/**
-			 * Clear the processing flag when a slot response is received.
-			 */
-			googletag.pubads().addEventListener( 'slotResponseReceived', function( event ) {
-				const slotId = event.slot.getSlotElementId();
+			// /**
+			//  * Clear the processing flag when a slot response is received.
+			//  */
+			// googletag.pubads().addEventListener( 'slotResponseReceived', function( event ) {
+			// 	const slotId = event.slot.getSlotElementId();
 
-				// Bail if the slot is not being processed.
-				if ( ! currentlyProcessing[ slotId ] ) {
-					return;
-				}
+			// 	// Bail if the slot is not being processed.
+			// 	if ( ! currentlyProcessing[ slotId ] ) {
+			// 		return;
+			// 	}
 
-				// Clear the processing flag and update last refresh time.
-				delete currentlyProcessing[ slotId ];
-				lastRefreshTimes[ slotId ] = Date.now();
-				maiPubLog( `Cleared processing flag for ${slotId} after slotResponseReceived` );
-			});
+			// 	// Clear the processing flag and update last refresh time.
+			// 	delete currentlyProcessing[ slotId ];
+			// 	lastRefreshTimes[ slotId ] = Date.now();
+			// 	maiPubLog( `Cleared processing flag for ${slotId} after slotResponseReceived` );
+			// });
 
 			/**
 			 * Clear the processing flag when a slot is rendered.
@@ -545,7 +545,7 @@ function initGoogleTag() {
 				// If becoming invisible, clear any pending refresh timeout.
 				else if ( timeoutIds[ slotId ] ) {
 					clearTimeout( timeoutIds[ slotId ] );
-					maiPubLog( `cleared refresh timeout for ${slotId} - no longer visible` );
+					maiPubLog( `cleared refresh timeout via slotVisibilityChanged for ${slotId} - no longer visible` );
 				}
 			});
 
@@ -1307,7 +1307,7 @@ function maiPubMaybeDisplaySlot( slot, eventName ) {
 			maiPubLog( `checking refresh for ${slotId} after ${Math.floor(timeUntilNextRefresh/1000)}s timeout` );
 
 			// Try to the slot.
-			maiPubMaybeDisplaySlot( slot, 'timeout' );
+			maiPubMaybeDisplaySlot( slot, 'setTimeout' );
 
 		}, timeUntilNextRefresh );
 	}
