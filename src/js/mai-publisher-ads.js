@@ -4,37 +4,38 @@ window.googletag = window.googletag || {};
 googletag.cmd    = googletag.cmd || [];
 
 // Define global variables.
-const ads              = maiPubAdsVars['ads'];
-const adSlotIds        = [];
-const adSlots          = [];
-const gamBase          = maiPubAdsVars.gamBase;
-const gamBaseClient    = maiPubAdsVars.gamBaseClient;
-const refreshKey       = 'refresh';
-const refreshValue     = maiPubAdsVars.targets.refresh;
-const refreshTime      = 32; // Time in seconds. Google recommends 30, we add 2 seconds for safety.
-const lastRefreshTimes = {};
-const currentlyVisible = {};
-const timeoutIds       = {};
-const cmpTimeout       = 2000; // Fallback in case CMP never responds.
-const matomoTimeout    = 2000; // Fallback in case Matomo never loads.
-const bidderTimeout    = 5000;
-const fallbackTimeout  = 6000; // Set global failsafe timeout ~1000ms after DM UI bidder timeout.
-const debug            = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb') || window.location.search.includes('pbjs_debug=true');
-const log              = maiPubAdsVars.debug;
-const bidResponses     = { prebid: {}, amazon: {}, timeouts: [] };
-const serverConsent    = Boolean( maiPubAdsVars.consent );
-const serverPpid       = maiPubAdsVars.ppid;
-const localConsent     = getLocalConsent();
-const localPpid        = getLocalPpid();
-let   timestamp        = Date.now();
-let   consent          = serverConsent || localConsent;
-let   ppid             = '';
-let   isGeneratingPpid = false;
-let   cmpReady         = false;
-let   matomoReady      = false;
+const ads                 = maiPubAdsVars['ads'];
+const adSlotIds           = [];
+const adSlots             = [];
+const gamBase             = maiPubAdsVars.gamBase;
+const gamBaseClient       = maiPubAdsVars.gamBaseClient;
+const refreshKey          = 'refresh';
+const refreshValue        = maiPubAdsVars.targets.refresh;
+const refreshTime         = 32;                                                                                                                                            // Time in seconds. Google recommends 30, we add 2 seconds for safety.
+const lastRefreshTimes    = {};
+const currentlyVisible    = {};
+const currentlyProcessing = {};
+const timeoutIds          = {};
+const cmpTimeout          = 2000;                                                                                                                                          // Fallback in case CMP never responds.
+const matomoTimeout       = 2000;                                                                                                                                          // Fallback in case Matomo never loads.
+const bidderTimeout       = 5000;
+const fallbackTimeout     = 6000;                                                                                                                                          // Set global failsafe timeout ~1000ms after DM UI bidder timeout.
+const debug               = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb') || window.location.search.includes('pbjs_debug=true');
+const log                 = maiPubAdsVars.debug;
+const bidResponses        = { prebid: {}, amazon: {}, timeouts: [] };
+const serverConsent       = Boolean( maiPubAdsVars.consent );
+const serverPpid          = maiPubAdsVars.ppid;
+const localConsent        = getLocalConsent();
+const localPpid           = getLocalPpid();
+let   timestamp           = Date.now();
+let   consent             = serverConsent || localConsent;
+let   ppid                = '';
+let   isGeneratingPpid    = false;
+let   cmpReady            = false;
+let   matomoReady         = false;
 
 // If debugging, log.
-maiPubLog( 'v224' );
+maiPubLog( 'v225' );
 
 // If we have a server-side PPID, log it.
 if ( serverPpid ) {
@@ -603,8 +604,29 @@ function maiPubProcessSlots(slotsToProcess, forceProcess) {
 		return;
 	}
 
+	// Filter out slots that are already being processed.
+	const slotsToRefreshNow = slotsToRefresh.filter( slot => {
+		const slotId = slot.getSlotElementId();
+		if ( currentlyProcessing[ slotId ] ) {
+			maiPubLog( `Skipping ${slotId} - already being processed` );
+			return false;
+		}
+		return true;
+	});
+
+	// If no slots to process after filtering, bail.
+	if ( ! slotsToRefreshNow.length ) {
+		maiPubLog( 'No slots to process after filtering out already processing slots' );
+		return;
+	}
+
+	// Mark slots as being processed.
+	slotsToRefreshNow.forEach( slot => {
+		currentlyProcessing[ slot.getSlotElementId() ] = true;
+	});
+
 	// Log slots being refreshed.
-	maiPubLog( `Processing ${slotsToRefresh.length} slots:`, slotsToRefresh.map( slot => slot.getSlotElementId() ) );
+	maiPubLog( `Processing ${slotsToRefreshNow.length} slots:`, slotsToRefreshNow.map( slot => slot.getSlotElementId() ) );
 
 	// Object to manage each request state.
 	const requestManager = {
@@ -624,33 +646,47 @@ function maiPubProcessSlots(slotsToProcess, forceProcess) {
 			maiPubLog( 'Adserver request already sent, skipping. State:', {
 				dmBidsReceived: requestManager.dmBidsReceived,
 				apsBidsReceived: requestManager.apsBidsReceived,
-				slots: slotsToRefresh.map(slot => slot.getSlotElementId())
+				slots: slotsToRefreshNow.map(slot => slot.getSlotElementId())
 			});
 			return;
 		}
 
 		// Set the request manager to true and refresh the slots.
 		requestManager.adserverRequestSent = true;
-		maiPubLog( 'Sending adserver request for slots:', slotsToRefresh.map(slot => slot.getSlotElementId()));
+		maiPubLog( 'Sending adserver request for slots:', slotsToRefreshNow.map(slot => slot.getSlotElementId()));
 
 		// Refresh the slots.
-		maiPubRefreshSlots( slotsToRefresh );
+		maiPubRefreshSlots( slotsToRefreshNow );
+
+		// Clear processing flags after a delay.
+		setTimeout(() => {
+			slotsToRefreshNow.forEach( slot => {
+				delete currentlyProcessing[ slot.getSlotElementId() ];
+			});
+		}, 1000 );
 	}
 
 	// Handle Magnite/DM bids.
 	if ( maiPubAdsVars.magnite ) {
 		// Fetch bids from Magnite using Prebid.
 		pbjs.que.push( function() {
+			// Track request start time
+			const prebidRequestStartTime = Date.now();
+
 			// Request bids from Magnite/Prebid.
 			pbjs.rp.requestBids( {
-				gptSlotObjects: slotsToRefresh,
+				gptSlotObjects: slotsToRefreshNow,
 				timeout: bidderTimeout,
 				bidsBackHandler: function() {
 					// Set targeting.
-					pbjs.setTargetingForGPTAsync && pbjs.setTargetingForGPTAsync( slotsToRefresh.map( slot => slot.getSlotElementId() ) );
+					pbjs.setTargetingForGPTAsync && pbjs.setTargetingForGPTAsync( slotsToRefreshNow.map( slot => slot.getSlotElementId() ) );
 
 					// Set the request manager to true.
 					requestManager.dmBidsReceived = true;
+
+					// Log timing information
+					const prebidResponseTime = Date.now() - prebidRequestStartTime;
+					maiPubLog( `Prebid response time: ${ prebidResponseTime }ms` );
 
 					// Log.
 					maiPubLog('Prebid bids received:', {
@@ -659,7 +695,8 @@ function maiPubProcessSlots(slotsToProcess, forceProcess) {
 						timing: {
 							totalTime: Date.now() - timestamp + 'ms',
 							bidderTimeout: bidderTimeout + 'ms',
-							fallbackTimeout: fallbackTimeout + 'ms'
+							fallbackTimeout: fallbackTimeout + 'ms',
+							responseTime: prebidResponseTime + 'ms'
 						}
 					});
 
@@ -677,7 +714,7 @@ function maiPubProcessSlots(slotsToProcess, forceProcess) {
 	if ( maiPubAdsVars.amazonUAM ) {
 		// Filter out ads[slug].sizes that only contain a single size named 'fluid'. This was throwing an error in amazon.
 		// Filter out client ads.
-		const uadSlots = slotsToRefresh
+		const uadSlots = slotsToRefreshNow
 			.filter( slot => {
 				const slug = slot.getSlotElementId().replace( 'mai-ad-', '' );
 
@@ -709,10 +746,10 @@ function maiPubProcessSlots(slotsToProcess, forceProcess) {
 			maiPubLog( 'amazonConfig', amazonConfig );
 
 			// Fetch bids from Amazon UAM using apstag.
-			const requestStartTime = Date.now();
+			const uadRequestStartTime = Date.now();
 			apstag.fetchBids( amazonConfig, function( bids ) {
 				// Log timing information
-				const amazonResponseTime = Date.now() - requestStartTime;
+				const amazonResponseTime = Date.now() - uadRequestStartTime;
 				maiPubLog( `Amazon response time: ${ amazonResponseTime }ms` );
 
 				// Track Amazon bids
@@ -762,7 +799,7 @@ function maiPubProcessSlots(slotsToProcess, forceProcess) {
 
 			// If we have all bids, send the adserver request.
 			if ( requestManager.dmBidsReceived ) {
-				maiPubLog( `Sending adserver request without amazon slots to fetch: ${ slotsToRefresh.map( slot => slot.getSlotElementId() ).join( ', ' ) }`, slotsToRefresh );
+				maiPubLog( `Sending adserver request without amazon slots to fetch: ${ slotsToRefreshNow.map( slot => slot.getSlotElementId() ).join( ', ' ) }`, slotsToRefreshNow );
 				sendAdserverRequest();
 			}
 		}
@@ -770,7 +807,7 @@ function maiPubProcessSlots(slotsToProcess, forceProcess) {
 
 	// Standard GAM.
 	if ( ! maiPubAdsVars.magnite && ! maiPubAdsVars.amazonUAM ) {
-		maiPubLog( `Sending adserver request with GAM: ${ slotsToRefresh.map( slot => slot.getSlotElementId() ).join( ', ' ) }`, slotsToRefresh );
+		maiPubLog( `Sending adserver request with GAM: ${ slotsToRefreshNow.map( slot => slot.getSlotElementId() ).join( ', ' ) }`, slotsToRefreshNow );
 		sendAdserverRequest();
 	}
 
