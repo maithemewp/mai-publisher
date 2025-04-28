@@ -1403,7 +1403,18 @@ function maiPubIsMaiSlot( slot ) {
  *                 - timeUntilNextRefresh: number of milliseconds until next refresh (based on actual elapsed time)
  */
 function maiPubShouldRefreshSlot( slot, now = Date.now() ) {
-	const slotId      = slot.getSlotElementId();
+	const slotId = slot.getSlotElementId();
+
+	// Bail if the slot is already being processed.
+	if ( currentlyProcessing[ slotId ] ) {
+		maiPubLog( `Slot ${slotId} is already being processed, skipping refresh check` );
+		return {
+			shouldRefresh: false,
+			timeSinceLastRefresh: 0,
+			timeUntilNextRefresh: 0
+		};
+	}
+
 	const lastRefresh = lastRefreshTimes[ slotId ];
 
 	// If never refreshed, should refresh immediately.
