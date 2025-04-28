@@ -533,7 +533,7 @@ function initGoogleTag() {
 					// Clear the processing flag and update last refresh time.
 					delete currentlyProcessing[ slotId ];
 					lastRefreshTimes[ slotId ] = Date.now();
-					maiPubLog( `Cleared processing flag for ${slotId} after slotRenderEnded` );
+					maiPubLog( `Cleared processing flag for ${slotId} after slotVisibilityChanged` );
 				}
 
 				// Bail if not a refreshable slot.
