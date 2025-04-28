@@ -25,8 +25,8 @@ const log                 = maiPubAdsVars.debug;
 const bidResponses        = { prebid: {}, amazon: {}, timeouts: [] };
 const serverConsent       = Boolean( maiPubAdsVars.consent );
 const serverPpid          = maiPubAdsVars.ppid;
-const localConsent        = getLocalConsent();
-const localPpid           = getLocalPpid();
+const localConsent        = maiPubGetLocalConsent();
+const localPpid           = maiPubGetLocalPpid();
 let   timestamp           = Date.now();
 let   consent             = serverConsent || localConsent;
 let   ppid                = '';
@@ -173,7 +173,7 @@ if ( 'function' === typeof __tcfapi ) {
 		if ( ! cmpReady ) {
 			maiPubLog( 'CMP timeout, proceeding with initialization' );
 			cmpReady = true;
-			maybeInitGoogleTag();
+			maiPubMaybeInit();
 		}
 	}, cmpTimeout );
 
@@ -190,19 +190,19 @@ if ( 'function' === typeof __tcfapi ) {
 				consent  = Boolean( success );
 				clearTimeout( cmpTimeoutId );
 				maiPubLog( `CMP loaded, proceeding with initialization: ${ success }`, tcData );
-				maybeInitGoogleTag();
+				maiPubMaybeInit();
 			}
 		});
 	} catch ( error ) {
 		maiPubLog( 'CMP error:', error );
 		clearTimeout( cmpTimeoutId );
 		cmpReady = true;
-		maybeInitGoogleTag();
+		maiPubMaybeInit();
 	}
 } else {
 	// No CMP present, mark as ready.
 	cmpReady = true;
-	maybeInitGoogleTag();
+	maiPubMaybeInit();
 }
 
 /**
@@ -214,7 +214,7 @@ if ( maiPubAdsVars.matomo.enabled && maiPubAdsVars.shouldTrack ) {
 		if ( ! matomoReady ) {
 			maiPubLog( 'Matomo timeout, proceeding with initialization' );
 			matomoReady = true;
-			maybeInitGoogleTag();
+			maiPubMaybeInit();
 		}
 	}, matomoTimeout );
 
@@ -223,7 +223,7 @@ if ( maiPubAdsVars.matomo.enabled && maiPubAdsVars.shouldTrack ) {
 		matomoReady = true;
 		clearTimeout( matomoTimeoutId );
 		maiPubLog( `Skipping Matomo initialization, using existing PPID: ${ppid}` );
-		maybeInitGoogleTag();
+		maiPubMaybeInit();
 	}
 	// Check if Matomo is already initialized.
 	else if ( 'undefined' !== typeof Matomo ) {
@@ -238,21 +238,21 @@ if ( maiPubAdsVars.matomo.enabled && maiPubAdsVars.shouldTrack ) {
 
 				// If we have a visitor ID, generate a PPID from it.
 				if ( visitorId ) {
-					generatePpid( visitorId ).then( transformedPpid => {
+					maiPubGeneratePpid( visitorId ).then( transformedPpid => {
 						ppid        = transformedPpid;
 						matomoReady = true;
 						clearTimeout( matomoTimeoutId );
 						maiPubLog( `Matomo already initialized, generated PPID from visitor ID: ${ppid}` );
-						maybeInitGoogleTag();
+						maiPubMaybeInit();
 					}).catch( error => {
 						maiPubLog( 'Error generating PPID from Matomo visitor ID:', error );
 						// Fallback to random PPID.
-						generatePpid().then( transformedPpid => {
+						maiPubGeneratePpid().then( transformedPpid => {
 							ppid        = transformedPpid;
 							matomoReady = true;
 							clearTimeout( matomoTimeoutId );
 							maiPubLog( `Matomo already initialized, generated random PPID after generation error: ${ppid}` );
-							maybeInitGoogleTag();
+							maiPubMaybeInit();
 						});
 					});
 				}
@@ -260,12 +260,12 @@ if ( maiPubAdsVars.matomo.enabled && maiPubAdsVars.shouldTrack ) {
 		} catch (error) {
 			maiPubLog( 'Error accessing Matomo:', error );
 			// Fallback to random PPID.
-			generatePpid().then( transformedPpid => {
+			maiPubGeneratePpid().then( transformedPpid => {
 				ppid        = transformedPpid;
 				matomoReady = true;
 				clearTimeout( matomoTimeoutId );
 				maiPubLog( `Matomo already initialized, generated random PPID after catching error: ${ppid}` );
-				maybeInitGoogleTag();
+				maiPubMaybeInit();
 			});
 		}
 	}
@@ -275,12 +275,12 @@ if ( maiPubAdsVars.matomo.enabled && maiPubAdsVars.shouldTrack ) {
 		// Wait for analytics init event.
 		document.addEventListener( 'maiPublisherAnalyticsInit', function( event ) {
 			// Get and transform the visitor ID immediately.
-			generatePpid( event.detail.tracker.getVisitorId() ).then( transformedPpid => {
+			maiPubGeneratePpid( event.detail.tracker.getVisitorId() ).then( transformedPpid => {
 				ppid        = transformedPpid;
 				matomoReady = true;
 				clearTimeout( matomoTimeoutId );
 				maiPubLog( `Matomo async event fired, generated PPID from visitor ID: ${ppid}` );
-				maybeInitGoogleTag();
+				maiPubMaybeInit();
 			});
 		}, { once: true } );
 	}
@@ -293,7 +293,7 @@ if ( maiPubAdsVars.matomo.enabled && maiPubAdsVars.shouldTrack ) {
 		maiPubLog( 'Matomo enabled but should not track' );
 	}
 
-	maybeInitGoogleTag();
+	maiPubMaybeInit();
 }
 
 /**
@@ -302,7 +302,7 @@ if ( maiPubAdsVars.matomo.enabled && maiPubAdsVars.shouldTrack ) {
  * 1. CMP is ready (or not present) AND Matomo is ready (or not enabled)
  * 2. We've hit our timeout for either system
  */
-function maybeInitGoogleTag() {
+function maiPubMaybeInit() {
 	// Check if we should initialize based on CMP and Matomo states.
 	const shouldInit = (
 		// CMP is ready or not present.
@@ -332,17 +332,17 @@ function maybeInitGoogleTag() {
 	// If still no ppid.
 	if ( ! ppid ) {
 		// Generate a random PPID.
-		generatePpid().then( transformedPpid => {
+		maiPubGeneratePpid().then( transformedPpid => {
 			ppid = transformedPpid;
 			maiPubLog( `Generated random PPID: ${ppid}` );
 			maiPubLog( `Initializing GAM with ppid: ${ppid}` );
-			initGoogleTag();
+			maiPubInit();
 		});
 	}
 	// We have a ppid.
 	else {
 		maiPubLog( `Initializing GAM with ppid: ${ppid}` );
-		initGoogleTag();
+		maiPubInit();
 	}
 }
 
@@ -351,15 +351,15 @@ function maybeInitGoogleTag() {
  *
  * @return {void}
  */
-function initGoogleTag() {
+function maiPubInit() {
 	// If consent is different from the local consent, store it.
 	if ( consent !== serverConsent || consent !== localConsent ) {
-		setLocalConsent( consent );
+		maiPubSetLocalConsent( consent );
 	}
 
 	// If ppid is different from the local ppid, store it.
 	if ( ppid && ( ppid !== serverPpid || ! localPpid || ppid !== localPpid ) ) {
-		setLocalPpid( ppid );
+		maiPubSetLocalPpid( ppid );
 	}
 
 	// If we have segments.
@@ -528,17 +528,17 @@ function initGoogleTag() {
 				const slotId = slot.getSlotElementId();
 				const inView = event.inViewPercentage > 5;
 
+				// Bail if not a Mai Publisher slot.
+				if ( ! maiPubIsMaiSlot( slot ) ) {
+					return;
+				}
+
 				// If the slot is currently being processed.
 				if ( currentlyProcessing[ slotId ] ) {
 					// Clear the processing flag and update last refresh time.
 					delete currentlyProcessing[ slotId ];
 					lastRefreshTimes[ slotId ] = Date.now();
 					maiPubLog( `Cleared processing flag for ${slotId} after slotVisibilityChanged` );
-				}
-
-				// Bail if not a refreshable slot.
-				if ( ! maiPubIsRefreshable( slot ) ) {
-					return;
 				}
 
 				// Update visibility state.
@@ -550,11 +550,11 @@ function initGoogleTag() {
 					// Handle display logic.
 					maiPubMaybeDisplaySlot( slot, 'slotVisibilityChanged' );
 				}
-				// If becoming invisible, clear any pending refresh timeout.
-				else if ( timeoutIds[ slotId ] ) {
-					clearTimeout( timeoutIds[ slotId ] );
-					maiPubLog( `cleared refresh timeout via slotVisibilityChanged for ${slotId} - no longer visible` );
-				}
+				// // If becoming invisible, clear any pending refresh timeout.
+				// else if ( timeoutIds[ slotId ] ) {
+				// 	clearTimeout( timeoutIds[ slotId ] );
+				// 	maiPubLog( `cleared refresh timeout via slotVisibilityChanged for ${slotId} - no longer visible` );
+				// }
 			});
 
 			// /**
@@ -639,6 +639,476 @@ function initGoogleTag() {
 	});
 }
 
+// /**
+//  * Debounced version of maiPubRequestSlots.
+//  *
+//  * @param {array}   slots The slots to process.
+//  * @param {boolean} force Whether to force refresh.
+//  *
+//  * @return {void}
+//  */
+// function maiPubRequestSlotsDebounced( slots, force ) {
+// 	return maiPubDebounce( maiPubRequestSlots, 100 )( slots, force );
+// }
+
+/**
+ * Generate a GAM-compliant PPID from a single string identifier.
+ * JS equivalent of PHP maipub_generate_ppid function in functions-utility.php
+ * except this generates a random PPID if no identifier is provided
+ * and it also checks for session storage if cookie is not available.
+ *
+ * @param {string} identifier The identifier (Matomo Visitor ID or user email).
+ *
+ * @return {Promise<string|null>} A GAM-compliant PPID (64-character hexadecimal) or null if generation fails.
+ */
+async function maiPubGeneratePpid( identifier = '' ) {
+	// If we're already generating a PPID, wait for it to complete.
+	if ( isGeneratingPpid ) {
+		return new Promise( ( resolve ) => {
+			// Wait for current generation to complete
+			const check = setInterval(() => {
+				if ( ! isGeneratingPpid ) {
+					clearInterval( check );
+					resolve( ppid );
+				}
+			}, 100);
+		});
+	}
+
+	// Set the flag.
+	isGeneratingPpid = true;
+
+	try {
+		// Convert input to string to handle unexpected types (e.g., null, number).
+		// Ensures compatibility with TextEncoder, which requires a string.
+		let input = String( identifier || '' );
+
+		// If we don't have an identifier.
+		if ( ! input ) {
+			// Check if crypto is available
+			if ( ! window.crypto || ! window.crypto.subtle ) {
+				throw new Error( 'Web Crypto API not available' );
+			}
+
+			// Generate a UUID v4 as a unique fallback identifier.
+			// UUID ensures high uniqueness (collision risk ~1 in 2^128) for anonymous users.
+			input = typeof crypto.randomUUID === 'function'
+				? crypto.randomUUID() // e.g., '123e4567-e89b-12d3-a456-426614174000'.
+				: Array.from( crypto.getRandomValues( new Uint8Array( 16 ) ) )
+					.map( b => b.toString( 16 ).padStart( 2, '0' ) )
+					.join( '' ); // Fallback: 32-char random hex string.
+		}
+
+		// Encode the input string to a Uint8Array (UTF-8 bytes) as an ArrayBuffer.
+		// Web Crypto API's digest method requires an ArrayBuffer input for hashing.
+		const msgBuffer = new TextEncoder().encode( input );
+
+		// Compute SHA-256 hash of the encoded input.
+		// SHA-256 produces a 32-byte (256-bit) hash, ensuring the output is cryptographically secure
+		// and meaningless to Google, meeting GAM's encryption requirement.
+		const hashBuffer = await crypto.subtle.digest( 'SHA-256', msgBuffer );
+
+		// Convert the hash ArrayBuffer to an array of bytes (0–255).
+		// Allows iteration over the binary data to transform it into a string format.
+		const hashArray = Array.from( new Uint8Array( hashBuffer ) );
+
+		// Convert each byte to a two-character hexadecimal string (0–9, a–f).
+		// - toString(16) converts a byte to hex (e.g., 94 -> '5e').
+		// - padStart(2, '0') ensures single-digit hex values (e.g., 0x0) become '00'.
+		// - join('') combines into a 64-character string (32 bytes × 2 chars/byte).
+		// Hexadecimal ensures the output is alphanumeric, meeting GAM's format requirement.
+		// (no need for URL encoding) and producing a 64-character string within 22–150 chars.
+		const finalPpid = hashArray.map( b => b.toString( 16 ).padStart( 2, '0' ) ).join( '' );
+
+		return finalPpid;
+
+	} catch ( error ) {
+		// Catch any errors (e.g., invalid input, Web Crypto API issues) to prevent
+		// unhandled promise rejections that could break ad scripts (e.g., GAM, Prebid).
+		// Log the error for debugging without disrupting execution.
+		maiPubLog( 'Error transforming ppid:', error );
+
+		// Return null to allow calling code to skip PPID usage safely.
+		// GAM ignores null PPIDs, processing ad requests without them, avoiding errors.
+		return null;
+
+	} finally {
+		isGeneratingPpid = false;
+	}
+}
+
+/**
+ * Get the consent from cookie or local storage.
+ *
+ * @return {boolean} The consent from cookie or local storage.
+ */
+function maiPubGetLocalConsent() {
+	// Set cached consent variable.
+	let scopedConsent = false;
+
+	// Check for existing consent in cookie.
+	scopedConsent = document.cookie.match( /(?:^|;)\s*maipub_consent=([^;]*)(?:;|$)/ );
+	scopedConsent = scopedConsent && scopedConsent[1] ? scopedConsent[1] : false;
+
+	// If no cookie consent, check local storage.
+	if ( ! scopedConsent ) {
+		scopedConsent = localStorage.getItem( 'maipub_consent' );
+	}
+
+	return Boolean( scopedConsent );
+}
+
+/**
+ * Get the PPID from cookie or local storage.
+ *
+ * @return {string} The PPID from cookie or local storage, or an empty string if not found.
+ */
+function maiPubGetLocalPpid() {
+	const cookiePpid = maiPubGetCookiePpid();
+	const storagePpid = localStorage.getItem( 'maipub_ppid' );
+
+	// Return cookie PPID if we have one, otherwise try localStorage
+	return cookiePpid || storagePpid || '';
+}
+
+/**
+ * Get the PPID from cookie.
+ *
+ * @return {string} The PPID from cookie, or an empty string if not found.
+ */
+function maiPubGetCookiePpid() {
+	const cookieMatch = document.cookie.match( /(?:^|;)\s*maipub_ppid=([^;]*)(?:;|$)/ );
+
+	return cookieMatch?.[1] || '';
+}
+
+/**
+ * Store the consent. In cookie and local storage always
+ * since if we don't have consent we can store false in cookie.
+ *
+ * @param {boolean} consent The consent to set.
+ *
+ * @return {void}
+ */
+function maiPubSetLocalConsent( consent ) {
+	// Log.
+	maiPubLog( `Storing consent in cookie and session storage: ${ consent }` );
+
+	// Store the consent in a cookie for persistence.
+	document.cookie = `maipub_consent=${ consent };path=/;max-age=31104000;SameSite=Lax;Secure`;
+
+	// Store in local storage also, for fallback.
+	localStorage.setItem( 'maipub_consent', consent );
+}
+
+/**
+ * Store the PPID. In cookie with consent, and local storage always.
+ *
+ * @param {string} ppid The PPID to set.
+ *
+ * @return {void}
+ */
+function maiPubSetLocalPpid( ppid ) {
+	// Store the PPID in a cookie for persistence if generated from UUID.
+	// Ensures consistent PPID across sessions for anonymous users, improving ad targeting.
+	// 12-month expiration.
+	if ( consent ) {
+		maiPubLog( `Storing PPID in cookie: ${ ppid }` );
+		document.cookie = `maipub_ppid=${ ppid };path=/;max-age=31104000;SameSite=Lax;Secure`;
+	} else if ( getCookiePpid() ) {
+		maiPubLog( 'No consent, removing PPID from cookie' );
+		// If consent is removed and we have a PPID cookie, delete it.
+		document.cookie = 'maipub_ppid=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT;SameSite=Lax;Secure';
+	}
+
+	// Store in local storage also, for fallback.
+	maiPubLog( `Storing PPID in session storage: ${ ppid }` );
+	localStorage.setItem( 'maipub_ppid', ppid );
+}
+
+/**
+ * DOMContentLoaded and IntersectionObserver handler.
+ *
+ * @return {void}
+ */
+function maiPubDOMContentLoaded() {
+	// Select all atf and btf ads.
+	// const toloadATF = [];
+	const adsATF = document.querySelectorAll( '.mai-ad-unit[data-ap="atf"], .mai-ad-unit[data-ap="bs"]' );
+	const adsBTF = document.querySelectorAll( '.mai-ad-unit:not([data-ap="atf"]):not([data-ap="bs"])' );
+
+	// Add to queue, so they don't step on each other.
+	googletag.cmd.push(() => {
+		// Define ATF ads.
+		adsATF.forEach( adATF => {
+			// Get slug.
+			const slug = adATF.getAttribute( 'id' ).replace( 'mai-ad-', '' );
+
+			// Define and display the slot.
+			maiPubMaybeDisplaySlot( maiPubDefineSlot( slug ), 'ATF via DOMContentLoaded' );
+
+			// Add to toloadATF array.
+			// toloadATF.push( maiPubDefineSlot( slug ) );
+
+			// If debugging, add inline styling.
+			if ( debug ) {
+				adATF.style.outline = '2px dashed limegreen';
+
+				// Add data-label attribute of slug.
+				adATF.setAttribute( 'data-label', slug );
+			}
+		});
+
+		// // Display ATF ads.
+		// if ( toloadATF.length ) {
+		// 	// maiPubDisplaySlots( toloadATF );
+		// 	toloadATF.forEach( slot => {
+		// 		maiPubMaybeDisplaySlot( slot, 'ATF via DOMContentLoaded' );
+		// 	});
+		// }
+	});
+
+	// Create the IntersectionObserver.
+	const observer  = new IntersectionObserver( (entries, observer) => {
+		const toLoadBTF = [];
+
+		// Loop through the entries.
+		entries.forEach( entry => {
+			// Skip if not intersecting.
+			if ( ! entry.isIntersecting ) {
+				return;
+			}
+
+			// Get slug.
+			const slug = entry.target.getAttribute( 'id' ).replace( 'mai-ad-', '' );
+
+			// If debugging, add inline styling.
+			if ( debug ) {
+				entry.target.style.outline = '2px dashed red';
+
+				// Add data-label attribute of slug.
+				entry.target.setAttribute( 'data-label', slug );
+			}
+
+			// Add to toLoadBTF array.
+			toLoadBTF.push( slug );
+
+			// Unobserve. GAM event listener will handle refreshes.
+			observer.unobserve( entry.target );
+		}); // End entries loop.
+
+		// Bail if no slots to load.
+		if ( ! toLoadBTF.length ) {
+			return;
+		}
+
+		// Add to queue, so they don't step on each other.
+		googletag.cmd.push(() => {
+			// Define and display all slots in view.
+			// maiPubDisplaySlots( toLoadBTF.map( slug => maiPubDefineSlot( slug ) ) );
+			toLoadBTF.forEach( slug => maiPubMaybeDisplaySlot( maiPubDefineSlot( slug ), 'IntersectionObserver' ) );
+		});
+	}, {
+		root: null, // Use the viewport as the root.
+		rootMargin: '600px 0px 600px 0px', // Trigger when the top of the element is X away from each part of the viewport.
+		threshold: 0 // No threshold needed.
+	});
+
+	// Observe each BTF ad.
+	adsBTF.forEach( adBTF => {
+		observer.observe( adBTF );
+	});
+}
+
+/**
+ * Define a slot.
+ *
+ * @param {string} slug The ad slug.
+ *
+ * @return {object} The slot object.
+ */
+function maiPubDefineSlot( slug ) {
+	let toReturn = null;
+
+	// Get base from context.
+	const base = ads?.[slug]?.['context'] && 'client' === ads[slug]['context'] ? gamBaseClient : gamBase;
+
+	// Define slot ID.
+	const slotId = base + ads[slug]['id'];
+
+	// Get slot element ID.
+	const slotElId = 'mai-ad-' + slug;
+
+	// Check for existing slot.
+	const existingSlot = adSlots.find( slot => slotElId == slot.getSlotElementId() );
+
+	// If existing, return it.
+	if ( existingSlot ) {
+		maiPubLog( 'Slot already defined:', existingSlot );
+
+		return existingSlot;
+	}
+
+	// Define ad slot. googletag.defineSlot( "/1234567/sports", [728, 90], "div-1" );
+	const slot = googletag.defineSlot( slotId, ads[slug].sizes, 'mai-ad-' + slug );
+
+	// Register the ad slot.
+	// An ad will not be fetched until refresh is called,
+	// due to the disableInitialLoad() method being called earlier.
+	googletag.display( 'mai-ad-' + slug );
+
+	// Add slot to our array.
+	adSlotIds.push( slotId );
+	adSlots.push( slot );
+
+	// If debugging, log.
+	maiPubLog( 'defineSlot() & display():', adSlots );
+
+	// If amazon is enabled and ads[slug].sizes only contains a single size named 'fluid'.
+	// if ( maiPubAdsVars.amazonUAM && 1 === ads[slug].sizes.length && 'fluid' === ads[slug].sizes[0] ) {
+	// 	// If debugging, log.
+	// 	maiPubLog( 'disabled safeframe: ' + slot.getSlotElementId() );
+
+	// 	// Disabled SafeFrame for this slot.
+	// 	slot.setForceSafeFrame( false );
+	// }
+
+	// Set refresh targeting.
+	slot.setTargeting( refreshKey, refreshValue );
+
+	// Set slot-level targeting.
+	if ( ads[slug].targets ) {
+		Object.keys( ads[slug].targets ).forEach( key => {
+			slot.setTargeting( key, ads[slug].targets[key] );
+		});
+	}
+
+	// Set split testing.
+	if ( ads[slug].splitTest && 'rand' === ads[slug].splitTest ) {
+		// Set 'st' to a value between 0-99.
+		slot.setTargeting( 'st', Math.floor(Math.random() * 100) );
+	}
+
+	// Get it running.
+	slot.addService( googletag.pubads() );
+
+	/**
+	 * Define size mapping.
+	 * If these breakpoints change, make sure to update the breakpoints in the mai-publisher.css file.
+	 */
+	slot.defineSizeMapping(
+		googletag.sizeMapping()
+		.addSize( [ 1024, 768 ], ads[slug].sizesDesktop )
+		.addSize( [ 728, 480 ], ads[slug].sizesTablet )
+		.addSize( [ 0, 0 ], ads[slug].sizesMobile )
+		.build()
+	);
+
+	// Set to return.
+	toReturn = slot;
+
+	return toReturn;
+}
+
+/**
+ * Helper function to handle slot display logic.
+ *
+ * Flow:
+ * 1. Checks if slot should refresh based on timing.
+ * 2. If should refresh, calls maiPubDisplaySlots with force=true to bypass timing check.
+ * 3. If not ready to refresh but visible, sets timeout to check again.
+ *
+ * @param {object} slot      The slot to display.
+ * @param {string} eventName The event name for logging.
+ *
+ * @return {void}
+ */
+function maiPubMaybeDisplaySlot( slot, eventName ) {
+	const slotId = slot.getSlotElementId();
+
+	// // If the slot is already being processed, skip this check.
+	// if ( currentlyProcessing[ slotId ] ) {
+	// 	maiPubLog( `Skipping refresh check for ${slotId} - already being processed` );
+	// 	return;
+	// }
+
+	// Check if we should refresh now or set a timeout.
+	const { shouldRefresh, timeUntilNextRefresh } = maiPubShouldRefreshSlot( slot );
+
+	// If we should refresh, display the slot.
+	if ( shouldRefresh ) {
+		// Log.
+		maiPubLog( `refreshed via ${ eventName }: ${ slotId }`, slot );
+
+		// Use maiPubDisplaySlots with force=true to bypass timing check.
+		// This prevents circular logic since force=true skips the timing check in maiPubDisplaySlots.
+		maiPubDisplaySlots( [ slot ], true );
+	}
+	// Not ready to refresh yet and timeUntilNextRefresh is positive.
+	else if ( currentlyVisible[ slotId ] && timeUntilNextRefresh > 0 ) {
+		// // Clear any existing timeout before setting a new one.
+		// if ( timeoutIds[ slotId ] ) {
+		// 	clearTimeout( timeoutIds[ slotId ] );
+		// }
+
+		// // Set timeout to check again in timeUntilNextRefresh.
+		// timeoutIds[ slotId ] = setTimeout(() => {
+		// 	// Bail if the slot is no longer visible.
+		// 	if ( ! currentlyVisible[ slotId ] ) {
+		// 		return;
+		// 	}
+		// 	// Log.
+		// 	maiPubLog( `checking refresh for ${slotId} after ${Math.floor(timeUntilNextRefresh/1000)}s timeout` );
+
+		// 	// Try to the slot.
+		// 	maiPubMaybeDisplaySlot( slot, 'setTimeout' );
+
+		// }, timeUntilNextRefresh );
+	}
+	// Not displaying and not setting a timeout.
+	else {
+		maiPubLog( `not refreshing ${ slotId } because it's not visible or no valid timeUntilNextRefresh` );
+	}
+}
+
+/**
+ * Display slots.
+ * The requestManager logic take from Magnite docs.
+ *
+ * Flow:
+ * 1. If force=true, skips timing check entirely.
+ * 2. If force=false, filters slots based on timing check.
+ * 3. Handles bid requests and refreshes eligible slots.
+ *
+ * @link https://help.magnite.com/help/web-integration-guide#parallel-header-bidding-integrations
+ *
+ * @param {array}   slots An array of the defined slots objects.
+ * @param {boolean} force Whether to force refresh without checking timing.
+ *
+ * @return {void}
+ */
+function maiPubDisplaySlots( slots, force = false ) {
+	// Enable services.
+	// This needs to run after defineSlot() but before display()/refresh().
+	// If we did this in maiPubDefineSlot() it would run for every single slot, instead of batches.
+	// NM, changed this when Magnites docs show it how we had it. Via: https://help.magnite.com/help/web-integration-guide
+	// googletag.enableServices();
+
+	// Log initial state.
+	maiPubLog( `Display slots called with ${slots.length} slots, force=${force}` );
+
+	// // If force is true, process immediately without debounce
+	// if ( force ) {
+	// 	maiPubRequestSlots( slots, force );
+	// 	return;
+	// }
+
+	maiPubRequestSlots( slots, force );
+
+	// Use the debounced version.
+	// maiPubRequestSlotsDebounced( slots, force );
+}
+
 /**
  * Request slots.
  * The requestManager logic take from Magnite docs.
@@ -661,8 +1131,9 @@ function maiPubRequestSlots( slotsToProcess, forceProcess ) {
 			maiPubLog( `Skipping refresh of ${slot.getSlotElementId()}, refreshed ${Math.floor(timeSinceLastRefresh/1000)}s ago` );
 			return false;
 		}
-		const timeSinceLastRefreshText = Infinity === timeSinceLastRefresh ? 'First refresh' : `${Math.floor(timeSinceLastRefresh/1000)}s since last refresh`;
-		maiPubLog( `Processing ${slot.getSlotElementId()}, ${timeSinceLastRefreshText}` );
+		const firstDisplay    = ! timeSinceLastRefresh || Infinity === timeSinceLastRefresh;
+		const lastRefreshText = firstDisplay ? 'First display' : `${Math.floor(timeSinceLastRefresh/1000)}s since last refresh`;
+		maiPubLog( `Processing ${slot.getSlotElementId()}, ${lastRefreshText}` );
 		return true;
 	});
 
@@ -902,466 +1373,6 @@ function maiPubRequestSlots( slotsToProcess, forceProcess ) {
 }
 
 /**
- * Debounced version of maiPubRequestSlots.
- *
- * @param {array}   slots The slots to process.
- * @param {boolean} force Whether to force refresh.
- *
- * @return {void}
- */
-function maiPubRequestSlotsDebounced( slots, force ) {
-	return maiPubDebounce( maiPubRequestSlots, 100 )( slots, force );
-}
-/**
- * Generate a GAM-compliant PPID from a single string identifier.
- * JS equivalent of PHP maipub_generate_ppid function in functions-utility.php
- * except this generates a random PPID if no identifier is provided
- * and it also checks for session storage if cookie is not available.
- *
- * @param {string} identifier The identifier (Matomo Visitor ID or user email).
- *
- * @return {Promise<string|null>} A GAM-compliant PPID (64-character hexadecimal) or null if generation fails.
- */
-async function generatePpid( identifier = '' ) {
-	// If we're already generating a PPID, wait for it to complete.
-	if ( isGeneratingPpid ) {
-		return new Promise( ( resolve ) => {
-			// Wait for current generation to complete
-			const check = setInterval(() => {
-				if ( ! isGeneratingPpid ) {
-					clearInterval( check );
-					resolve( ppid );
-				}
-			}, 100);
-		});
-	}
-
-	// Set the flag.
-	isGeneratingPpid = true;
-
-	try {
-		// Convert input to string to handle unexpected types (e.g., null, number).
-		// Ensures compatibility with TextEncoder, which requires a string.
-		let input = String( identifier || '' );
-
-		// If we don't have an identifier.
-		if ( ! input ) {
-			// Check if crypto is available
-			if ( ! window.crypto || ! window.crypto.subtle ) {
-				throw new Error( 'Web Crypto API not available' );
-			}
-
-			// Generate a UUID v4 as a unique fallback identifier.
-			// UUID ensures high uniqueness (collision risk ~1 in 2^128) for anonymous users.
-			input = typeof crypto.randomUUID === 'function'
-				? crypto.randomUUID() // e.g., '123e4567-e89b-12d3-a456-426614174000'.
-				: Array.from( crypto.getRandomValues( new Uint8Array( 16 ) ) )
-					.map( b => b.toString( 16 ).padStart( 2, '0' ) )
-					.join( '' ); // Fallback: 32-char random hex string.
-		}
-
-		// Encode the input string to a Uint8Array (UTF-8 bytes) as an ArrayBuffer.
-		// Web Crypto API's digest method requires an ArrayBuffer input for hashing.
-		const msgBuffer = new TextEncoder().encode( input );
-
-		// Compute SHA-256 hash of the encoded input.
-		// SHA-256 produces a 32-byte (256-bit) hash, ensuring the output is cryptographically secure
-		// and meaningless to Google, meeting GAM's encryption requirement.
-		const hashBuffer = await crypto.subtle.digest( 'SHA-256', msgBuffer );
-
-		// Convert the hash ArrayBuffer to an array of bytes (0–255).
-		// Allows iteration over the binary data to transform it into a string format.
-		const hashArray = Array.from( new Uint8Array( hashBuffer ) );
-
-		// Convert each byte to a two-character hexadecimal string (0–9, a–f).
-		// - toString(16) converts a byte to hex (e.g., 94 -> '5e').
-		// - padStart(2, '0') ensures single-digit hex values (e.g., 0x0) become '00'.
-		// - join('') combines into a 64-character string (32 bytes × 2 chars/byte).
-		// Hexadecimal ensures the output is alphanumeric, meeting GAM's format requirement.
-		// (no need for URL encoding) and producing a 64-character string within 22–150 chars.
-		const finalPpid = hashArray.map( b => b.toString( 16 ).padStart( 2, '0' ) ).join( '' );
-
-		return finalPpid;
-
-	} catch ( error ) {
-		// Catch any errors (e.g., invalid input, Web Crypto API issues) to prevent
-		// unhandled promise rejections that could break ad scripts (e.g., GAM, Prebid).
-		// Log the error for debugging without disrupting execution.
-		maiPubLog( 'Error transforming ppid:', error );
-
-		// Return null to allow calling code to skip PPID usage safely.
-		// GAM ignores null PPIDs, processing ad requests without them, avoiding errors.
-		return null;
-
-	} finally {
-		isGeneratingPpid = false;
-	}
-}
-
-/**
- * Get the consent from cookie or local storage.
- *
- * @return {boolean} The consent from cookie or local storage.
- */
-function getLocalConsent() {
-	// Set cached consent variable.
-	let scopedConsent = false;
-
-	// Check for existing consent in cookie.
-	scopedConsent = document.cookie.match( /(?:^|;)\s*maipub_consent=([^;]*)(?:;|$)/ );
-	scopedConsent = scopedConsent && scopedConsent[1] ? scopedConsent[1] : false;
-
-	// If no cookie consent, check local storage.
-	if ( ! scopedConsent ) {
-		scopedConsent = localStorage.getItem( 'maipub_consent' );
-	}
-
-	return Boolean( scopedConsent );
-}
-
-/**
- * Get the PPID from cookie or local storage.
- *
- * @return {string} The PPID from cookie or local storage, or an empty string if not found.
- */
-function getLocalPpid() {
-	const cookiePpid = getCookiePpid();
-	const storagePpid = localStorage.getItem( 'maipub_ppid' );
-
-	// Return cookie PPID if we have one, otherwise try localStorage
-	return cookiePpid || storagePpid || '';
-}
-
-/**
- * Get the PPID from cookie.
- *
- * @return {string} The PPID from cookie, or an empty string if not found.
- */
-function getCookiePpid() {
-	const cookieMatch = document.cookie.match( /(?:^|;)\s*maipub_ppid=([^;]*)(?:;|$)/ );
-
-	return cookieMatch?.[1] || '';
-}
-
-/**
- * Store the consent. In cookie and local storage always
- * since if we don't have consent we can store false in cookie.
- *
- * @param {boolean} consent The consent to set.
- *
- * @return {void}
- */
-function setLocalConsent( consent ) {
-	// Log.
-	maiPubLog( `Storing consent in cookie and session storage: ${ consent }` );
-
-	// Store the consent in a cookie for persistence.
-	document.cookie = `maipub_consent=${ consent };path=/;max-age=31104000;SameSite=Lax;Secure`;
-
-	// Store in local storage also, for fallback.
-	localStorage.setItem( 'maipub_consent', consent );
-}
-
-/**
- * Store the PPID. In cookie with consent, and local storage always.
- *
- * @param {string} ppid The PPID to set.
- *
- * @return {void}
- */
-function setLocalPpid( ppid ) {
-	// Store the PPID in a cookie for persistence if generated from UUID.
-	// Ensures consistent PPID across sessions for anonymous users, improving ad targeting.
-	// 12-month expiration.
-	if ( consent ) {
-		maiPubLog( `Storing PPID in cookie: ${ ppid }` );
-		document.cookie = `maipub_ppid=${ ppid };path=/;max-age=31104000;SameSite=Lax;Secure`;
-	} else if ( getCookiePpid() ) {
-		maiPubLog( 'No consent, removing PPID from cookie' );
-		// If consent is removed and we have a PPID cookie, delete it.
-		document.cookie = 'maipub_ppid=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT;SameSite=Lax;Secure';
-	}
-
-	// Store in local storage also, for fallback.
-	maiPubLog( `Storing PPID in session storage: ${ ppid }` );
-	localStorage.setItem( 'maipub_ppid', ppid );
-}
-
-/**
- * DOMContentLoaded and IntersectionObserver handler.
- *
- * @return {void}
- */
-function maiPubDOMContentLoaded() {
-	// Select all atf and btf ads.
-	const toloadATF = [];
-	const adsATF    = document.querySelectorAll( '.mai-ad-unit[data-ap="atf"], .mai-ad-unit[data-ap="bs"]' );
-	const adsBTF    = document.querySelectorAll( '.mai-ad-unit:not([data-ap="atf"]):not([data-ap="bs"])' );
-
-	// Add to queue, so they don't step on each other.
-	googletag.cmd.push(() => {
-		// Define ATF ads.
-		adsATF.forEach( adATF => {
-			// Get slug.
-			const slug = adATF.getAttribute( 'id' ).replace( 'mai-ad-', '' );
-
-			// Add to toloadATF array.
-			toloadATF.push( maiPubDefineSlot( slug ) );
-
-			// If debugging, add inline styling.
-			if ( debug ) {
-				adATF.style.outline = '2px dashed limegreen';
-
-				// Add data-label attribute of slug.
-				adATF.setAttribute( 'data-label', slug );
-			}
-		});
-
-		// Display ATF ads.
-		if ( toloadATF.length ) {
-			maiPubDisplaySlots( toloadATF );
-		}
-	});
-
-	// Create the IntersectionObserver.
-	const observer  = new IntersectionObserver( (entries, observer) => {
-		const toLoadBTF = [];
-
-		// Loop through the entries.
-		entries.forEach( entry => {
-			// Skip if not intersecting.
-			if ( ! entry.isIntersecting ) {
-				return;
-			}
-
-			// Get slug.
-			const slug = entry.target.getAttribute( 'id' ).replace( 'mai-ad-', '' );
-
-			// If debugging, add inline styling.
-			if ( debug ) {
-				entry.target.style.outline = '2px dashed red';
-
-				// Add data-label attribute of slug.
-				entry.target.setAttribute( 'data-label', slug );
-			}
-
-			// Add to toLoadBTF array.
-			toLoadBTF.push( slug );
-
-			// Unobserve. GAM event listener will handle refreshes.
-			observer.unobserve( entry.target );
-		}); // End entries loop.
-
-		// Bail if no slots to load.
-		if ( ! toLoadBTF.length ) {
-			return;
-		}
-
-		// Add to queue, so they don't step on each other.
-		googletag.cmd.push(() => {
-			// Define and display all slots in view.
-			maiPubDisplaySlots( toLoadBTF.map( slug => maiPubDefineSlot( slug ) ) );
-		});
-	}, {
-		root: null, // Use the viewport as the root.
-		rootMargin: '600px 0px 600px 0px', // Trigger when the top of the element is X away from each part of the viewport.
-		threshold: 0 // No threshold needed.
-	});
-
-	// Observe each BTF ad.
-	adsBTF.forEach( adBTF => {
-		observer.observe( adBTF );
-	});
-}
-
-/**
- * Define a slot.
- *
- * @param {string} slug The ad slug.
- *
- * @return {object} The slot object.
- */
-function maiPubDefineSlot( slug ) {
-	let toReturn = null;
-
-	// Get base from context.
-	const base = ads?.[slug]?.['context'] && 'client' === ads[slug]['context'] ? gamBaseClient : gamBase;
-
-	// Define slot ID.
-	const slotId = base + ads[slug]['id'];
-
-	// Get slot element ID.
-	const slotElId = 'mai-ad-' + slug;
-
-	// Check for existing slot.
-	const existingSlot = adSlots.find( slot => slotElId == slot.getSlotElementId() );
-
-	// If existing, return it.
-	if ( existingSlot ) {
-		maiPubLog( 'Slot already defined:', existingSlot );
-
-		return existingSlot;
-	}
-
-	// Define ad slot. googletag.defineSlot( "/1234567/sports", [728, 90], "div-1" );
-	const slot = googletag.defineSlot( slotId, ads[slug].sizes, 'mai-ad-' + slug );
-
-	// Register the ad slot.
-	// An ad will not be fetched until refresh is called,
-	// due to the disableInitialLoad() method being called earlier.
-	googletag.display( 'mai-ad-' + slug );
-
-	// Add slot to our array.
-	adSlotIds.push( slotId );
-	adSlots.push( slot );
-
-	// If debugging, log.
-	maiPubLog( 'defineSlot() & display():', adSlots );
-
-	// If amazon is enabled and ads[slug].sizes only contains a single size named 'fluid'.
-	// if ( maiPubAdsVars.amazonUAM && 1 === ads[slug].sizes.length && 'fluid' === ads[slug].sizes[0] ) {
-	// 	// If debugging, log.
-	// 	maiPubLog( 'disabled safeframe: ' + slot.getSlotElementId() );
-
-	// 	// Disabled SafeFrame for this slot.
-	// 	slot.setForceSafeFrame( false );
-	// }
-
-	// Set refresh targeting.
-	slot.setTargeting( refreshKey, refreshValue );
-
-	// Set slot-level targeting.
-	if ( ads[slug].targets ) {
-		Object.keys( ads[slug].targets ).forEach( key => {
-			slot.setTargeting( key, ads[slug].targets[key] );
-		});
-	}
-
-	// Set split testing.
-	if ( ads[slug].splitTest && 'rand' === ads[slug].splitTest ) {
-		// Set 'st' to a value between 0-99.
-		slot.setTargeting( 'st', Math.floor(Math.random() * 100) );
-	}
-
-	// Get it running.
-	slot.addService( googletag.pubads() );
-
-	/**
-	 * Define size mapping.
-	 * If these breakpoints change, make sure to update the breakpoints in the mai-publisher.css file.
-	 */
-	slot.defineSizeMapping(
-		googletag.sizeMapping()
-		.addSize( [ 1024, 768 ], ads[slug].sizesDesktop )
-		.addSize( [ 728, 480 ], ads[slug].sizesTablet )
-		.addSize( [ 0, 0 ], ads[slug].sizesMobile )
-		.build()
-	);
-
-	// Set to return.
-	toReturn = slot;
-
-	return toReturn;
-}
-
-/**
- * Helper function to handle slot display logic.
- *
- * Flow:
- * 1. Checks if slot should refresh based on timing.
- * 2. If should refresh, calls maiPubDisplaySlots with force=true to bypass timing check.
- * 3. If not ready to refresh but visible, sets timeout to check again.
- *
- * @param {object} slot      The slot to display.
- * @param {string} eventName The event name for logging.
- *
- * @return {void}
- */
-function maiPubMaybeDisplaySlot( slot, eventName ) {
-	const slotId = slot.getSlotElementId();
-
-	// // If the slot is already being processed, skip this check.
-	// if ( currentlyProcessing[ slotId ] ) {
-	// 	maiPubLog( `Skipping refresh check for ${slotId} - already being processed` );
-	// 	return;
-	// }
-
-	// Check if we should refresh now or set a timeout.
-	const { shouldRefresh, timeUntilNextRefresh } = maiPubShouldRefreshSlot( slot );
-
-	// If we should refresh, display the slot.
-	if ( shouldRefresh ) {
-		// Log.
-		maiPubLog( `refreshed via ${ eventName }: ${ slotId }`, slot );
-
-		// Use maiPubDisplaySlots with force=true to bypass timing check.
-		// This prevents circular logic since force=true skips the timing check in maiPubDisplaySlots.
-		maiPubDisplaySlots( [ slot ], true );
-	}
-	// Not ready to refresh yet and timeUntilNextRefresh is positive.
-	else if ( currentlyVisible[ slotId ] && timeUntilNextRefresh > 0 ) {
-		// // Clear any existing timeout before setting a new one.
-		// if ( timeoutIds[ slotId ] ) {
-		// 	clearTimeout( timeoutIds[ slotId ] );
-		// }
-
-		// // Set timeout to check again in timeUntilNextRefresh.
-		// timeoutIds[ slotId ] = setTimeout(() => {
-		// 	// Bail if the slot is no longer visible.
-		// 	if ( ! currentlyVisible[ slotId ] ) {
-		// 		return;
-		// 	}
-		// 	// Log.
-		// 	maiPubLog( `checking refresh for ${slotId} after ${Math.floor(timeUntilNextRefresh/1000)}s timeout` );
-
-		// 	// Try to the slot.
-		// 	maiPubMaybeDisplaySlot( slot, 'setTimeout' );
-
-		// }, timeUntilNextRefresh );
-	}
-	// Not displaying and not setting a timeout.
-	else {
-		maiPubLog( `not refreshing ${ slotId } because it's not visible or no valid timeUntilNextRefresh` );
-	}
-}
-
-/**
- * Display slots.
- * The requestManager logic take from Magnite docs.
- *
- * Flow:
- * 1. If force=true, skips timing check entirely.
- * 2. If force=false, filters slots based on timing check.
- * 3. Handles bid requests and refreshes eligible slots.
- *
- * @link https://help.magnite.com/help/web-integration-guide#parallel-header-bidding-integrations
- *
- * @param {array}   slots An array of the defined slots objects.
- * @param {boolean} force Whether to force refresh without checking timing.
- *
- * @return {void}
- */
-function maiPubDisplaySlots( slots, force = false ) {
-	// Enable services.
-	// This needs to run after defineSlot() but before display()/refresh().
-	// If we did this in maiPubDefineSlot() it would run for every single slot, instead of batches.
-	// NM, changed this when Magnites docs show it how we had it. Via: https://help.magnite.com/help/web-integration-guide
-	// googletag.enableServices();
-
-	// Log initial state.
-	maiPubLog( `Display slots called with ${slots.length} slots, force=${force}` );
-
-	// If force is true, process immediately without debounce
-	if ( force ) {
-		maiPubRequestSlots( slots, force );
-		return;
-	}
-
-	// Use the debounced version.
-	maiPubRequestSlotsDebounced( slots, force );
-}
-
-/**
  * Refreshes slots.
  * This should only be called from maiPubDisplaySlots after getting bids.
  *
@@ -1425,10 +1436,11 @@ function maiPubShouldRefreshSlot( slot, now = Date.now() ) {
 		};
 	}
 
-	const lastRefresh = lastRefreshTimes[ slotId ];
+	const lastRefresh  = lastRefreshTimes[ slotId ];
+	const firstDisplay = ! lastRefresh;
 
 	// If never refreshed, should refresh immediately.
-	if ( ! lastRefresh ) {
+	if ( firstDisplay ) {
 		maiPubLog( `Slot ${slotId} never refreshed, should refresh immediately` );
 		return {
 			shouldRefresh: true,
@@ -1472,6 +1484,8 @@ function maiPubShouldRefreshSlot( slot, now = Date.now() ) {
 }
 
 /**
+ * TODO: Reintroduce this. Currently disabled while we work on the refresh logic.
+ *
  * Check if a slot is refreshable.
  * Checks if we have a defined mai ad slot that has targetting set to refresh.
  *
@@ -1483,21 +1497,21 @@ function maiPubIsRefreshable( slot ) {
 	return maiPubIsMaiSlot( slot ) && Boolean( slot.getTargeting( refreshKey ).shift() );
 }
 
-/**
- * Create a debounced version of a function.
- *
- * @param {Function} func The function to debounce.
- * @param {number}   wait The number of milliseconds to wait.
- *
- * @return {Function} The debounced function.
- */
-function maiPubDebounce( func, wait ) {
-	let timeout;
-	return function(...args) {
-		clearTimeout( timeout );
-		timeout = setTimeout(() => func.apply( this, args ), wait );
-	};
-}
+// /**
+//  * Create a debounced version of a function.
+//  *
+//  * @param {Function} func The function to debounce.
+//  * @param {number}   wait The number of milliseconds to wait.
+//  *
+//  * @return {Function} The debounced function.
+//  */
+// function maiPubDebounce( func, wait ) {
+// 	let timeout;
+// 	return function(...args) {
+// 		clearTimeout( timeout );
+// 		timeout = setTimeout(() => func.apply( this, args ), wait );
+// 	};
+// }
 
 /**
  * Log if debugging.
