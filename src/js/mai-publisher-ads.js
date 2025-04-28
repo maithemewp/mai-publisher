@@ -533,10 +533,10 @@ function initGoogleTag() {
 					return;
 				}
 
-				// Bail if the slot is currently being processed.
-				if ( currentlyProcessing[ slotId ] ) {
-					return;
-				}
+				// // Bail if the slot is currently being processed.
+				// if ( currentlyProcessing[ slotId ] ) {
+				// 	return;
+				// }
 
 				// Update visibility state.
 				currentlyVisible[ slotId ] = inView;
@@ -1277,11 +1277,11 @@ function maiPubDefineSlot( slug ) {
 function maiPubMaybeDisplaySlot( slot, eventName ) {
 	const slotId = slot.getSlotElementId();
 
-	// If the slot is already being processed, skip this check.
-	if ( currentlyProcessing[ slotId ] ) {
-		maiPubLog( `Skipping refresh check for ${slotId} - already being processed` );
-		return;
-	}
+	// // If the slot is already being processed, skip this check.
+	// if ( currentlyProcessing[ slotId ] ) {
+	// 	maiPubLog( `Skipping refresh check for ${slotId} - already being processed` );
+	// 	return;
+	// }
 
 	// Check if we should refresh now or set a timeout.
 	const { shouldRefresh, timeUntilNextRefresh } = maiPubShouldRefreshSlot( slot );
@@ -1456,11 +1456,11 @@ function maiPubShouldRefreshSlot( slot, now = Date.now() ) {
 	};
 
 	maiPubLog( `Slot ${slotId} refresh check:`, {
-		lastRefresh,
-		now,
-		elapsedTime,
+		lastRefresh: lastRefresh,
+		now: now,
+		elapsedTime: elapsedTime,
 		isVisible: currentlyVisible[ slotId ],
-		timeSinceLastRefresh,
+		timeSinceLastRefresh: timeSinceLastRefresh,
 		requiredTime: refreshTime * 1000,
 		shouldRefresh: result.shouldRefresh
 	});
