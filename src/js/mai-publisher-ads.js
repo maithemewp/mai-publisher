@@ -498,26 +498,26 @@ function initGoogleTag() {
 				maiPubLog( `Cleared processing flag for ${slotId} after slotError` );
 			});
 
-			/**
-			 * Handle the impressionViewable event.
-			 * Set the slot as visible and handle display logic.
-			 */
-			googletag.pubads().addEventListener( 'impressionViewable', (event) => {
-				const slot   = event.slot;
-				const slotId = slot.getSlotElementId();
+			// /**
+			//  * Handle the impressionViewable event.
+			//  * Set the slot as visible and handle display logic.
+			//  */
+			// googletag.pubads().addEventListener( 'impressionViewable', (event) => {
+			// 	const slot   = event.slot;
+			// 	const slotId = slot.getSlotElementId();
 
-				// Bail if not a refreshable slot.
-				if ( ! maiPubIsRefreshable( slot ) ) {
-					return;
-				}
+			// 	// Bail if not a refreshable slot.
+			// 	if ( ! maiPubIsRefreshable( slot ) ) {
+			// 		return;
+			// 	}
 
-				// Ad is visible.
-				currentlyVisible[ slotId ] = true;
-				maiPubLog( `Slot ${slotId} impression viewable` );
+			// 	// Ad is visible.
+			// 	currentlyVisible[ slotId ] = true;
+			// 	maiPubLog( `Slot ${slotId} impression viewable` );
 
-				// Handle display logic.
-				maiPubMaybeDisplaySlot( slot, 'impressionViewable' );
-			});
+			// 	// Handle display logic.
+			// 	maiPubMaybeDisplaySlot( slot, 'impressionViewable' );
+			// });
 
 			/**
 			 * Refreshes ads when scrolled back into view.
