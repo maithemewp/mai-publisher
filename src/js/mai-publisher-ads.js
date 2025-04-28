@@ -458,8 +458,9 @@ function initGoogleTag() {
 					return;
 				}
 
-				// Clear the processing flag.
+				// Clear the processing flag and update last refresh time.
 				delete currentlyProcessing[ slotId ];
+				lastRefreshTimes[ slotId ] = Date.now();
 				maiPubLog( `Cleared processing flag for ${slotId} after slotResponseReceived` );
 			});
 
@@ -474,8 +475,9 @@ function initGoogleTag() {
 					return;
 				}
 
-				// Clear the processing flag.
+				// Clear the processing flag and update last refresh time.
 				delete currentlyProcessing[ slotId ];
+				lastRefreshTimes[ slotId ] = Date.now();
 				maiPubLog( `Cleared processing flag for ${slotId} after slotRenderEnded` );
 			});
 
@@ -490,8 +492,9 @@ function initGoogleTag() {
 					return;
 				}
 
-				// Clear the processing flag.
+				// Clear the processing flag and update last refresh time.
 				delete currentlyProcessing[ slotId ];
+				lastRefreshTimes[ slotId ] = Date.now();
 				maiPubLog( `Cleared processing flag for ${slotId} after slotError` );
 			});
 
