@@ -1357,7 +1357,7 @@ function maiPubRefreshSlots( slots ) {
 	slots.forEach( slot => {
 		const slotId               = slot.getSlotElementId();
 		lastRefreshTimes[ slotId ] = Date.now();
-		maiPubLog( `Updated last refresh time for ${slotId}` );
+		maiPubLog( `Updated last refresh time for ${slotId} to ${lastRefreshTimes[ slotId ]}` );
 	});
 
 	// Log.
@@ -1408,6 +1408,7 @@ function maiPubShouldRefreshSlot( slot, now = Date.now() ) {
 
 	// If never refreshed, should refresh immediately.
 	if ( ! lastRefresh ) {
+		maiPubLog( `Slot ${slotId} never refreshed, should refresh immediately` );
 		return {
 			shouldRefresh: true,
 			timeSinceLastRefresh: Infinity, // Forces immediate refresh.
@@ -1423,22 +1424,30 @@ function maiPubShouldRefreshSlot( slot, now = Date.now() ) {
 	// When invisible, timeSinceLastRefresh is 0, preventing refreshes.
 	const timeSinceLastRefresh = currentlyVisible[ slotId ] ? elapsedTime : 0;
 
-	// Calculate when the next refresh should occur
-	// Based on actual elapsed time, not just visible time
+	// Calculate when the next refresh should occur.
+	// Based on actual elapsed time, not just visible time.
 	const timeUntilNextRefresh = Math.max( 0, ( refreshTime * 1000 ) - elapsedTime );
 
-	// Add a 5-second cooldown after any refresh to prevent rapid-fire refreshes
-	const cooldownTime = 5000; // 5 seconds
-	const isInCooldown = elapsedTime < cooldownTime;
-
-	return {
-		// Only refresh if we've accumulated enough visible time and not in cooldown
-		shouldRefresh: timeSinceLastRefresh >= ( refreshTime * 1000 ) && ! isInCooldown,
+	const result = {
+		// Only refresh if we've accumulated enough visible time.
+		shouldRefresh: timeSinceLastRefresh >= ( refreshTime * 1000 ),
 		// How long the slot has been visible since last refresh.
 		timeSinceLastRefresh,
 		// How long until the next refresh check.
 		timeUntilNextRefresh
 	};
+
+	maiPubLog( `Slot ${slotId} refresh check:`, {
+		lastRefresh,
+		now,
+		elapsedTime,
+		isVisible: currentlyVisible[ slotId ],
+		timeSinceLastRefresh,
+		requiredTime: refreshTime * 1000,
+		shouldRefresh: result.shouldRefresh
+	});
+
+	return result;
 }
 
 /**
