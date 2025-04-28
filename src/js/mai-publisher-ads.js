@@ -1272,6 +1272,12 @@ function maiPubDefineSlot( slug ) {
 function maiPubMaybeDisplaySlot( slot, eventName ) {
 	const slotId = slot.getSlotElementId();
 
+	// If the slot is already being processed, skip this check.
+	if ( currentlyProcessing[ slotId ] ) {
+		maiPubLog( `Skipping refresh check for ${slotId} - already being processed` );
+		return;
+	}
+
 	// Check if we should refresh now or set a timeout.
 	const { shouldRefresh, timeUntilNextRefresh } = maiPubShouldRefreshSlot( slot );
 
@@ -1356,13 +1362,6 @@ function maiPubDisplaySlots( slots, force = false ) {
  * @return {void}
  */
 function maiPubRefreshSlots( slots ) {
-	// Update last refresh times before refreshing to prevent race conditions
-	slots.forEach( slot => {
-		const slotId               = slot.getSlotElementId();
-		lastRefreshTimes[ slotId ] = Date.now();
-		maiPubLog( `Updated last refresh time for ${slotId} to ${lastRefreshTimes[ slotId ]}` );
-	});
-
 	// Log.
 	maiPubLog( `Refreshing ${slots.length} slots:`, slots.map( slot => slot.getSlotElementId() ) );
 
