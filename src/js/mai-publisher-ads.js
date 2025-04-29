@@ -530,11 +530,17 @@ function maiPubInit() {
 				const slotId = slot.getSlotElementId();
 				const inView = event.inViewPercentage > 5;
 
-				// Update the slot visibility.
-				slotManager[ slotId ].visible = inView;
+				// Update the slot manager.
+				slotManager[ slotId ].visible         = inView;
+				slotManager[ slotId ].lastRefreshTime = Date.now();
 
 				// Log.
 				maiPubLog( `Slot ${slotId} visibility via slotVisibilityChanged: (${event.inViewPercentage}%)` );
+
+				// If the slot is visible, maybe request the slot.
+				if ( inView ) {
+					maiPubMaybeRequestSlots( [ slot ] );
+				}
 			});
 
 			// /**
@@ -680,7 +686,7 @@ function maiPubDOMContentLoaded() {
 		// If there are slots to request, request them.
 		if ( slotsToRequest.length ) {
 			// Request the slots.
-			maiPubRequestSlots( slotsToRequest );
+			maiPubMaybeRequestSlots( slotsToRequest );
 		}
 	}, {
 		root: null, // Use the viewport as the root.
@@ -790,34 +796,39 @@ function maiPubDefineSlot( slotId, slug ) {
 /**
  * Maybe request a slot.
  *
- * @param {object} slot The slot to request.
+ * @param {array} slots The slots to request.
  *
  * @return {void}
  */
-function maiPubMaybeRequestSlot( slot ) {
-	const slotId = slot.getSlotElementId();
-	const now    = Date.now();
+function maiPubMaybeRequestSlots( slots ) {
+	// Filter out slots to request.
+	const slotsToRequest = slots.filter( slot => {
+		// Get the slot ID.
+		const slotId = slot.getSlotElementId();
 
-	// Bail if the slot is already being processed.
-	if ( slotManager[ slotId ].processing ) {
-		maiPubLog( `Skipping request for ${slotId} - already being processed` );
-		return;
-	}
+		// Bail if the slot is already being processed.
+		if ( slotManager[ slotId ].processing ) {
+			maiPubLog( `Skipping request for ${slotId} - already being processed` );
+			return false;
+		}
 
-	// Bail if the slot is not visible.
-	if ( ! slotManager[ slotId ].visible ) {
-		maiPubLog( `Skipping request for ${slotId} - not visible` );
-		return;
-	}
+		// Bail if the slot is not visible.
+		if ( ! slotManager[ slotId ].visible ) {
+			maiPubLog( `Skipping request for ${slotId} - not visible` );
+			return false;
+		}
 
-	// Bail if the slot has been refreshed too recently.
-	if ( slotManager[ slotId ].lastRefreshTime && ( now - slotManager[ slotId ].lastRefreshTime ) < refreshTime ) {
-		maiPubLog( `Skipping request for ${slotId} - too soon` );
-		return;
-	}
+		// Bail if the slot has been refreshed too recently.
+		if ( slotManager[ slotId ].lastRefreshTime && ( now - slotManager[ slotId ].lastRefreshTime ) < refreshTime ) {
+			maiPubLog( `Skipping request for ${slotId} - too soon` );
+			return false;
+		}
+
+		return true;
+	} );
 
 	// Request the slot.
-	maiPubRequestSlot( slot );
+	maiPubRequestSlots( slotsToRequest );
 }
 
 /**
@@ -903,18 +914,6 @@ function maiPubRequestSlots( slots ) {
 						timedOut: timedOut,
 						auctionId: auctionId
 					} );
-
-					// // Log.
-					// maiPubLog( 'Prebid bids received:', {
-					// 	prebid: bidResponses.prebid,
-					// 	timeouts: bidResponses.timeouts,
-					// 	timing: {
-					// 		totalTime: Date.now() - timestamp + 'ms',
-					// 		bidderTimeout: bidderTimeout + 'ms',
-					// 		fallbackTimeout: fallbackTimeout + 'ms',
-					// 		responseTime: prebidResponseTime + 'ms'
-					// 	}
-					// });
 
 					// If we have all bids, send the adserver request.
 					if ( requestManager.amazonBidsReceived ) {
