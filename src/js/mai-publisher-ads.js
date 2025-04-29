@@ -641,15 +641,6 @@ function maiPubDOMContentLoaded() {
 			const slug   = slotId.replace( 'mai-ad-', '' );
 			const slot   = maiPubMaybeDefineSlot( slug );
 
-			// If the slot is not in the slotManager, add it.
-			if ( ! slotManager[ slotId ] ) {
-				slotManager[ slotId ] = {
-					processing: false,
-					visible: false,
-					lastRefreshTime: 0,
-				};
-			}
-
 			// Log.
 			// maiPubLog( `Slot ${slotId} visibility via IntersectionObserver: ${entry.intersectionRatio}%` );
 
@@ -661,7 +652,7 @@ function maiPubDOMContentLoaded() {
 			// If intersecting.
 			if ( entry.isIntersecting ) {
 				// Set the slot to visible.
-				slotManager[ slotId ].visible = true;
+				// slotManager[ slotId ].visible = true;
 
 				// If debugging, add inline styling.
 				if ( debug ) {
@@ -678,7 +669,7 @@ function maiPubDOMContentLoaded() {
 			// Not intersecting.
 			else {
 				// Force the slot to not visible.
-				slotManager[ slotId ].visible = false;
+				// slotManager[ slotId ].visible = false;
 			}
 		});
 
@@ -698,6 +689,17 @@ function maiPubDOMContentLoaded() {
 
 	// Observe each ad unit.
 	adUnits.forEach( adUnit => {
+		// Get the slot ID.
+		const slotId = adUnit.getAttribute( 'id' );
+
+		// Add the slot to the slotManager.
+		slotManager[ slotId ] = {
+			processing: false,
+			visible: null,
+			lastRefreshTime: 0,
+			firstRender: true,
+		};
+
 		observer.observe( adUnit );
 	});
 }
@@ -811,6 +813,11 @@ function maiPubMaybeRequestSlots( slots ) {
 
 		// Log manager.
 		maiPubLog( `Temp slot manager: ${slotId}`, slotManager[ slotId ] );
+
+		// If first render, return true, force a request.
+		if ( slotManager[ slotId ].firstRender ) {
+			return true;
+		}
 
 		// Bail if the slot is already being processed.
 		if ( slotManager[ slotId ].processing ) {
@@ -1067,6 +1074,12 @@ function maiPubRequestSlots( slots ) {
 function maiPubRefreshSlots( slots ) {
 	// Log.
 	maiPubLog( `Refreshing ${slots.length} ${1 === slots.length ? 'slot' : 'slots'}: ${slots.map( slot => slot.getSlotElementId() ).join( ', ' )}` );
+
+	// Update firstRender flag.
+	slots.forEach( slot => {
+		const slotId = slot.getSlotElementId();
+		slotManager[ slotId ].firstRender = false;
+	});
 
 	// Refresh the slots.
 	googletag.pubads().refresh( slots, { changeCorrelator: false } );
