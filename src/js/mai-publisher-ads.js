@@ -534,7 +534,7 @@ function maiPubInit() {
 				slotManager[ slotId ].visible = inView;
 
 				// Log.
-				maiPubLog( `Slot ${slotId} visibility: (${event.inViewPercentage}%)` );
+				maiPubLog( `Slot ${slotId} visibility via slotVisibilityChanged: (${event.inViewPercentage}%)` );
 			});
 
 			// /**
@@ -645,7 +645,8 @@ function maiPubDOMContentLoaded() {
 				};
 			}
 
-			console.log( `maipub isIntersecting: ${entry.isIntersecting}, percent: ${entry.intersectionRatio}, slotId: ${slotId}` );
+			// console.log( `maipub isIntersecting: ${entry.isIntersecting}, percent: ${entry.intersectionRatio}, slotId: ${slotId}` );
+			maiPubLog( `Slot ${slotId} visibility via IntersectionObserver: (${entry.intersectionRatio}%)` );
 
 			// Bail if the slot is already being processed.
 			if ( slotManager[ slotId ].processing ) {
