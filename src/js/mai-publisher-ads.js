@@ -842,7 +842,7 @@ function maiPubMaybeRequestSlots( slots ) {
 
 		// Bail if the slot has been refreshed too recently.
 		if ( slotManager[ slotId ].lastRefreshTime && ( now - slotManager[ slotId ].lastRefreshTime ) < refreshTime ) {
-			maiPubLog( `Skipping request for ${slotId} - too soon` );
+			maiPubLog( `Skipping request for ${slotId} - it's only been ${Math.round( ( now - slotManager[ slotId ].lastRefreshTime ) / 1000 )} seconds since the last refresh` );
 			return false;
 		}
 
