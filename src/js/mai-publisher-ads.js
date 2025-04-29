@@ -547,7 +547,7 @@ function maiPubInit() {
 				currentlyVisible[ slotId ] = inView;
 				maiPubLog( `Slot ${slotId} visibility changed to ${inView ? 'visible' : 'invisible'} (${event.inViewPercentage}%)` );
 
-				console.log( `Slot ${slotId} visibility changed to ${inView ? 'visible' : 'invisible'} (${event.inViewPercentage}%)` );
+				console.log( `TEST Slot ${slotId} visibility changed to ${inView ? 'visible' : 'invisible'} (${event.inViewPercentage}%)` );
 
 
 				// If becoming visible, handle display logic.
