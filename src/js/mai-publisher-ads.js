@@ -812,10 +812,16 @@ function maiPubMaybeRequestSlots( slots ) {
 			return false;
 		}
 
-		// Bail if the slot has been refreshed too recently.
-		if ( slotManager[ slotId ].lastRefreshTime && ( now - slotManager[ slotId ].lastRefreshTime ) < refreshTime ) {
-			// maiPubLog( `Skipping request for ${slotId} - ${Math.round( ( now - slotManager[ slotId ].lastRefreshTime ) / 1000 )} seconds since the last refresh` );
-			return false;
+		// If last refresh time.
+		if ( slotManager[ slotId ].lastRefreshTime ) {
+			// Bail if the slot has been refreshed too recently.
+			if ( ( now - slotManager[ slotId ].lastRefreshTime ) < refreshTime ) {
+				// maiPubLog( `Skipping request for ${slotId} - ${Math.round( ( now - slotManager[ slotId ].lastRefreshTime ) / 1000 )} seconds since the last refresh` );
+				return false;
+			}
+
+			// Log.
+			maiPubLog( `Requesting slot ${slotId} - ${Math.round( ( now - slotManager[ slotId ].lastRefreshTime ) / 1000 )} seconds since the last refresh` );
 		}
 
 		return true;
