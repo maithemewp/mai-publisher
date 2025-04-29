@@ -13,6 +13,7 @@ const refreshKey       = 'refresh';
 const refreshValue     = maiPubAdsVars.targets.refresh;
 const refreshTime      = 32 * 1000;  // Seconds to milliseconds. Google recommends 30, we add 2 seconds for safety.
 const slotManager      = {};
+const timeoutManager   = {};
 const cmpTimeout       = 2000; // Fallback in case CMP never responds.
 const matomoTimeout    = 2000; // Fallback in case Matomo never loads.
 const bidderTimeout    = 5000; // Timout for PBJS and Amazon UAM bids.
@@ -498,6 +499,11 @@ function maiPubInit() {
 				setTimeout( () => {
 					slotManager[ slotId ].processing = false;
 				}, 5000 );
+
+				// Set timeout to request the slot.
+				timeoutManager[ slotId ] = setTimeout( () => {
+					maiPubMaybeRequestSlots( [ slot ] );
+				}, refreshTime );
 			});
 
 			/**
@@ -522,6 +528,11 @@ function maiPubInit() {
 				setTimeout( () => {
 					slotManager[ slotId ].processing = false;
 				}, 5000 );
+
+				// Set timeout to request the slot.
+				timeoutManager[ slotId ] = setTimeout( () => {
+					maiPubMaybeRequestSlots( [ slot ] );
+				}, refreshTime );
 			});
 
 			/**
@@ -840,6 +851,10 @@ function maiPubMaybeRequestSlots( slots ) {
 		// Bail if the slot is not visible.
 		if ( ! slotManager[ slotId ].visible ) {
 			maiPubLog( `Skipping request for ${slotId} - not visible` );
+
+			// Clear the timeout.
+			clearTimeout( timeoutManager[ slotId ] );
+
 			return false;
 		}
 
