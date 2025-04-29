@@ -667,15 +667,15 @@ function maiPubDOMContentLoaded() {
 
 				// Add the slot to the slotsToRequest array.
 				slotsToRequest.push( slot );
+
+				// Unobserve the displayed slots, let GAM events handle refreshing and visibility.
+				observer.unobserve( entry.target );
 			}
 			// Not intersecting.
 			else {
 				// Force the slot to not visible.
 				slotManager[ slotId ].visible = false;
 			}
-
-			// Unobserve the slots, let GAM events handle refreshing and visibility.
-			observer.unobserve( entry.target );
 		});
 
 		// If there are slots to request, request them.
