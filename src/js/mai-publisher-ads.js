@@ -724,7 +724,8 @@ function maiPubMaybeDefineSlot( slug ) {
 
 	// If existing, return it.
 	if ( existingSlot ) {
-		maiPubLog( 'Slot already defined:', existingSlot );
+		// Log.
+		// maiPubLog( 'Slot already defined:', existingSlot );
 
 		return existingSlot;
 	}
