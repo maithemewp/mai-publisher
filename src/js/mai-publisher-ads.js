@@ -801,6 +801,9 @@ function maiPubDefineSlot( slotId, slug ) {
  * @return {void}
  */
 function maiPubMaybeRequestSlots( slots ) {
+	// Log.
+	maiPubLog( `Maybe requesting slots: ${slots.map( slot => slot.getSlotElementId() ).join( ', ' )}` );
+
 	// Filter out slots to request.
 	const slotsToRequest = slots.filter( slot => {
 		// Get the slot ID.
@@ -826,6 +829,9 @@ function maiPubMaybeRequestSlots( slots ) {
 
 		return true;
 	} );
+
+	// Log.
+	maiPubLog( `Requesting slots: ${slotsToRequest.map( slot => slot.getSlotElementId() ).join( ', ' )}` );
 
 	// Request the slot.
 	maiPubRequestSlots( slotsToRequest );
