@@ -538,6 +538,8 @@ function maiPubInit() {
 
 				// If the slot is visible, maybe request the slot.
 				if ( inView ) {
+					maiPubLog( `Slot ${slotId} is visible, maybe requesting via slotVisibilityChanged` );
+
 					maiPubMaybeRequestSlots( [ slot ] );
 				}
 			});
