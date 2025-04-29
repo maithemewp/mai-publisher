@@ -689,17 +689,18 @@ function maiPubMaybeDefineSlot( slug ) {
 	}
 
 	// Define the slot.
-	return maiPubDefineSlot( slug );
+	return maiPubDefineSlot( slotId, slug );
 }
 
 /**
  * Define a slot.
  *
- * @param {string} slug The ad slug.
+ * @param {string} slotId The slot ID.
+ * @param {string} slug   The ad slug.
  *
  * @return {object} The slot object.
  */
-function maiPubDefineSlot( slug ) {
+function maiPubDefineSlot( slotId, slug ) {
 	// Define ad slot. googletag.defineSlot( "/1234567/sports", [728, 90], "div-1" );
 	const slot = googletag.defineSlot( slotId, ads[slug].sizes, 'mai-ad-' + slug );
 
