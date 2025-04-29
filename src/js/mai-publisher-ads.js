@@ -560,54 +560,6 @@ function maiPubInit() {
 				}
 			});
 
-			// /**
-			//  * Checks if this is a client GAM ad and not the main plugin MCM ad,
-			//  * if it's a client ad and isEmpty, try to load the main plugin ad.
-			//  */
-			// googletag.pubads().addEventListener( 'slotRenderEnded', (event) => {
-			// 	// Bail if slot is not empty.
-			// 	if ( ! event.isEmpty ) {
-			// 		return;
-			// 	}
-
-			// 	// Bail if not one of our slots.
-			// 	if ( ! maiPubIsMaiSlot( event.slot ) ) {
-			// 		return;
-			// 	}
-
-			// 	// Get slug from slot ID.
-			// 	const slotId = event.slot.getSlotElementId();
-			// 	const slug   = slotId.replace( 'mai-ad-', '' );
-
-			// 	// Bail if it's not a client ad.
-			// 	if ( 'client' !== ads[slug]['context'] ) {
-			// 		return;
-			// 	}
-
-			// 	// Bail if no backfill ad with a backfill id.
-			// 	if ( ! ( ads?.[slug]?.['backfill'] && ads?.[slug]?.['backfillId'] ) ) {
-			// 		return;
-			// 	}
-
-			// 	// // If debugging, log.
-			// 	// maiPubLog( 'maipub backfilling with: ' + ads[slug]['backfill'], document.getElementById( slotId ).id );
-
-			// 	// // Set the ID to the backfill ID and define/display the backfill ad.
-			// 	// document.getElementById( slotId ).id = ads[slug]['backfillId'];
-
-			// 	// // Define and display the main plugin ad.
-			// 	// maiPubDisplaySlots( [ maiPubMaybeDefineSlot( ads[slug]['backfill'] ) ] );
-
-			// 	// // If debugging, log.
-			// 	// maiPubLog( 'maipub destroying: ' + slug );
-
-			// 	// // Unset ads[slug].
-			// 	// // delete ads[slug];
-
-			// 	// // Destroy the empty slot.
-			// 	// googletag.destroySlots( [ event.slot ] );
-			// });
-
 			// // If debugging, set listeners to log.
 			// if ( debug || log ) {
 			// 	// Log when a slot is requested/fetched.
@@ -740,9 +692,6 @@ function maiPubMaybeDefineSlot( slug ) {
 
 	// If existing, return it.
 	if ( existingSlot ) {
-		// Log.
-		// maiPubLog( 'Slot already defined:', existingSlot );
-
 		return existingSlot;
 	}
 
