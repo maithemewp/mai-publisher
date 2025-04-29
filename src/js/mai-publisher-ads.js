@@ -522,6 +522,7 @@ function maiPubInit() {
 
 				// Bail if not a Mai Publisher slot.
 				if ( ! maiPubIsMaiSlot( slot ) ) {
+					maiPubLog( `Slot ${slot.getSlotElementId()} is not a Mai Publisher slot` );
 					return;
 				}
 
@@ -533,7 +534,7 @@ function maiPubInit() {
 				slotManager[ slotId ].visible = inView;
 
 				// Log.
-				// maiPubLog( `Slot ${slotId} visibility via slotVisibilityChanged: ${event.inViewPercentage}%` );
+				maiPubLog( `Slot ${slotId} visibility via slotVisibilityChanged: ${event.inViewPercentage}%` );
 
 				// If the slot is visible, maybe request the slot.
 				if ( inView ) {
@@ -820,7 +821,7 @@ function maiPubMaybeRequestSlots( slots ) {
 
 		// If first render, return true, force a request.
 		if ( slotManager[ slotId ].firstRender ) {
-			maiPubLog( `First render for ${slotId}` );
+			maiPubLog( `First request for ${slotId}` );
 			return true;
 		}
 
