@@ -490,9 +490,14 @@ function maiPubInit() {
 				// Get the slot ID.
 				const slotId = slot.getSlotElementId();
 
-				// Update the slot manager.
-				slotManager[ slotId ].processing      = false;
+				// Update the last refresh time.
 				slotManager[ slotId ].lastRefreshTime = Date.now();
+
+				// Update the processing flag after 5 seconds.
+				// This prevents extra checks from slotVisibilityChanged from being called too soon after slotRenderEnded.
+				setTimeout( () => {
+					slotManager[ slotId ].processing = false;
+				}, 5000 );
 			});
 
 			/**
@@ -509,9 +514,14 @@ function maiPubInit() {
 				// Get the slot ID.
 				const slotId = slot.getSlotElementId();
 
-				// Update the slot manager.
-				slotManager[ slotId ].processing      = false;
+				// Update the last refresh time.
 				slotManager[ slotId ].lastRefreshTime = Date.now();
+
+				// Update the processing flag after 5 seconds.
+				// This prevents extra checks from slotVisibilityChanged from being called too soon after slotRenderEnded.
+				setTimeout( () => {
+					slotManager[ slotId ].processing = false;
+				}, 5000 );
 			});
 
 			/**
@@ -642,14 +652,6 @@ function maiPubDOMContentLoaded() {
 			const slotId = entry.target.getAttribute( 'id' );
 			const slug   = slotId.replace( 'mai-ad-', '' );
 			const slot   = maiPubMaybeDefineSlot( slug );
-
-			// Log.
-			// maiPubLog( `Slot ${slotId} visibility via IntersectionObserver: ${entry.intersectionRatio}%` );
-
-			// // Skip if the slot is already being processed.
-			// if ( slotManager[ slotId ].processing ) {
-			// 	return;
-			// }
 
 			// If intersecting.
 			if ( entry.isIntersecting ) {
