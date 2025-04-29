@@ -19,7 +19,6 @@ const bidderTimeout    = 5000; // Timout for PBJS and Amazon UAM bids.
 const fallbackTimeout  = 6000; // Set global failsafe timeout ~1000ms after DM UI bidder timeout.
 const debug            = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb') || window.location.search.includes('pbjs_debug=true');
 const log              = maiPubAdsVars.debug;
-// const bidResponses     = { prebid: {}, amazon: {}, timeouts: [] };
 const serverConsent    = Boolean( maiPubAdsVars.consent );
 const serverPpid       = maiPubAdsVars.ppid;
 const localConsent     = maiPubGetLocalConsent();
@@ -808,6 +807,9 @@ function maiPubMaybeRequestSlots( slots ) {
 	// Log.
 	maiPubLog( `Temp maybe requesting slots: ${slots.map( slot => slot.getSlotElementId() ).join( ', ' )}` );
 
+	// Set timestamp.
+	const now = Date.now();
+
 	// Filter out slots to request.
 	const slotsToRequest = slots.filter( slot => {
 		// Get the slot ID.
@@ -918,7 +920,7 @@ function maiPubRequestSlots( slots ) {
 		// Fetch bids from Magnite using Prebid.
 		pbjs.que.push( function() {
 			// Track request start time
-			const prebidRequestStartTime = Date.now();
+			const prebidStartTime = Date.now();
 
 			// Request bids from Magnite/Prebid.
 			pbjs.rp.requestBids( {
@@ -933,7 +935,7 @@ function maiPubRequestSlots( slots ) {
 					requestManager.prebidBidsReceived = true;
 
 					// Log timing information.
-					const prebidResponseTime = Date.now() - prebidRequestStartTime;
+					const prebidResponseTime = Date.now() - prebidStartTime;
 					maiPubLog( `Prebid response time: ${ prebidResponseTime }ms`, {
 						bids: bids,
 						timedOut: timedOut,
@@ -986,21 +988,11 @@ function maiPubRequestSlots( slots ) {
 			maiPubLog( 'amazonConfig', amazonConfig );
 
 			// Fetch bids from Amazon UAM using apstag.
-			const uadRequestStartTime = Date.now();
+			const amazonStartTime = Date.now();
 			apstag.fetchBids( amazonConfig, function( bids ) {
 				// Log timing information.
-				const amazonResponseTime = Date.now() - uadRequestStartTime;
+				const amazonResponseTime = Date.now() - amazonStartTime;
 				maiPubLog( `Amazon response time: ${ amazonResponseTime }ms`, bids );
-
-				// // Track Amazon bids.
-				// bids.forEach((bid) => {
-				// 	bidResponses.amazon[bid.slotID] = {
-				// 		value: bid.amznbid,
-				// 		size: bid.size,
-				// 		responseTime: amazonResponseTime + 'ms',
-				// 		error: bid.error || null
-				// 	};
-				// });
 
 				// Set apstag bids, then trigger the first request to GAM, regardless of whether we have bids from Amazon.
 				apstag.setDisplayBids();
@@ -1056,9 +1048,6 @@ function maiPubRequestSlots( slots ) {
 			adserverRequestSent: requestManager.adserverRequestSent,
 			dmBidsReceived: requestManager.dmBidsReceived,
 			apsBidsReceived: requestManager.apsBidsReceived,
-			// prebidBids: bidResponses.prebid,
-			// amazonBids: bidResponses.amazon,
-			// timeouts: bidResponses.timeouts,
 			timing: {
 				totalTime: Date.now() - timestamp,
 				bidderTimeout: bidderTimeout,
@@ -1074,7 +1063,6 @@ function maiPubRequestSlots( slots ) {
 
 /**
  * Refreshes slots.
- * This should only be called from maiPubDisplaySlots after getting bids.
  *
  * @param {array} slots The defined slots.
  *
@@ -1134,7 +1122,7 @@ async function maiPubGeneratePpid( identifier = '' ) {
 	// If we're already generating a PPID, wait for it to complete.
 	if ( isGeneratingPpid ) {
 		return new Promise( ( resolve ) => {
-			// Wait for current generation to complete
+			// Wait for current generation to complete.
 			const check = setInterval(() => {
 				if ( ! isGeneratingPpid ) {
 					clearInterval( check );
