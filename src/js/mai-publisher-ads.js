@@ -4,41 +4,35 @@ window.googletag = window.googletag || {};
 googletag.cmd    = googletag.cmd || [];
 
 // Define global variables.
-const ads                 = maiPubAdsVars['ads'];
-const adSlotIds           = [];
-const adSlots             = [];
-const gamBase             = maiPubAdsVars.gamBase;
-const gamBaseClient       = maiPubAdsVars.gamBaseClient;
-const refreshKey          = 'refresh';
-const refreshValue        = maiPubAdsVars.targets.refresh;
-const refreshTime         = 32 * 1000; // Seconds to milliseconds. Google recommends 30, we add 2 seconds for safety.
-// const lastRefreshTimes    = {};
-// const nextRefreshTimes    = {};
-// const currentlyVisible    = {};
-// const currentlyProcessing = {};
-// const timeoutIds          = {};
-const cmpTimeout          = 2000;  // Fallback in case CMP never responds.
-const matomoTimeout       = 2000;  // Fallback in case Matomo never loads.
-const bidderTimeout       = 5000;
-const fallbackTimeout     = 6000;  // Set global failsafe timeout ~1000ms after DM UI bidder timeout.
-const debug               = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb') || window.location.search.includes('pbjs_debug=true');
-const log                 = maiPubAdsVars.debug;
-const bidResponses        = { prebid: {}, amazon: {}, timeouts: [] };
-const serverConsent       = Boolean( maiPubAdsVars.consent );
-const serverPpid          = maiPubAdsVars.ppid;
-const localConsent        = maiPubGetLocalConsent();
-const localPpid           = maiPubGetLocalPpid();
-let   timestamp           = Date.now();
-let   consent             = serverConsent || localConsent;
-let   ppid                = '';
-let   isGeneratingPpid    = false;
-let   cmpReady            = false;
-let   matomoReady         = false;
-
-const slotManager = {};
+const ads              = maiPubAdsVars['ads'];
+const adSlotIds        = [];
+const adSlots          = [];
+const gamBase          = maiPubAdsVars.gamBase;
+const gamBaseClient    = maiPubAdsVars.gamBaseClient;
+const refreshKey       = 'refresh';
+const refreshValue     = maiPubAdsVars.targets.refresh;
+const refreshTime      = 32 * 1000;  // Seconds to milliseconds. Google recommends 30, we add 2 seconds for safety.
+const slotManager      = {};
+const cmpTimeout       = 2000; // Fallback in case CMP never responds.
+const matomoTimeout    = 2000; // Fallback in case Matomo never loads.
+const bidderTimeout    = 5000; // Timout for PBJS and Amazon UAM bids.
+const fallbackTimeout  = 6000; // Set global failsafe timeout ~1000ms after DM UI bidder timeout.
+const debug            = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb') || window.location.search.includes('pbjs_debug=true');
+const log              = maiPubAdsVars.debug;
+const bidResponses     = { prebid: {}, amazon: {}, timeouts: [] };
+const serverConsent    = Boolean( maiPubAdsVars.consent );
+const serverPpid       = maiPubAdsVars.ppid;
+const localConsent     = maiPubGetLocalConsent();
+const localPpid        = maiPubGetLocalPpid();
+let   timestamp        = Date.now();
+let   consent          = serverConsent || localConsent;
+let   ppid             = '';
+let   isGeneratingPpid = false;
+let   cmpReady         = false;
+let   matomoReady      = false;
 
 // If debugging, log.
-maiPubLog( 'v225' );
+maiPubLog( 'v226' );
 
 // If we have a server-side PPID, log it.
 if ( serverPpid ) {
@@ -618,29 +612,33 @@ function maiPubDOMContentLoaded() {
 				};
 			}
 
-			// If not intersecting.
-			if ( ! entry.isIntersecting ) {
-				// Force the slot to not visible.
-				slotManager[ slotId ].visible = false;
-
-				// Bail.
+			// Bail if the slot is already being processed.
+			if ( slotManager[ slotId ].processing ) {
 				return;
 			}
 
-			// Set the slot to visible.
-			slotManager[ slotId ].visible = true;
+			// If intersecting.
+			if ( entry.isIntersecting ) {
+				// Set the slot to visible.
+				slotManager[ slotId ].visible = true;
 
-			// If debugging, add inline styling.
-			if ( debug ) {
-				// Add inline styling.
-				entry.target.style.outline = '2px dashed red';
+				// If debugging, add inline styling.
+				if ( debug ) {
+					// Add inline styling.
+					entry.target.style.outline = '2px dashed red';
 
-				// Add data-label attribute of slug.
-				entry.target.setAttribute( 'data-label', slug );
+					// Add data-label attribute of slug.
+					entry.target.setAttribute( 'data-label', slug );
+				}
+
+				// Add the slot to the slotsToRequest array.
+				slotsToRequest.push( slot );
 			}
-
-			// Add the slot to the slotsToRequest array.
-			slotsToRequest.push( slot );
+			// Not intersecting.
+			else {
+				// Force the slot to not visible.
+				slotManager[ slotId ].visible = false;
+			}
 		});
 
 		// If there are slots to request, request them.
