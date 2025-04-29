@@ -123,41 +123,41 @@ if ( maiPubAdsVars.magnite ) {
 		// Set the magnite config.
 		pbjs.setConfig( pbjsConfig );
 
-		// Add bid response tracking.
-		pbjs.onEvent( 'bidResponse', function( bid ) {
-			bidResponses.prebid[ bid.bidder ] = {
-				value: bid.cpm,
-				size: bid.size,
-				adUnitCode: bid.adUnitCode,
-				timeToRespond: bid.timeToRespond + 'ms'
-			};
-			maiPubLog( `Prebid bid received from ${ bid.bidder }`, bid );
-		});
+		// // Add bid response tracking.
+		// pbjs.onEvent( 'bidResponse', function( bid ) {
+		// 	bidResponses.prebid[ bid.bidder ] = {
+		// 		value: bid.cpm,
+		// 		size: bid.size,
+		// 		adUnitCode: bid.adUnitCode,
+		// 		timeToRespond: bid.timeToRespond + 'ms'
+		// 	};
+		// 	maiPubLog( `Prebid bid received from ${ bid.bidder }`, bid );
+		// });
 
-		// Add timeout monitoring.
-		pbjs.onEvent( 'bidTimeout', function( timeoutBids ) {
-			timeoutBids.forEach(bid => {
-				bidResponses.timeouts.push({
-					bidder: bid.bidder,
-					adUnitCode: bid.adUnitCode,
-					timeout: bidderTimeout + 'ms'
-				});
-			});
-			maiPubLog( 'Bid timeout occurred:', timeoutBids );
-		});
+		// // Add timeout monitoring.
+		// pbjs.onEvent( 'bidTimeout', function( timeoutBids ) {
+		// 	timeoutBids.forEach(bid => {
+		// 		bidResponses.timeouts.push({
+		// 			bidder: bid.bidder,
+		// 			adUnitCode: bid.adUnitCode,
+		// 			timeout: bidderTimeout + 'ms'
+		// 		});
+		// 	});
+		// 	maiPubLog( 'Bid timeout occurred:', timeoutBids );
+		// });
 
-		// Log when the auction ends.
-		pbjs.onEvent( 'auctionEnd', function( bids ) {
-			maiPubLog( 'Prebid auction ended:', bids, {
-				prebid: bidResponses.prebid,
-				timeouts: bidResponses.timeouts,
-				timing: {
-					totalTime: Date.now() - timestamp + 'ms',
-					bidderTimeout: bidderTimeout + 'ms',
-					fallbackTimeout: fallbackTimeout + 'ms'
-				}
-			});
-		});
+		// // Log when the auction ends.
+		// pbjs.onEvent( 'auctionEnd', function( bids ) {
+		// 	maiPubLog( 'Prebid auction ended:', bids, {
+		// 		prebid: bidResponses.prebid,
+		// 		timeouts: bidResponses.timeouts,
+		// 		timing: {
+		// 			totalTime: Date.now() - timestamp + 'ms',
+		// 			bidderTimeout: bidderTimeout + 'ms',
+		// 			fallbackTimeout: fallbackTimeout + 'ms'
+		// 		}
+		// 	});
+		// });
 	});
 }
 
@@ -810,8 +810,8 @@ function maiPubRequestSlots( slots ) {
 	// Object to manage each request state.
 	const requestManager = {
 		adserverRequestSent: false,
-		dmBidsReceived: ! maiPubAdsVars.magnite, // If Magnite is disabled, consider bids received.
-		apsBidsReceived: ! maiPubAdsVars.amazonUAM, // If Amazon is disabled, consider bids received.
+		prebidBidsReceived: ! maiPubAdsVars.magnite, // If Magnite is disabled, consider bids received.
+		amazonBidsReceived: ! maiPubAdsVars.amazonUAM, // If Amazon is disabled, consider bids received.
 	};
 
 	/**
@@ -824,8 +824,8 @@ function maiPubRequestSlots( slots ) {
 		if ( requestManager.adserverRequestSent ) {
 			// Log.
 			maiPubLog( 'Adserver request already sent, skipping. State:', {
-				dmBidsReceived: requestManager.dmBidsReceived,
-				apsBidsReceived: requestManager.apsBidsReceived,
+				prebidBidsReceived: requestManager.prebidBidsReceived,
+				amazonBidsReceived: requestManager.amazonBidsReceived,
 				slots: slotsToRefreshNow.map(slot => slot.getSlotElementId())
 			});
 
@@ -852,16 +852,21 @@ function maiPubRequestSlots( slots ) {
 			pbjs.rp.requestBids( {
 				gptSlotObjects: slots,
 				timeout: bidderTimeout,
-				bidsBackHandler: function() {
+				// bidsBackHandler: function() { // It seems Magnite doesn't use this.
+				callback: function( bids, timedOut, auctionId ) {
 					// Set targeting.
 					pbjs.setTargetingForGPTAsync && pbjs.setTargetingForGPTAsync( slots.map( slot => slot.getSlotElementId() ) );
 
 					// Set the request manager to true.
-					requestManager.dmBidsReceived = true;
+					requestManager.prebidBidsReceived = true;
 
 					// Log timing information.
 					const prebidResponseTime = Date.now() - prebidRequestStartTime;
-					maiPubLog( `Prebid response time: ${ prebidResponseTime }ms` );
+					maiPubLog( `Prebid response time: ${ prebidResponseTime }ms`, {
+						bids: bids,
+						timedOut: timedOut,
+						auctionId: auctionId
+					} );
 
 					// Log.
 					maiPubLog( 'Prebid bids received:', {
@@ -876,7 +881,7 @@ function maiPubRequestSlots( slots ) {
 					});
 
 					// If we have all bids, send the adserver request.
-					if ( requestManager.apsBidsReceived ) {
+					if ( requestManager.amazonBidsReceived ) {
 						maiPubLog( 'Sending adserver request after Prebid bids' );
 						sendAdserverRequest();
 					}
@@ -948,10 +953,10 @@ function maiPubRequestSlots( slots ) {
 				apstag.setDisplayBids();
 
 				// Set the request manager to true.
-				requestManager.apsBidsReceived = true;
+				requestManager.amazonBidsReceived = true;
 
 				// If we have all bids, send the adserver request.
-				if ( requestManager.dmBidsReceived ) {
+				if ( requestManager.prebidBidsReceived ) {
 					maiPubLog( `Sending adserver request with amazon fetch: ${ uadSlots.map( slot => slot.slotID.replace( 'mai-ad-', '' ) ).join( ', ' ) }`, uadSlots );
 					sendAdserverRequest();
 				}
@@ -970,10 +975,10 @@ function maiPubRequestSlots( slots ) {
 		// No UAD, but we have others.
 		else {
 			// Set the request manager to true.
-			requestManager.apsBidsReceived = true;
+			requestManager.amazonBidsReceived = true;
 
 			// If we have all bids, send the adserver request.
-			if ( requestManager.dmBidsReceived ) {
+			if ( requestManager.prebidBidsReceived ) {
 				maiPubLog( `Sending adserver request without amazon slots to fetch: ${ slots.map( slot => slot.getSlotElementId() ).join( ', ' ) }`, slots );
 				sendAdserverRequest();
 			}
@@ -990,8 +995,8 @@ function maiPubRequestSlots( slots ) {
 	setTimeout(() => {
 		const timeoutData = {
 			adserverRequestSent: requestManager.adserverRequestSent,
-			dmBidsReceived: requestManager.dmBidsReceived,
-			apsBidsReceived: requestManager.apsBidsReceived,
+			prebidBidsReceived: requestManager.prebidBidsReceived,
+			amazonBidsReceived: requestManager.amazonBidsReceived,
 			prebidBids: bidResponses.prebid,
 			amazonBids: bidResponses.amazon,
 			timeouts: bidResponses.timeouts,
