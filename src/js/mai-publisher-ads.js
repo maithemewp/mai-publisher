@@ -963,7 +963,7 @@ function maiPubRequestSlots( slots ) {
 			apstag.fetchBids( amazonConfig, function( bids ) {
 				// Log timing information.
 				const amazonResponseTime = Date.now() - uadRequestStartTime;
-				maiPubLog( `Amazon response time: ${ amazonResponseTime }ms` );
+				maiPubLog( `Amazon response time: ${ amazonResponseTime }ms`, bids );
 
 				// // Track Amazon bids.
 				// bids.forEach((bid) => {
@@ -975,14 +975,7 @@ function maiPubRequestSlots( slots ) {
 				// 	};
 				// });
 
-				// Log.
-				if ( ! bids.length ) {
-					maiPubLog( 'No Amazon bids received.' );
-				} else {
-					maiPubLog( 'Amazon bids received:', bids );
-				}
-
-				// Set apstag bids, then trigger the first request to GAM.
+				// Set apstag bids, then trigger the first request to GAM, regardless of whether we have bids from Amazon.
 				apstag.setDisplayBids();
 
 				// Set the request manager to true.
