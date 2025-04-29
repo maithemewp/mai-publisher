@@ -714,7 +714,7 @@ function maiPubDefineSlot( slotId, slug ) {
 	adSlots.push( slot );
 
 	// If debugging, log.
-	maiPubLog( 'defineSlot() & display():', adSlots );
+	maiPubLog( `defineSlot() & display(): mai-ad-${slug}` );
 
 	// Set refresh targeting.
 	slot.setTargeting( refreshKey, refreshValue );
