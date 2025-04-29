@@ -13,6 +13,7 @@ const refreshKey          = 'refresh';
 const refreshValue        = maiPubAdsVars.targets.refresh;
 const refreshTime         = 32;                                                                                                                                            // Time in seconds. Google recommends 30, we add 2 seconds for safety.
 const lastRefreshTimes    = {};
+const nextRefreshTimes    = {};
 const currentlyVisible    = {};
 const currentlyProcessing = {};
 const timeoutIds          = {};
@@ -527,6 +528,7 @@ function maiPubInit() {
 				const slot   = event.slot;
 				const slotId = slot.getSlotElementId();
 				const inView = event.inViewPercentage > 5;
+				const now    = Date.now();
 
 				// Bail if not a Mai Publisher slot.
 				if ( ! maiPubIsMaiSlot( slot ) ) {
@@ -545,8 +547,14 @@ function maiPubInit() {
 				currentlyVisible[ slotId ] = inView;
 				maiPubLog( `Slot ${slotId} visibility changed to ${inView ? 'visible' : 'invisible'} (${event.inViewPercentage}%)` );
 
+				console.log( `Slot ${slotId} visibility changed to ${inView ? 'visible' : 'invisible'} (${event.inViewPercentage}%)` );
+
+
 				// If becoming visible, handle display logic.
 				if ( inView ) {
+					// Set the next refresh time.
+					nextRefreshTimes[ slotId ] = now + refreshTime * 1000;
+
 					// Handle display logic.
 					maiPubMaybeDisplaySlot( slot, 'slotVisibilityChanged' );
 				}
