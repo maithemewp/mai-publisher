@@ -531,11 +531,10 @@ function maiPubInit() {
 				const inView = event.inViewPercentage > 5;
 
 				// Update the slot manager.
-				slotManager[ slotId ].visible         = inView;
-				slotManager[ slotId ].lastRefreshTime = Date.now();
+				slotManager[ slotId ].visible = inView;
 
 				// Log.
-				maiPubLog( `Slot ${slotId} visibility via slotVisibilityChanged: (${event.inViewPercentage}%)` );
+				maiPubLog( `Slot ${slotId} visibility via slotVisibilityChanged: ${event.inViewPercentage}%` );
 
 				// If the slot is visible, maybe request the slot.
 				if ( inView ) {
@@ -652,9 +651,9 @@ function maiPubDOMContentLoaded() {
 			}
 
 			// console.log( `maipub isIntersecting: ${entry.isIntersecting}, percent: ${entry.intersectionRatio}, slotId: ${slotId}` );
-			maiPubLog( `Slot ${slotId} visibility via IntersectionObserver: (${entry.intersectionRatio}%)` );
+			maiPubLog( `Slot ${slotId} visibility via IntersectionObserver: ${entry.intersectionRatio}%` );
 
-			// Bail if the slot is already being processed.
+			// Skip if the slot is already being processed.
 			if ( slotManager[ slotId ].processing ) {
 				return;
 			}
