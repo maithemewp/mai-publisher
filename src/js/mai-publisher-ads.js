@@ -816,6 +816,7 @@ function maiPubMaybeRequestSlots( slots ) {
 
 		// If first render, return true, force a request.
 		if ( slotManager[ slotId ].firstRender ) {
+			maiPubLog( `First render for ${slotId}` );
 			return true;
 		}
 
@@ -839,6 +840,12 @@ function maiPubMaybeRequestSlots( slots ) {
 
 		return true;
 	} );
+
+	// Bail if no slots to request.
+	if ( ! slotsToRequest.length ) {
+		maiPubLog( 'No slots to request' );
+		return;
+	}
 
 	// Log.
 	maiPubLog( `Temp requesting slots: ${slotsToRequest.map( slot => slot.getSlotElementId() ).join( ', ' )}` );
