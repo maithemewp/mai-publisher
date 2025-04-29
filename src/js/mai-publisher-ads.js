@@ -645,6 +645,8 @@ function maiPubDOMContentLoaded() {
 				};
 			}
 
+			console.log( `maipub isIntersecting: ${entry.isIntersecting}, percent: ${entry.intersectionRatio}, slotId: ${slotId}` );
+
 			// Bail if the slot is already being processed.
 			if ( slotManager[ slotId ].processing ) {
 				return;
