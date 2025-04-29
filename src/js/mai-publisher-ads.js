@@ -673,6 +673,9 @@ function maiPubDOMContentLoaded() {
 				// Force the slot to not visible.
 				slotManager[ slotId ].visible = false;
 			}
+
+			// Unobserve the slots, let GAM events handle refreshing and visibility.
+			observer.unobserve( entry.target );
 		});
 
 		// If there are slots to request, request them.
@@ -681,8 +684,6 @@ function maiPubDOMContentLoaded() {
 			maiPubMaybeRequestSlots( slotsToRequest );
 		}
 
-		// Unobserve the slots, let GAM events handle refreshing and visibility.
-		observer.unobserve( entry.target );
 	}, {
 		root: null, // Use the viewport as the root.
 		rootMargin: '600px 0px 600px 0px', // Trigger when the top of the element is X away from each part of the viewport.
@@ -842,7 +843,7 @@ function maiPubMaybeRequestSlots( slots ) {
 
 		// Bail if the slot has been refreshed too recently.
 		if ( slotManager[ slotId ].lastRefreshTime && ( now - slotManager[ slotId ].lastRefreshTime ) < refreshTime ) {
-			maiPubLog( `Skipping request for ${slotId} - it's only been ${Math.round( ( now - slotManager[ slotId ].lastRefreshTime ) / 1000 )} seconds since the last refresh` );
+			maiPubLog( `Skipping request for ${slotId} - ${Math.round( ( now - slotManager[ slotId ].lastRefreshTime ) / 1000 )} seconds since the last refresh` );
 			return false;
 		}
 
