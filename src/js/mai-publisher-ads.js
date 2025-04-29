@@ -554,13 +554,8 @@ function maiPubInit() {
 				// Update the slot manager.
 				slotManager[ slotId ].visible = inView;
 
-				// Log.
-				maiPubLog( `Slot ${slotId} visibility via slotVisibilityChanged: ${event.inViewPercentage}%` );
-
 				// If the slot is visible, maybe request the slot.
 				if ( inView ) {
-					maiPubLog( `Slot ${slotId} is visible, maybe requesting via slotVisibilityChanged` );
-
 					maiPubMaybeRequestSlots( [ slot ] );
 				}
 			});
@@ -926,7 +921,7 @@ function maiPubRequestSlots( slots ) {
 
 		// Set the request manager to true and refresh the slots.
 		requestManager.adserverRequestSent = true;
-		maiPubLog( `Sending adserver request for slots: ${slots.map( slot => slot.getSlotElementId() ).join( ', ' )}` );
+		maiPubLog( `Sending adserver request: ${slots.map( slot => slot.getSlotElementId() ).join( ', ' )}` );
 
 		// Refresh the slots.
 		maiPubRefreshSlots( slots );
