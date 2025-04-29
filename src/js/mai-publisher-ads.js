@@ -854,6 +854,7 @@ function maiPubMaybeRequestSlots( slots ) {
 
 			// Clear the timeout.
 			clearTimeout( timeoutManager[ slotId ] );
+			delete timeoutManager[ slotId ];
 
 			return false;
 		}
@@ -1098,6 +1099,13 @@ function maiPubRefreshSlots( slots ) {
 	slots.forEach( slot => {
 		const slotId = slot.getSlotElementId();
 		slotManager[ slotId ].firstRender = false;
+	});
+
+	// Clear timeouts for the slots.
+	slots.forEach( slot => {
+		const slotId = slot.getSlotElementId();
+		clearTimeout( timeoutManager[ slotId ] );
+		delete timeoutManager[ slotId ];
 	});
 
 	// Refresh the slots.
