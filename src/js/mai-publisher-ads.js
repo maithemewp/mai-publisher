@@ -822,9 +822,6 @@ function maiPubDefineSlot( slotId, slug ) {
  * @return {void}
  */
 function maiPubMaybeRequestSlots( slots ) {
-	// Log.
-	maiPubLog( `Temp maybe requesting slots: ${slots.map( slot => slot.getSlotElementId() ).join( ', ' )}` );
-
 	// Set timestamp.
 	const now = Date.now();
 
@@ -832,9 +829,6 @@ function maiPubMaybeRequestSlots( slots ) {
 	const slotsToRequest = slots.filter( slot => {
 		// Get the slot ID.
 		const slotId = slot.getSlotElementId();
-
-		// Log manager.
-		maiPubLog( `Temp slot manager: ${slotId}`, slotManager[ slotId ] );
 
 		// If first render, return true, force a request.
 		if ( slotManager[ slotId ].firstRender ) {
@@ -844,13 +838,13 @@ function maiPubMaybeRequestSlots( slots ) {
 
 		// Bail if the slot is already being processed.
 		if ( slotManager[ slotId ].processing ) {
-			maiPubLog( `Skipping request for ${slotId} - already being processed` );
+			// maiPubLog( `Skipping request for ${slotId} - already being processed` );
 			return false;
 		}
 
 		// Bail if the slot is not visible.
 		if ( ! slotManager[ slotId ].visible ) {
-			maiPubLog( `Skipping request for ${slotId} - not visible` );
+			// maiPubLog( `Skipping request for ${slotId} - not visible` );
 
 			// Clear the timeout.
 			clearTimeout( timeoutManager[ slotId ] );
@@ -861,7 +855,7 @@ function maiPubMaybeRequestSlots( slots ) {
 
 		// Bail if the slot has been refreshed too recently.
 		if ( slotManager[ slotId ].lastRefreshTime && ( now - slotManager[ slotId ].lastRefreshTime ) < refreshTime ) {
-			maiPubLog( `Skipping request for ${slotId} - ${Math.round( ( now - slotManager[ slotId ].lastRefreshTime ) / 1000 )} seconds since the last refresh` );
+			// maiPubLog( `Skipping request for ${slotId} - ${Math.round( ( now - slotManager[ slotId ].lastRefreshTime ) / 1000 )} seconds since the last refresh` );
 			return false;
 		}
 
@@ -870,12 +864,8 @@ function maiPubMaybeRequestSlots( slots ) {
 
 	// Bail if no slots to request.
 	if ( ! slotsToRequest.length ) {
-		maiPubLog( 'No slots to request' );
 		return;
 	}
-
-	// Log.
-	maiPubLog( `Temp requesting slots: ${slotsToRequest.map( slot => slot.getSlotElementId() ).join( ', ' )}` );
 
 	// Request the slot.
 	maiPubRequestSlots( slotsToRequest );
@@ -899,6 +889,10 @@ function maiPubRequestSlots( slots ) {
 
 		// Mark the slot as being processed.
 		slotManager[ slotId ].processing = true;
+
+		// Clear any scheduled timeouts before requesting.
+		clearTimeout( timeoutManager[ slotId ] );
+		delete timeoutManager[ slotId];
 	});
 
 	// Log.
@@ -967,7 +961,7 @@ function maiPubRequestSlots( slots ) {
 
 					// If we have all bids, send the adserver request.
 					if ( requestManager.amazonBidsReceived ) {
-						maiPubLog( 'Sending adserver request after Prebid bids' );
+						maiPubLog( 'Sending adserver request via Prebid bids' );
 						sendAdserverRequest();
 					}
 				}
@@ -1025,7 +1019,7 @@ function maiPubRequestSlots( slots ) {
 
 				// If we have all bids, send the adserver request.
 				if ( requestManager.prebidBidsReceived ) {
-					maiPubLog( `Sending adserver request with amazon fetch: ${ uadSlots.map( slot => slot.slotID.replace( 'mai-ad-', '' ) ).join( ', ' ) }`, uadSlots );
+					maiPubLog( `Sending adserver request via amazon: ${ uadSlots.map( slot => slot.slotID.replace( 'mai-ad-', '' ) ).join( ', ' ) }`, uadSlots );
 					sendAdserverRequest();
 				}
 
@@ -1099,13 +1093,6 @@ function maiPubRefreshSlots( slots ) {
 	slots.forEach( slot => {
 		const slotId = slot.getSlotElementId();
 		slotManager[ slotId ].firstRender = false;
-	});
-
-	// Clear timeouts for the slots.
-	slots.forEach( slot => {
-		const slotId = slot.getSlotElementId();
-		clearTimeout( timeoutManager[ slotId ] );
-		delete timeoutManager[ slotId ];
 	});
 
 	// Refresh the slots.
