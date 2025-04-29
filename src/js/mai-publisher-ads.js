@@ -500,6 +500,11 @@ function maiPubInit() {
 					slotManager[ slotId ].processing = false;
 				}, 5000 );
 
+				// Bail if not refreshable.
+				if ( ! maiPubIsRefreshable( slot ) ) {
+					return;
+				}
+
 				// Set timeout to request the slot.
 				timeoutManager[ slotId ] = setTimeout( () => {
 					maiPubMaybeRequestSlots( [ slot ] );
@@ -529,6 +534,11 @@ function maiPubInit() {
 					slotManager[ slotId ].processing = false;
 				}, 5000 );
 
+				// Bail if not refreshable.
+				if ( ! maiPubIsRefreshable( slot ) ) {
+					return;
+				}
+
 				// Set timeout to request the slot.
 				timeoutManager[ slotId ] = setTimeout( () => {
 					maiPubMaybeRequestSlots( [ slot ] );
@@ -543,7 +553,12 @@ function maiPubInit() {
 
 				// Bail if not a Mai Publisher slot.
 				if ( ! maiPubIsMaiSlot( slot ) ) {
-					maiPubLog( `Slot ${slot.getSlotElementId()} is not a Mai Publisher slot` );
+					// maiPubLog( `Slot ${slot.getSlotElementId()} is not a Mai Publisher slot` );
+					return;
+				}
+
+				// Bail if not refreshable.
+				if ( ! maiPubIsRefreshable( slot ) ) {
 					return;
 				}
 
@@ -1056,17 +1071,14 @@ function maiPubIsMaiSlot( slot ) {
 }
 
 /**
- * TODO: Reintroduce this. Currently disabled while we work on the refresh logic.
- *
- * Check if a slot is refreshable.
- * Checks if we have a defined mai ad slot that has targetting set to refresh.
+ * Check if a slot has targetting set to refresh.
  *
  * @param {object} slot The ad slot.
  *
  * @return {boolean} True if refreshable.
  */
 function maiPubIsRefreshable( slot ) {
-	return maiPubIsMaiSlot( slot ) && Boolean( slot.getTargeting( refreshKey ).shift() );
+	return slot && Boolean( slot.getTargeting( refreshKey ).shift() );
 }
 
 /**
