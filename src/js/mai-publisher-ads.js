@@ -646,15 +646,15 @@ function maiPubDOMContentLoaded() {
 			// Log.
 			// maiPubLog( `Slot ${slotId} visibility via IntersectionObserver: ${entry.intersectionRatio}%` );
 
-			// Skip if the slot is already being processed.
-			if ( slotManager[ slotId ].processing ) {
-				return;
-			}
+			// // Skip if the slot is already being processed.
+			// if ( slotManager[ slotId ].processing ) {
+			// 	return;
+			// }
 
 			// If intersecting.
 			if ( entry.isIntersecting ) {
 				// Set the slot to visible.
-				// slotManager[ slotId ].visible = true;
+				slotManager[ slotId ].visible = true;
 
 				// If debugging, add inline styling.
 				if ( debug ) {
@@ -671,7 +671,7 @@ function maiPubDOMContentLoaded() {
 			// Not intersecting.
 			else {
 				// Force the slot to not visible.
-				// slotManager[ slotId ].visible = false;
+				slotManager[ slotId ].visible = false;
 			}
 		});
 
@@ -680,6 +680,9 @@ function maiPubDOMContentLoaded() {
 			// Request the slots.
 			maiPubMaybeRequestSlots( slotsToRequest );
 		}
+
+		// Unobserve the slots, let GAM events handle refreshing and visibility.
+		observer.unobserve( entry.target );
 	}, {
 		root: null, // Use the viewport as the root.
 		rootMargin: '600px 0px 600px 0px', // Trigger when the top of the element is X away from each part of the viewport.
