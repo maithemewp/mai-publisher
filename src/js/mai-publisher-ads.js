@@ -809,6 +809,9 @@ function maiPubMaybeRequestSlots( slots ) {
 		// Get the slot ID.
 		const slotId = slot.getSlotElementId();
 
+		// Log manager.
+		maiPubLog( `Temp slot manager: ${slotId}`, slotManager[ slotId ] );
+
 		// Bail if the slot is already being processed.
 		if ( slotManager[ slotId ].processing ) {
 			maiPubLog( `Skipping request for ${slotId} - already being processed` );
