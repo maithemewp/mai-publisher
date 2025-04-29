@@ -19,7 +19,7 @@ const bidderTimeout    = 5000; // Timout for PBJS and Amazon UAM bids.
 const fallbackTimeout  = 6000; // Set global failsafe timeout ~1000ms after DM UI bidder timeout.
 const debug            = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb') || window.location.search.includes('pbjs_debug=true');
 const log              = maiPubAdsVars.debug;
-const bidResponses     = { prebid: {}, amazon: {}, timeouts: [] };
+// const bidResponses     = { prebid: {}, amazon: {}, timeouts: [] };
 const serverConsent    = Boolean( maiPubAdsVars.consent );
 const serverPpid       = maiPubAdsVars.ppid;
 const localConsent     = maiPubGetLocalConsent();
@@ -133,6 +133,16 @@ if ( maiPubAdsVars.magnite ) {
 		// 	};
 		// 	maiPubLog( `Prebid bid received from ${ bid.bidder }`, bid );
 		// });
+		// // Add bid response tracking.
+		// pbjs.onEvent( 'bidResponse', function( bid ) {
+		// 	bidResponses.prebid[ bid.bidder ] = {
+		// 		value: bid.cpm,
+		// 		size: bid.size,
+		// 		adUnitCode: bid.adUnitCode,
+		// 		timeToRespond: bid.timeToRespond + 'ms'
+		// 	};
+		// 	maiPubLog( `Prebid bid received from ${ bid.bidder }`, bid );
+		// });
 
 		// // Add timeout monitoring.
 		// pbjs.onEvent( 'bidTimeout', function( timeoutBids ) {
@@ -145,7 +155,30 @@ if ( maiPubAdsVars.magnite ) {
 		// 	});
 		// 	maiPubLog( 'Bid timeout occurred:', timeoutBids );
 		// });
+		// // Add timeout monitoring.
+		// pbjs.onEvent( 'bidTimeout', function( timeoutBids ) {
+		// 	timeoutBids.forEach(bid => {
+		// 		bidResponses.timeouts.push({
+		// 			bidder: bid.bidder,
+		// 			adUnitCode: bid.adUnitCode,
+		// 			timeout: bidderTimeout + 'ms'
+		// 		});
+		// 	});
+		// 	maiPubLog( 'Bid timeout occurred:', timeoutBids );
+		// });
 
+		// // Log when the auction ends.
+		// pbjs.onEvent( 'auctionEnd', function( bids ) {
+		// 	maiPubLog( 'Prebid auction ended:', bids, {
+		// 		prebid: bidResponses.prebid,
+		// 		timeouts: bidResponses.timeouts,
+		// 		timing: {
+		// 			totalTime: Date.now() - timestamp + 'ms',
+		// 			bidderTimeout: bidderTimeout + 'ms',
+		// 			fallbackTimeout: fallbackTimeout + 'ms'
+		// 		}
+		// 	});
+		// });
 		// // Log when the auction ends.
 		// pbjs.onEvent( 'auctionEnd', function( bids ) {
 		// 	maiPubLog( 'Prebid auction ended:', bids, {
@@ -868,17 +901,17 @@ function maiPubRequestSlots( slots ) {
 						auctionId: auctionId
 					} );
 
-					// Log.
-					maiPubLog( 'Prebid bids received:', {
-						prebid: bidResponses.prebid,
-						timeouts: bidResponses.timeouts,
-						timing: {
-							totalTime: Date.now() - timestamp + 'ms',
-							bidderTimeout: bidderTimeout + 'ms',
-							fallbackTimeout: fallbackTimeout + 'ms',
-							responseTime: prebidResponseTime + 'ms'
-						}
-					});
+					// // Log.
+					// maiPubLog( 'Prebid bids received:', {
+					// 	prebid: bidResponses.prebid,
+					// 	timeouts: bidResponses.timeouts,
+					// 	timing: {
+					// 		totalTime: Date.now() - timestamp + 'ms',
+					// 		bidderTimeout: bidderTimeout + 'ms',
+					// 		fallbackTimeout: fallbackTimeout + 'ms',
+					// 		responseTime: prebidResponseTime + 'ms'
+					// 	}
+					// });
 
 					// If we have all bids, send the adserver request.
 					if ( requestManager.amazonBidsReceived ) {
@@ -932,21 +965,21 @@ function maiPubRequestSlots( slots ) {
 				const amazonResponseTime = Date.now() - uadRequestStartTime;
 				maiPubLog( `Amazon response time: ${ amazonResponseTime }ms` );
 
-				// Track Amazon bids.
-				bids.forEach((bid) => {
-					bidResponses.amazon[bid.slotID] = {
-						value: bid.amznbid,
-						size: bid.size,
-						responseTime: amazonResponseTime + 'ms',
-						error: bid.error || null
-					};
-				});
+				// // Track Amazon bids.
+				// bids.forEach((bid) => {
+				// 	bidResponses.amazon[bid.slotID] = {
+				// 		value: bid.amznbid,
+				// 		size: bid.size,
+				// 		responseTime: amazonResponseTime + 'ms',
+				// 		error: bid.error || null
+				// 	};
+				// });
 
 				// Log.
 				if ( ! bids.length ) {
 					maiPubLog( 'No Amazon bids received.' );
 				} else {
-					maiPubLog( 'Amazon bids received:', bidResponses.amazon );
+					maiPubLog( 'Amazon bids received:', bids );
 				}
 
 				// Set apstag bids, then trigger the first request to GAM.
@@ -993,26 +1026,27 @@ function maiPubRequestSlots( slots ) {
 
 	// Start the failsafe timeout.
 	setTimeout(() => {
-		const timeoutData = {
+		// Bail if already sent.
+		if ( requestManager.adserverRequestSent ) {
+			return;
+		}
+
+		// Log.
+		maiPubLog( 'refresh() with failsafe timeout. Debug data:', {
 			adserverRequestSent: requestManager.adserverRequestSent,
-			prebidBidsReceived: requestManager.prebidBidsReceived,
-			amazonBidsReceived: requestManager.amazonBidsReceived,
-			prebidBids: bidResponses.prebid,
-			amazonBids: bidResponses.amazon,
-			timeouts: bidResponses.timeouts,
+			dmBidsReceived: requestManager.dmBidsReceived,
+			apsBidsReceived: requestManager.apsBidsReceived,
+			// prebidBids: bidResponses.prebid,
+			// amazonBids: bidResponses.amazon,
+			// timeouts: bidResponses.timeouts,
 			timing: {
 				totalTime: Date.now() - timestamp,
 				bidderTimeout: bidderTimeout,
 				fallbackTimeout: fallbackTimeout
 			}
-		};
+		} );
 
-		// Log if no adserver request has been sent.
-		if ( ! requestManager.adserverRequestSent ) {
-			maiPubLog( 'refresh() with failsafe timeout. Debug data:', timeoutData );
-		}
-
-		// Maybe send request.
+		// Send request.
 		sendAdserverRequest();
 
 	}, fallbackTimeout );
