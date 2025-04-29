@@ -1057,7 +1057,7 @@ function maiPubRequestSlots( slots ) {
  */
 function maiPubRefreshSlots( slots ) {
 	// Log.
-	maiPubLog( `Refreshing ${slots.length} slots: ${slots.map( slot => slot.getSlotElementId() ).join( ', ' )}` );
+	maiPubLog( `Refreshing ${slots.length} ${1 === slots.length ? 'slot' : 'slots'}: ${slots.map( slot => slot.getSlotElementId() ).join( ', ' )}` );
 
 	// Refresh the slots.
 	googletag.pubads().refresh( slots, { changeCorrelator: false } );
