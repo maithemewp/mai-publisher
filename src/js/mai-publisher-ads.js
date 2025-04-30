@@ -465,12 +465,12 @@ function maiPubInit() {
 					IAB_CONTENT_2_2: {
 						values: iabCats,
 					},
-					IAB_CONTENT_3_0: {
-						values: iabCats,
-					},
-					IAB_CONTENT_3_1: {
-						values: iabCats,
-					},
+					// IAB_CONTENT_3_0: {
+					// 	values: iabCats,
+					// },
+					// IAB_CONTENT_3_1: {
+					// 	values: iabCats,
+					// },
 				});
 			}
 
