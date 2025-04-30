@@ -346,6 +346,8 @@ class Mai_Publisher_Output {
 				'loadDelay'     => maipub_get_option( 'load_delay' ),
 				'debug'         => maipub_get_option( 'debug_enabled' ),
 				'shouldTrack'   => maipub_should_track(),
+				'iabGlobalCat'  => maipub_get_option( 'category' ),
+				'iabCat'        => maipub_get_iab_category(),
 				'matomo'        => [
 					'url'     => maipub_get_option( 'matomo_url', false ),
 					'site_id' => maipub_get_option( 'matomo_site_id', false ),

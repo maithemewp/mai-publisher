@@ -449,6 +449,31 @@ function maiPubInit() {
 			// Disabled for now: https://developers.google.com/publisher-tag/reference#googletag.PubAdsService_setForceSafeFrame
 			// googletag.pubads().setForceSafeFrame( true );
 
+			// Get the IAB categories, removing duplicates.
+			const iabCats = [...new Set( [ maiPubAdsVars.iabGlobalCat, maiPubAdsVars.iabCat ].filter( cat => cat ) )];
+
+			// If we have IAB categories, set them in the config.
+			if ( iabCats.length ) {
+				/**
+				 * Set Google Publisher Tag config.
+				 * The docs make it seem like it only supports IAB Content Categories 2.2, not 3.0.
+				 * We're settings 3_0 and 3_1 incase they add support for 3.0.
+				 *
+				 * @link https://developers.google.com/publisher-tag/reference#googletag.config.PublisherProvidedSignalsConfig
+				 */
+				googletag.pubads().setConfig({
+					IAB_CONTENT_2_2: {
+						values: iabCats,
+					},
+					IAB_CONTENT_3_0: {
+						values: iabCats,
+					},
+					IAB_CONTENT_3_1: {
+						values: iabCats,
+					},
+				});
+			}
+
 			// Set page-level targeting.
 			if ( maiPubAdsVars.targets ) {
 				Object.keys( maiPubAdsVars.targets ).forEach( key => {
