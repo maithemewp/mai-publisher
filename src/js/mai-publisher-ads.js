@@ -94,6 +94,20 @@ if ( maiPubAdsVars.magnite ) {
 			bidderTimeout: bidderTimeout,
 			enableTIDs: true,
 			ortb2: maiPubAdsVars.ortb2,
+			// @link https://github.com/prebid/prebid.github.io/blob/master/dev-docs/modules/schain.md
+			schain: {
+				complete: 1, // Integer 1 or 0 indicating if all preceding nodes are complete.
+				ver: '1.0', // Version of the spec used.
+				nodes: [
+					{
+						asi: 'bizbudding.com', // Populate with the canonical domain of the advertising system where the seller.JSON file is hosted.
+						sid: maiPubAdsVars.sellersId, // The identifier associated with the seller or reseller account within your advertising system.
+						hp: 1, // 1 or 0, whether this node is involved in the payment flow.
+						name: maiPubAdsVars.sellersName, // Name of the company paid for inventory under seller ID (optional).
+						domain: maiPubAdsVars.domain, // Business domain of this node (optional).
+					}
+				]
+			}
 		};
 
 		/**
@@ -496,6 +510,17 @@ function maiPubInit() {
 				slotManager[ slotId ].lastRefreshTime = Date.now();
 				slotManager[ slotId ].processing      = false;
 
+				// Log if the slot is empty.
+				if ( event.isEmpty ) {
+					maiPubLog( `Slot empty: ${slotId}`, {
+						slug: slug,
+						adUnitPath: slot.getAdUnitPath(),
+						sizes: event.size,
+						targeting: slot.getTargetingMap(),
+						event: event,
+					});
+				}
+
 				// Bail if not refreshable.
 				if ( ! maiPubIsRefreshable( slot ) ) {
 					return;
@@ -525,6 +550,15 @@ function maiPubInit() {
 				// Update the last refresh time and mark processing as complete.
 				slotManager[ slotId ].lastRefreshTime = Date.now();
 				slotManager[ slotId ].processing      = false;
+
+				// Log the error details.
+				maiPubLog( `Slot error: ${slotId}`, {
+					slug: slug,
+					adUnitPath: slot.getAdUnitPath(),
+					sizes: slot.getSizes(), // Get defined sizes for the slot
+					targeting: slot.getTargetingMap(),
+					event: event, // Log the raw event object for any potential extra info
+				});
 
 				// Bail if not refreshable.
 				if ( ! maiPubIsRefreshable( slot ) ) {
