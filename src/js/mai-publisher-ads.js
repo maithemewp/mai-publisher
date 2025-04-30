@@ -449,12 +449,12 @@ function maiPubInit() {
 			// Disabled for now: https://developers.google.com/publisher-tag/reference#googletag.PubAdsService_setForceSafeFrame
 			// googletag.pubads().setForceSafeFrame( true );
 
-			// // Set page-level targeting.
-			// if ( maiPubAdsVars.targets ) {
-			// 	Object.keys( maiPubAdsVars.targets ).forEach( key => {
-			// 		googletag.pubads().setTargeting( key, maiPubAdsVars.targets[key].toString() );
-			// 	});
-			// }
+			// Set page-level targeting.
+			if ( maiPubAdsVars.targets ) {
+				Object.keys( maiPubAdsVars.targets ).forEach( key => {
+					googletag.pubads().setTargeting( key, maiPubAdsVars.targets[key].toString() );
+				});
+			}
 
 			// Make ads centered.
 			googletag.pubads().setCentering( true );
@@ -777,12 +777,12 @@ function maiPubDefineSlot( slotId, slug ) {
 		// Set refresh targeting.
 		slot.setTargeting( refreshKey, refreshValue );
 
-		// // Set slot-level targeting.
-		// if ( ads[slug].targets ) {
-		// 	Object.keys( ads[slug].targets ).forEach( key => {
-		// 		slot.setTargeting( key, ads[slug].targets[key] );
-		// 	});
-		// }
+		// Set slot-level targeting.
+		if ( ads[slug].targets ) {
+			Object.keys( ads[slug].targets ).forEach( key => {
+				slot.setTargeting( key, ads[slug].targets[key] );
+			});
+		}
 
 		// Set split testing.
 		if ( ads[slug].splitTest && 'rand' === ads[slug].splitTest ) {
