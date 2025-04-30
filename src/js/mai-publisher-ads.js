@@ -455,8 +455,8 @@ function maiPubInit() {
 					googletag.pubads().setTargeting( key, maiPubAdsVars.targets[key].toString() );
 				});
 
-				// Log the page-level targeting.
-				maiPubLog( 'Set page-level targeting:', googletag.pubads().getTargetingMap() );
+				// Log the page-level targeting that was set.
+				maiPubLog( 'Set page-level targeting from:', maiPubAdsVars.targets );
 			}
 
 			// Make ads centered.
