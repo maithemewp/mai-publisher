@@ -457,7 +457,6 @@ function maiPubInit() {
 				/**
 				 * Set Google Publisher Tag config for PPS.
 				 * The docs make it seem like it only supports IAB Content Categories 2.2, not 3.0.
-				 * We're settings 3_0 and 3_1 incase they add support for 3.0.
 				 *
 				 * @link https://developers.google.com/publisher-tag/reference#googletag.config.PublisherProvidedSignalsConfig
 				 */
@@ -465,12 +464,6 @@ function maiPubInit() {
 					pps: {
 						taxonomies: {
 							IAB_CONTENT_2_2: {
-								values: iabCats,
-							},
-							IAB_CONTENT_3_0: {
-								values: iabCats,
-							},
-							IAB_CONTENT_3_1: {
 								values: iabCats,
 							},
 						},
