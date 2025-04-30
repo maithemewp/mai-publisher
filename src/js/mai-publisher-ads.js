@@ -32,7 +32,7 @@ let   cmpReady         = false;
 let   matomoReady      = false;
 
 // If debugging, log.
-maiPubLog( 'v228' );
+maiPubLog( 'v229' );
 
 // If we have a server-side PPID, log it.
 if ( serverPpid ) {
@@ -893,8 +893,10 @@ function maiPubRequestSlots( slots ) {
 		requestManager.adserverRequestSent = true;
 		maiPubLog( `Sending adserver request: ${slots.map( slot => slot.getSlotElementId() ).join( ', ' )}` );
 
-		// Refresh the slots.
-		maiPubRefreshSlots( slots );
+		// Queue the refresh operation.
+		googletag.cmd.push(() => {
+			maiPubRefreshSlots( slots );
+		});
 	}
 
 	// Handle Magnite/DM bids.
@@ -910,25 +912,28 @@ function maiPubRequestSlots( slots ) {
 				timeout: bidderTimeout,
 				// bidsBackHandler: function() { // It seems Magnite doesn't use this.
 				callback: function( bids, timedOut, auctionId ) {
-					// Set targeting.
-					pbjs.setTargetingForGPTAsync && pbjs.setTargetingForGPTAsync( slots.map( slot => slot.getSlotElementId() ) );
+					// Queue all GAM-dependent operations.
+					googletag.cmd.push(() => {
+						// Set targeting
+						pbjs.setTargetingForGPTAsync && pbjs.setTargetingForGPTAsync( slots.map( slot => slot.getSlotElementId() ) );
 
-					// Set the request manager to true.
-					requestManager.prebidBidsReceived = true;
+						// Set the request manager to true.
+						requestManager.prebidBidsReceived = true;
 
-					// Log timing information.
-					const prebidResponseTime = Date.now() - prebidStartTime;
-					maiPubLog( `Prebid response time: ${ prebidResponseTime }ms`, {
-						bids: bids,
-						timedOut: timedOut,
-						auctionId: auctionId
-					} );
+						// Log timing information.
+						const prebidResponseTime = Date.now() - prebidStartTime;
+						maiPubLog( `Prebid response time: ${ prebidResponseTime }ms`, {
+							bids: bids,
+							timedOut: timedOut,
+							auctionId: auctionId
+						} );
 
-					// If we have all bids, send the adserver request.
-					if ( requestManager.amazonBidsReceived ) {
-						maiPubLog( 'Sending adserver request via Prebid bids' );
-						sendAdserverRequest();
-					}
+						// If we have all bids, send the adserver request.
+						if ( requestManager.amazonBidsReceived ) {
+							maiPubLog( 'Sending adserver request via Prebid bids' );
+							sendAdserverRequest();
+						}
+					});
 				}
 			});
 		});
@@ -1060,8 +1065,11 @@ function maiPubRefreshSlots( slots ) {
 		slotManager[ slotId ].firstRender = false;
 	});
 
-	// Refresh the slots.
-	googletag.pubads().refresh( slots, { changeCorrelator: false } );
+	// Queue the refresh operation.
+	googletag.cmd.push(() => {
+		// Refresh the slots.
+		googletag.pubads().refresh( slots, { changeCorrelator: false } );
+	});
 }
 
 /**
