@@ -18,7 +18,6 @@ const cmpTimeout       = 2000; // Fallback in case CMP never responds.
 const matomoTimeout    = 2000; // Fallback in case Matomo never loads.
 const bidderTimeout    = 5000; // Timout for PBJS and Amazon UAM bids.
 const fallbackTimeout  = 6000; // Set global failsafe timeout, something longer than the bidderTimeout.
-
 const debug            = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb') || window.location.search.includes('pbjs_debug=true');
 const log              = maiPubAdsVars.debug;
 const serverConsent    = Boolean( maiPubAdsVars.consent );
@@ -778,12 +777,12 @@ function maiPubDefineSlot( slotId, slug ) {
 		// Set refresh targeting.
 		slot.setTargeting( refreshKey, refreshValue );
 
-		// Set slot-level targeting.
-		if ( ads[slug].targets ) {
-			Object.keys( ads[slug].targets ).forEach( key => {
-				slot.setTargeting( key, ads[slug].targets[key] );
-			});
-		}
+		// // Set slot-level targeting.
+		// if ( ads[slug].targets ) {
+		// 	Object.keys( ads[slug].targets ).forEach( key => {
+		// 		slot.setTargeting( key, ads[slug].targets[key] );
+		// 	});
+		// }
 
 		// Set split testing.
 		if ( ads[slug].splitTest && 'rand' === ads[slug].splitTest ) {
