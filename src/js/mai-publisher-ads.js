@@ -546,46 +546,11 @@ function maiPubInit() {
 			});
 
 			/**
-			 * Update the slot manager when a slot errors.
-			 */
-			googletag.pubads().addEventListener( 'slotError', function( event ) {
-				const slot = event.slot;
-
-				// Bail if not a Mai Publisher slot.
-				if ( ! maiPubIsMaiSlot( slot ) ) {
-					return;
-				}
-
-				// Get the slot ID and slug.
-				const slotId = slot.getSlotElementId();
-				const slug   = slotId.replace( 'mai-ad-', '' );
-
-				// Update the last refresh time and mark processing as complete.
-				slotManager[ slotId ].lastRefreshTime = Date.now();
-				slotManager[ slotId ].processing      = false;
-
-				// Log the error details.
-				maiPubLog( `Slot error: ${slotId}`, {
-					slug: slug,
-					adUnitPath: slot.getAdUnitPath(),
-					sizes: slot.getSizes(), // Get defined sizes for the slot
-					targeting: slot.getTargetingMap(),
-					event: event, // Log the raw event object for any potential extra info
-				});
-
-				// Bail if not refreshable.
-				if ( ! maiPubIsRefreshable( slot ) ) {
-					return;
-				}
-
-				// Set timeout to potentially request the slot later.
-				timeoutManager[ slotId ] = setTimeout( () => {
-					maiPubMaybeRequestSlots( [ slug ] );
-				}, refreshTime );
-			});
-
-			/**
 			 * Update the slot manager when a slot's visibility changes.
+			 * This event is fired whenever the on-screen percentage of an ad slot's area changes.
+			 * The event is throttled and will not fire more often than once every 200ms.
+			 *
+			 * @link https://developers.google.com/publisher-tag/reference#googletag.events.SlotVisibilityChangedEvent
 			 */
 			googletag.pubads().addEventListener( 'slotVisibilityChanged', (event) => {
 				const slot = event.slot;
