@@ -554,7 +554,7 @@ function maiPubInit() {
 				}
 				// Log if the slot is not empty.
 				else {
-					maiPubLog( `Slot not empty: ${slotId}`, {
+					maiPubLog( `Slot filled: ${slotId}`, {
 						slug: slug,
 						adUnitPath: slot.getAdUnitPath(),
 						sizes: event.size,
