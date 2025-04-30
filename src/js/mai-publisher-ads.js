@@ -454,6 +454,9 @@ function maiPubInit() {
 				Object.keys( maiPubAdsVars.targets ).forEach( key => {
 					googletag.pubads().setTargeting( key, maiPubAdsVars.targets[key].toString() );
 				});
+
+				// Log the page-level targeting.
+				maiPubLog( 'Set page-level targeting:', googletag.pubads().getTargetingMap() );
 			}
 
 			// Make ads centered.
@@ -771,9 +774,6 @@ function maiPubDefineSlot( slotId, slug ) {
 		// due to the disableInitialLoad() method being called earlier.
 		googletag.display( 'mai-ad-' + slug );
 
-		// If debugging, log.
-		maiPubLog( `defineSlot() & display(): mai-ad-${slug}` );
-
 		// Set refresh targeting.
 		slot.setTargeting( refreshKey, refreshValue );
 
@@ -790,6 +790,13 @@ function maiPubDefineSlot( slotId, slug ) {
 			slot.setTargeting( 'st', Math.floor(Math.random() * 100) );
 		}
 
+		// Log.
+		maiPubLog( `defineSlot() & display(): mai-ad-${slug}`, {
+			slotId: slotId,
+			slot: slot,
+			targets: slot.getTargetingMap(),
+		} );
+
 		// Get it running.
 		slot.addService( googletag.pubads() );
 
@@ -805,7 +812,7 @@ function maiPubDefineSlot( slotId, slug ) {
 			.build()
 		);
 
-		// Add slot to our tracking arrays AFTER it's defined.
+		// Add slot to our tracking arrays after it's defined.
 		adSlotIds.push( slotId );
 		adSlots.push( slot );
 	});
