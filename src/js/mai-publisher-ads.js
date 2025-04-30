@@ -5,8 +5,8 @@ googletag.cmd    = googletag.cmd || [];
 
 // Define global variables.
 const ads              = maiPubAdsVars['ads'];
-const adSlotIds        = [];
-const adSlots          = [];
+const adSlotIds        = []; // Stores GAM Ad Unit Paths (e.g., /12345/leaderboard) for slots defined by this script.
+const adSlots          = []; // Stores the actual GPT Slot objects returned by defineSlot.
 const gamBase          = maiPubAdsVars.gamBase;
 const gamBaseClient    = maiPubAdsVars.gamBaseClient;
 const refreshKey       = 'refresh';
@@ -488,26 +488,22 @@ function maiPubInit() {
 					return;
 				}
 
-				// Get the slot ID.
+				// Get the slot ID and slug.
 				const slotId = slot.getSlotElementId();
+				const slug   = slotId.replace( 'mai-ad-', '' );
 
-				// Update the last refresh time.
+				// Update the last refresh time and mark processing as complete.
 				slotManager[ slotId ].lastRefreshTime = Date.now();
-
-				// Update the processing flag after 5 seconds.
-				// This prevents extra checks from slotVisibilityChanged from being called too soon after slotRenderEnded.
-				setTimeout( () => {
-					slotManager[ slotId ].processing = false;
-				}, 5000 );
+				slotManager[ slotId ].processing      = false;
 
 				// Bail if not refreshable.
 				if ( ! maiPubIsRefreshable( slot ) ) {
 					return;
 				}
 
-				// Set timeout to request the slot.
+				// Set timeout to potentially request the slot later.
 				timeoutManager[ slotId ] = setTimeout( () => {
-					maiPubMaybeRequestSlots( [ slot ] );
+					maiPubMaybeRequestSlots( [ slug ] );
 				}, refreshTime );
 			});
 
@@ -522,26 +518,22 @@ function maiPubInit() {
 					return;
 				}
 
-				// Get the slot ID.
+				// Get the slot ID and slug.
 				const slotId = slot.getSlotElementId();
+				const slug   = slotId.replace( 'mai-ad-', '' );
 
-				// Update the last refresh time.
+				// Update the last refresh time and mark processing as complete.
 				slotManager[ slotId ].lastRefreshTime = Date.now();
-
-				// Update the processing flag after 5 seconds.
-				// This prevents extra checks from slotVisibilityChanged from being called too soon after slotRenderEnded.
-				setTimeout( () => {
-					slotManager[ slotId ].processing = false;
-				}, 5000 );
+				slotManager[ slotId ].processing      = false;
 
 				// Bail if not refreshable.
 				if ( ! maiPubIsRefreshable( slot ) ) {
 					return;
 				}
 
-				// Set timeout to request the slot.
+				// Set timeout to potentially request the slot later.
 				timeoutManager[ slotId ] = setTimeout( () => {
-					maiPubMaybeRequestSlots( [ slot ] );
+					maiPubMaybeRequestSlots( [ slug ] );
 				}, refreshTime );
 			});
 
@@ -562,8 +554,9 @@ function maiPubInit() {
 					return;
 				}
 
-				// Get the slot ID and check if it's in view.
+				// Get the slot ID, slug, and check if it's in view.
 				const slotId = slot.getSlotElementId();
+				const slug   = slotId.replace( 'mai-ad-', '' );
 				const inView = event.inViewPercentage > 5;
 
 				// Update the slot manager.
@@ -571,7 +564,7 @@ function maiPubInit() {
 
 				// If the slot is visible, maybe request the slot.
 				if ( inView ) {
-					maiPubMaybeRequestSlots( [ slot ] );
+					maiPubMaybeRequestSlots( [ slug ] );
 				}
 			});
 
@@ -617,18 +610,20 @@ function maiPubInit() {
 function maiPubDOMContentLoaded() {
 	// Setup the IntersectionObserver.
 	const observer = new IntersectionObserver( (entries, observer) => {
-		const slotsToRequest = [];
+		const slugsToRequest = [];
 
 		// Loop through the entries.
 		entries.forEach( entry => {
 			// Get slug.
 			const slotId = entry.target.getAttribute( 'id' );
 			const slug   = slotId.replace( 'mai-ad-', '' );
-			const slot   = maiPubMaybeDefineSlot( slug );
+
+			// Trigger the definition (async).
+			maiPubMaybeDefineSlot( slug );
 
 			// If intersecting.
 			if ( entry.isIntersecting ) {
-				// Set the slot to visible.
+				// Set the slot to visible (using slotManager).
 				slotManager[ slotId ].visible = true;
 
 				// If debugging, add inline styling.
@@ -640,8 +635,8 @@ function maiPubDOMContentLoaded() {
 					entry.target.setAttribute( 'data-label', slug );
 				}
 
-				// Add the slot to the slotsToRequest array.
-				slotsToRequest.push( slot );
+				// Add the slug to the slugsToRequest array.
+				slugsToRequest.push( slug );
 
 				// Unobserve the displayed slots, let GAM events handle refreshing and visibility.
 				observer.unobserve( entry.target );
@@ -653,12 +648,11 @@ function maiPubDOMContentLoaded() {
 			}
 		});
 
-		// If there are slots to request, request them.
-		if ( slotsToRequest.length ) {
-			// Request the slots.
-			maiPubMaybeRequestSlots( slotsToRequest );
+		// If there are slugs to request, trigger the request logic.
+		if ( slugsToRequest.length ) {
+			// Request the slots using slugs.
+			maiPubMaybeRequestSlots( slugsToRequest );
 		}
-
 	}, {
 		root: null, // Use the viewport as the root.
 		rootMargin: '600px 0px 600px 0px', // Trigger when the top of the element is X away from each part of the viewport.
@@ -696,22 +690,22 @@ function maiPubMaybeDefineSlot( slug ) {
 	// Get base from context.
 	const base = ads?.[slug]?.['context'] && 'client' === ads[slug]['context'] ? gamBaseClient : gamBase;
 
-	// Define slot ID.
+	// Define slot ID (GAM Path).
 	const slotId = base + ads[slug]['id'];
 
-	// Get slot element ID.
+	// Get slot element ID (HTML ID).
 	const slotElId = 'mai-ad-' + slug;
 
 	// Check for existing slot.
-	const existingSlot = adSlots.find( slot => slotElId == slot.getSlotElementId() );
+	const existingSlot = adSlots.find( slot => slotElId == slot.getSlotElementId() ); // Checks against HTML ID in slot objects
 
 	// If existing, return it.
 	if ( existingSlot ) {
-		return existingSlot;
+		return;
 	}
 
-	// Define the slot.
-	return maiPubDefineSlot( slotId, slug );
+	// Define the slot (this is async via googletag.cmd.push inside maiPubDefineSlot).
+	maiPubDefineSlot( slotId, slug );
 }
 
 /**
@@ -723,117 +717,130 @@ function maiPubMaybeDefineSlot( slug ) {
  * @return {object} The slot object.
  */
 function maiPubDefineSlot( slotId, slug ) {
-	// Define ad slot. googletag.defineSlot( "/1234567/sports", [728, 90], "div-1" );
-	const slot = googletag.defineSlot( slotId, ads[slug].sizes, 'mai-ad-' + slug );
+	// Define the slot and related operations within the command queue.
+	googletag.cmd.push(() => {
+		// Define ad slot. googletag.defineSlot( "/1234567/sports", [728, 90], "div-1" );
+		const slot = googletag.defineSlot( slotId, ads[slug].sizes, 'mai-ad-' + slug );
 
-	// Register the ad slot.
-	// An ad will not be fetched until refresh is called,
-	// due to the disableInitialLoad() method being called earlier.
-	googletag.display( 'mai-ad-' + slug );
+		// Register the ad slot.
+		// An ad will not be fetched until refresh is called,
+		// due to the disableInitialLoad() method being called earlier.
+		googletag.display( 'mai-ad-' + slug );
 
-	// Add slot to our array.
-	adSlotIds.push( slotId );
-	adSlots.push( slot );
+		// If debugging, log.
+		maiPubLog( `defineSlot() & display(): mai-ad-${slug}` );
 
-	// If debugging, log.
-	maiPubLog( `defineSlot() & display(): mai-ad-${slug}` );
+		// Set refresh targeting.
+		slot.setTargeting( refreshKey, refreshValue );
 
-	// Set refresh targeting.
-	slot.setTargeting( refreshKey, refreshValue );
+		// Set slot-level targeting.
+		if ( ads[slug].targets ) {
+			Object.keys( ads[slug].targets ).forEach( key => {
+				slot.setTargeting( key, ads[slug].targets[key] );
+			});
+		}
 
-	// Set slot-level targeting.
-	if ( ads[slug].targets ) {
-		Object.keys( ads[slug].targets ).forEach( key => {
-			slot.setTargeting( key, ads[slug].targets[key] );
-		});
-	}
+		// Set split testing.
+		if ( ads[slug].splitTest && 'rand' === ads[slug].splitTest ) {
+			// Set 'st' to a value between 0-99.
+			slot.setTargeting( 'st', Math.floor(Math.random() * 100) );
+		}
 
-	// Set split testing.
-	if ( ads[slug].splitTest && 'rand' === ads[slug].splitTest ) {
-		// Set 'st' to a value between 0-99.
-		slot.setTargeting( 'st', Math.floor(Math.random() * 100) );
-	}
+		// Get it running.
+		slot.addService( googletag.pubads() );
 
-	// Get it running.
-	slot.addService( googletag.pubads() );
+		/**
+		 * Define size mapping.
+		 * If these breakpoints change, make sure to update the breakpoints in the mai-publisher.css file.
+		 */
+		slot.defineSizeMapping(
+			googletag.sizeMapping()
+			.addSize( [ 1024, 768 ], ads[slug].sizesDesktop )
+			.addSize( [ 728, 480 ], ads[slug].sizesTablet )
+			.addSize( [ 0, 0 ], ads[slug].sizesMobile )
+			.build()
+		);
 
-	/**
-	 * Define size mapping.
-	 * If these breakpoints change, make sure to update the breakpoints in the mai-publisher.css file.
-	 */
-	slot.defineSizeMapping(
-		googletag.sizeMapping()
-		.addSize( [ 1024, 768 ], ads[slug].sizesDesktop )
-		.addSize( [ 728, 480 ], ads[slug].sizesTablet )
-		.addSize( [ 0, 0 ], ads[slug].sizesMobile )
-		.build()
-	);
-
-	// Return the slot.
-	return slot;
+		// Add slot to our tracking arrays AFTER it's defined.
+		adSlotIds.push( slotId );
+		adSlots.push( slot );
+	});
 }
 
 /**
  * Maybe request a slot.
  *
  * @param {array} slots The slots to request.
+ * @param {array} slugs The slugs of the slots to potentially request.
  *
  * @return {void}
  */
-function maiPubMaybeRequestSlots( slots ) {
-	// Set timestamp.
-	const now = Date.now();
+function maiPubMaybeRequestSlots( slugs ) {
+	// Queue the logic to ensure slots are defined and GAM is ready.
+	googletag.cmd.push(() => {
+		// Set timestamp.
+		const now = Date.now();
 
-	// Filter out slots to request.
-	const slotsToRequest = slots.filter( slot => {
-		// Get the slot ID.
-		const slotId = slot.getSlotElementId();
-
-		// If first render, return true, force a request.
-		if ( slotManager[ slotId ].firstRender ) {
-			maiPubLog( `First request for ${slotId}` );
-			return true;
-		}
-
-		// Bail if the slot is already being processed.
-		if ( slotManager[ slotId ].processing ) {
-			// maiPubLog( `Skipping request for ${slotId} - already being processed` );
-			return false;
-		}
-
-		// Bail if the slot is not visible.
-		if ( ! slotManager[ slotId ].visible ) {
-			// maiPubLog( `Skipping request for ${slotId} - not visible` );
-
-			// Clear the timeout.
-			clearTimeout( timeoutManager[ slotId ] );
-			delete timeoutManager[ slotId ];
-
-			return false;
-		}
-
-		// If last refresh time.
-		if ( slotManager[ slotId ].lastRefreshTime ) {
-			// Bail if the slot has been refreshed too recently.
-			if ( ( now - slotManager[ slotId ].lastRefreshTime ) < refreshTime ) {
-				// maiPubLog( `Skipping request for ${slotId} - ${Math.round( ( now - slotManager[ slotId ].lastRefreshTime ) / 1000 )} seconds since the last refresh` );
+		// Process slugs to get actual slots and filter.
+		const slotsToRequest = slugs.map( slug => {
+			// Find the corresponding slot object from the global array.
+			return adSlots.find( s => 'mai-ad-' + slug === s.getSlotElementId() );
+		}).filter( slot => {
+			// Ensure slot exists (was found and defined).
+			if ( ! slot ) {
+				maiPubLog( `Warning: Slot object not found for slug ${slug} during request check.` );
 				return false;
 			}
 
-			// Log.
-			maiPubLog( `Requesting slot ${slotId} - ${Math.round( ( now - slotManager[ slotId ].lastRefreshTime ) / 1000 )} seconds since the last refresh` );
+			// Get the slot ID.
+			const slotId = slot.getSlotElementId();
+
+			// If first render, return true, force a request.
+			if ( slotManager[ slotId ].firstRender ) {
+				maiPubLog( `First request for ${slotId}` );
+				return true;
+			}
+
+			// Bail if the slot is already being processed.
+			if ( slotManager[ slotId ].processing ) {
+				// maiPubLog( `Skipping request for ${slotId} - already being processed` );
+				return false;
+			}
+
+			// Bail if the slot is not visible.
+			if ( ! slotManager[ slotId ].visible ) {
+				// maiPubLog( `Skipping request for ${slotId} - not visible` );
+
+				// Clear the timeout.
+				clearTimeout( timeoutManager[ slotId ] );
+				delete timeoutManager[ slotId ];
+
+				return false;
+			}
+
+			// If last refresh time.
+			if ( slotManager[ slotId ].lastRefreshTime ) {
+				// Bail if the slot has been refreshed too recently.
+				if ( ( now - slotManager[ slotId ].lastRefreshTime ) < refreshTime ) {
+					// maiPubLog( `Skipping request for ${slotId} - ${Math.round( ( now - slotManager[ slotId ].lastRefreshTime ) / 1000 )} seconds since the last refresh` );
+					return false;
+				}
+
+				// Log.
+				maiPubLog( `Requesting slot ${slotId} - ${Math.round( ( now - slotManager[ slotId ].lastRefreshTime ) / 1000 )} seconds since the last refresh` );
+			}
+
+			return true;
+		} );
+
+		// Bail if no slots to request after filtering.
+		if ( ! slotsToRequest.length ) {
+			return;
 		}
 
-		return true;
-	} );
-
-	// Bail if no slots to request.
-	if ( ! slotsToRequest.length ) {
-		return;
-	}
-
-	// Request the slot.
-	maiPubRequestSlots( slotsToRequest );
+		// Request the filtered slot objects.
+		maiPubRequestSlots( slotsToRequest );
+	});
 }
 
 /**
@@ -889,12 +896,15 @@ function maiPubRequestSlots( slots ) {
 			return;
 		}
 
-		// Set the request manager to true and refresh the slots.
-		requestManager.adserverRequestSent = true;
-		maiPubLog( `Sending adserver request: ${slots.map( slot => slot.getSlotElementId() ).join( ', ' )}` );
-
 		// Queue the refresh operation.
 		googletag.cmd.push(() => {
+			// Set the request manager to true and refresh the slots.
+			requestManager.adserverRequestSent = true;
+
+			// Log.
+			maiPubLog( `Sending adserver request: ${slots.map( slot => slot.getSlotElementId() ).join( ', ' )}` );
+
+			// Refresh the slots.
 			maiPubRefreshSlots( slots );
 		});
 	}
@@ -903,7 +913,7 @@ function maiPubRequestSlots( slots ) {
 	if ( maiPubAdsVars.magnite ) {
 		// Fetch bids from Magnite using Prebid.
 		pbjs.que.push( function() {
-			// Track request start time
+			// Track request start time.
 			const prebidStartTime = Date.now();
 
 			// Request bids from Magnite/Prebid.
@@ -977,31 +987,34 @@ function maiPubRequestSlots( slots ) {
 			// Fetch bids from Amazon UAM using apstag.
 			const amazonStartTime = Date.now();
 			apstag.fetchBids( amazonConfig, function( bids ) {
-				// Log timing information.
-				const amazonResponseTime = Date.now() - amazonStartTime;
-				maiPubLog( `Amazon response time: ${ amazonResponseTime }ms`, bids );
+				// Queue all GAM-dependent operations.
+				googletag.cmd.push(() => {
+					// Log timing information.
+					const amazonResponseTime = Date.now() - amazonStartTime;
+					maiPubLog( `Amazon response time: ${ amazonResponseTime }ms`, bids );
 
-				// Set apstag bids, then trigger the first request to GAM, regardless of whether we have bids from Amazon.
-				apstag.setDisplayBids();
+					// Set apstag bids, then trigger the first request to GAM, regardless of whether we have bids from Amazon.
+					apstag.setDisplayBids();
 
-				// Set the request manager to true.
-				requestManager.amazonBidsReceived = true;
+					// Set the request manager to true.
+					requestManager.amazonBidsReceived = true;
 
-				// If we have all bids, send the adserver request.
-				if ( requestManager.prebidBidsReceived ) {
-					maiPubLog( `Sending adserver request via amazon: ${ uadSlots.map( slot => slot.slotID.replace( 'mai-ad-', '' ) ).join( ', ' ) }`, uadSlots );
-					sendAdserverRequest();
-				}
+					// If we have all bids, send the adserver request.
+					if ( requestManager.prebidBidsReceived ) {
+						maiPubLog( `Sending adserver request via amazon: ${ uadSlots.map( slot => slot.slotID.replace( 'mai-ad-', '' ) ).join( ', ' ) }`, uadSlots );
+						sendAdserverRequest();
+					}
 
-				// Log if debugging.
-				if ( debug || log ) {
-					// Check bid responses for errors.
-					bids.forEach((bid) => {
-						if ( bid.error ) {
-							maiPubLog( 'apstag.fetchBids error:', bid );
-						}
-					});
-				}
+					// Log if debugging.
+					if ( debug || log ) {
+						// Check bid responses for errors.
+						bids.forEach((bid) => {
+							if ( bid.error ) {
+								maiPubLog( 'apstag.fetchBids error:', bid );
+							}
+						});
+					}
+				});
 			});
 		}
 		// No UAD, but we have others.
@@ -1056,17 +1069,17 @@ function maiPubRequestSlots( slots ) {
  * @return {void}
  */
 function maiPubRefreshSlots( slots ) {
-	// Log.
-	maiPubLog( `Refreshing ${slots.length} ${1 === slots.length ? 'slot' : 'slots'}: ${slots.map( slot => slot.getSlotElementId() ).join( ', ' )}` );
-
-	// Update firstRender flag.
-	slots.forEach( slot => {
-		const slotId = slot.getSlotElementId();
-		slotManager[ slotId ].firstRender = false;
-	});
-
 	// Queue the refresh operation.
 	googletag.cmd.push(() => {
+		// Log.
+		maiPubLog( `Refreshing ${slots.length} ${1 === slots.length ? 'slot' : 'slots'}: ${slots.map( slot => slot.getSlotElementId() ).join( ', ' )}` );
+
+		// Update firstRender flag.
+		slots.forEach( slot => {
+			const slotId = slot.getSlotElementId();
+			slotManager[ slotId ].firstRender = false;
+		});
+
 		// Refresh the slots.
 		googletag.pubads().refresh( slots, { changeCorrelator: false } );
 	});
@@ -1075,12 +1088,16 @@ function maiPubRefreshSlots( slots ) {
 /**
  * Check if a slot is a defined mai ad slot.
  * Checks if the ad slot ID is in our array of ad slot IDs.
+
+ * Used by GAM event listeners to determine if an event pertains to a slot
+ * managed by this script, by comparing the event slot's Ad Unit Path.
  *
  * @param {object} slot The ad slot.
  *
  * @return {boolean} True if a mai ad slot.
  */
 function maiPubIsMaiSlot( slot ) {
+	// Check if the slot object exists and if its GAM Ad Unit Path is in our tracked array.
 	return slot && adSlotIds.includes( slot.getAdUnitPath() );
 }
 
@@ -1208,7 +1225,7 @@ function maiPubGetLocalConsent() {
  * @return {string} The PPID from cookie or local storage, or an empty string if not found.
  */
 function maiPubGetLocalPpid() {
-	const cookiePpid = maiPubGetCookiePpid();
+	const cookiePpid  = maiPubGetCookiePpid();
 	const storagePpid = localStorage.getItem( 'maipub_ppid' );
 
 	// Return cookie PPID if we have one, otherwise try localStorage
