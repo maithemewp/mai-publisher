@@ -32,7 +32,7 @@ let   cmpReady         = false;
 let   matomoReady      = false;
 
 // If debugging, log.
-maiPubLog( 'v233' );
+maiPubLog( 'v234' );
 
 // If we have a server-side PPID, log it.
 if ( serverPpid ) {
@@ -937,7 +937,7 @@ function maiPubRequestSlots( slots ) {
 			maiPubLog( 'Adserver request already sent, skipping. State:', {
 				prebidBidsReceived: requestManager.prebidBidsReceived,
 				amazonBidsReceived: requestManager.amazonBidsReceived,
-				slots: slotsToRefreshNow.map(slot => slot.getSlotElementId())
+				slots: slots.map(slot => slot.getSlotElementId())
 			});
 
 			// Return.
