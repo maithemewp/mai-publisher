@@ -478,9 +478,6 @@ function maiPubRun() {
 			const slotId = entry.target.getAttribute( 'id' );
 			const slug   = slotId.replace( 'mai-ad-', '' );
 
-			// Trigger the definition (async).
-			maiPubDefineSlot( slug );
-
 			// If intersecting.
 			if ( entry.isIntersecting ) {
 				// Set the slot to visible (using slotManager).
