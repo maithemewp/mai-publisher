@@ -32,7 +32,7 @@ let   cmpReady         = false;
 let   matomoReady      = false;
 
 // If debugging, log.
-maiPubLog( 'v229' );
+maiPubLog( 'v230' );
 
 // If we have a server-side PPID, log it.
 if ( serverPpid ) {
@@ -479,7 +479,7 @@ function maiPubRun() {
 			const slug   = slotId.replace( 'mai-ad-', '' );
 
 			// Trigger the definition (async).
-			maiPubMaybeDefineSlot( slug );
+			maiPubDefineSlot( slug );
 
 			// If intersecting.
 			if ( entry.isIntersecting ) {
@@ -589,7 +589,7 @@ function maiPubRun() {
 			const slug   = slotId.replace( 'mai-ad-', '' );
 
 			// Trigger the definition (async).
-			maiPubMaybeDefineSlot( slug );
+			maiPubDefineSlot( slug );
 
 			// Add the slot to the slotManager.
 			slotManager[ slotId ] = {
@@ -623,11 +623,11 @@ function maiPubRun() {
 	adUnits.forEach( adUnit => {
 		const slotId = adUnit.getAttribute( 'id' );
 
-		// Log.
-		maiPubLog( `Displaying ad slot: ${slotId}` );
-
 		// Display.
 		googletag.display( slotId );
+
+		// Log.
+		maiPubLog( `Registered ad slot via display(): ${slotId}` );
 	});
 
 	/**
@@ -757,37 +757,13 @@ function maiPubRun() {
  *
  * @return {object} The slot object.
  */
-function maiPubMaybeDefineSlot( slug ) {
+function maiPubDefineSlot( slug ) {
 	// Get base from context.
 	const base = ads?.[slug]?.['context'] && 'client' === ads[slug]['context'] ? gamBaseClient : gamBase;
 
 	// Define slot ID (GAM Path).
 	const slotId = base + ads[slug]['id'];
 
-	// Get slot element ID (HTML ID).
-	const slotElId = 'mai-ad-' + slug;
-
-	// Check for existing slot.
-	const existingSlot = adSlots.find( slot => slotElId == slot.getSlotElementId() ); // Checks against HTML ID in slot objects.
-
-	// If existing, return it.
-	if ( existingSlot ) {
-		return;
-	}
-
-	// Define the slot (this is async via googletag.cmd.push inside maiPubDefineSlot).
-	maiPubDefineSlot( slotId, slug );
-}
-
-/**
- * Define a slot.
- *
- * @param {string} slotId The slot ID.
- * @param {string} slug   The ad slug.
- *
- * @return {object} The slot object.
- */
-function maiPubDefineSlot( slotId, slug ) {
 	// Define the slot and related operations within the command queue.
 	googletag.cmd.push(() => {
 		// Define ad slot. googletag.defineSlot( "/1234567/sports", [728, 90], "div-1" );
@@ -825,7 +801,7 @@ function maiPubDefineSlot( slotId, slug ) {
 		);
 
 		// Log.
-		maiPubLog( `defineSlot(): mai-ad-${slug}`, {
+		maiPubLog( `Defined slot: ${slotId}`, {
 			slotId: slotId,
 			slot: slot,
 			targets: slot.getTargetingMap(),
