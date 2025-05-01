@@ -617,14 +617,17 @@ function maiPubRun() {
 	 *    An ad will not be fetched until refresh is called,
 	 *    due to the `disableInitialLoad()` method being called earlier.
 	 */
-	adUnits.forEach( adUnit => {
-		const slotId = adUnit.getAttribute( 'id' );
+	googletag.cmd.push(() => {
+		// Loop through the ad units.
+		adUnits.forEach( adUnit => {
+			const slotId = adUnit.getAttribute( 'id' );
 
-		// Display.
-		googletag.display( slotId );
+			// Display.
+			googletag.display( slotId );
 
-		// Log.
-		maiPubLog( `Registered ad slot via display(): ${slotId}` );
+			// Log.
+			maiPubLog( `Registered ad slot via display(): ${slotId}` );
+		});
 	});
 
 	/**
