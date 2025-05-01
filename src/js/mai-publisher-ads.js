@@ -439,201 +439,24 @@ function maiPubInit() {
 		document.head.appendChild( pcdScript );
 	}
 
-	// Push the Google Tag to the queue.
-	googletag.cmd.push(() => {
-		try {
-			/**
-			 * Set SafeFrame -- This setting will only take effect for subsequent ad requests made for the respective slots.
-			 * To enable cross domain rendering for all creatives, execute setForceSafeFrame before loading any ad slots.
-			 */
-			// Disabled for now: https://developers.google.com/publisher-tag/reference#googletag.PubAdsService_setForceSafeFrame
-			// googletag.pubads().setForceSafeFrame( true );
-
-			// Get the IAB categories, removing duplicates.
-			const iabCats = [...new Set( [ maiPubAdsVars.iabGlobalCat, maiPubAdsVars.iabCat ].filter( cat => cat ) )];
-
-			// If we have IAB categories, set them in the config as Publisher Provided Signals (PPS).
-			if ( iabCats.length ) {
-				/**
-				 * Set Google Publisher Tag config for PPS.
-				 * The docs make it seem like it only supports IAB Content Categories 2.2, not 3.0.
-				 *
-				 * @link https://developers.google.com/publisher-tag/reference#googletag.config.PublisherProvidedSignalsConfig
-				 */
-				googletag.setConfig({
-					pps: {
-						taxonomies: {
-							IAB_CONTENT_2_2: {
-								values: iabCats,
-							},
-						},
-					},
-				});
-			}
-
-			// Set page-level targeting.
-			if ( maiPubAdsVars.targets ) {
-				Object.keys( maiPubAdsVars.targets ).forEach( key => {
-					googletag.pubads().setTargeting( key, maiPubAdsVars.targets[key].toString() );
-				});
-
-				// Log the page-level targeting that was set.
-				maiPubLog( 'Set page-level targeting from:', maiPubAdsVars.targets );
-			}
-
-			// Make ads centered.
-			googletag.pubads().setCentering( true );
-
-			// Enable SRA and services.
-			googletag.pubads().disableInitialLoad(); // Disable initial load for header bidding.
-			googletag.pubads().enableSingleRequest();
-
-			// If we have a ppid, set it.
-			if ( ppid ) {
-				maiPubLog( 'Setting googletag PPID:', ppid );
-				googletag.pubads().setPublisherProvidedId( ppid );
-			}
-
-			// Enable services.
-			googletag.enableServices();
-
-			// If no delay, run on DOMContentLoaded.
-			if ( ! maiPubAdsVars.loadDelay ) {
-				// Check if DOMContentLoaded has run.
-				if ( 'loading' === document.readyState ) {
-					// If it's still loading, wait for the event.
-					document.addEventListener( 'DOMContentLoaded', maiPubDOMContentLoaded, { once: true } );
-				} else {
-					// If it's already loaded, execute maiPubDOMContentLoaded().
-					maiPubDOMContentLoaded();
-				}
-			}
-			// Delayed on window load.
-			else {
-				// On window load.
-				window.addEventListener( 'load', () => {
-					setTimeout( maiPubDOMContentLoaded, maiPubAdsVars.loadDelay );
-				}, { once: true });
-			}
-
-			/**
-			 * Update the slot manager when a slot is rendered.
-			 */
-			googletag.pubads().addEventListener( 'slotRenderEnded', (event) => {
-				const slot = event.slot;
-
-				// Bail if not a Mai Publisher slot.
-				if ( ! maiPubIsMaiSlot( slot ) ) {
-					return;
-				}
-
-				// Get the slot ID and slug.
-				const slotId = slot.getSlotElementId();
-				const slug   = slotId.replace( 'mai-ad-', '' );
-
-				// Update the last refresh time and mark processing as complete.
-				slotManager[ slotId ].lastRefreshTime = Date.now();
-				slotManager[ slotId ].processing      = false;
-
-				// Log if the slot is empty.
-				if ( event.isEmpty ) {
-					maiPubLog( `Slot empty: ${slotId}`, {
-						slug: slug,
-						adUnitPath: slot.getAdUnitPath(),
-						sizes: event.size,
-						targeting: slot.getTargetingMap(),
-						event: event,
-					});
-				}
-				// Log if the slot is not empty.
-				else {
-					maiPubLog( `Slot filled: ${slotId}`, {
-						slug: slug,
-						adUnitPath: slot.getAdUnitPath(),
-						sizes: event.size,
-						targeting: slot.getTargetingMap(),
-						event: event,
-					});
-				}
-
-				// Bail if not refreshable.
-				if ( ! maiPubIsRefreshable( slot ) ) {
-					return;
-				}
-
-				// Set timeout to potentially request the slot later.
-				timeoutManager[ slotId ] = setTimeout( () => {
-					maiPubMaybeRequestSlots( [ slug ] );
-				}, refreshTime );
-			});
-
-			/**
-			 * Update the slot manager when a slot's visibility changes.
-			 * This event is fired whenever the on-screen percentage of an ad slot's area changes.
-			 * The event is throttled and will not fire more often than once every 200ms.
-			 *
-			 * @link https://developers.google.com/publisher-tag/reference#googletag.events.SlotVisibilityChangedEvent
-			 */
-			googletag.pubads().addEventListener( 'slotVisibilityChanged', (event) => {
-				const slot = event.slot;
-
-				// Bail if not a Mai Publisher slot.
-				if ( ! maiPubIsMaiSlot( slot ) ) {
-					// maiPubLog( `Slot ${slot.getSlotElementId()} is not a Mai Publisher slot` );
-					return;
-				}
-
-				// Bail if not refreshable.
-				if ( ! maiPubIsRefreshable( slot ) ) {
-					return;
-				}
-
-				// Get the slot ID, slug, and check if it's in view.
-				const slotId = slot.getSlotElementId();
-				const slug   = slotId.replace( 'mai-ad-', '' );
-				const inView = event.inViewPercentage > 5;
-
-				// Update the slot manager.
-				slotManager[ slotId ].visible = inView;
-
-				// If the slot is visible, maybe request the slot.
-				if ( inView ) {
-					maiPubMaybeRequestSlots( [ slug ] );
-				}
-			});
-
-			// // If debugging, set listeners to log.
-			// if ( debug || log ) {
-			// 	// Log when a slot is requested/fetched.
-			// 	googletag.pubads().addEventListener( 'slotRequested', (event) => {
-			// 		maiPubLog( 'slotRequested:', event.slot, event );
-			// 	});
-
-			// 	// Log when a slot was loaded.
-			// 	googletag.pubads().addEventListener( 'slotOnload', (event) => {
-			// 		maiPubLog( 'slotOnload:', event.slot, event );
-			// 	});
-
-			// 	// Log when a slot response is received.
-			// 	googletag.pubads().addEventListener( 'slotResponseReceived', (event) => {
-			// 		maiPubLog( 'slotResponseReceived:', event.slot, event );
-			// 	});
-
-			// 	// Log when slot render has ended, regardless of whether ad was empty or not.
-			// 	googletag.pubads().addEventListener( 'slotRenderEnded', (event) => {
-			// 		maiPubLog( 'slotRenderEnded:', event.slot, event );
-			// 	});
-
-			// 	// Log when a slot ID visibility changed.
-			// 	googletag.pubads().addEventListener( 'slotVisibilityChanged', (event) => {
-			// 		maiPubLog( 'changed:', event.slot.getSlotElementId(), `${event.inViewPercentage}%` );
-			// 	});
-			// }
-		} catch ( error ) {
-			maiPubLog( 'Error initializing GAM:', error );
-			// Potentially retry or fallback to simpler setup
+	// If no delay, run on DOMContentLoaded.
+	if ( ! maiPubAdsVars.loadDelay ) {
+		// Check if DOMContentLoaded has run.
+		if ( 'loading' === document.readyState ) {
+			// If it's still loading, wait for the event.
+			document.addEventListener( 'DOMContentLoaded', maiPubRun, { once: true } );
+		} else {
+			// If it's already loaded, execute maiPubRun().
+			maiPubRun();
 		}
-	});
+	}
+	// Delayed on window load.
+	else {
+		// On window load.
+		window.addEventListener( 'load', () => {
+			setTimeout( maiPubRun, maiPubAdsVars.loadDelay );
+		}, { once: true });
+	}
 }
 
 /**
@@ -641,7 +464,10 @@ function maiPubInit() {
  *
  * @return {void}
  */
-function maiPubDOMContentLoaded() {
+function maiPubRun() {
+	// Get all the ad units.
+	const adUnits = document.querySelectorAll( '.mai-ad-unit' );
+
 	// Setup the IntersectionObserver.
 	const observer = new IntersectionObserver( (entries, observer) => {
 		const slugsToRequest = [];
@@ -693,23 +519,234 @@ function maiPubDOMContentLoaded() {
 		threshold: 0 // No threshold needed.
 	});
 
-	// Get all the ad units.
-	const adUnits = document.querySelectorAll( '.mai-ad-unit' );
+	/**
+	 * 1. Setup the Google Tag.
+	 */
+	googletag.cmd.push(() => {
+		/**
+		 * Set SafeFrame -- This setting will only take effect for subsequent ad requests made for the respective slots.
+		 * To enable cross domain rendering for all creatives, execute setForceSafeFrame before loading any ad slots.
+		 */
+		// Disabled for now: https://developers.google.com/publisher-tag/reference#googletag.PubAdsService_setForceSafeFrame
+		// googletag.pubads().setForceSafeFrame( true );
 
-	// Observe each ad unit.
+		// Get the IAB categories, removing duplicates.
+		const iabCats = [...new Set( [ maiPubAdsVars.iabGlobalCat, maiPubAdsVars.iabCat ].filter( cat => cat ) )];
+
+		// If we have IAB categories, set them in the config as Publisher Provided Signals (PPS).
+		if ( iabCats.length ) {
+			/**
+			 * Set Google Publisher Tag config for PPS.
+			 * The docs make it seem like it only supports IAB Content Categories 2.2, not 3.0.
+			 *
+			 * @link https://developers.google.com/publisher-tag/reference#googletag.config.PublisherProvidedSignalsConfig
+			 */
+			googletag.setConfig({
+				pps: {
+					taxonomies: {
+						IAB_CONTENT_2_2: {
+							values: iabCats,
+						},
+					},
+				},
+			});
+		}
+
+		// Disable initial load for header bidding.
+		googletag.pubads().disableInitialLoad();
+
+		// Enable single request.
+		googletag.pubads().enableSingleRequest();
+
+		// Make ads centered.
+		googletag.pubads().setCentering( true );
+
+		// If we have a ppid, set it.
+		if ( ppid ) {
+			maiPubLog( 'Setting googletag PPID:', ppid );
+			googletag.pubads().setPublisherProvidedId( ppid );
+		}
+
+		// Set page-level targeting.
+		if ( maiPubAdsVars.targets ) {
+			Object.keys( maiPubAdsVars.targets ).forEach( key => {
+				googletag.pubads().setTargeting( key, maiPubAdsVars.targets[key].toString() );
+			});
+
+			// Log the page-level targeting that was set.
+			maiPubLog( 'Set page-level targeting from:', maiPubAdsVars.targets );
+		}
+	});
+
+	/**
+	 * 2. Define the slots and observe the ad units.
+	 */
+	googletag.cmd.push(() => {
+		// Observe each ad unit.
+		adUnits.forEach( adUnit => {
+			// Get slug.
+			const slotId = adUnit.getAttribute( 'id' );
+			const slug   = slotId.replace( 'mai-ad-', '' );
+
+			// Trigger the definition (async).
+			maiPubMaybeDefineSlot( slug );
+
+			// Add the slot to the slotManager.
+			slotManager[ slotId ] = {
+				processing: false,
+				visible: null,
+				lastRefreshTime: 0,
+				firstRender: true,
+			};
+
+			// Observe the ad unit.
+			observer.observe( adUnit );
+		});
+	});
+
+	/**
+	 * 3. Enable services.
+	 */
+	googletag.cmd.push(() => {
+		// Log.
+		maiPubLog( 'Enabling GAM services' );
+
+		// Enable services last.
+		googletag.enableServices();
+	});
+
+	/**
+	 * 4. Register the ad slot.
+	 *    An ad will not be fetched until refresh is called,
+	 *    due to the `disableInitialLoad()` method being called earlier.
+	 */
 	adUnits.forEach( adUnit => {
-		// Get the slot ID.
 		const slotId = adUnit.getAttribute( 'id' );
 
-		// Add the slot to the slotManager.
-		slotManager[ slotId ] = {
-			processing: false,
-			visible: null,
-			lastRefreshTime: 0,
-			firstRender: true,
-		};
+		// Log.
+		maiPubLog( `Displaying ad slot: ${slotId}` );
 
-		observer.observe( adUnit );
+		// Display.
+		googletag.display( slotId );
+	});
+
+	/**
+	 * 5. Add event listeners to handle refreshable slots.
+	 */
+	googletag.cmd.push(() => {
+		/**
+		 * Update the slot manager when a slot is rendered.
+		 */
+		googletag.pubads().addEventListener( 'slotRenderEnded', (event) => {
+			const slot = event.slot;
+
+			// Bail if not a Mai Publisher slot.
+			if ( ! maiPubIsMaiSlot( slot ) ) {
+				return;
+			}
+
+			// Get the slot ID and slug.
+			const slotId = slot.getSlotElementId();
+			const slug   = slotId.replace( 'mai-ad-', '' );
+
+			// Update the last refresh time and mark processing as complete.
+			slotManager[ slotId ].lastRefreshTime = Date.now();
+			slotManager[ slotId ].processing      = false;
+
+			// Log if the slot is empty.
+			if ( event.isEmpty ) {
+				maiPubLog( `Slot empty: ${slotId}`, {
+					slug: slug,
+					adUnitPath: slot.getAdUnitPath(),
+					sizes: event.size,
+					targeting: slot.getTargetingMap(),
+					event: event,
+				});
+			}
+			// Log if the slot is not empty.
+			else {
+				maiPubLog( `Slot filled: ${slotId}`, {
+					slug: slug,
+					adUnitPath: slot.getAdUnitPath(),
+					sizes: event.size,
+					targeting: slot.getTargetingMap(),
+					event: event,
+				});
+			}
+
+			// Bail if not refreshable.
+			if ( ! maiPubIsRefreshable( slot ) ) {
+				return;
+			}
+
+			// Set timeout to potentially request the slot later.
+			timeoutManager[ slotId ] = setTimeout( () => {
+				maiPubMaybeRequestSlots( [ slug ] );
+			}, refreshTime );
+		});
+
+		/**
+		 * Update the slot manager when a slot's visibility changes.
+		 * This event is fired whenever the on-screen percentage of an ad slot's area changes.
+		 * The event is throttled and will not fire more often than once every 200ms.
+		 *
+		 * @link https://developers.google.com/publisher-tag/reference#googletag.events.SlotVisibilityChangedEvent
+		 */
+		googletag.pubads().addEventListener( 'slotVisibilityChanged', (event) => {
+			const slot = event.slot;
+
+			// Bail if not a Mai Publisher slot.
+			if ( ! maiPubIsMaiSlot( slot ) ) {
+				// maiPubLog( `Slot ${slot.getSlotElementId()} is not a Mai Publisher slot` );
+				return;
+			}
+
+			// Bail if not refreshable.
+			if ( ! maiPubIsRefreshable( slot ) ) {
+				return;
+			}
+
+			// Get the slot ID, slug, and check if it's in view.
+			const slotId = slot.getSlotElementId();
+			const slug   = slotId.replace( 'mai-ad-', '' );
+			const inView = event.inViewPercentage > 5;
+
+			// Update the slot manager.
+			slotManager[ slotId ].visible = inView;
+
+			// If the slot is visible, maybe request the slot.
+			if ( inView ) {
+				maiPubMaybeRequestSlots( [ slug ] );
+			}
+		});
+
+		// // If debugging, set listeners to log.
+		// if ( debug || log ) {
+		// 	// Log when a slot is requested/fetched.
+		// 	googletag.pubads().addEventListener( 'slotRequested', (event) => {
+		// 		maiPubLog( 'slotRequested:', event.slot, event );
+		// 	});
+
+		// 	// Log when a slot was loaded.
+		// 	googletag.pubads().addEventListener( 'slotOnload', (event) => {
+		// 		maiPubLog( 'slotOnload:', event.slot, event );
+		// 	});
+
+		// 	// Log when a slot response is received.
+		// 	googletag.pubads().addEventListener( 'slotResponseReceived', (event) => {
+		// 		maiPubLog( 'slotResponseReceived:', event.slot, event );
+		// 	});
+
+		// 	// Log when slot render has ended, regardless of whether ad was empty or not.
+		// 	googletag.pubads().addEventListener( 'slotRenderEnded', (event) => {
+		// 		maiPubLog( 'slotRenderEnded:', event.slot, event );
+		// 	});
+
+		// 	// Log when a slot ID visibility changed.
+		// 	googletag.pubads().addEventListener( 'slotVisibilityChanged', (event) => {
+		// 		maiPubLog( 'changed:', event.slot.getSlotElementId(), `${event.inViewPercentage}%` );
+		// 	});
+		// }
 	});
 }
 
@@ -731,7 +768,7 @@ function maiPubMaybeDefineSlot( slug ) {
 	const slotElId = 'mai-ad-' + slug;
 
 	// Check for existing slot.
-	const existingSlot = adSlots.find( slot => slotElId == slot.getSlotElementId() ); // Checks against HTML ID in slot objects
+	const existingSlot = adSlots.find( slot => slotElId == slot.getSlotElementId() ); // Checks against HTML ID in slot objects.
 
 	// If existing, return it.
 	if ( existingSlot ) {
@@ -756,10 +793,8 @@ function maiPubDefineSlot( slotId, slug ) {
 		// Define ad slot. googletag.defineSlot( "/1234567/sports", [728, 90], "div-1" );
 		const slot = googletag.defineSlot( slotId, ads[slug].sizes, 'mai-ad-' + slug );
 
-		// Register the ad slot.
-		// An ad will not be fetched until refresh is called,
-		// due to the disableInitialLoad() method being called earlier.
-		googletag.display( 'mai-ad-' + slug );
+		// Get it running.
+		slot.addService( googletag.pubads() );
 
 		// Set refresh targeting.
 		slot.setTargeting( refreshKey, refreshValue );
@@ -777,16 +812,6 @@ function maiPubDefineSlot( slotId, slug ) {
 			slot.setTargeting( 'st', Math.floor(Math.random() * 100) );
 		}
 
-		// Log.
-		maiPubLog( `defineSlot() & display(): mai-ad-${slug}`, {
-			slotId: slotId,
-			slot: slot,
-			targets: slot.getTargetingMap(),
-		} );
-
-		// Get it running.
-		slot.addService( googletag.pubads() );
-
 		/**
 		 * Define size mapping.
 		 * If these breakpoints change, make sure to update the breakpoints in the mai-publisher.css file.
@@ -798,6 +823,13 @@ function maiPubDefineSlot( slotId, slug ) {
 			.addSize( [ 0, 0 ], ads[slug].sizesMobile )
 			.build()
 		);
+
+		// Log.
+		maiPubLog( `defineSlot(): mai-ad-${slug}`, {
+			slotId: slotId,
+			slot: slot,
+			targets: slot.getTargetingMap(),
+		} );
 
 		// Add slot to our tracking arrays after it's defined.
 		adSlotIds.push( slotId );
