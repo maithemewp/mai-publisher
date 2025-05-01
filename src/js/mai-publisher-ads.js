@@ -1122,12 +1122,8 @@ function maiPubRefreshSlots( slots ) {
 			slotManager[ slotId ].firstRender = false;
 		});
 
-		// Set the log vars.
-		const refreshOrDisplay = slotManager[ slotId ].firstRender ? 'Displaying' : 'Refreshing';
-		const slotOrSlots      = 1 === slots.length ? 'slot' : 'slots';
-
 		// Log.
-		maiPubLog( `${refreshOrDisplay} ${slots.length} ${slotOrSlots}: ${slots.map( slot => slot.getSlotElementId() ).join( ', ' )}` );
+		maiPubLog( `Displaying/refreshing ${slots.length} ${1 === slots.length ? 'slot' : 'slots'} via refresh(): ${slots.map( slot => slot.getSlotElementId() ).join( ', ' )}` );
 
 		// Refresh the slots.
 		googletag.pubads().refresh( slots, { changeCorrelator: false } );
