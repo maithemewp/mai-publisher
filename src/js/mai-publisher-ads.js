@@ -32,7 +32,7 @@ let   cmpReady         = false;
 let   matomoReady      = false;
 
 // If debugging, log.
-maiPubLog( 'v231' );
+maiPubLog( 'v232' );
 
 // If we have a server-side PPID, log it.
 if ( serverPpid ) {
@@ -1114,14 +1114,18 @@ function maiPubRequestSlots( slots ) {
 function maiPubRefreshSlots( slots ) {
 	// Queue the refresh operation.
 	googletag.cmd.push(() => {
-		// Log.
-		maiPubLog( `Refreshing ${slots.length} ${1 === slots.length ? 'slot' : 'slots'}: ${slots.map( slot => slot.getSlotElementId() ).join( ', ' )}` );
-
 		// Update firstRender flag.
 		slots.forEach( slot => {
 			const slotId = slot.getSlotElementId();
 			slotManager[ slotId ].firstRender = false;
 		});
+
+		// Set the log vars.
+		const refreshOrDisplay = slotManager[ slotId ].firstRender ? 'Displaying' : 'Refreshing';
+		const slotOrSlots      = 1 === slots.length ? 'slot' : 'slots';
+
+		// Log.
+		maiPubLog( `${refreshOrDisplay} ${slots.length} ${slotOrSlots}: ${slots.map( slot => slot.getSlotElementId() ).join( ', ' )}` );
 
 		// Refresh the slots.
 		googletag.pubads().refresh( slots, { changeCorrelator: false } );
