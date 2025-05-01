@@ -1128,8 +1128,8 @@ function maiPubRequestSlots( slots ) {
 		// Log.
 		maiPubLog( 'refresh() with failsafe timeout. Debug data:', {
 			adserverRequestSent: requestManager.adserverRequestSent,
-			dmBidsReceived: requestManager.dmBidsReceived,
-			apsBidsReceived: requestManager.apsBidsReceived,
+			prebidBidsReceived: requestManager.prebidBidsReceived,
+			amazonBidsReceived: requestManager.amazonBidsReceived,
 			timing: {
 				totalTime: Date.now() - timestamp,
 				bidderTimeout: bidderTimeout,
