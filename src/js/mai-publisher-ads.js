@@ -639,6 +639,8 @@ function maiPubRun() {
 
 			// Bail if not a Mai Publisher slot.
 			if ( ! maiPubIsMaiSlot( slot ) ) {
+				// Log.
+				maiPubLog( `Slot ${slot.getSlotElementId()} is not a Mai Publisher slot, via slotRenderEnded` );
 				return;
 			}
 
@@ -694,7 +696,7 @@ function maiPubRun() {
 
 			// Bail if not a Mai Publisher slot.
 			if ( ! maiPubIsMaiSlot( slot ) ) {
-				// maiPubLog( `Slot ${slot.getSlotElementId()} is not a Mai Publisher slot` );
+				maiPubLog( `Slot ${slot.getSlotElementId()} is not a Mai Publisher slot, via slotVisibilityChanged` );
 				return;
 			}
 
