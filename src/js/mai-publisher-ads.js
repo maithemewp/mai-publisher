@@ -803,7 +803,7 @@ function maiPubDefineSlot( slug ) {
 		);
 
 		// Log.
-		maiPubLog( `Defined slot: ${slotId}`, {
+		maiPubLog( `Defined slot: ${'mai-ad-' + slug} via ${slotId}`, {
 			slotId: slotId,
 			slot: slot,
 			targets: slot.getTargetingMap(),
