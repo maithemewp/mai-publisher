@@ -553,7 +553,8 @@ function maiPubRun() {
 		googletag.pubads().disableInitialLoad();
 
 		// Enable single request.
-		googletag.pubads().enableSingleRequest();
+		// TEMP disabled for testing.
+		// googletag.pubads().enableSingleRequest();
 
 		// Make ads centered.
 		googletag.pubads().setCentering( true );
