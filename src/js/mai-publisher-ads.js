@@ -5,7 +5,7 @@ googletag.cmd    = googletag.cmd || [];
 
 // Define global variables.
 const ads              = maiPubAdsVars['ads'];
-const adSlotIds        = []; // Stores GAM Ad Unit Paths (e.g., /12345/leaderboard) for slots defined by this script.
+const adGamIds         = []; // Stores GAM Ad Unit Paths (e.g., /12345/leaderboard) for slots defined by this script.
 const adSlots          = []; // Stores the actual GPT Slot objects returned by defineSlot.
 const gamBase          = maiPubAdsVars.gamBase;
 const gamBaseClient    = maiPubAdsVars.gamBaseClient;
@@ -30,9 +30,10 @@ let   ppid             = '';
 let   isGeneratingPpid = false;
 let   cmpReady         = false;
 let   matomoReady      = false;
+let   gptInitialized   = false;
 
 // If debugging, log.
-maiPubLog( 'v235' );
+maiPubLog( 'v236' );
 
 // If we have a server-side PPID, log it.
 if ( serverPpid ) {
@@ -465,12 +466,13 @@ function maiPubInit() {
  * @return {void}
  */
 function maiPubRun() {
-	// Get all the ad units.
-	const adUnits = document.querySelectorAll( '.mai-ad-unit' );
-
-	// Setup the IntersectionObserver.
+	/**
+	 * Setup the IntersectionObserver.
+	 * This doesn't run until step 2, after Google Tag is setup.
+	 */
 	const observer = new IntersectionObserver( (entries, observer) => {
-		const slugsToRequest = [];
+		const ATFSlugs = [];
+		const BTFSlugs = [];
 
 		// Loop through the entries.
 		entries.forEach( entry => {
@@ -483,6 +485,20 @@ function maiPubRun() {
 				// Set the slot to visible (using slotManager).
 				slotManager[ slotId ].visible = true;
 
+				// GPT is not initialized.
+				// then we define and display the in view slots,
+				// enable services,
+				// refresh the slots,
+				// then gptInitialized = true;
+				if ( ! gptInitialized ) {
+					ATFSlugs.push( slug );
+				}
+				// GPT is initialized.
+				else {
+					// then we only define, display, and refresh the in view slots.
+					BTFSlugs.push( slug );
+				}
+
 				// If debugging, add inline styling.
 				if ( debug ) {
 					// Add inline styling.
@@ -493,7 +509,7 @@ function maiPubRun() {
 				}
 
 				// Add the slug to the slugsToRequest array.
-				slugsToRequest.push( slug );
+				// slugsToRequest.push( slug );
 
 				// Unobserve the displayed slots, let GAM events handle refreshing and visibility.
 				observer.unobserve( entry.target );
@@ -505,10 +521,55 @@ function maiPubRun() {
 			}
 		});
 
-		// If there are slugs to request, trigger the request logic.
-		if ( slugsToRequest.length ) {
-			// Request the slots using slugs.
-			maiPubMaybeRequestSlots( slugsToRequest );
+		// If there are ATF slugs.
+		if ( ATFSlugs.length ) {
+			/**
+			 * Define and display the ATF slots.
+			 * Enable services so ATF ads can be refreshed.
+			 * Set GPT initialized to true.
+			 * Maybe request the slots.
+			 */
+			googletag.cmd.push(() => {
+				// Loop through the ATF slugs.
+				ATFSlugs.forEach( slug => {
+					// Define the slot.
+					maiPubDefineSlot( slug );
+
+					// Display.
+					googletag.display( 'mai-ad-' + slug );
+				});
+
+				// Enable services so ATF ads can be refreshed.
+				googletag.enableServices();
+
+				// Set GPT initialized to true.
+				gptInitialized = true;
+
+				// Maybe request the slots.
+				maiPubMaybeRequestSlots( ATFSlugs );
+			});
+		}
+
+		// If there are BTF slugs to define, define them.
+		if ( BTFSlugs.length ) {
+			/**
+			 * Define and display the BTF slots.
+			 * Set GPT initialized to true.
+			 * Maybe request the slots.
+			 */
+			googletag.cmd.push(() => {
+				// Loop through the BTF slugs.
+				BTFSlugs.forEach( slug => {
+					// Define the slot.
+					maiPubDefineSlot( slug );
+
+					// Display the slot.
+					googletag.display( 'mai-ad-' + slug );
+				});
+
+				// Maybe request the slots.
+				maiPubMaybeRequestSlots( BTFSlugs );
+			});
 		}
 	}, {
 		root: null, // Use the viewport as the root.
@@ -517,7 +578,7 @@ function maiPubRun() {
 	});
 
 	/**
-	 * 1. Setup the Google Tag.
+	 * 1. Setup Google Tag.
 	 */
 	googletag.cmd.push(() => {
 		/**
@@ -553,8 +614,7 @@ function maiPubRun() {
 		googletag.pubads().disableInitialLoad();
 
 		// Enable single request.
-		// TEMP disabled for testing.
-		// googletag.pubads().enableSingleRequest();
+		googletag.pubads().enableSingleRequest();
 
 		// Make ads centered.
 		googletag.pubads().setCentering( true );
@@ -577,17 +637,16 @@ function maiPubRun() {
 	});
 
 	/**
-	 * 2. Define the slots and observe the ad units.
+	 * 2. Observe the BTF ad units.
 	 */
 	googletag.cmd.push(() => {
+		// Get all the ad units.
+		const adUnits = document.querySelectorAll( '.mai-ad-unit' );
+
 		// Observe each ad unit.
 		adUnits.forEach( adUnit => {
-			// Get slug.
+			// Get slotId.
 			const slotId = adUnit.getAttribute( 'id' );
-			const slug   = slotId.replace( 'mai-ad-', '' );
-
-			// Trigger the definition (async).
-			maiPubDefineSlot( slug );
 
 			// Add the slot to the slotManager.
 			slotManager[ slotId ] = {
@@ -599,35 +658,6 @@ function maiPubRun() {
 
 			// Observe the ad unit.
 			observer.observe( adUnit );
-		});
-	});
-
-	/**
-	 * 3. Enable services.
-	 */
-	googletag.cmd.push(() => {
-		// Log.
-		maiPubLog( 'Enabling GAM services' );
-
-		// Enable services last.
-		googletag.enableServices();
-	});
-
-	/**
-	 * 4. Register the ad slot.
-	 *    An ad will not be fetched until refresh is called,
-	 *    due to the `disableInitialLoad()` method being called earlier.
-	 */
-	googletag.cmd.push(() => {
-		// Loop through the ad units.
-		adUnits.forEach( adUnit => {
-			const slotId = adUnit.getAttribute( 'id' );
-
-			// Display.
-			googletag.display( slotId );
-
-			// Log.
-			maiPubLog( `Registered ad slot via display(): ${slotId}` );
 		});
 	});
 
@@ -764,13 +794,16 @@ function maiPubDefineSlot( slug ) {
 	// Get base from context.
 	const base = ads?.[slug]?.['context'] && 'client' === ads[slug]['context'] ? gamBaseClient : gamBase;
 
+	// Get the slot ID.
+	const slotId = 'mai-ad-' + slug;
+
 	// Define slot ID (GAM Path).
-	const slotId = base + ads[slug]['id'];
+	const gamId = base + ads[slug]['id'];
 
 	// Define the slot and related operations within the command queue.
 	googletag.cmd.push(() => {
 		// Define ad slot. googletag.defineSlot( "/1234567/sports", [728, 90], "div-1" );
-		const slot = googletag.defineSlot( slotId, ads[slug].sizes, 'mai-ad-' + slug );
+		const slot = googletag.defineSlot( gamId, ads[slug].sizes, slotId );
 
 		// Get it running.
 		slot.addService( googletag.pubads() );
@@ -804,14 +837,14 @@ function maiPubDefineSlot( slug ) {
 		);
 
 		// Log.
-		maiPubLog( `Defined slot: ${'mai-ad-' + slug} via ${slotId}`, {
-			slotId: slotId,
+		maiPubLog( `Defined slot: ${slotId} via ${gamId}`, {
+			gamId: gamId,
 			slot: slot,
 			targets: slot.getTargetingMap(),
 		} );
 
 		// Add slot to our tracking arrays after it's defined.
-		adSlotIds.push( slotId );
+		adGamIds.push( gamId );
 		adSlots.push( slot );
 	});
 }
@@ -1147,7 +1180,7 @@ function maiPubRefreshSlots( slots ) {
  */
 function maiPubIsMaiSlot( slot ) {
 	// Check if the slot object exists and if its GAM Ad Unit Path is in our tracked array.
-	return slot && adSlotIds.includes( slot.getAdUnitPath() );
+	return slot && adGamIds.includes( slot.getAdUnitPath() );
 }
 
 /**
