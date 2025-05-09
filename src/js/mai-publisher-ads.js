@@ -1358,7 +1358,7 @@ function maiPubSetLocalPpid( ppid ) {
 	if ( consent ) {
 		maiPubLog( `Storing PPID in cookie: ${ ppid }` );
 		document.cookie = `maipub_ppid=${ ppid };path=/;max-age=31104000;SameSite=Lax;Secure`;
-	} else if ( getCookiePpid() ) {
+	} else if ( maiPubGetCookiePpid() ) {
 		maiPubLog( 'No consent, removing PPID from cookie' );
 		// If consent is removed and we have a PPID cookie, delete it.
 		document.cookie = 'maipub_ppid=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT;SameSite=Lax;Secure';
