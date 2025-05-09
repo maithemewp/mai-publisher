@@ -4,10 +4,12 @@
  * @since 0.1.0
  */
 (function() {
-	var _paq             = window._paq = window._paq || [];
-	var analytics        = maiPubAnalyticsVars.analytics;
-	var analyticsPrimary = analytics[0];
-	var analyticsMore    = analytics.slice(1);
+	var   _paq             = window._paq = window._paq || [];
+	var   analytics        = maiPubAnalyticsVars.analytics;
+	var   analyticsPrimary = analytics[0];
+	var   analyticsMore    = analytics.slice(1);
+	const debug            = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb') || window.location.search.includes('pbjs_debug=true');
+	const log              = 'undefined' !== typeof maiPubAdsVars ? maiPubAdsVars.debug : false;
 
 	/**
 	 * Sets up trackers.
@@ -90,13 +92,45 @@
 					.then(function( data ) {
 					})
 					.catch(function( error ) {
-						console.log( error.name + ', ', error.message );
+						maiPubAnalyticsLog( error );
 					});
 				}
 
-			} catch( err ) {
-				console.log( err );
+			} catch( error ) {
+				maiPubAnalyticsLog( error );
 			}
 		}
 	};
+
+	/**
+	 * Log if debugging.
+	 *
+	 * @param {mixed} mixed The data to log.
+	 *
+	 * @return {void}
+	 */
+	function maiPubAnalyticsLog( ...mixed ) {
+		if ( ! ( debug || log ) ) {
+			return;
+		}
+
+		// Set log variables.
+		let timer = 'maipub analytics ';
+
+		// Set times.
+		const current = Date.now();
+		const now     = new Date().toLocaleTimeString( 'en-US', { hour12: true } );
+
+		// If first, start.
+		if ( timestamp === current ) {
+			timer += 'start';
+		}
+		// Not first, add time since.
+		else {
+			timer += current - timestamp + 'ms';
+		}
+
+		// Log the combined message.
+		console.log( `${timer} ${now}`, mixed );
+	}
 })();

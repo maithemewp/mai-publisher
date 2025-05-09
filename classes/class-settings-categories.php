@@ -66,12 +66,12 @@ class Mai_Publisher_Settings_Categories {
 			printf( '<h2>%s</h2>', __( 'Categories', 'mai-publisher' ) );
 
 			$doc = 'https://docs.google.com/spreadsheets/d/1uh3CcEW3N1d1hL5Mshi2EYk3lUeq6dcgn2QdkNF27IE/';
-			$iab = 'https://github.com/InteractiveAdvertisingBureau/Taxonomies/blob/main/Content%20Taxonomies/Content%20Taxonomy%203.0.tsv';
+			$iab = 'https://github.com/InteractiveAdvertisingBureau/Taxonomies/blob/main/Content%20Taxonomies/Content%20Taxonomy%203.1.tsv';
 
 			echo '<p>';
 				echo __( 'This page is for reference only, for easier copy & paste into the plugin\'s config.php.', 'mai-publisher' );
-				printf( '<br><a href="%s">%s</a>', $doc, __( 'View taxonomy spreadsheet here.', 'mai-publisher' ) );
-				printf( '<br><a href="%s">%s</a>', $iab, __( 'View original spreadsheet from IAB Tech Lab.', 'mai-publisher' ) );
+				printf( '<br><a target="_blank" rel="noopener noreferrer" href="%s">%s</a>', $doc, __( 'View taxonomy spreadsheet here.', 'mai-publisher' ) );
+				printf( '<br><a target="_blank" rel="noopener noreferrer" href="%s">%s</a>', $iab, __( 'View original spreadsheet from IAB Tech Lab.', 'mai-publisher' ) );
 			echo '</p>';
 
 			// Get the CSV file as an array.

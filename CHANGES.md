@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.13.0 (5/9/25)
+* Added: Explicitly checking for consent before running.
+* Added: Passing IAB categories directly to GAM.
+* Added: Now passing schain to Prebid.
+* Changed: Rewrite of timing and logic to check for consent as well as define/display on the fly and enable services after ATF ads are defined.
+* Changed: Better handling of ad refreshes.
+* Changed: PPID hashed to meet Google length requirements.
+* Changed: Update IAB Content Taxonomies to 3.1.
+* Changed: Even better logging.
+
 ## 1.12.0 (4/24/25)
 * Added: New PCD script support.
 * Added: New PPID support via Matomo `visitorId`.

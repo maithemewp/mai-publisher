@@ -4,6 +4,84 @@
 defined( 'ABSPATH' ) || die;
 
 /**
+ * Get consent.
+ *
+ * @since TBD
+ *
+ * @return bool
+ */
+function maipub_get_consent() {
+	return isset( $_COOKIE['maipub_consent'] ) ? (bool) $_COOKIE['maipub_consent'] : false;
+}
+
+/**
+ * Get a GAM-compliant PPID from the logged in user.
+ * PHP equivalent of JavaScript generatePpid function in mai-publisher-ads.js
+ * except this doesn't generate a random PPID if no identifier is provided and it
+ * only checks for cookie since session storage is not available in PHP.
+ *
+ * @since TBD
+ *
+ * @param string $identifier The identifier (Matomo Visitor ID or user email).
+ *
+ * @return string A GAM-compliant PPID (64-character hexadecimal) or null if generation fails.
+ */
+function maipub_get_ppid() {
+	try {
+		// If user is logged in, get user email.
+		$user_email = '';
+		if ( is_user_logged_in() ) {
+			$current_user = wp_get_current_user();
+			$user_email   = $current_user->user_email;
+		}
+
+		// Convert input to string to handle unexpected types (e.g., null, number).
+		// Ensures compatibility with hash function, which requires a string.
+		$input = strval( $user_email ?: '' );
+
+		// Set local PPID variable.
+		$local_ppid = '';
+
+		// Check for existing PPID in cookie.
+		// We don't need to check for consent, because this would only be stored
+		// via JS if consent was given.
+		if ( isset( $_COOKIE['maipub_ppid'] ) && preg_match( '/^[0-9a-f]{64}$/', $_COOKIE['maipub_ppid'] ) ) {
+			$local_ppid = $_COOKIE['maipub_ppid'];
+		}
+
+		// If we don't have an identifier and we have a cached PPID.
+		if ( ! $input && $local_ppid ) {
+			return $local_ppid;
+		}
+
+		// Bail if no input.
+		if ( ! $input ) {
+			return '';
+		}
+
+		// Compute SHA-256 hash of the input.
+		// SHA-256 produces a 64-character hexadecimal hash, ensuring the output is cryptographically secure
+		// and meaningless to Google, meeting GAM's encryption requirement.
+		$final_ppid = hash( 'sha256', $input );
+
+		// Return without storing in cookies or session storage.
+		// This makes sure the JS checks against local PPID are always accurate
+		// instead of trusting the PHP and JS checks are the same,
+		// which could cause issues if the PHP and JS checks are ever different.
+		return $final_ppid;
+
+	} catch ( Exception $error ) {
+		// Catch any errors (e.g., invalid input, random_bytes failure) to prevent
+		// script failures that could break ad functionality (e.g., GAM, Prebid).
+		// Log the error for debugging without disrupting execution.
+		error_log( 'Mai Publisher: Error transforming ppid: ' . $error->getMessage() );
+
+		// Return empty string to allow calling code to skip PPID usage safely.
+		return '';
+	}
+}
+
+/**
  * Check if a post has a term or a child term.
  *
  * @access private
