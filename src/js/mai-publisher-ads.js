@@ -31,9 +31,36 @@ let   isGeneratingPpid = false;
 let   cmpReady         = false;
 let   matomoReady      = false;
 let   gptInitialized   = false;
+let   maiPubVersion    = 'v236.21';
+
 
 // If debugging, log.
-maiPubLog( 'v236' );
+maiPubLog( `maiPubVersion: ${ maiPubVersion }` );
+
+
+// Check if we're in debug mode and using minimized version
+// TODO: We should check if we are in debug mode and if we are, we should not load the development version.
+/*
+if (debug && document.currentScript.src.includes('.min.js')) {
+	// Get the non-minimized version path
+	const devScript = document.currentScript.src.replace('.min.js', '.js');
+	
+	// Create and load the development version
+	const script = document.createElement('script');
+	script.src = devScript;
+	script.async = true;
+	
+	// Remove the minimized version
+	document.currentScript.remove();
+	
+	// Add the development version
+	document.head.appendChild(script);
+	
+	// Log the switch and stop execution
+	maiPubLog(`Switching to development version: ${ devScript }`);
+}
+*/
+
 
 // If we have a server-side PPID, log it.
 if ( serverPpid ) {
@@ -54,6 +81,8 @@ if ( maiPubAdsVars.amazonUAM ) {
 	 * Disable debugging via `apstag.debug('disableConsole')`.
 	 */
 	!function(a9,a,p,s,t,A,g){if(a[a9])return;function q(c,r){a[a9]._Q.push([c,r])}a[a9]={init:function(){q("i",arguments)},fetchBids:function(){q("f",arguments)},setDisplayBids:function(){},targetingKeys:function(){return[]},_Q:[]};A=p.createElement(s);A.async=!0;A.src=t;g=p.getElementsByTagName(s)[0];g.parentNode.insertBefore(A,g)}("apstag",window,document,"script","//c.amazon-adsystem.com/aax2/apstag.js");
+
+	maiPubLog( `amazonUAM enabled for domain, ready to init` );
 
 	// Initialize apstag.
 	apstag.init({
@@ -76,6 +105,9 @@ if ( maiPubAdsVars.amazonUAM ) {
 			]
 		}
 	});
+	maiPubLog( `AmazonUAM init called, apstag: ${ apstag }` );	
+} else {
+	maiPubLog( `AmazonUAM disabled for domain, skipping init` );
 }
 
 /**
@@ -87,6 +119,8 @@ if ( maiPubAdsVars.magnite ) {
 	maiPubAdsVars.ortb2.privacypolicy  = parseInt( maiPubAdsVars.ortb2.privacypolicy );
 	maiPubAdsVars.ortb2.cattax         = parseInt( maiPubAdsVars.ortb2.cattax );
 	maiPubAdsVars.ortb2.content.cattax = parseInt( maiPubAdsVars.ortb2.content.cattax );
+
+	maiPubLog( `MagniteDM enabled for domain, ready to init` );
 
 	// Configure Prebid.js
 	pbjs.que.push( function() {
@@ -207,13 +241,17 @@ if ( maiPubAdsVars.magnite ) {
 		// 	});
 		// });
 	});
+} else {
+	maiPubLog( `MagniteDM disabled for domain, skipping init` );
 }
 
 /**
  * Handle CMP initialization.
  */
+
 if ( 'function' === typeof __tcfapi ) {
 	// Set timeout to proceed with initialization if CMP never responds.
+	maiPubLog( `CMP: set timeout to proceed with initialization if CMP never responds` );
 	const cmpTimeoutId = setTimeout(() => {
 		if ( ! cmpReady ) {
 			maiPubLog( 'CMP timeout, proceeding with initialization' );
@@ -224,11 +262,12 @@ if ( 'function' === typeof __tcfapi ) {
 
 	try {
 		// Add event listener for CMP events.
+		maiPubLog( `CMP: add event listener for CMP events` );
 		__tcfapi( 'addEventListener', 2, ( tcData, success ) => {
 			if ( cmpReady ) {
 				return;
 			}
-
+			
 			// If we have loaded or completed.
 			if ( tcData && ( tcData.eventStatus === 'tcloaded' || tcData.eventStatus === 'useractioncomplete' ) ) {
 				cmpReady = true;
@@ -237,15 +276,19 @@ if ( 'function' === typeof __tcfapi ) {
 				maiPubLog( `CMP loaded, proceeding with initialization: ${ success }`, tcData );
 				maiPubMaybeInit();
 			}
+			else {
+				maiPubLog( `CMP event not good status: ${ tcData.eventStatus }`, tcData );
+			}
 		});
 	} catch ( error ) {
-		maiPubLog( 'CMP error:', error );
+		maiPubLog( 'CMP event listener error:', error );
 		clearTimeout( cmpTimeoutId );
 		cmpReady = true;
 		maiPubMaybeInit();
 	}
 } else {
 	// No CMP present, mark as ready.
+	maiPubLog( `No CMP present, mark as ready` );
 	cmpReady = true;
 	maiPubMaybeInit();
 }
@@ -254,6 +297,7 @@ if ( 'function' === typeof __tcfapi ) {
  * Handle PPID and Matomo initialization.
  */
 if ( maiPubAdsVars.matomo.enabled && maiPubAdsVars.shouldTrack ) {
+	maiPubLog( `Matomo: enabled and should track` );
 	// Set timeout to proceed with initialization if Matomo never responds.
 	const matomoTimeoutId = setTimeout(() => {
 		if ( ! matomoReady ) {
@@ -330,12 +374,14 @@ if ( maiPubAdsVars.matomo.enabled && maiPubAdsVars.shouldTrack ) {
 		}, { once: true } );
 	}
 } else {
+	// Matomo is disabled or should not track, or both.
 	matomoReady = true;
 
 	if ( ! maiPubAdsVars.matomo.enabled ) {
-		maiPubLog( 'Matomo disabled' );
-	} else if ( ! maiPubAdsVars.shouldTrack ) {
-		maiPubLog( 'Matomo enabled but should not track' );
+		maiPubLog( 'Matomo was set as disabled' );
+	} 
+	if ( ! maiPubAdsVars.shouldTrack ) {
+		maiPubLog( 'Matomo was set as should not track' );
 	}
 
 	maiPubMaybeInit();
@@ -348,6 +394,7 @@ if ( maiPubAdsVars.matomo.enabled && maiPubAdsVars.shouldTrack ) {
  * 2. We've hit our timeout for either system
  */
 function maiPubMaybeInit() {
+	maiPubLog( `Checking if we should initialize GAM, based on CMP and Matomo states` );
 	// Check if we should initialize based on CMP and Matomo states.
 	const shouldInit = (
 		// CMP is ready or not present.
@@ -373,22 +420,22 @@ function maiPubMaybeInit() {
 		// Bail, not initializing yet.
 		return;
 	}
+	maiPubLog( `Looks like we should initialize GAM` );
 
 	// If still no ppid.
 	if ( ! ppid ) {
 		// Generate a random PPID.
 		maiPubGeneratePpid().then( transformedPpid => {
 			ppid = transformedPpid;
-			maiPubLog( `Generated random PPID: ${ppid}` );
-			maiPubLog( `Initializing GAM with ppid: ${ppid}` );
-			maiPubInit();
+			maiPubLog( `Still No PPID available, generated random PPID: ${ppid}` );
+		}).catch( error => {
+			maiPubLog( `Error generating random PPID: ${error}` );
 		});
+
 	}
-	// We have a ppid.
-	else {
-		maiPubLog( `Initializing GAM with ppid: ${ppid}` );
-		maiPubInit();
-	}
+
+	maiPubLog( `Initializing GAM with ppid: ${ppid}` );
+	maiPubInit();
 }
 
 /**
@@ -399,16 +446,19 @@ function maiPubMaybeInit() {
 function maiPubInit() {
 	// If consent is different from the local consent, store it.
 	if ( consent !== serverConsent || consent !== localConsent ) {
+		maiPubLog( `maiPubInit(): Consent different from local consent, storing consent` );
 		maiPubSetLocalConsent( consent );
 	}
 
 	// If ppid is different from the local ppid, store it.
 	if ( ppid && ( ppid !== serverPpid || ! localPpid || ppid !== localPpid ) ) {
+		maiPubLog( `maiPubInit(): PPID different from local ppid, storing ppid` );
 		maiPubSetLocalPpid( ppid );
 	}
 
 	// If we have segments.
 	if ( maiPubAdsVars.dcSeg ) {
+		maiPubLog( `maiPubInit(): We have segments, building PCD script` );
 		// Build the PCD script.
 		const pcdScript             = document.createElement( 'script' );
 				pcdScript.async     = true;
@@ -417,17 +467,22 @@ function maiPubInit() {
 				pcdScript.src       = 'https://pagead2.googlesyndication.com/pagead/js/pcd.js';
 
 		// Build the segments.
+		// TODO:  Not sure if this is correct.  It appears to be building the segments string 
+		// from the dcSeg array and seg, when viewing in console this is empty...
 		let segments = '';
 		maiPubAdsVars.dcSeg.forEach( seg => {
 			segments += `dc_seg=${seg};`;
 		});
+		maiPubLog( `maiPubInit(): We have segments, building the segments string: ${segments}` );
 
 		// Build the audience pixel.
 		let audiencePixel = `dc_iu=/${maiPubAdsVars.bbNetworkCode}/DFPAudiencePixel;${segments}gd=${maiPubAdsVars.domainHashed}`;
+		maiPubLog( `maiPubInit(): We have segments, building the audience pixel: ${audiencePixel}` );
 
 		// If we have a ppid, add it.
 		if ( ppid ) {
 			audiencePixel += `;ppid=${ppid}`;
+			maiPubLog( `maiPubInit(): We have segments, and a ppid, adding it to the audience pixel: ${audiencePixel}` );
 		}
 
 		// Set the audience pixel.
@@ -439,22 +494,29 @@ function maiPubInit() {
 		// Insert at the end of the head.
 		document.head.appendChild( pcdScript );
 	}
+	else {
+		maiPubLog( `maiPubInit(): No segments, skipping PCD script` );
+	}
 
 	// If no delay, run on DOMContentLoaded.
 	if ( ! maiPubAdsVars.loadDelay ) {
 		// Check if DOMContentLoaded has run.
 		if ( 'loading' === document.readyState ) {
 			// If it's still loading, wait for the event.
+			maiPubLog( `maiPubInit(): No delay, but waiting for DOMContentLoaded` );
 			document.addEventListener( 'DOMContentLoaded', maiPubRun, { once: true } );
 		} else {
 			// If it's already loaded, execute maiPubRun().
+			maiPubLog( `maiPubInit(): No delay, DOMContentLoaded has run, running maiPubRun` );
 			maiPubRun();
 		}
 	}
 	// Delayed on window load.
 	else {
+		maiPubLog( `maiPubInit(): Delayed on window load, setting up event listener ${maiPubAdsVars.loadDelay}ms` );
 		// On window load.
 		window.addEventListener( 'load', () => {
+			maiPubLog( `maiPubInit(): Delayed on window load, setting up event listener ${maiPubAdsVars.loadDelay}ms, running maiPubRun` );
 			setTimeout( maiPubRun, maiPubAdsVars.loadDelay );
 		}, { once: true });
 	}
@@ -482,7 +544,8 @@ function maiPubRun() {
 
 			// If intersecting.
 			if ( entry.isIntersecting ) {
-				// Set the slot to visible (using slotManager).
+				// Set the slot to visible (using slotManager)
+				maiPubLog( `maiPubRun(): Intersecting, setting slot to visible: ${slotId}` );
 				slotManager[ slotId ].visible = true;
 
 				// GPT is not initialized.
@@ -491,11 +554,12 @@ function maiPubRun() {
 				// refresh the slots,
 				// then gptInitialized = true;
 				if ( ! gptInitialized ) {
+					maiPubLog( `maiPubRun(): GPT is not initialized, adding slug to ATFSlugs: ${slug}` );	
 					ATFSlugs.push( slug );
 				}
 				// GPT is initialized.
 				else {
-					// then we only define, display, and refresh the in view slots.
+					maiPubLog( `maiPubRun(): GPT is initialized, adding slug to BTFSlugs: ${slug}` );
 					BTFSlugs.push( slug );
 				}
 
@@ -505,6 +569,7 @@ function maiPubRun() {
 					entry.target.style.outline = '2px dashed red';
 
 					// Add data-label attribute of slug.
+					maiPubLog( `maiPubRun(): Intersecting, debug set, adding data-label attribute of slug: ${slug}` );
 					entry.target.setAttribute( 'data-label', slug );
 				}
 
@@ -512,17 +577,19 @@ function maiPubRun() {
 				// slugsToRequest.push( slug );
 
 				// Unobserve the displayed slots, let GAM events handle refreshing and visibility.
+				maiPubLog( `maiPubRun(): Intersecting, unobserving slot to let GAM events handle refreshing and visibility: ${slotId}` );
 				observer.unobserve( entry.target );
 			}
 			// Not intersecting.
 			else {
-				// Force the slot to not visible.
+				maiPubLog( `maiPubRun(): Not intersecting, setting slot to not visible: ${slotId}` );
 				slotManager[ slotId ].visible = false;
 			}
 		});
 
 		// If there are ATF slugs.
 		if ( ATFSlugs.length ) {
+			maiPubLog( `maiPubRun(): There are ATF slugs, defining and displaying them` );
 			/**
 			 * Define and display the ATF slots.
 			 * Enable services so ATF ads can be refreshed.
@@ -533,9 +600,11 @@ function maiPubRun() {
 				// Loop through the ATF slugs.
 				ATFSlugs.forEach( slug => {
 					// Define the slot.
+					maiPubLog( `maiPubRun(): Defining the ATF slot: ${slug}` );
 					maiPubDefineSlot( slug );
 
 					// Display.
+					maiPubLog( `maiPubRun(): Displaying the ATF slot: 'mai-ad-'${slug}` );
 					googletag.display( 'mai-ad-' + slug );
 				});
 
@@ -552,6 +621,7 @@ function maiPubRun() {
 
 		// If there are BTF slugs to define, define them.
 		if ( BTFSlugs.length ) {
+			maiPubLog( `maiPubRun(): There are BTF slugs, defining and displaying them` );
 			/**
 			 * Define and display the BTF slots.
 			 * Set GPT initialized to true.
@@ -561,13 +631,16 @@ function maiPubRun() {
 				// Loop through the BTF slugs.
 				BTFSlugs.forEach( slug => {
 					// Define the slot.
+					maiPubLog( `maiPubRun(): Defining the BTF slot: ${slug}` );
 					maiPubDefineSlot( slug );
 
 					// Display the slot.
+					maiPubLog( `maiPubRun(): Displaying the BTF slot: 'mai-ad-'${slug}` );
 					googletag.display( 'mai-ad-' + slug );
 				});
 
 				// Maybe request the slots.
+				maiPubLog( `maiPubRun(): calling maiPubMaybeRequestSlots() for the BTF slots: ${BTFSlugs.join( ', ' )}` );
 				maiPubMaybeRequestSlots( BTFSlugs );
 			});
 		}
@@ -576,6 +649,7 @@ function maiPubRun() {
 		rootMargin: '600px 0px 600px 0px', // Trigger when the top of the element is X away from each part of the viewport.
 		threshold: 0 // No threshold needed.
 	});
+	maiPubLog( `maiPubRun(): Observer is set, root to null, rootMargin to 600px 0px 600px 0px, threshold to 0` );
 
 	/**
 	 * 1. Setup Google Tag.
@@ -587,9 +661,11 @@ function maiPubRun() {
 		 */
 		// Disabled for now: https://developers.google.com/publisher-tag/reference#googletag.PubAdsService_setForceSafeFrame
 		// googletag.pubads().setForceSafeFrame( true );
+		maiPubLog( ` googletag.cmd.push(): entering` );
 
 		// Get the IAB categories, removing duplicates.
 		const iabCats = [...new Set( [ maiPubAdsVars.iabGlobalCat, maiPubAdsVars.iabCat ].filter( cat => cat ) )];
+		maiPubLog( `googletag.cmd.push(): Got the IAB categories ${iabCats}, removing duplicates: ${iabCats.join( ', ' )}` );
 
 		// If we have IAB categories, set them in the config as Publisher Provided Signals (PPS).
 		if ( iabCats.length ) {
@@ -608,20 +684,32 @@ function maiPubRun() {
 					},
 				},
 			});
+			maiPubLog( `googletag.cmd.push(): setConfig() for PPS:`, {
+				pps: {
+					taxonomies: {
+						IAB_CONTENT_2_2: {
+							values: iabCats,
+						},
+					},
+				},
+			});
 		}
 
 		// Disable initial load for header bidding.
+		maiPubLog( `googletag.cmd.push(): googletag.pubads() Disabling initial load for header bidding` );
 		googletag.pubads().disableInitialLoad();
 
 		// Enable single request.
+		maiPubLog( `googletag.cmd.push(): googletag.pubads() Enabling single request` );
 		googletag.pubads().enableSingleRequest();
 
 		// Make ads centered.
+		maiPubLog( `googletag.cmd.push(): googletag.pubads() Making ads centered` );
 		googletag.pubads().setCentering( true );
 
 		// If we have a ppid, set it.
 		if ( ppid ) {
-			maiPubLog( 'Setting googletag PPID:', ppid );
+			maiPubLog( `googletag.cmd.push(): googletag.pubads() Setting PPID: ${ppid}` );
 			googletag.pubads().setPublisherProvidedId( ppid );
 		}
 
@@ -629,25 +717,29 @@ function maiPubRun() {
 		if ( maiPubAdsVars.targets ) {
 			Object.keys( maiPubAdsVars.targets ).forEach( key => {
 				googletag.pubads().setTargeting( key, maiPubAdsVars.targets[key].toString() );
+				maiPubLog( `googletag.cmd.push(): googletag.pubads() page-level targeting for ${key}:`, googletag.pubads().getTargeting(key) );
 			});
-
-			// Log the page-level targeting that was set.
-			maiPubLog( 'Set page-level targeting from:', maiPubAdsVars.targets );
 		}
 	});
 
 	/**
 	 * 2. Observe the BTF ad units.
 	 */
+
+// TODO:  Not sure the above comment is correct.  This section of code appears to be observing all the ad units
+// and adding them to the slotManager.
+
+	maiPubLog( `Time to identify ad units and observe them` );
 	googletag.cmd.push(() => {
 		// Get all the ad units.
 		const adUnits = document.querySelectorAll( '.mai-ad-unit' );
+		maiPubLog( `googletag.cmd.push(): Got all the ad units ${adUnits}` );
 
 		// Observe each ad unit.
 		adUnits.forEach( adUnit => {
 			// Get slotId.
 			const slotId = adUnit.getAttribute( 'id' );
-
+			maiPubLog( `Found ad unit: ${slotId}` );
 			// Add the slot to the slotManager.
 			slotManager[ slotId ] = {
 				processing: false,
@@ -655,11 +747,13 @@ function maiPubRun() {
 				lastRefreshTime: 0,
 				firstRender: true,
 			};
-
+			maiPubLog( `Added to slotManager: ${slotId}` );
 			// Observe the ad unit.
 			observer.observe( adUnit );
+			maiPubLog( `Observed the ad unit: ${adUnit}` );
 		});
 	});
+	maiPubLog( `Done identifying ad units and observing them` );
 
 	/**
 	 * 5. Add event listeners to handle refreshable slots.
@@ -1377,7 +1471,9 @@ function maiPubSetLocalPpid( ppid ) {
  * @return {void}
  */
 function maiPubLog( ...mixed ) {
-	if ( ! ( debug || log ) ) {
+
+	// If not debugging or logging, bail.
+	if ( ! debug && ! log ) {
 		return;
 	}
 
@@ -1397,6 +1493,6 @@ function maiPubLog( ...mixed ) {
 		timer += current - timestamp + 'ms';
 	}
 
-	// Log the combined message.
-	console.log( `${timer} ${now}`, mixed );
+	// Log to console with both timer and caller name.
+	console.log( `${timer} ${now}`, ...mixed );
 }
