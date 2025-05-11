@@ -31,7 +31,7 @@ let   isGeneratingPpid = false;
 let   cmpReady         = false;
 let   matomoReady      = false;
 let   gptInitialized   = false;
-let   maiPubVersion    = 'v236.21';
+let   maiPubVersion    = 'v236.44';
 
 
 // If debugging, log.
@@ -40,8 +40,9 @@ maiPubLog( `maiPubVersion: ${ maiPubVersion }` );
 
 // Check if we're in debug mode and using minimized version
 // TODO: We should check if we are in debug mode and if we are, we should not load the development version.
+// The build process should be updated to include the debug version in the build.
 /*
-if (debug && document.currentScript.src.includes('.min.js')) {
+if (debug && document.urrentScript.src.includes('.min.js')) {
 	// Get the non-minimized version path
 	const devScript = document.currentScript.src.replace('.min.js', '.js');
 	
@@ -80,9 +81,12 @@ if ( maiPubAdsVars.amazonUAM ) {
 	 * Debug via `apstag.debug('enableConsole')`.
 	 * Disable debugging via `apstag.debug('disableConsole')`.
 	 */
+
+	maiPubLog( `AmazonUAM enabled for domain, ready to init: ${ maiPubAdsVars.amazonUAM }` );
+
+
 	!function(a9,a,p,s,t,A,g){if(a[a9])return;function q(c,r){a[a9]._Q.push([c,r])}a[a9]={init:function(){q("i",arguments)},fetchBids:function(){q("f",arguments)},setDisplayBids:function(){},targetingKeys:function(){return[]},_Q:[]};A=p.createElement(s);A.async=!0;A.src=t;g=p.getElementsByTagName(s)[0];g.parentNode.insertBefore(A,g)}("apstag",window,document,"script","//c.amazon-adsystem.com/aax2/apstag.js");
 
-	maiPubLog( `amazonUAM enabled for domain, ready to init` );
 
 	// Initialize apstag.
 	apstag.init({
@@ -105,7 +109,13 @@ if ( maiPubAdsVars.amazonUAM ) {
 			]
 		}
 	});
-	maiPubLog( `AmazonUAM init called, apstag: ${ apstag }` );	
+	maiPubLog( `AmazonUAM apstag.init() called, apstag object contents:`, {
+		_Q: apstag._Q,
+		init: apstag.init,
+		fetchBids: apstag.fetchBids,
+		setDisplayBids: apstag.setDisplayBids,
+		targetingKeys: apstag.targetingKeys
+	});	
 } else {
 	maiPubLog( `AmazonUAM disabled for domain, skipping init` );
 }
@@ -114,133 +124,88 @@ if ( maiPubAdsVars.amazonUAM ) {
  * Configure Prebid.js if Magnite is enabled.
  */
 if ( maiPubAdsVars.magnite ) {
+
+	maiPubLog( `MagniteDM enabled for domain, ready to init: ${ maiPubAdsVars.magnite }` );
+
 	// Force integers.
 	maiPubAdsVars.ortb2.mobile         = parseInt( maiPubAdsVars.ortb2.mobile );
 	maiPubAdsVars.ortb2.privacypolicy  = parseInt( maiPubAdsVars.ortb2.privacypolicy );
 	maiPubAdsVars.ortb2.cattax         = parseInt( maiPubAdsVars.ortb2.cattax );
 	maiPubAdsVars.ortb2.content.cattax = parseInt( maiPubAdsVars.ortb2.content.cattax );
 
-	maiPubLog( `MagniteDM enabled for domain, ready to init` );
 
-	// Configure Prebid.js
-	pbjs.que.push( function() {
-		// Start the config.
-		const pbjsConfig = {
-			bidderTimeout: bidderTimeout,
-			enableTIDs: true,
-			ortb2: maiPubAdsVars.ortb2,
-			// @link https://github.com/prebid/prebid.github.io/blob/master/dev-docs/modules/schain.md
-			schain: {
-				complete: 1, // Integer 1 or 0 indicating if all preceding nodes are complete.
-				ver: '1.0', // Version of the spec used.
-				nodes: [
-					{
-						asi: 'bizbudding.com', // Populate with the canonical domain of the advertising system where the seller.JSON file is hosted.
-						sid: maiPubAdsVars.sellersId, // The identifier associated with the seller or reseller account within your advertising system.
-						hp: 1, // 1 or 0, whether this node is involved in the payment flow.
-						name: maiPubAdsVars.sellersName, // Name of the company paid for inventory under seller ID (optional).
-						domain: maiPubAdsVars.domain, // Business domain of this node (optional).
-					}
-				]
-			}
-		};
+	// dws122: this was firig before the pbjs was loaded, so we need to wait for it to load.
+	// Wait for Prebid.js to load
+	const waitForPrebid = setInterval(() => {
+		if (typeof pbjs !== 'undefined' && typeof pbjs.que !== 'undefined') {
+			clearInterval(waitForPrebid);
+			maiPubLog( `Prebid.js for MagniteDM loaded, proceeding with configuration` );
 
-		/**
-		 * If we have a ppid, add it.
-		 * @link https://docs.prebid.org/dev-docs/modules/userid-submodules/pubprovided.html
-		 */
-		if ( ppid ) {
-			pbjsConfig.userSync = {
-				userIds: [{
-					name: "pubProvidedId",
-					params: {
-						eids: [{
-							source: maiPubAdsVars.domain,
-							uids: [{
-								id: ppid,
-								atype: 1
+			maiPubLog( `About to configure Prebid.js, checking if pbjs exists:`, typeof pbjs );
+			maiPubLog( `About to configure Prebid.js, checking if pbjs.que exists:`, typeof pbjs.que );
+		
+
+			pbjs.que.push( function() {
+				try {
+					// Start the config.
+					maiPubLog( `pbjs.que.push: starting Prebid.js configuration using MagniteDM` );
+					const pbjsConfig = {
+						bidderTimeout: bidderTimeout,
+						enableTIDs: true,
+						ortb2: maiPubAdsVars.ortb2,
+						// @link https://github.com/prebid/prebid.github.io/blob/master/dev-docs/modules/schain.md
+						schain: {
+							complete: 1, // Integer 1 or 0 indicating if all preceding nodes are complete.
+							ver: '1.0', // Version of the spec used.
+							nodes: [
+								{
+									asi: 'bizbudding.com', // Populate with the canonical domain of the advertising system where the seller.JSON file is hosted.
+									sid: maiPubAdsVars.sellersId, // The identifier associated with the seller or reseller account within your advertising system.
+									hp: 1, // 1 or 0, whether this node is involved in the payment flow.
+									name: maiPubAdsVars.sellersName, // Name of the company paid for inventory under seller ID (optional).
+									domain: maiPubAdsVars.domain, // Business domain of this node (optional).
+								}
+							]
+						}
+					};
+
+					/**
+					 * If we have a ppid, add it.
+					 * @link https://docs.prebid.org/dev-docs/modules/userid-submodules/pubprovided.html
+					 */
+					if ( ppid ) {
+						pbjsConfig.userSync = {
+							userIds: [{
+								name: "pubProvidedId",
+								params: {
+									eids: [{
+										source: maiPubAdsVars.domain,
+										uids: [{
+											id: ppid,
+											atype: 1
+										}]
+									}]
+								}
 							}]
-						}]
+						};
+						maiPubLog( `Adding ppid to Prebid.js configuration: ${ppid}` );
 					}
-				}]
-			};
+					else {
+						maiPubLog( `No ppid to add to Prebid.js configuration, skipping` );
+					}
+
+					// Set the magnite config.
+					pbjs.setConfig( pbjsConfig );
+					maiPubLog( `Prebid.js configuration set, pbjsConfig:`, pbjsConfig );
+				} catch (error) {
+					maiPubLog('Error in Prebid.js configuration:', error);
+				}
+			});
 		}
 
-		// Log.
-		maiPubLog( 'pbjsConfig', pbjsConfig );
-
-		// Set the magnite config.
-		pbjs.setConfig( pbjsConfig );
-
-		// // Add bid response tracking.
-		// pbjs.onEvent( 'bidResponse', function( bid ) {
-		// 	bidResponses.prebid[ bid.bidder ] = {
-		// 		value: bid.cpm,
-		// 		size: bid.size,
-		// 		adUnitCode: bid.adUnitCode,
-		// 		timeToRespond: bid.timeToRespond + 'ms'
-		// 	};
-		// 	maiPubLog( `Prebid bid received from ${ bid.bidder }`, bid );
-		// });
-		// // Add bid response tracking.
-		// pbjs.onEvent( 'bidResponse', function( bid ) {
-		// 	bidResponses.prebid[ bid.bidder ] = {
-		// 		value: bid.cpm,
-		// 		size: bid.size,
-		// 		adUnitCode: bid.adUnitCode,
-		// 		timeToRespond: bid.timeToRespond + 'ms'
-		// 	};
-		// 	maiPubLog( `Prebid bid received from ${ bid.bidder }`, bid );
-		// });
-
-		// // Add timeout monitoring.
-		// pbjs.onEvent( 'bidTimeout', function( timeoutBids ) {
-		// 	timeoutBids.forEach(bid => {
-		// 		bidResponses.timeouts.push({
-		// 			bidder: bid.bidder,
-		// 			adUnitCode: bid.adUnitCode,
-		// 			timeout: bidderTimeout + 'ms'
-		// 		});
-		// 	});
-		// 	maiPubLog( 'Bid timeout occurred:', timeoutBids );
-		// });
-		// // Add timeout monitoring.
-		// pbjs.onEvent( 'bidTimeout', function( timeoutBids ) {
-		// 	timeoutBids.forEach(bid => {
-		// 		bidResponses.timeouts.push({
-		// 			bidder: bid.bidder,
-		// 			adUnitCode: bid.adUnitCode,
-		// 			timeout: bidderTimeout + 'ms'
-		// 		});
-		// 	});
-		// 	maiPubLog( 'Bid timeout occurred:', timeoutBids );
-		// });
-
-		// // Log when the auction ends.
-		// pbjs.onEvent( 'auctionEnd', function( bids ) {
-		// 	maiPubLog( 'Prebid auction ended:', bids, {
-		// 		prebid: bidResponses.prebid,
-		// 		timeouts: bidResponses.timeouts,
-		// 		timing: {
-		// 			totalTime: Date.now() - timestamp + 'ms',
-		// 			bidderTimeout: bidderTimeout + 'ms',
-		// 			fallbackTimeout: fallbackTimeout + 'ms'
-		// 		}
-		// 	});
-		// });
-		// // Log when the auction ends.
-		// pbjs.onEvent( 'auctionEnd', function( bids ) {
-		// 	maiPubLog( 'Prebid auction ended:', bids, {
-		// 		prebid: bidResponses.prebid,
-		// 		timeouts: bidResponses.timeouts,
-		// 		timing: {
-		// 			totalTime: Date.now() - timestamp + 'ms',
-		// 			bidderTimeout: bidderTimeout + 'ms',
-		// 			fallbackTimeout: fallbackTimeout + 'ms'
-		// 		}
-		// 	});
-		// });
 	});
+	maiPubLog( `Prebid.js for MagniteDM undefined, waiting for it to load` );
+
 } else {
 	maiPubLog( `MagniteDM disabled for domain, skipping init` );
 }
@@ -254,7 +219,7 @@ if ( 'function' === typeof __tcfapi ) {
 	maiPubLog( `CMP: set timeout to proceed with initialization if CMP never responds` );
 	const cmpTimeoutId = setTimeout(() => {
 		if ( ! cmpReady ) {
-			maiPubLog( 'CMP timeout, proceeding with initialization' );
+			maiPubLog( 'CMP: timeout, proceeding with initialization' );
 			cmpReady = true;
 			maiPubMaybeInit();
 		}
@@ -262,7 +227,7 @@ if ( 'function' === typeof __tcfapi ) {
 
 	try {
 		// Add event listener for CMP events.
-		maiPubLog( `CMP: add event listener for CMP events` );
+		maiPubLog( `CMP: adding event listener for CMP events` );
 		__tcfapi( 'addEventListener', 2, ( tcData, success ) => {
 			if ( cmpReady ) {
 				return;
@@ -273,22 +238,45 @@ if ( 'function' === typeof __tcfapi ) {
 				cmpReady = true;
 				consent  = Boolean( success );
 				clearTimeout( cmpTimeoutId );
-				maiPubLog( `CMP loaded, proceeding with initialization: ${ success }`, tcData );
+				maiPubLog( `CMP: loaded, proceeding with initialization`, { 
+					tcData: tcData 
+				});
+				
+				// TODO: This would be a great place to add a check to see if we have Google Basic Consent.
+				// Check if tcData is valid
+				if ( typeof __tcfapi === 'function' ) {
+					// Check for Google basic consent and eConsent
+					__tcfapi('getTCData', 2, (data, success) => {
+						if ( success && data.vendor && data.vendor.consents ) {
+							// Check Google's vendor ID (755)
+							const hasGoogleConsent = data.vendor.consents[755];
+							maiPubLog( `CMP: Google basic consent status:`, hasGoogleConsent );
+
+							// Check for eConsent (purpose 1)
+							const hasEConsent = data.purpose && data.purpose.consents && data.purpose.consents[1];
+							maiPubLog( `CMP: eConsent status:`, hasEConsent );
+						} else {
+							maiPubLog( `CMP: Unable to determine Google basic consent and eConsent status` );
+						}
+					});
+				} else {
+					maiPubLog( `CMP: __tcfapi not available for Google basic consent and eConsent check` );
+				}
+
 				maiPubMaybeInit();
 			}
 			else {
-				maiPubLog( `CMP event not good status: ${ tcData.eventStatus }`, tcData );
+				maiPubLog( `CMP: event not good status: ${ tcData.eventStatus }`, tcData );
 			}
 		});
 	} catch ( error ) {
-		maiPubLog( 'CMP event listener error:', error );
+		maiPubLog( 'CMP: event listener error:', error );
 		clearTimeout( cmpTimeoutId );
 		cmpReady = true;
 		maiPubMaybeInit();
 	}
 } else {
-	// No CMP present, mark as ready.
-	maiPubLog( `No CMP present, mark as ready` );
+	maiPubLog( `CMP not present, marking as ready` );
 	cmpReady = true;
 	maiPubMaybeInit();
 }
@@ -394,7 +382,7 @@ if ( maiPubAdsVars.matomo.enabled && maiPubAdsVars.shouldTrack ) {
  * 2. We've hit our timeout for either system
  */
 function maiPubMaybeInit() {
-	maiPubLog( `Checking if we should initialize GAM, based on CMP and Matomo states` );
+	maiPubLog( `maiPubMaybeInit(): checking if we should initialize GAM, based on CMP and Matomo states` );
 	// Check if we should initialize based on CMP and Matomo states.
 	const shouldInit = (
 		// CMP is ready or not present.
@@ -415,26 +403,26 @@ function maiPubMaybeInit() {
 		}
 
 		// Log reason.
-		maiPubLog( 'GAM not initialized, waiting for ' + waitingFor.join( ' and ' ) );
+		maiPubLog( `maiPubMaybeInit(): GAM not initialized, waiting for ${waitingFor.join( ' and ' )}` );
 
 		// Bail, not initializing yet.
 		return;
 	}
-	maiPubLog( `Looks like we should initialize GAM` );
+	maiPubLog( `maiPubMaybeInit(): looks like we should initialize GAM` );
 
 	// If still no ppid.
 	if ( ! ppid ) {
 		// Generate a random PPID.
 		maiPubGeneratePpid().then( transformedPpid => {
 			ppid = transformedPpid;
-			maiPubLog( `Still No PPID available, generated random PPID: ${ppid}` );
+			maiPubLog( `maiPubMaybeInit(): still No PPID available, generated random PPID: ${ppid}` );
 		}).catch( error => {
-			maiPubLog( `Error generating random PPID: ${error}` );
+			maiPubLog( `maiPubMaybeInit(): error generating random PPID: ${error}` );
 		});
 
 	}
 
-	maiPubLog( `Initializing GAM with ppid: ${ppid}` );
+	maiPubLog( `maiPubMaybeInit(): initializing GAM with ppid: ${ppid}. Now calling maiPubInit()` );
 	maiPubInit();
 }
 
@@ -455,7 +443,7 @@ function maiPubInit() {
 		maiPubLog( `maiPubInit(): PPID different from local ppid, storing ppid` );
 		maiPubSetLocalPpid( ppid );
 	}
-
+/* dws122 comment out segments for now
 	// If we have segments.
 	if ( maiPubAdsVars.dcSeg ) {
 		maiPubLog( `maiPubInit(): We have segments, building PCD script` );
@@ -497,6 +485,7 @@ function maiPubInit() {
 	else {
 		maiPubLog( `maiPubInit(): No segments, skipping PCD script` );
 	}
+*/
 
 	// If no delay, run on DOMContentLoaded.
 	if ( ! maiPubAdsVars.loadDelay ) {
@@ -536,13 +525,14 @@ function maiPubRun() {
 		const ATFSlugs = [];
 		const BTFSlugs = [];
 
+		maiPubLog( `maiPubRun() entering the observer,entries:`, entries );
 		// Loop through the entries.
 		entries.forEach( entry => {
 			// Get slug.
 			const slotId = entry.target.getAttribute( 'id' );
 			const slug   = slotId.replace( 'mai-ad-', '' );
 
-			// If intersecting.
+			// If intersecting, then we are going to classify the slot as ATF.
 			if ( entry.isIntersecting ) {
 				// Set the slot to visible (using slotManager)
 				maiPubLog( `maiPubRun(): Intersecting, setting slot to visible: ${slotId}` );
@@ -557,13 +547,14 @@ function maiPubRun() {
 					maiPubLog( `maiPubRun(): GPT is not initialized, adding slug to ATFSlugs: ${slug}` );	
 					ATFSlugs.push( slug );
 				}
-				// GPT is initialized.
 				else {
+					// GPT is initialized, so we are going to classify the slot as BTF.
+					// dws122: why is this happening?
 					maiPubLog( `maiPubRun(): GPT is initialized, adding slug to BTFSlugs: ${slug}` );
 					BTFSlugs.push( slug );
 				}
 
-				// If debugging, add inline styling.
+				// If ?maideb or ?dfpdeb is on via querry parameter, then add inline styling.
 				if ( debug ) {
 					// Add inline styling.
 					entry.target.style.outline = '2px dashed red';
@@ -579,6 +570,7 @@ function maiPubRun() {
 				// Unobserve the displayed slots, let GAM events handle refreshing and visibility.
 				maiPubLog( `maiPubRun(): Intersecting, unobserving slot to let GAM events handle refreshing and visibility: ${slotId}` );
 				observer.unobserve( entry.target );
+
 			}
 			// Not intersecting.
 			else {
@@ -601,6 +593,7 @@ function maiPubRun() {
 				ATFSlugs.forEach( slug => {
 					// Define the slot.
 					maiPubLog( `maiPubRun(): Defining the ATF slot: ${slug}` );
+
 					maiPubDefineSlot( slug );
 
 					// Display.
@@ -615,6 +608,7 @@ function maiPubRun() {
 				gptInitialized = true;
 
 				// Maybe request the slots.
+				maiPubLog( `maiPubRun(): calling maiPubMaybeRequestSlots() for the ATF slots: ${ATFSlugs.join( ', ' )}` );
 				maiPubMaybeRequestSlots( ATFSlugs );
 			});
 		}
@@ -632,6 +626,7 @@ function maiPubRun() {
 				BTFSlugs.forEach( slug => {
 					// Define the slot.
 					maiPubLog( `maiPubRun(): Defining the BTF slot: ${slug}` );
+
 					maiPubDefineSlot( slug );
 
 					// Display the slot.
@@ -654,73 +649,77 @@ function maiPubRun() {
 	/**
 	 * 1. Setup Google Tag.
 	 */
-	googletag.cmd.push(() => {
-		/**
-		 * Set SafeFrame -- This setting will only take effect for subsequent ad requests made for the respective slots.
-		 * To enable cross domain rendering for all creatives, execute setForceSafeFrame before loading any ad slots.
-		 */
-		// Disabled for now: https://developers.google.com/publisher-tag/reference#googletag.PubAdsService_setForceSafeFrame
-		// googletag.pubads().setForceSafeFrame( true );
-		maiPubLog( ` googletag.cmd.push(): entering` );
+	try {
+		googletag.cmd.push(() => {
 
-		// Get the IAB categories, removing duplicates.
-		const iabCats = [...new Set( [ maiPubAdsVars.iabGlobalCat, maiPubAdsVars.iabCat ].filter( cat => cat ) )];
-		maiPubLog( `googletag.cmd.push(): Got the IAB categories ${iabCats}, removing duplicates: ${iabCats.join( ', ' )}` );
+			maiPubLog( `googletag.cmd.push(): entering` );
 
-		// If we have IAB categories, set them in the config as Publisher Provided Signals (PPS).
-		if ( iabCats.length ) {
-			/**
-			 * Set Google Publisher Tag config for PPS.
-			 * The docs make it seem like it only supports IAB Content Categories 2.2, not 3.0.
-			 *
-			 * @link https://developers.google.com/publisher-tag/reference#googletag.config.PublisherProvidedSignalsConfig
-			 */
-			googletag.setConfig({
-				pps: {
-					taxonomies: {
-						IAB_CONTENT_2_2: {
-							values: iabCats,
+			// Disabled for now: https://developers.google.com/publisher-tag/reference#googletag.PubAdsService_setForceSafeFrame
+			// googletag.pubads().setForceSafeFrame( true );
+
+			// Get the IAB categories, removing duplicates.
+			// We can have duplicates IAB categories if the parent category and child category 
+			// have the same IAB Marketing Category.
+			const iabCats = [...new Set( [ maiPubAdsVars.iabGlobalCat, maiPubAdsVars.iabCat ].filter( cat => cat ) )];
+			maiPubLog( `googletag.cmd.push(): Got the IAB categories ${iabCats}, removing duplicates: ${iabCats.join( ', ' )}` );
+
+			// If we have IAB categories, set them in the config as Publisher Provided Signals (PPS).
+			if ( iabCats.length ) {
+				/**
+				 * Set Google Publisher Tag config for PPS.
+				 * The docs make it seem like it only supports IAB Content Categories 2.2, not 3.0.
+				 *
+				 * @link https://developers.google.com/publisher-tag/reference#googletag.config.PublisherProvidedSignalsConfig
+				 */
+				googletag.setConfig({
+					pps: {
+						taxonomies: {
+							IAB_CONTENT_2_2: {
+								values: iabCats,
+							},
 						},
 					},
-				},
-			});
-			maiPubLog( `googletag.cmd.push(): setConfig() for PPS:`, {
-				pps: {
-					taxonomies: {
-						IAB_CONTENT_2_2: {
-							values: iabCats,
+				});
+				maiPubLog( `googletag.cmd.push(): setConfig() for PPS IAB_CONTENT_2_2 IAB Categories:`, {
+					pps: {
+						taxonomies: {
+							IAB_CONTENT_2_2: {
+								values: iabCats,
+							},
 						},
 					},
-				},
-			});
-		}
+				});
+			}
 
-		// Disable initial load for header bidding.
-		maiPubLog( `googletag.cmd.push(): googletag.pubads() Disabling initial load for header bidding` );
-		googletag.pubads().disableInitialLoad();
+			// Disable initial load for header bidding.
+			googletag.pubads().disableInitialLoad();
+			maiPubLog( `googletag.cmd.push(): googletag.pubads() Disabling initial load for header bidding` );
 
-		// Enable single request.
-		maiPubLog( `googletag.cmd.push(): googletag.pubads() Enabling single request` );
-		googletag.pubads().enableSingleRequest();
+			// Enable single request.
+			googletag.pubads().enableSingleRequest();
+			maiPubLog( `googletag.cmd.push(): googletag.pubads() Enabling single request` );
 
-		// Make ads centered.
-		maiPubLog( `googletag.cmd.push(): googletag.pubads() Making ads centered` );
-		googletag.pubads().setCentering( true );
+			// Make ads centered.
+			maiPubLog( `googletag.cmd.push(): googletag.pubads() Making ads centered` );
+			googletag.pubads().setCentering( true );
 
-		// If we have a ppid, set it.
-		if ( ppid ) {
-			maiPubLog( `googletag.cmd.push(): googletag.pubads() Setting PPID: ${ppid}` );
-			googletag.pubads().setPublisherProvidedId( ppid );
-		}
+			// If we have a ppid, set it.
+			if ( ppid ) {
+				googletag.pubads().setPublisherProvidedId( ppid );
+				maiPubLog( `googletag.cmd.push(): googletag.pubads() Setting PPID: ${ppid}` );
+			}
 
-		// Set page-level targeting.
-		if ( maiPubAdsVars.targets ) {
-			Object.keys( maiPubAdsVars.targets ).forEach( key => {
-				googletag.pubads().setTargeting( key, maiPubAdsVars.targets[key].toString() );
-				maiPubLog( `googletag.cmd.push(): googletag.pubads() page-level targeting for ${key}:`, googletag.pubads().getTargeting(key) );
-			});
-		}
-	});
+			// Set page-level targeting.
+			if ( maiPubAdsVars.targets ) {
+				Object.keys( maiPubAdsVars.targets ).forEach( key => {
+					googletag.pubads().setTargeting( key, maiPubAdsVars.targets[key].toString() );
+					maiPubLog( `googletag.cmd.push(): googletag.pubads() page-level targeting for ${key}:`, googletag.pubads().getTargeting(key) );
+				});
+			}
+		});
+	} catch (error) {
+		maiPubLog('Error in Google Tag setup:', error);
+	}
 
 	/**
 	 * 2. Observe the BTF ad units.
@@ -729,152 +728,147 @@ function maiPubRun() {
 // TODO:  Not sure the above comment is correct.  This section of code appears to be observing all the ad units
 // and adding them to the slotManager.
 
-	maiPubLog( `Time to identify ad units and observe them` );
-	googletag.cmd.push(() => {
-		// Get all the ad units.
-		const adUnits = document.querySelectorAll( '.mai-ad-unit' );
-		maiPubLog( `googletag.cmd.push(): Got all the ad units ${adUnits}` );
+	maiPubLog( `Ready to identify ad units, add to slot manager, and observe them` );
+	try {
+		googletag.cmd.push(() => {
+			try {
+				// Get all the ad units.
+				const adUnits = document.querySelectorAll( '.mai-ad-unit' );
+				maiPubLog( `googletag.cmd.push(): Found ${adUnits.length} ad units:`, Array.from(adUnits).map(unit => ({
+					id: unit.id,
+					className: unit.className
+				})));
 
-		// Observe each ad unit.
-		adUnits.forEach( adUnit => {
-			// Get slotId.
-			const slotId = adUnit.getAttribute( 'id' );
-			maiPubLog( `Found ad unit: ${slotId}` );
-			// Add the slot to the slotManager.
-			slotManager[ slotId ] = {
-				processing: false,
-				visible: null,
-				lastRefreshTime: 0,
-				firstRender: true,
-			};
-			maiPubLog( `Added to slotManager: ${slotId}` );
-			// Observe the ad unit.
-			observer.observe( adUnit );
-			maiPubLog( `Observed the ad unit: ${adUnit}` );
+				// Observe each ad unit.
+				adUnits.forEach( adUnit => {
+					// Get slotId.
+					const slotId = adUnit.getAttribute( 'id' );
+					maiPubLog( `googletag.cmd.push(): Found ad unit: ${slotId}` );
+					// Add the slot to the slotManager.
+					slotManager[ slotId ] = {
+						processing: false,
+						visible: null,
+						lastRefreshTime: 0,
+						firstRender: true
+					};
+					maiPubLog( `googletag.cmd.push(): Added to slotManager: slotId=${slotId}, data=`, slotManager[slotId] );
+					// Observe the ad unit.
+					observer.observe( adUnit );
+					maiPubLog( `googletag.cmd.push(): Observed the ad unit: ${adUnit.id}, classname: (${adUnit.className})` );
+				});
+				maiPubLog( 'googletag.cmd.push(): Successfully processed all ad units' );
+			} catch (innerError) {
+				maiPubLog( 'googletag.cmd.push(): Error processing ad units:', innerError );
+			}
 		});
-	});
-	maiPubLog( `Done identifying ad units and observing them` );
+	} catch (error) {
+		maiPubLog( 'googletag.cmd.push(): Error in googletag.cmd.push:', error );
+	}
 
 	/**
 	 * 5. Add event listeners to handle refreshable slots.
 	 */
-	googletag.cmd.push(() => {
-		/**
-		 * Update the slot manager when a slot is rendered.
-		 */
-		googletag.pubads().addEventListener( 'slotRenderEnded', (event) => {
-			const slot = event.slot;
+	maiPubLog( `Ready to add event listeners to handle refreshable slots` );
+	try {
+		googletag.cmd.push(() => {
+			try {
+				/**
+				 * Update the slot manager when a slot is rendered.
+				 */
+				googletag.pubads().addEventListener( 'slotRenderEnded', (event) => {
+					const slot = event.slot;
 
-			// Bail if not a Mai Publisher slot.
-			if ( ! maiPubIsMaiSlot( slot ) ) {
-				// Log.
-				maiPubLog( `Slot ${slot.getSlotElementId()} is not a Mai Publisher slot, via slotRenderEnded` );
-				return;
-			}
+					// Bail if not a Mai Publisher slot.
+					if ( ! maiPubIsMaiSlot( slot ) ) {
+						// Log.
+						maiPubLog( `Slot ${slot.getSlotElementId()} is not a Mai Publisher slot, via slotRenderEnded` );
+						return;
+					}
 
-			// Get the slot ID and slug.
-			const slotId = slot.getSlotElementId();
-			const slug   = slotId.replace( 'mai-ad-', '' );
+					// Get the slot ID and slug.
+					const slotId = slot.getSlotElementId();
+					const slug   = slotId.replace( 'mai-ad-', '' );
 
-			// Update the last refresh time and mark processing as complete.
-			slotManager[ slotId ].lastRefreshTime = Date.now();
-			slotManager[ slotId ].processing      = false;
+					// Update the last refresh time and mark processing as complete.
+					slotManager[ slotId ].lastRefreshTime = Date.now();
+					slotManager[ slotId ].processing      = false;
 
-			// Log if the slot is empty.
-			if ( event.isEmpty ) {
-				maiPubLog( `Slot empty: ${slotId}`, {
-					slug: slug,
-					adUnitPath: slot.getAdUnitPath(),
-					sizes: event.size,
-					targeting: slot.getTargetingMap(),
-					event: event,
+					// Log if the slot is empty.
+					if ( event.isEmpty ) {
+						maiPubLog( `Slot empty: ${slotId}`, {
+							slug: slug,
+							adUnitPath: slot.getAdUnitPath(),
+							sizes: event.size,
+							targeting: slot.getTargetingMap(),
+							event: event,
+						});
+					}
+					// Log if the slot is not empty.
+					else {
+						maiPubLog( `Slot filled: ${slotId}`, {
+							slug: slug,
+							adUnitPath: slot.getAdUnitPath(),
+							sizes: event.size,
+							targeting: slot.getTargetingMap(),
+							event: event,
+						});
+					}
+
+					// Bail if not refreshable.
+					if ( ! maiPubIsRefreshable( slot ) ) {
+						maiPubLog( `maiPubRun(): slot ${slotId} is not refreshable` );
+						return;
+					}
+
+					// Set timeout to potentially request the slot later.
+					timeoutManager[ slotId ] = setTimeout( () => {
+						maiPubMaybeRequestSlots( [ slug ] );
+					}, refreshTime );
 				});
-			}
-			// Log if the slot is not empty.
-			else {
-				maiPubLog( `Slot filled: ${slotId}`, {
-					slug: slug,
-					adUnitPath: slot.getAdUnitPath(),
-					sizes: event.size,
-					targeting: slot.getTargetingMap(),
-					event: event,
+
+				/**
+				 * Update the slot manager when a slot's visibility changes.
+				 * This event is fired whenever the on-screen percentage of an ad slot's area changes.
+				 * The event is throttled and will not fire more often than once every 200ms.
+				 *
+				 * @link https://developers.google.com/publisher-tag/reference#googletag.events.SlotVisibilityChangedEvent
+				 */
+				googletag.pubads().addEventListener( 'slotVisibilityChanged', (event) => {
+					const slot = event.slot;
+
+					// Bail if not a Mai Publisher slot.
+					if ( ! maiPubIsMaiSlot( slot ) ) {
+						maiPubLog( `Slot ${slot.getSlotElementId()} is not a Mai Publisher slot, via slotVisibilityChanged` );
+						return;
+					}
+
+					// Bail if not refreshable.
+					if ( ! maiPubIsRefreshable( slot ) ) {
+						return;
+					}
+
+					// Get the slot ID, slug, and check if it's in view.
+					const slotId = slot.getSlotElementId();
+					const slug   = slotId.replace( 'mai-ad-', '' );
+					const inView = event.inViewPercentage > 5;
+
+					// Update the slot manager.
+					slotManager[ slotId ].visible = inView;
+
+					// If the slot is visible, maybe request the slot.
+					if ( inView ) {
+						maiPubMaybeRequestSlots( [ slug ] );
+					}
 				});
-			}
 
-			// Bail if not refreshable.
-			if ( ! maiPubIsRefreshable( slot ) ) {
-				return;
-			}
-
-			// Set timeout to potentially request the slot later.
-			timeoutManager[ slotId ] = setTimeout( () => {
-				maiPubMaybeRequestSlots( [ slug ] );
-			}, refreshTime );
-		});
-
-		/**
-		 * Update the slot manager when a slot's visibility changes.
-		 * This event is fired whenever the on-screen percentage of an ad slot's area changes.
-		 * The event is throttled and will not fire more often than once every 200ms.
-		 *
-		 * @link https://developers.google.com/publisher-tag/reference#googletag.events.SlotVisibilityChangedEvent
-		 */
-		googletag.pubads().addEventListener( 'slotVisibilityChanged', (event) => {
-			const slot = event.slot;
-
-			// Bail if not a Mai Publisher slot.
-			if ( ! maiPubIsMaiSlot( slot ) ) {
-				maiPubLog( `Slot ${slot.getSlotElementId()} is not a Mai Publisher slot, via slotVisibilityChanged` );
-				return;
-			}
-
-			// Bail if not refreshable.
-			if ( ! maiPubIsRefreshable( slot ) ) {
-				return;
-			}
-
-			// Get the slot ID, slug, and check if it's in view.
-			const slotId = slot.getSlotElementId();
-			const slug   = slotId.replace( 'mai-ad-', '' );
-			const inView = event.inViewPercentage > 5;
-
-			// Update the slot manager.
-			slotManager[ slotId ].visible = inView;
-
-			// If the slot is visible, maybe request the slot.
-			if ( inView ) {
-				maiPubMaybeRequestSlots( [ slug ] );
+				maiPubLog( 'googletag.cmd.push(): Successfully added event listeners' );
+			} catch (innerError) {
+				maiPubLog( 'googletag.cmd.push(): Error adding event listeners:', innerError );
 			}
 		});
-
-		// // If debugging, set listeners to log.
-		// if ( debug || log ) {
-		// 	// Log when a slot is requested/fetched.
-		// 	googletag.pubads().addEventListener( 'slotRequested', (event) => {
-		// 		maiPubLog( 'slotRequested:', event.slot, event );
-		// 	});
-
-		// 	// Log when a slot was loaded.
-		// 	googletag.pubads().addEventListener( 'slotOnload', (event) => {
-		// 		maiPubLog( 'slotOnload:', event.slot, event );
-		// 	});
-
-		// 	// Log when a slot response is received.
-		// 	googletag.pubads().addEventListener( 'slotResponseReceived', (event) => {
-		// 		maiPubLog( 'slotResponseReceived:', event.slot, event );
-		// 	});
-
-		// 	// Log when slot render has ended, regardless of whether ad was empty or not.
-		// 	googletag.pubads().addEventListener( 'slotRenderEnded', (event) => {
-		// 		maiPubLog( 'slotRenderEnded:', event.slot, event );
-		// 	});
-
-		// 	// Log when a slot ID visibility changed.
-		// 	googletag.pubads().addEventListener( 'slotVisibilityChanged', (event) => {
-		// 		maiPubLog( 'changed:', event.slot.getSlotElementId(), `${event.inViewPercentage}%` );
-		// 	});
-		// }
-	});
+	} catch (error) {
+		maiPubLog( 'googletag.cmd.push(): Error in googletag.cmd.push for event listeners:', error );
+	}
 }
 
 /**
@@ -887,60 +881,76 @@ function maiPubRun() {
 function maiPubDefineSlot( slug ) {
 	// Get base from context.
 	const base = ads?.[slug]?.['context'] && 'client' === ads[slug]['context'] ? gamBaseClient : gamBase;
+	maiPubLog( `maiPubDefineSlot(): base: ${base}` );
 
 	// Get the slot ID.
-	const slotId = 'mai-ad-' + slug;
+	const slotDivId = 'mai-ad-' + slug;
+	maiPubLog( `maiPubDefineSlot(): slotDivId: ${slotDivId}` );
 
 	// Define slot ID (GAM Path).
 	const gamId = base + ads[slug]['id'];
+	maiPubLog( `maiPubDefineSlot(): GAM Ad Unit Path: ${gamId}` );
+
 
 	// Define the slot and related operations within the command queue.
-	googletag.cmd.push(() => {
-		// Define ad slot. googletag.defineSlot( "/1234567/sports", [728, 90], "div-1" );
-		const slot = googletag.defineSlot( gamId, ads[slug].sizes, slotId );
+	try {
+		googletag.cmd.push(() => {
+			// Define ad slot. googletag.defineSlot( "/1234567/sports", [728, 90], "div-1" );
 
-		// Get it running.
-		slot.addService( googletag.pubads() );
 
-		// Set refresh targeting.
-		slot.setTargeting( refreshKey, refreshValue );
+			// sizes is from config.php
+			const slot = googletag.defineSlot( gamId, ads[slug].sizes, slotDivId );
+			maiPubLog( `maiPubDefineSlot() googletag.cmd.push(): defineSlot: ${gamId}, sizes: ${ads[slug].sizes}, slotDivId: ${slotDivId}` );
 
-		// Set slot-level targeting.
-		if ( ads[slug].targets ) {
-			Object.keys( ads[slug].targets ).forEach( key => {
-				slot.setTargeting( key, ads[slug].targets[key] );
-			});
-		}
+			// Get it running.
+			slot.addService( googletag.pubads() );
+			maiPubLog( `maiPubDefineSlot() googletag.cmd.push(): addService` );
 
-		// Set split testing.
-		if ( ads[slug].splitTest && 'rand' === ads[slug].splitTest ) {
-			// Set 'st' to a value between 0-99.
-			slot.setTargeting( 'st', Math.floor(Math.random() * 100) );
-		}
+			// Set refresh targeting.
+			slot.setTargeting( refreshKey, refreshValue );
+			maiPubLog( `maiPubDefineSlot() googletag.cmd.push(): refreshKey: ${refreshKey}, refreshValue: ${refreshValue}` );
+			
+			// Set slot-level targeting.
+			if ( ads[slug].targets ) {
+				Object.keys( ads[slug].targets ).forEach( key => {
+					slot.setTargeting( key, ads[slug].targets[key] );
+					maiPubLog( `maiPubDefineSlot() googletag.cmd.push(): slot-level targeting: key ${key}, value: ${ads[slug].targets[key]}` );
+				});
+			}
 
-		/**
-		 * Define size mapping.
-		 * If these breakpoints change, make sure to update the breakpoints in the mai-publisher.css file.
-		 */
-		slot.defineSizeMapping(
-			googletag.sizeMapping()
-			.addSize( [ 1024, 768 ], ads[slug].sizesDesktop )
-			.addSize( [ 728, 480 ], ads[slug].sizesTablet )
-			.addSize( [ 0, 0 ], ads[slug].sizesMobile )
-			.build()
-		);
+			// Set split testing.
+			if ( ads[slug].splitTest && 'rand' === ads[slug].splitTest ) {
+				// Set 'st' to a value between 0-99.
+				slot.setTargeting( 'st', Math.floor(Math.random() * 100) );
+				maiPubLog( `maiPubDefineSlot() googletag.cmd.push(): splitTest: ${ads[slug].splitTest}, st: ${Math.floor(Math.random() * 100)}` );
+			}
+			/**
+			 * Define size mapping.
+			 * If these breakpoints change, make sure to update the breakpoints in the mai-publisher.css file.
+			 */
+			slot.defineSizeMapping(
+				googletag.sizeMapping()
+				.addSize( [ 1024, 768 ], ads[slug].sizesDesktop )
+				.addSize( [ 728, 480 ], ads[slug].sizesTablet )
+				.addSize( [ 0, 0 ], ads[slug].sizesMobile )
+				.build()
+			);
+			maiPubLog( `maiPubDefineSlot() googletag.cmd.push(): defineSizeMapping` );
 
-		// Log.
-		maiPubLog( `Defined slot: ${slotId} via ${gamId}`, {
-			gamId: gamId,
-			slot: slot,
-			targets: slot.getTargetingMap(),
-		} );
+			// Log.
+			maiPubLog( `Defined slot: ${slotDivId} via ${gamId}`, {
+				gamId: gamId,
+				slot: slot,
+				targets: slot.getTargetingMap(),
+			} );
 
-		// Add slot to our tracking arrays after it's defined.
-		adGamIds.push( gamId );
-		adSlots.push( slot );
-	});
+			// Add slot to our tracking arrays after it's defined.
+			adGamIds.push( gamId );
+			adSlots.push( slot );
+		});
+	} catch (error) {
+		maiPubLog( 'Error in googletag.cmd.push for slot definition:', error );
+	}
 }
 
 /**
@@ -964,7 +974,7 @@ function maiPubMaybeRequestSlots( slugs ) {
 		}).filter( slot => {
 			// Ensure slot exists (was found and defined).
 			if ( ! slot ) {
-				maiPubLog( `Warning: Slot object not found for slug ${slug} during request check.` );
+				maiPubLog( `maiPubMaybeRequestSlots(): warning: Slot object not found for slug ${slug} during request check.` );
 				return false;
 			}
 
@@ -973,19 +983,19 @@ function maiPubMaybeRequestSlots( slugs ) {
 
 			// If first render, return true, force a request.
 			if ( slotManager[ slotId ].firstRender ) {
-				maiPubLog( `First request for ${slotId}` );
+				maiPubLog( `maiPubMaybeRequestSlots(): first request for ${slotId}` );
 				return true;
 			}
 
 			// Bail if the slot is already being processed.
 			if ( slotManager[ slotId ].processing ) {
-				// maiPubLog( `Skipping request for ${slotId} - already being processed` );
+				maiPubLog( `maiPubMaybeRequestSlots(): skipping request for ${slotId} - already being processed` );
 				return false;
 			}
 
 			// Bail if the slot is not visible.
 			if ( ! slotManager[ slotId ].visible ) {
-				// maiPubLog( `Skipping request for ${slotId} - not visible` );
+				maiPubLog( `maiPubMaybeRequestSlots(): skipping request for ${slotId} - not visible` );
 
 				// Clear the timeout.
 				clearTimeout( timeoutManager[ slotId ] );
@@ -998,12 +1008,10 @@ function maiPubMaybeRequestSlots( slugs ) {
 			if ( slotManager[ slotId ].lastRefreshTime ) {
 				// Bail if the slot has been refreshed too recently.
 				if ( ( now - slotManager[ slotId ].lastRefreshTime ) < refreshTime ) {
-					// maiPubLog( `Skipping request for ${slotId} - ${Math.round( ( now - slotManager[ slotId ].lastRefreshTime ) / 1000 )} seconds since the last refresh` );
+					maiPubLog( `maiPubMaybeRequestSlots(): skipping request for ${slotId} - ${Math.round( ( now - slotManager[ slotId ].lastRefreshTime ) / 1000 )} seconds since the last refresh` );
 					return false;
 				}
-
-				// Log.
-				maiPubLog( `Requesting slot ${slotId} - ${Math.round( ( now - slotManager[ slotId ].lastRefreshTime ) / 1000 )} seconds since the last refresh` );
+				maiPubLog( `maiPubMaybeRequestSlots(): requesting slot ${slotId} - ${Math.round( ( now - slotManager[ slotId ].lastRefreshTime ) / 1000 )} seconds since the last refresh` );
 			}
 
 			return true;
@@ -1073,16 +1081,35 @@ function maiPubRequestSlots( slots ) {
 		}
 
 		// Queue the refresh operation.
-		googletag.cmd.push(() => {
-			// Set the request manager to true and refresh the slots.
-			requestManager.adserverRequestSent = true;
+		try {
+			googletag.cmd.push(() => {
+				// Set the request manager to true and refresh the slots.
+				requestManager.adserverRequestSent = true;
 
-			// Log.
-			maiPubLog( `Sending adserver request: ${slots.map( slot => slot.getSlotElementId() ).join( ', ' )}` );
+				maiPubLog( `sendAdserverRequest(): requestManager() set to true to refresh slots: ${slots.map( slot => slot.getSlotElementId() ).join( ', ' )}` );
 
-			// Refresh the slots.
-			maiPubRefreshSlots( slots );
-		});
+				// Queue the refresh operation.
+				try {
+					// Update firstRender flag.
+					slots.forEach( slot => {
+						const slotId = slot.getSlotElementId();
+						slotManager[ slotId ].firstRender = false;
+					});
+			
+					// Refresh the slots.
+					try {
+						googletag.pubads().refresh( slots, { changeCorrelator: false } );
+						maiPubLog( `sendAdserverRequest(): googletag.pubads().refresh() called for slots ${slots.length} ${1 === slots.length ? 'slot' : 'slots'} via refresh(): ${slots.map( slot => slot.getSlotElementId() ).join( ', ' )}` );
+					} catch (error) {
+						maiPubLog( 'Error calling googletag.pubads().refresh():', error );
+					}
+				} catch (error) {
+					maiPubLog( 'Error refreshing individual slots:', error );
+				}
+			});
+		} catch (error) {
+			maiPubLog( 'Error in queing refresh operation:', error );
+		}
 	}
 
 	// Handle Magnite/DM bids.
@@ -1108,7 +1135,7 @@ function maiPubRequestSlots( slots ) {
 
 						// Log timing information.
 						const prebidResponseTime = Date.now() - prebidStartTime;
-						maiPubLog( `Prebid response time: ${ prebidResponseTime }ms`, {
+						maiPubLog( `sendAdserverRequest(): Prebid response time: ${ prebidResponseTime }ms`, {
 							bids: bids,
 							timedOut: timedOut,
 							auctionId: auctionId
@@ -1116,7 +1143,7 @@ function maiPubRequestSlots( slots ) {
 
 						// If we have all bids, send the adserver request.
 						if ( requestManager.amazonBidsReceived ) {
-							maiPubLog( 'Sending adserver request via Prebid bids' );
+							maiPubLog( 'sendAdserverRequest(): Sending adserver request via Prebid bids' );
 							sendAdserverRequest();
 						}
 					});
@@ -1237,29 +1264,6 @@ function maiPubRequestSlots( slots ) {
 	}, fallbackTimeout );
 }
 
-/**
- * Refreshes slots.
- *
- * @param {array} slots The defined slots.
- *
- * @return {void}
- */
-function maiPubRefreshSlots( slots ) {
-	// Queue the refresh operation.
-	googletag.cmd.push(() => {
-		// Update firstRender flag.
-		slots.forEach( slot => {
-			const slotId = slot.getSlotElementId();
-			slotManager[ slotId ].firstRender = false;
-		});
-
-		// Log.
-		maiPubLog( `Displaying/refreshing ${slots.length} ${1 === slots.length ? 'slot' : 'slots'} via refresh(): ${slots.map( slot => slot.getSlotElementId() ).join( ', ' )}` );
-
-		// Refresh the slots.
-		googletag.pubads().refresh( slots, { changeCorrelator: false } );
-	});
-}
 
 /**
  * Check if a slot is a defined mai ad slot.
