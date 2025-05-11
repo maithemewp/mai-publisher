@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/maithemewp/mai-publisher#readme",
   "devDependencies": {
-    "@wordpress/scripts": "^30.7.0",
+    "@wordpress/scripts": "^30.16.0",
     "glob": "^10.3.10"
   },
   "dependencies": {
