@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.13.1 (5/11/25)
+* Added: extensive logging
+* Added: try catch error handling and reporting
+* Added: wait for pbjs before setting values
+* Added: advanced consent management reporting and checking
+
 ## 1.13.0 (5/9/25)
 * Added: Explicitly checking for consent before running.
 * Added: Passing IAB categories directly to GAM.

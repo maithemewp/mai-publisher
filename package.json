@@ -1,6 +1,6 @@
 {
   "name": "mai-publisher",
-  "version": "1.10.0",
+  "version": "1.13.1",
   "description": "Manage ads and more for websites in the Mai Publisher network.",
   "scripts": {
     "build": "wp-scripts build",
@@ -18,7 +18,10 @@
   },
   "homepage": "https://github.com/maithemewp/mai-publisher#readme",
   "devDependencies": {
-    "@wordpress/scripts": "^27.4.0",
+    "@wordpress/scripts": "^30.7.0",
     "glob": "^10.3.10"
+  },
+  "dependencies": {
+    "node": "^24.0.1"
   }
 }
