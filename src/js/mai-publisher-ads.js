@@ -31,36 +31,11 @@ let   isGeneratingPpid = false;
 let   cmpReady         = false;
 let   matomoReady      = false;
 let   gptInitialized   = false;
-let   maiPubVersion    = 'v236.44';
+let   maiPubVersion    = '237';
 
 
 // If debugging, log.
 maiPubLog( `maiPubVersion: ${ maiPubVersion }` );
-
-
-// Check if we're in debug mode and using minimized version
-// TODO: We should check if we are in debug mode and if we are, we should not load the development version.
-// The build process should be updated to include the debug version in the build.
-/*
-if (debug && document.urrentScript.src.includes('.min.js')) {
-	// Get the non-minimized version path
-	const devScript = document.currentScript.src.replace('.min.js', '.js');
-	
-	// Create and load the development version
-	const script = document.createElement('script');
-	script.src = devScript;
-	script.async = true;
-	
-	// Remove the minimized version
-	document.currentScript.remove();
-	
-	// Add the development version
-	document.head.appendChild(script);
-	
-	// Log the switch and stop execution
-	maiPubLog(`Switching to development version: ${ devScript }`);
-}
-*/
 
 
 // If we have a server-side PPID, log it.
@@ -202,17 +177,31 @@ if ( maiPubAdsVars.magnite ) {
 				}
 			});
 		}
-
+		else {
+			if (typeof pbjs !== 'undefined') {
+				maiPubLog( `Prebid.js pbjs object for MagniteDM undefined, waiting for it to load` );
+			}
+			if (typeof pbjs.que !== 'undefined') {
+				maiPubLog( `Prebid.js pbjs.que for MagniteDM undefined, waiting for it to load` );
+			}
+		}
 	});
-	maiPubLog( `Prebid.js for MagniteDM undefined, waiting for it to load` );
-
-} else {
-	maiPubLog( `MagniteDM disabled for domain, skipping init` );
+	else {
+		maiPubLog( `MagniteDM disabled for domain, skipping init` );
+	}
 }
 
 /**
  * Handle CMP initialization.
  */
+
+// if (__uspapi('getUSPData', 1, function(uspData,success) ){
+// 		maiPubLog( `CMP: getUSPData success, uspData:`, uspData );
+// });
+
+// __gpp('ping',(e)
+
+
 
 if ( 'function' === typeof __tcfapi ) {
 	// Set timeout to proceed with initialization if CMP never responds.
