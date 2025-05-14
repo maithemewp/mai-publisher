@@ -31,7 +31,7 @@ let   isGeneratingPpid = false;
 let   cmpReady         = false;
 let   matomoReady      = false;
 let   gptInitialized   = false;
-let   maiPubVersion    = '237';
+let   maiPubVersion    = '238';
 
 
 // If debugging, log.
@@ -185,11 +185,11 @@ if ( maiPubAdsVars.magnite ) {
 				maiPubLog( `Prebid.js pbjs.que for MagniteDM undefined, waiting for it to load` );
 			}
 		}
-	});
-	else {
-		maiPubLog( `MagniteDM disabled for domain, skipping init` );
-	}
+	}, 100);
 }
+else {
+	maiPubLog( `MagniteDM disabled for domain, skipping init` );
+}		
 
 /**
  * Handle CMP initialization.

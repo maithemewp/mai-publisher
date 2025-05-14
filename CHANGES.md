@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.14.0 (5/11/25)
+## 1.14.1 (5/13/25)
 * Added: extensive logging
 * Added: try catch error handling and reporting
 * Added: pbjs tweaks
