@@ -93,7 +93,7 @@ final class Mai_Publisher_Plugin {
 	private function setup_constants() {
 		// Plugin version.
 		if ( ! defined( 'MAI_PUBLISHER_VERSION' ) ) {
-			define( 'MAI_PUBLISHER_VERSION', '1.14.1' );
+			define( 'MAI_PUBLISHER_VERSION', '1.15.1.1' );
 		}
 
 		// Plugin Folder Path.
