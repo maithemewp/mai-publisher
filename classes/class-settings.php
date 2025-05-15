@@ -204,6 +204,14 @@ class Mai_Publisher_Settings {
 		);
 
 		add_settings_field(
+			'gam_google_tag', // id
+			__( 'Google Tag', 'mai-publisher' ), // title
+			[ $this, 'gam_google_tag_callback' ], // callback
+			'mai-publisher-section', // page
+			'maipub_settings' // section
+		);
+
+		add_settings_field(
 			'gam_hashed_domain', // id
 			__( 'GAM Hashed Domain', 'mai-publisher' ), // title
 			[ $this, 'gam_hashed_domain_callback' ], // callback
