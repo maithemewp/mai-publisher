@@ -456,6 +456,7 @@ class Mai_Publisher_Settings {
 			'ad_mode'                     => 'sanitize_text_field',
 			'gam_domain'                  => 'maipub_get_url_host',
 			'gam_network_code'            => 'absint',
+			'gam_google_tag'              => 'sanitize_text_field',
 			'gam_hashed_domain'           => 'sanitize_text_field',
 			'gam_sellers_id'              => 'sanitize_text_field',
 			'gam_sellers_name'            => 'sanitize_text_field',
