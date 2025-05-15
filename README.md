@@ -5,6 +5,13 @@ Manage ads and more for websites in the Mai Publisher network.
 1. Visit Dashboard > Mai Ads > Settings and configure the settings.
 1. Visit Dashboard > Mai Ads and configure and default ads or add your own.
 
+## Mai Ad Settings
+
+Find Your Google Tag
+Instructions: https://support.google.com/analytics/answer/9539598
+
+
+
 ### How to remove ad sizes from ad units
 ```
 /**

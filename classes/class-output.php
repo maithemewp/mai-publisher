@@ -1,5 +1,19 @@
 <?php
 
+/*
+This class is responsible for outputting the ads.
+
+It is also responsible for handing the following (in this order):
+
+1. Consent Initialization
+2. Async Loading of All Ad Tech Scripts
+- Load Prebid pbjs.js
+- Load Amazon UAM apstag.js
+- Load Google Publisher Tag gpt.js
+3. Utilize respecdtive command queues to manage execution.
+*/
+
+
 // Prevent direct file access.
 defined( 'ABSPATH' ) || die;
 
@@ -60,6 +74,7 @@ class Mai_Publisher_Output {
 		$this->bb_network_code = '23001026477';
 		$this->domain          = (string) maipub_get_option( 'gam_domain' );
 		$this->network_code    = (string) maipub_get_option( 'gam_network_code' );
+		$this->google_tag      = (string) maipub_get_option( 'gam_google_tag' );
 		$this->domain_hashed   = (string) maipub_get_option( 'gam_hashed_domain' );
 		$this->sellers_name    = (string) maipub_get_option( 'gam_sellers_name' );
 		$this->sellers_id      = (string) maipub_get_option( 'gam_sellers_id' );
@@ -76,6 +91,7 @@ class Mai_Publisher_Output {
 			return;
 		}
 
+		// Start output buffering, capturing output for processing before sending to browser.
 		ob_start( [ $this, 'callback' ] );
 	}
 
@@ -338,6 +354,7 @@ class Mai_Publisher_Output {
 				'sellersId'     => $this->sellers_id,
 				'gamBase'       => $gam_base,
 				'gamBaseClient' => $gam_base_client,
+				'googleTag'     => $this->google_tag,
 				'ads'           => $this->gam,
 				'targets'       => $this->get_targets(),
 				'dcSeg'         => (array) $dc_seg,
@@ -354,6 +371,21 @@ class Mai_Publisher_Output {
 					'enabled' => maipub_matomo_enabled(),
 				],
 			];
+
+			// The first script we need to load inline is the google tag.
+			// 
+			if ( $localize['googleTag'] ) {
+				$scripts[] = 
+					'<!-- Google tag (gtag.js) -->
+					<script async src="https://www.googletagmanager.com/gtag/js?id=' . $localize['googleTag'] . '"></script>
+					<script>
+						window.dataLayer = window.dataLayer || [];
+						function gtag(){dataLayer.push(arguments);}
+						gtag(\'js\', new Date());
+						
+						gtag(\'config\', \'' . $localize['googleTag'] . '\');
+					</script>';
+			}
 
 			// If magnite is enabled.
 			if ( $localize['magnite'] ) {
@@ -446,9 +478,10 @@ class Mai_Publisher_Output {
 		// $load_connatix = apply_filters( 'mai_publisher_load_connatix', $has_connatix );
 
 		// If we have connatix ads.
+		// dws122: adding async to the connatix script.
 		if ( $load_connatix ) {
 			$preconnects[] = '<link rel="preconnect" href="https://capi.connatix.com">';
-			$scripts[]     = "<script id=\"mai-publisher-connatix\">!function(n){if(!window.cnx){window.cnx={},window.cnx.cmd=[];var t=n.createElement('iframe');t.src='javascript:false'; t.display='none',t.onload=function(){var n=t.contentWindow.document,c=n.createElement('script');c.src='//cd.connatix.com/connatix.player.js?cid=db8b4096-c769-48da-a4c5-9fbc9ec753f0',c.setAttribute('async','1'),c.setAttribute('type','text/javascript'),n.body.appendChild(c)},n.head.appendChild(t)}}(document);</script>";
+			$scripts[]     = "<script async id=\"mai-publisher-connatix\">!function(n){if(!window.cnx){window.cnx={},window.cnx.cmd=[];var t=n.createElement('iframe');t.src='javascript:false'; t.display='none',t.onload=function(){var n=t.contentWindow.document,c=n.createElement('script');c.src='//cd.connatix.com/connatix.player.js?cid=db8b4096-c769-48da-a4c5-9fbc9ec753f0',c.setAttribute('async','1'),c.setAttribute('type','text/javascript'),n.body.appendChild(c)},n.head.appendChild(t)}}(document);</script>";
 		}
 
 		// Allow filtering the scripts.
