@@ -1,2 +1,134 @@
-!function(){var t=window._paq=window._paq||[],e=maiPubAnalyticsVars.analytics,n=e[0],a=e.slice(1);const o=window.location.search.includes("dfpdeb")||window.location.search.includes("maideb")||window.location.search.includes("pbjs_debug=true"),c="undefined"!=typeof maiPubAdsVars&&maiPubAdsVars.debug;function i(...t){if(!o&&!c)return;let e="maipub analytics ";const n=Date.now(),a=(new Date).toLocaleTimeString("en-US",{hour12:!0});timestamp===n?e+="start":e+=n-timestamp+"ms",console.log(`${e} ${a}`,t)}!function(){t.push(["setTrackerUrl",n.url+"matomo.php"]),t.push(["setSiteId",n.id]);for(const e in a)t.push(["addTracker",a[e].url+"matomo.php",a[e].id]);var e=document,o=e.createElement("script"),c=e.getElementsByTagName("script")[0];o.async=!0,o.src=n.url+"matomo.js",c.parentNode.insertBefore(o,c)}(),window.matomoAsyncInit=function(){const t=new CustomEvent("beforeMaiPublisherAnalytics",{detail:maiPubAnalyticsVars,cancelable:!0});document.dispatchEvent(t);for(const t in e)try{const o=Matomo.getTracker(e[t].url+"matomo.php",e[t].id);for(const c in e[t].toPush){var n=e[t].toPush[c][0],a=e[t].toPush[c].slice(1);(a=a||null)?o[n](...a):o[n]()}const c=new CustomEvent("maiPublisherAnalyticsInit",{detail:{tracker:o},cancelable:!0});document.dispatchEvent(c),e[t].ajaxUrl&&e[t].body&&fetch(e[t].ajaxUrl,{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/x-www-form-urlencoded","Cache-Control":"no-cache"},body:new URLSearchParams(e[t].body)}).then((function(t){if(!t.ok)throw new Error(t.statusText);return t.json()})).then((function(t){})).catch((function(t){i(t)}))}catch(t){i(t)}}}();
+/******/ (() => { // webpackBootstrap
+/*!*******************************************!*\
+  !*** ./src/js/mai-publisher-analytics.js ***!
+  \*******************************************/
+/**
+ * Run Matomo instance.
+ *
+ * @since 0.1.0
+ */
+(function () {
+  var _paq = window._paq = window._paq || [];
+  var analytics = maiPubAnalyticsVars.analytics;
+  var analyticsPrimary = analytics[0];
+  var analyticsMore = analytics.slice(1);
+  const debug = window.location.search.includes('dfpdeb') || window.location.search.includes('maideb') || window.location.search.includes('pbjs_debug=true');
+  const log = 'undefined' !== typeof maiPubAdsVars ? maiPubAdsVars.debug : false;
+
+  /**
+   * Sets up trackers.
+   */
+  (function () {
+    _paq.push(['setTrackerUrl', analyticsPrimary.url + 'matomo.php']);
+    _paq.push(['setSiteId', analyticsPrimary.id]);
+    for (const key in analyticsMore) {
+      _paq.push(['addTracker', analyticsMore[key].url + 'matomo.php', analyticsMore[key].id]);
+    }
+    var d = document,
+      g = d.createElement('script'),
+      s = d.getElementsByTagName('script')[0];
+    g.async = true;
+    g.src = analyticsPrimary.url + 'matomo.js';
+    s.parentNode.insertBefore(g, s);
+  })();
+
+  /**
+   * Handles all trackers asyncronously.
+   */
+  window.matomoAsyncInit = function () {
+    // Dispatch custom event before processing analytics.
+    const event = new CustomEvent('beforeMaiPublisherAnalytics', {
+      detail: maiPubAnalyticsVars,
+      cancelable: true
+    });
+    document.dispatchEvent(event);
+
+    // Continue with existing tracker code
+    for (const tracker in analytics) {
+      try {
+        const matomoTracker = Matomo.getTracker(analytics[tracker].url + 'matomo.php', analytics[tracker].id);
+
+        // Loop through and push items.
+        for (const key in analytics[tracker].toPush) {
+          var func = analytics[tracker].toPush[key][0];
+          var vals = analytics[tracker].toPush[key].slice(1);
+          vals = vals ? vals : null;
+          if (vals) {
+            matomoTracker[func](...vals);
+          } else {
+            matomoTracker[func]();
+          }
+        }
+
+        // Dispatch custom event after processing analytics.
+        const trackerEvent = new CustomEvent('maiPublisherAnalyticsInit', {
+          detail: {
+            tracker: matomoTracker
+          },
+          cancelable: true
+        });
+        document.dispatchEvent(trackerEvent);
+
+        // If we have an ajax url and body, update the views.
+        if (analytics[tracker].ajaxUrl && analytics[tracker].body) {
+          // Send ajax request.
+          fetch(analytics[tracker].ajaxUrl, {
+            method: "POST",
+            credentials: 'same-origin',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'Cache-Control': 'no-cache'
+            },
+            body: new URLSearchParams(analytics[tracker].body)
+          }).then(function (response) {
+            if (!response.ok) {
+              throw new Error(response.statusText);
+            }
+            return response.json();
+          }).then(function (data) {}).catch(function (error) {
+            maiPubAnalyticsLog(error);
+          });
+        }
+      } catch (error) {
+        maiPubAnalyticsLog(error);
+      }
+    }
+  };
+
+  /**
+   * Log if debugging.
+   *
+   * @param {mixed} mixed The data to log.
+   *
+   * @return {void}
+   */
+  function maiPubAnalyticsLog(...mixed) {
+    if (!(debug || log)) {
+      return;
+    }
+
+    // Set log variables.
+    let timer = 'maipub analytics ';
+
+    // Set times.
+    const current = Date.now();
+    const now = new Date().toLocaleTimeString('en-US', {
+      hour12: true
+    });
+
+    // If first, start.
+    if (timestamp === current) {
+      timer += 'start';
+    }
+    // Not first, add time since.
+    else {
+      timer += current - timestamp + 'ms';
+    }
+
+    // Log the combined message.
+    console.log(`${timer} ${now}`, mixed);
+  }
+})();
+/******/ })()
+;
 //# sourceMappingURL=mai-publisher-analytics.js.map
