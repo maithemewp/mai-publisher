@@ -31,7 +31,7 @@ let   isGeneratingPpid = false;
 let   cmpReady         = false;
 let   matomoReady      = false;
 let   gptInitialized   = false;
-let   maiPubVersion    = '238';
+let   maiPubVersion    = '239.beta3';
 
 
 // If debugging, log.
