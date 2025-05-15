@@ -615,6 +615,17 @@ class Mai_Publisher_Settings {
 	/**
 	 * Setting callback.
 	 *
+	 * @since 0.5.1
+	 *
+	 * @return void
+	 */
+	function gam_google_tag_callback() {
+		printf( '<input class="regular-text" type="text" name="mai_publisher[gam_google_tag]" id="gam_google_tag" value="%s">', maipub_get_option( 'gam_google_tag', false ) );
+	}
+
+	/**
+	 * Setting callback.
+	 *
 	 * @since 0.11.0?
 	 *
 	 * @return void
