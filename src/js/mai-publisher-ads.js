@@ -37,6 +37,13 @@ let   maiPubVersion    = '238';
 // If debugging, log.
 maiPubLog( `maiPubVersion: ${ maiPubVersion }` );
 
+// if we have a google tag, log it.
+if ( maiPubAdsVars.googleTag ) {
+	maiPubLog( `Google Tag: ${ maiPubAdsVars.googleTag }` );
+}
+else {
+	maiPubLog( `No Google Tag found` );
+}
 
 // If we have a server-side PPID, log it.
 if ( serverPpid ) {
